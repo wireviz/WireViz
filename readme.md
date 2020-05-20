@@ -13,10 +13,10 @@ It is based on GraphViz and designed as an "extension" of it. A parser reads a W
   * Human readable
   * Easy version control
   * GraphViz-like syntax
-* Understands and uses color abbreviations as per IEC 60757
+* Understands and uses color abbreviations as per [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) (black=BK, red=RD, ...)
 * Auto-generates standard wire color schemes and allows custom ones if needed
-  * DIN 47100 (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
-  * IEC ???   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
+  * [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100) (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
+  * [IEC 62](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
 * Allows more than one connector per side, as well as loopbacks
 * Will include images of known connectors, together with their pinouts
 
