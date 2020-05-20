@@ -13,6 +13,7 @@ It is based on GraphViz and designed as an "extension" of it. A parser reads a W
   * Human readable
   * Easy version control
   * GraphViz-like syntax
+* Understands and uses color abbreviations as per IEC 60757
 * Auto-generates standard wire color schemes and allows custom ones if needed
   * DIN 47100 (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
   * IEC ???   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
