@@ -6,7 +6,7 @@ digraph G {
     X1[label="X1 | D-Sub DE-9 | female | {{DCD|RX|TX|DTR|GND|DSR|RTS|CTS|RI} | {<p1>1|<p2>2|<p3>3|<p4>4|<p5>5|<p6>6|<p7>7|<p8>8|<p9>9}} "];
     X2[label="X2 | Molex KK 254 6-pin | female | {{<p1>1|<p2>2|<p3>3|<p4>4|<p5>5|<p6>6} | {GND|RX|TX|NC|OUT|IN}}"];
 
-    W1[label="W1 | 3x 0,25 mm² shielded | 0.2 m | {{<w1i>1|<w2i>2|<w3i>3|<wsi>}|{WT|BN|GN|Shield}|{<w1o>1|<w2o>2|<w3o>3|<wsi>}}}"];
+    W1[label="W1 | 3x 0,25 mm² shielded | 0.2 m | {{<w1i>1|<w2i>2|<w3i>3|<wsi>}|{WH|BN|GN|Shield}|{<w1o>1|<w2o>2|<w3o>3|<wsi>}}}"];
 
     {edge[style=bold]
         {edge[color="#000000:#ffffff:#000000"] X1:p5 -> W1:w1i; W1:w1o -> X2:p1; }
