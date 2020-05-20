@@ -1,0 +1,47 @@
+graph G {
+    graph [rankdir = LR, ranksep=2, fontname = "arial"];
+    edge [arrowhead=none, fontname = "arial"];
+    node [shape=record, style=rounded, fontname = "arial"];
+
+    X1[label="X1 | Molex KK 254 8-pin | female | {{GND|VCC|SCL|SDA|MISO|MOSI|SCK|N/C} | {<p1>1|<p2>2|<p3>3|<p4>4|<p5>5|<p6>6|<p7>7|<p8>8}} "];
+    X2[label="X2 | Molex KK 254 4-pin | female | {{<p1>1|<p2>2|<p3>3|<p4>4} | {GND|VCC|SCL|SDA}}"];
+    X3[label="X3 | Molex KK 254 4-pin | female | {{<p1>1|<p2>2|<p3>3|<p4>4} | {GND|VCC|SCL|SDA}}"];
+    X4[label="X4 | Molex KK 254 5-pin | female | {{<p1>1|<p2>2|<p3>3|<p4>4|<p5>5} | {GND|VCC|MISO|MOSI|SCK}}"];
+
+    W1[label="W1 | 4x 0,14 mm² | 0.2 m | {{<w1i>1|<w2i>2|<w3i>3|<w4i>4}|{BK|RD|YE|GN}|{<w1o>1|<w2o>2|<w3o>3|<w4o>4}}}"];
+    W2[label="W2 | 4x 0,14 mm² | 0.2 m | {{<w1i>1|<w2i>2|<w3i>3|<w4i>4}|{BK|RD|YE|GN}|{<w1o>1|<w2o>2|<w3o>3|<w4o>4}}}"];
+    W3[label="W3 | 5x 0,14 mm² | 0.2 m | {{<w1i>1|<w2i>2|<w3i>3|<w4i>4|<w5i>5}|{BK|RD|BU|OR|VT}|{<w1o>1|<w2o>2|<w3o>3|<w4o>4|<w5o>5}}}"];
+
+    {edge[style=bold]
+        // GND
+        {edge[color="#000000:#000000:#000000"]
+            X1:p1 -- W1:w1i; W1:w1o -- X2:p1;
+            X1:p1 -- W2:w1i; W2:w1o -- X3:p1;
+            X1:p1 -- W3:w1i; W3:w1o -- X4:p1;
+        }
+
+        // VCC
+        {edge[color="#000000:#ff0000:#000000"]
+            X1:p2 -- W1:w2i; W1:w2o -- X2:p2;
+            X1:p2 -- W2:w2i; W2:w2o -- X3:p2;
+            X1:p2 -- W3:w2i; W3:w2o -- X4:p2;
+        }
+
+        // SCL
+        {edge[color="#000000:#ffff00:#000000"]
+            X1:p3 -- W1:w3i; W1:w3o -- X2:p3;
+            X1:p3 -- W2:w3i; W2:w3o -- X3:p3;
+        }
+
+        // SDA
+        {edge[color="#000000:#008000:#000000"]
+            X1:p4 -- W1:w4i; W1:w4o -- X2:p4;
+            X1:p4 -- W2:w4i; W2:w4o -- X3:p4;
+        }
+
+        // SPI
+        {edge[color="#0000:#0080ff:#000000"] X1:p5 -- W3:w3i; W3:w3o -- X4:p3; }
+        {edge[color="#0000:#ff8000:#000000"] X1:p6 -- W3:w4i; W3:w4o -- X4:p4; }
+        {edge[color="#0000:#8000ff:#000000"] X1:p7 -- W3:w5i; W3:w5o -- X4:p5; }
+    }
+}
