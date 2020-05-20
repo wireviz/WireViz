@@ -8,9 +8,11 @@ digraph G {
 
     W1[label="W1 | 3x 0,25 mm² shielded | 0.2 m | {{<w1i>1|<w2i>2|<w3i>3|<wsi>}|{WT|BN|GN|Shield}|{<w1o>1|<w2o>2|<w3o>3|<wsi>}}}"];
 
-    X1:p5 -> W1:w1i; W1:w1o -> X2:p1;
-    X1:p2 -> W1:w2i; W1:w2o -> X2:p3;
-    X1:p3 -> W1:w3i; W1:w3o -> X2:p2;
-    X1:p5 -> W1:wsi;
-    X2:p5:w -> X2:p6:w
+    {edge[style=bold]
+        {edge[color="#000000:#ffffff:#000000"] X1:p5 -> W1:w1i; W1:w1o -> X2:p1; }
+        {edge[color="#000000:#666600:#000000"] X1:p2 -> W1:w2i; W1:w2o -> X2:p3; }
+        {edge[color="#000000:#00ff00:#000000"] X1:p3 -> W1:w3i; W1:w3o -> X2:p2; }
+        X1:p5 -> W1:wsi;
+        X2:p5:w -> X2:p6:w;
+    }
 }
