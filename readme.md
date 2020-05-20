@@ -4,7 +4,7 @@
 
 WireViz is a simple yet flexible markup language for documenting wires and connector pinouts with beautiful graphical output.
 
-It is based on GraphViz and designed as an "extension" of it. A parser reads a WireViz file and generates valid GraphViz output, which can instantly be rendered to SVG/PNG.
+It is based on [GraphViz](https://www.graphviz.org/) and designed as an "extension" of it. A parser reads a WireViz file and generates valid GraphViz output, which can instantly be rendered to SVG/PNG.
 
 ## Features
 
