@@ -281,3 +281,23 @@ class Cable:
         s = s + '}'
 
         return s
+
+def output(objects, print_to_screen=False):
+    with open('output/output.dot','w') as f:
+        with open('input/header.dot','r') as infile:
+            for line in infile:
+                f.write(line)
+        f.write('\n\n')
+
+        for o in objects:
+            f.write(o.graphviz() + '\n')
+
+        f.write('\n\n')
+        with open('input/footer.dot','r') as infile:
+            for line in infile:
+                f.write(line)
+
+    if print_to_screen == True:
+        with open('output/output.dot','r') as f:
+            for line in f:
+                print(line)
