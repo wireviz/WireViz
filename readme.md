@@ -94,6 +94,18 @@ This is very much a work in progress, and mainly an idea in my head.
 A Python module and test scripts is available. Running the test script will generate GraphViz output.
 The parser will follow later; contributions are welcome!
 
+# To do
+
+* Automate creation of left/right side ports for connectors
+* Add simple connectors (ferrules, cable lugs)
+  * no pinout
+  * graphical representation?
+* Add support for cable splicing (as connector type)
+* Display picture of connector underneath (including pin 1 location)
+* Create parser (to make WireViz work as a GraphViz extension)
+* Automatic BOM generation
+
+
 ## License
 
 GNU GPLv3
