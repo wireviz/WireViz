@@ -10,7 +10,7 @@ PINOUT_SPI_DATAONLY = ('MISO','MOSI','SCK')
 # example 1
 X1 = wireviz.Node('X1', type='D-Sub DE-9', gender='female', pinout=PINOUT_SERIAL, ports_right=True)
 X2 = wireviz.Node('X2', type='Molex KK 254', gender='female', num_pins=6, ports_left=True)
-W1 = wireviz.Cable('W1', mm2=0.25, length=0.2, show_name=False, num_wires=3, color_code='DIN', shield=True)
+W1 = wireviz.Cable('W1', mm2=0.25, length=0.2, show_name=False, show_pinout=False, num_wires=3, color_code='DIN', shield=True)
 # Option 1: define wires and shield in one line
 # W1.connect(X1,(5,2,3,5),(1,2,3,'s'),X2,(1,3,2,None))
 # Option 2: define wires and shield separately

@@ -110,12 +110,13 @@ class Node:
 
 class Cable:
 
-    def __init__(self, name, mm2=0, awg=0, length=0, show_name=False, num_wires=None, colors=None, color_code=None, shield=False):
+    def __init__(self, name, mm2=0, awg=0, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.name = name
         self.mm2 = mm2
         self.awg = awg
         self.length = length
         self.show_name = show_name
+        self.show_pinout = show_pinout
         self.shield = shield
         self.connections = []
         if color_code is None and colors is None:
@@ -193,29 +194,39 @@ class Cable:
 
         s = s + '{'
         # print pinout
-        s = s + '{'
-        l = []
-        for i,x in enumerate(self.colors,1):
-            l.append('<w{wireno}i>{wireno}'.format(wireno=i))
-        s = s + '|'.join(l)
-        if self.shield == True:
-            s = s + '|<wsi>'
-        s = s + '} | '
+        if self.show_pinout:
+            s = s + '{'
+            l = []
+            for i,x in enumerate(self.colors,1):
+                l.append('<w{wireno}i>{wireno}'.format(wireno=i))
+            s = s + '|'.join(l)
+            if self.shield == True:
+                s = s + '|<wsi>'
+            s = s + '} | '
 
         s = s + '{'
-        s = s + '|'.join(self.colors)
-        if self.shield == True:
-            s = s + '|Shield'
+        if self.show_pinout:
+            s = s + '|'.join(self.colors)
+            if self.shield == True:
+                s = s + '|Shield'
+        else:
+            l = []
+            for i,x in enumerate(self.colors,1):
+                l.append('<w{wireno}>{wirecolor}'.format(wireno=i,wirecolor=x))
+            s = s + '|'.join(l)
+            if self.shield == True:
+                s = s + '|<ws>Shield'
         s = s + '}'
 
-        s = s + ' | {'
-        l = []
-        for i,x in enumerate(self.colors,1):
-            l.append('<w{wireno}o>{wireno}'.format(wireno=i))
-        s = s + '|'.join(l)
-        if self.shield == True:
-            s = s + '|<wso>'
-        s = s + '}'
+        if self.show_pinout:
+            s = s + ' | {'
+            l = []
+            for i,x in enumerate(self.colors,1):
+                l.append('<w{wireno}o>{wireno}'.format(wireno=i))
+            s = s + '|'.join(l)
+            if self.shield == True:
+                s = s + '|<wso>'
+            s = s + '}'
 
         s = s + '}}"]'
 
@@ -228,10 +239,10 @@ class Cable:
                 if search_color in color_dict:
                     s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_dict[search_color])
             if x[1] is not None:
-                t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}i; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2])
+                t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}{via_subport}; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2], via_subport='i' if self.show_pinout == True else '')
                 s = s + t
             if x[4] is not None:
-                t = '{via_name}:w{via_wire}o -> {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4])
+                t = '{via_name}:w{via_wire}{via_subport} -> {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4], via_subport='o' if self.show_pinout == True else '')
                 s = s + t
             s = s + '}\n'
         s = s + '}'
