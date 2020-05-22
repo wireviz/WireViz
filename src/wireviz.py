@@ -43,9 +43,6 @@ class Harness:
         self.objects[object.name] = object
         self.objects[object.name].color_mode = self.color_mode
 
-    def debug(self):
-        print(self.objects)
-
     def graphviz(self, print_to_screen=False):
         with open('output/output.dot','w') as f:
             with open('input/header.dot','r') as infile:
@@ -210,18 +207,6 @@ class Cable:
 
     def connect_all_straight(self, from_name, to_name):
         self.connect(from_name, 'auto', 'auto', to_name, 'auto')
-
-    def debug(self):
-        print(self.name)
-        print(self.colors)
-        if len(self.connections) > 0:
-            for i, x in enumerate(self.connections):
-                if i < len(self.colors):
-                    s = self.colors[int(x[2]-1)]
-                else:
-                    s = '--'
-                # print(self.colors(x[2]) if i < len(self.colors) else '-')
-                print('{}:{} -- {}({}) -- {}:{}'.format(x[0],x[1],x[2],s,x[3],x[4]))
 
     def graphviz(self):
         s = ''
