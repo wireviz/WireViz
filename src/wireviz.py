@@ -175,26 +175,26 @@ class Cable:
                 if num_wires is None:
                     raise Exception('Unknown number of wires')
                 else:
+                    if color_code is None:
+                        raise Exception('No color code')
                     # choose color code
                     if color_code not in COLOR_CODES:
                         raise Exception('Unknown color code')
                     else:
                         cc = COLOR_CODES[color_code]
-
-                    cc = tuple(cc)
-                    if num_wires <= len(cc):
-                        self.colors = cc[:num_wires]
-                    else:
-                         n = num_wires / len(cc) + 1
-                         cc = cc * int(n)
-                         self.colors = cc[:num_wires]
-
+                n = num_wires
             else: # custom color pallet was specified
+                cc = colors
                 if num_wires is None: # assume number of wires = number of items in custom pallet
-                    self.colors = colors
+                    n = len(cc)
                 else: # number of wires was specified
-                    # TODO: loop through colors if num_wires > len(colors)
-                    self.colors = colors[:num_wires]
+                    n = num_wires
+
+            cc = tuple(cc)
+            if n > len(cc):
+                 m = num_wires // len(cc) + 1
+                 cc = cc * int(m)
+            self.colors = cc[:n]
 
     def connect(self, from_name, from_pin, via, to_name, to_pin):
         if from_pin == 'auto':
@@ -270,20 +270,23 @@ class Cable:
         else:
             l = []
             for i,x in enumerate(self.colors,1):
-                if self.color_mode == 'full':
-                    x = color_full[x].lower()
-                elif self.color_mode == 'FULL':
-                    x = color_hex[x].upper()
-                elif self.color_mode == 'hex':
-                    x = color_hex[x].lower()
-                elif self.color_mode == 'HEX':
-                    x = color_hex[x].upper()
-                elif self.color_mode == 'short':
-                    x = x.lower()
-                elif self.color_mode == 'SHORT':
-                    x = x.upper()
+                if x in color_full:
+                    if self.color_mode == 'full':
+                        x = color_full[x].lower()
+                    elif self.color_mode == 'FULL':
+                        x = color_hex[x].upper()
+                    elif self.color_mode == 'hex':
+                        x = color_hex[x].lower()
+                    elif self.color_mode == 'HEX':
+                        x = color_hex[x].upper()
+                    elif self.color_mode == 'short':
+                        x = x.lower()
+                    elif self.color_mode == 'SHORT':
+                        x = x.upper()
+                    else:
+                        raise Exception('Unknown color mode')
                 else:
-                    raise Exception('Unknown color mode')
+                    x = ''
                 l.append('<w{wireno}>{wirecolor}'.format(wireno=i,wirecolor=x))
             s = s + '|'.join(l)
             if self.shield == True:
