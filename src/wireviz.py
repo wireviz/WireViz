@@ -93,6 +93,7 @@ class Cable:
     def __init__(self, name, show_name=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.name = name
         self.show_name = show_name
+        self.shield = shield
         self.connections = []
         if color_code is None and colors is None:
             self.colors = ("",) * num_wires
@@ -113,8 +114,8 @@ class Cable:
                     self.colors = colors
                 else:
                     self.colors = colors[:num_wires]
-        if shield == True:
-            self.colors = self.colors + ('Shield',)
+        # if shield == True:
+        #     self.colors = self.colors + ('Shield',)
 
     def connect(self, from_name, from_pin, via, to_name, to_pin):
         if from_pin == 'auto':
@@ -161,10 +162,14 @@ class Cable:
         for i,x in enumerate(self.colors,1):
             l.append('<w{wireno}i>{wireno}'.format(wireno=i))
         s = s + '|'.join(l)
+        if self.shield == True:
+            s = s + '|<wsi>'
         s = s + '} | '
 
         s = s + '{'
         s = s + '|'.join(self.colors)
+        if self.shield == True:
+            s = s + '|Shield'
         s = s + '}'
 
         s = s + ' | {'
@@ -172,6 +177,8 @@ class Cable:
         for i,x in enumerate(self.colors,1):
             l.append('<w{wireno}o>{wireno}'.format(wireno=i))
         s = s + '|'.join(l)
+        if self.shield == True:
+            s = s + '|<wso>'
         s = s + '}'
 
         s = s + '}}"]'
@@ -179,11 +186,16 @@ class Cable:
         s = s + '\n\n{edge[style=bold]\n'
         for x in self.connections:
             s = s + '{'
-            search_color = self.colors[x[2]-1]
-            if search_color in color_dict:
-                s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_dict[search_color])
-            t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}i; {via_name}:w{via_wire}o -> {to_name}:p{to_port}'.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4])
-            s = s + t
+            if isinstance(x[2], int):
+                search_color = self.colors[x[2]-1]
+                if search_color in color_dict:
+                    s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_dict[search_color])
+            if x[1] is not None:
+                t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}i; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2])
+                s = s + t
+            if x[4] is not None:
+                t = '{via_name}:w{via_wire}o -> {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4])
+                s = s + t
             s = s + '}\n'
         s = s + '}'
 
