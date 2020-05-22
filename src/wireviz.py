@@ -171,17 +171,29 @@ class Cable:
         if color_code is None and colors is None:
             self.colors = ('',) * num_wires
         else:
-            if colors is None:
+            if colors is None: # no custom color pallet was specified
                 if num_wires is None:
                     raise Exception('Unknown number of wires')
                 else:
                     # choose color code
                     if color_code not in COLOR_CODES:
                         raise Exception('Unknown color code')
-            else:
-                if num_wires is None:
+                    else:
+                        cc = COLOR_CODES[color_code]
+
+                    cc = tuple(cc)
+                    if num_wires <= len(cc):
+                        self.colors = cc[:num_wires]
+                    else:
+                         n = num_wires / len(cc) + 1
+                         cc = cc * int(n)
+                         self.colors = cc[:num_wires]
+
+            else: # custom color pallet was specified
+                if num_wires is None: # assume number of wires = number of items in custom pallet
                     self.colors = colors
-                else:
+                else: # number of wires was specified
+                    # TODO: loop through colors if num_wires > len(colors)
                     self.colors = colors[:num_wires]
 
     def connect(self, from_name, from_pin, via, to_name, to_pin):
