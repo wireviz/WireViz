@@ -32,7 +32,38 @@ color_full = {
              'BN': 'brown',
 }
 
-color_mode = 'SHORT'
+class Harness:
+
+    def __init__(self):
+        self.color_mode = 'SHORT'
+        self.objects = {}
+
+    def add(self, object):
+        self.objects[object.name] = object
+        self.objects[object.name].color_mode = self.color_mode
+
+    def debug(self):
+        print(self.objects)
+
+    def graphviz(self, print_to_screen=False):
+        with open('output/output.dot','w') as f:
+            with open('input/header.dot','r') as infile:
+                for line in infile:
+                    f.write(line)
+            f.write('\n\n')
+
+            for o in self.objects:
+                f.write(self.objects[o].graphviz() + '\n')
+
+            f.write('\n\n')
+            with open('input/footer.dot','r') as infile:
+                for line in infile:
+                    f.write(line)
+
+        if print_to_screen == True:
+            with open('output/output.dot','r') as f:
+                for line in f:
+                    print(line)
 
 class Node:
 
@@ -44,6 +75,7 @@ class Node:
         self.ports_left = ports_left
         self.ports_right = ports_right
         self.loops = []
+        self.color_mode = 'SHORT'
 
         if pinout is None:
             self.pinout = ('',) * num_pins
@@ -65,12 +97,6 @@ class Node:
             else:
                 loop_side = side
         self.loops.append((from_pin, to_pin, loop_side))
-
-    def __repr__(self):
-        return '{} = {} {}'.format(self.name, len(self.pinout), self.pinout)
-
-    def __str__(self):
-        return '{}'.format(self.name)
 
     def graphviz(self):
         s = ''
@@ -137,6 +163,7 @@ class Cable:
         self.show_pinout = show_pinout
         self.shield = shield
         self.connections = []
+        self.color_mode = 'SHORT'
         if color_code is None and colors is None:
             self.colors = ('',) * num_wires
         else:
@@ -171,9 +198,6 @@ class Cable:
 
     def connect_all_straight(self, from_name, to_name):
         self.connect(from_name, 'auto', 'auto', to_name, 'auto')
-
-    def __repr__(self):
-        return '{} = {} {}\n     {}'.format(self.name, len(self.colors), self.colors, self.connections)
 
     def debug(self):
         print(self.name)
@@ -231,17 +255,17 @@ class Cable:
         else:
             l = []
             for i,x in enumerate(self.colors,1):
-                if color_mode == 'full':
+                if self.color_mode == 'full':
                     x = color_full[x].lower()
-                elif color_mode == 'FULL':
+                elif self.color_mode == 'FULL':
                     x = color_hex[x].upper()
-                elif color_mode == 'hex':
+                elif self.color_mode == 'hex':
                     x = color_hex[x].lower()
-                elif color_mode == 'HEX':
+                elif self.color_mode == 'HEX':
                     x = color_hex[x].upper()
-                elif color_mode == 'short':
+                elif self.color_mode == 'short':
                     x = x.lower()
-                elif color_mode == 'SHORT':
+                elif self.color_mode == 'SHORT':
                     x = x.upper()
                 else:
                     raise Exception('Unknown color mode')
@@ -281,23 +305,3 @@ class Cable:
         s = s + '}'
 
         return s
-
-def output(objects, print_to_screen=False):
-    with open('output/output.dot','w') as f:
-        with open('input/header.dot','r') as infile:
-            for line in infile:
-                f.write(line)
-        f.write('\n\n')
-
-        for o in objects:
-            f.write(o.graphviz() + '\n')
-
-        f.write('\n\n')
-        with open('input/footer.dot','r') as infile:
-            for line in infile:
-                f.write(line)
-
-    if print_to_screen == True:
-        with open('output/output.dot','r') as f:
-            for line in f:
-                print(line)
