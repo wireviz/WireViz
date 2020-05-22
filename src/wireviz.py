@@ -63,15 +63,15 @@ class Node:
         if self.show_name == True:
             s = s + '{name} | '.format(name=self.name)
 
-        #print parameters
         s = s + '{'
         l = []
         if self.type is not None:
             l.append('{}'.format(self.type))
         if self.gender is not None:
             l.append('{}'.format(self.gender))
+        l.append('{}-pin'.format(len(self.pinout)))
         if len(l) > 0:
-            s = s + ', '.join(l)
+            s = s + '|'.join(l)
         s = s + '} | '
 
         s = s + '{'
@@ -138,8 +138,6 @@ class Cable:
                     self.colors = colors
                 else:
                     self.colors = colors[:num_wires]
-        # if shield == True:
-        #     self.colors = self.colors + ('Shield',)
 
     def connect(self, from_name, from_pin, via, to_name, to_pin):
         if from_pin == 'auto':
@@ -182,10 +180,13 @@ class Cable:
         #print parameters
         s = s + '{'
         l = []
+        l.append('{}x'.format(len(self.colors)))
         if self.mm2 > 0:
             l.append('{} mm²'.format(self.mm2))
         if self.awg > 0:
             l.append('{} AWG'.format(self.awg))
+        if self.shield == True:
+            l.append(' + S')
         if self.length > 0:
             l.append('{} m'.format(self.length))
         if len(l) > 0:
