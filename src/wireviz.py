@@ -223,7 +223,7 @@ class Cable:
         if self.mm2 is not None:
             e = awg_equiv(self.mm2)
             es = ' ({} AWG)'.format(e) if e is not None else ''
-            mm ='{} mm²{}'.format(self.mm2, es)
+            mm ='{} mm\u00B2{}'.format(self.mm2, es)
             l.append(mm)
         if self.awg is not None:
             l.append('{} AWG'.format(self.awg))
