@@ -7,6 +7,8 @@ COLORS_I2C = ('BK', 'RD', 'YE', 'GN')
 
 PINOUT_SPI_DATAONLY = ('MISO','MOSI','SCK')
 
+wireviz.color_mode = 'SHORT' # short/SHORT/full/FULL/hex/HEX
+
 # example 1
 X1 = wireviz.Node('X1', type='D-Sub', gender='female', pinout=PINOUT_SERIAL, ports_right=True)
 X2 = wireviz.Node('X2', type='Molex KK 254', gender='female', num_pins=6, ports_left=True)

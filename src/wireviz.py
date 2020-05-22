@@ -2,19 +2,37 @@
 COLOR_CODE_DIN = ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT']
 COLOR_CODE_IEC = ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK']
 
-color_dict = {'BK': '#000000',
-              'WH': '#ffffff',
-              'GY': '#808080',
-              'PK': '#ff80c0',
-              'RD': '#ff0000',
-              'OG': '#ff8000',
-              'YE': '#ffff00',
-              'GN': '#00ff00',
-              'TQ': '#00ffff',
-              'BU': '#0000ff',
-              'VT': '#8000ff',
-              'BN': '#666600',
+color_hex = {
+             'BK': '#000000',
+             'WH': '#ffffff',
+             'GY': '#808080',
+             'PK': '#ff80c0',
+             'RD': '#ff0000',
+             'OG': '#ff8000',
+             'YE': '#ffff00',
+             'GN': '#00ff00',
+             'TQ': '#00ffff',
+             'BU': '#0000ff',
+             'VT': '#8000ff',
+             'BN': '#666600',
               }
+
+color_full = {
+             'BK': 'black',
+             'WH': 'white',
+             'GY': 'grey',
+             'PK': 'pink',
+             'RD': 'red',
+             'OG': 'orange',
+             'YE': 'yellow',
+             'GN': 'green',
+             'TQ': 'turquoise',
+             'BU': 'blue',
+             'VT': 'violet',
+             'BN': 'brown',
+}
+
+color_mode = 'SHORT'
 
 class Node:
 
@@ -213,6 +231,20 @@ class Cable:
         else:
             l = []
             for i,x in enumerate(self.colors,1):
+                if color_mode == 'full':
+                    x = color_full[x].lower()
+                elif color_mode == 'FULL':
+                    x = color_hex[x].upper()
+                elif color_mode == 'hex':
+                    x = color_hex[x].lower()
+                elif color_mode == 'HEX':
+                    x = color_hex[x].upper()
+                elif color_mode == 'short':
+                    x = x.lower()
+                elif color_mode == 'SHORT':
+                    x = x.upper()
+                else:
+                    raise Exception('Unknown color mode')
                 l.append('<w{wireno}>{wirecolor}'.format(wireno=i,wirecolor=x))
             s = s + '|'.join(l)
             if self.shield == True:
@@ -237,8 +269,8 @@ class Cable:
             s = s + '{'
             if isinstance(x[2], int):
                 search_color = self.colors[x[2]-1]
-                if search_color in color_dict:
-                    s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_dict[search_color])
+                if search_color in color_hex:
+                    s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_hex[search_color])
             if x[1] is not None:
                 t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}{via_subport}; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2], via_subport='i' if self.show_pinout == True else '')
                 s = s + t
