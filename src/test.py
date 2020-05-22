@@ -10,16 +10,16 @@ W1 = wireviz.Cable("W1", num_wires=3, color_code="DIN", shield=True)
 
 W1.connect(X1,(2,3,5),(1,2,3),X2,(1,3,2))
 
+objects = [X1, X2, W1]
+
 with open('output/output.dot','w') as f:
     with open('input/header.dot','r') as infile:
         for line in infile:
             f.write(line)
     f.write('\n\n')
 
-    f.write(X1.graphviz() + '\n')
-    f.write(X2.graphviz() + '\n')
-    f.write(W1.graphviz() + '\n')
-
+    for o in objects:
+        f.write(o.graphviz() + '\n')
 
     f.write('\n\n')
     with open('input/footer.dot','r') as infile:
