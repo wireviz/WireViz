@@ -6,7 +6,7 @@ COLORS_WEIRD = ("infrared","ultraviolet","transparent","invisible")
 # example 1
 X1 = wireviz.Node("X1", pinout=PINOUT_SERIAL, ports_right=True)
 X2 = wireviz.Node("X2", num_pins=6, ports_left=True)
-W1 = wireviz.Cable("W1", num_wires=3, color_code="DIN", shield=True)
+W1 = wireviz.Cable("W1", show_name=True, num_wires=3, color_code="DIN", shield=True)
 W1.connect(X1,(2,3,5),(1,2,3),X2,(1,3,2))
 X2.loop(5,6)
 objects = [X1, X2, W1]

@@ -90,8 +90,9 @@ class Node:
 
 class Cable:
 
-    def __init__(self, name, num_wires=None, colors=None, color_code=None, shield=False):
+    def __init__(self, name, show_name=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.name = name
+        self.show_name = show_name
         self.connections = []
         if color_code is None and colors is None:
             self.colors = ("",) * num_wires
@@ -139,7 +140,12 @@ class Cable:
     def graphviz(self):
         s = ''
         # print header
-        s = s + '{name}[label="{name} | {{'.format(name=self.name)
+        s = s + '{name}[label="'.format(name=self.name)
+
+        if self.show_name == True:
+            s = s + '{name} | '.format(name=self.name)
+
+        s = s + '{'
         # print pinout
         s = s + '{'
         l = []
