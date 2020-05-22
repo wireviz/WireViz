@@ -1,0 +1,17 @@
+digraph G {
+    graph [rankdir = LR, ranksep=2, fontname = "arial"];
+    edge [arrowhead=none, fontname = "arial"];
+    node [shape=record, style=rounded, fontname = "arial"];
+
+
+X1[label="X1 | {{DCD|RX|TX|DTR|GND|DSR|RTS|CTS|RI} | {<p1>1|<p2>2|<p3>3|<p4>4|<p5>5|<p6>6|<p7>7|<p8>8|<p9>9}}}"]
+X2[label="X2 | {{<p1>1|<p2>2|<p3>3|<p4>4|<p5>5|<p6>6} | {|||||}}}"]
+W1[label="W1 | {{<w1i>1|<w2i>2|<w3i>3|<w4i>4} | {WH|BN|GN|Shield} | {<w1o>1|<w2o>2|<w3o>3|<w4o>4}}}"]
+
+{edge[style=bold]{X1:p2 -> W1:w1i; W1:w1o -> X2:p1}
+{X1:p3 -> W1:w2i; W1:w2o -> X2:p3}
+{X1:p5 -> W1:w3i; W1:w3o -> X2:p2}
+}
+
+
+}

@@ -1,20 +1,32 @@
 import wireviz
 
-PINOUT_I2C = ("GND","VCC","SCL","SDA")
+PINOUT_SERIAL = ('DCD','RX','TX','DTR','GND','DSR','RTS','CTS','RI')
 COLORS_WEIRD = ("infrared","ultraviolet","transparent","invisible")
 
-X1 = wireviz.Node("X1", num_pins=4)
-X2 = wireviz.Node("X2", pinout=PINOUT_I2C)
-X3 = wireviz.Node("X3", pinout=PINOUT_I2C)
+X1 = wireviz.Node("X1", pinout=PINOUT_SERIAL, ports_right=True)
+X2 = wireviz.Node("X2", num_pins=6, ports_left=True)
 
-W1 = wireviz.Cable("W1", num_wires=4)
-W2 = wireviz.Cable("W2", num_wires=4, color_code="DIN")
-W3 = wireviz.Cable("W3", num_wires=3, colors=COLORS_WEIRD)
+W1 = wireviz.Cable("W1", num_wires=3, color_code="DIN", shield=True)
 
-print(X1)
-print(X2)
-print(X3)
+W1.connect(X1,(2,3,5),(1,2,3),X2,(1,3,2))
 
-print(W1)
-print(W2)
-print(W3)
+with open('output/output.dot','w') as f:
+    with open('input/header.dot','r') as infile:
+        for line in infile:
+            f.write(line)
+    f.write('\n\n')
+
+    f.write(X1.graphviz() + '\n')
+    f.write(X2.graphviz() + '\n')
+    f.write(W1.graphviz() + '\n')
+
+
+    f.write('\n\n')
+    with open('input/footer.dot','r') as infile:
+        for line in infile:
+            f.write(line)
+
+# print output file
+# with open('output/output.dot','r') as f:
+#     for line in f:
+#         print(line)

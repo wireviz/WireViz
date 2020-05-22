@@ -1,0 +1,4 @@
+digraph G {
+    graph [rankdir = LR, ranksep=2, fontname = "arial"];
+    edge [arrowhead=none, fontname = "arial"];
+    node [shape=record, style=rounded, fontname = "arial"];
