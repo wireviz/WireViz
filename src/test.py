@@ -34,10 +34,10 @@ W1 = wireviz.Cable("W1", colors=COLORS_I2C)
 W2 = wireviz.Cable("W2", colors=COLORS_I2C)
 W3 = wireviz.Cable("W3", colors=('BK','BU','OG','VT'))
 W4 = wireviz.Cable("W4", colors=('BK','RD'))
-W1.connect(X1,(1,2,3,4),(1,2,3,4),X2,(1,2,3,4))
-W2.connect(X1,(1,2,3,4),(1,2,3,4),X3,(1,2,3,4))
-W3.connect(X1,(1,5,6,7),(1,2,3,4),X4,(1,3,4,5))
-W4.connect(X5,(1,2),(1,2),X4,(1,2))
+W1.connect(X1,(1,2,3,4),'auto',X2,'auto')
+W2.connect(X1,(1,2,3,4),'auto',X3,'auto')
+W3.connect(X1,(1,5,6,7),'auto',X4,(1,3,4,5))
+W4.connect(X5,'auto','auto',X4,'auto')
 objects = [X1, X2, X3, X4, X5, W1, W2, W3, W4]
 
 with open('output/output.dot','w') as f:
