@@ -18,8 +18,9 @@ color_dict = {'BK': '#000000',
 
 class Node:
 
-    def __init__(self, name, num_pins=None, pinout=None, ports_left=False, ports_right=False):
+    def __init__(self, name, show_name=True, num_pins=None, pinout=None, ports_left=False, ports_right=False):
         self.name = name
+        self.show_name = show_name
         self.ports_left = ports_left
         self.ports_right = ports_right
         self.loops = []
@@ -54,7 +55,14 @@ class Node:
     def graphviz(self):
         s = ''
         # print header
-        s = s + '{name}[label="{name} | {{'.format(name=self.name)
+
+        s = s + '{name}[label="'.format(name=self.name)
+
+        if self.show_name == True:
+            s = s + '{name} | '.format(name=self.name)
+
+        s = s + '{'
+
         # print pinout
         if self.ports_left == True:
             s = s + '{'
