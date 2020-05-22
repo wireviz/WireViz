@@ -1,6 +1,7 @@
 
-COLOR_CODE_DIN = ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT']
-COLOR_CODE_IEC = ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK']
+COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'],
+               'IEC': ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK'],
+               'BW':  ['BK','WH']}
 
 color_hex = {
              'BK': '#000000',
@@ -174,12 +175,8 @@ class Cable:
                 if num_wires is None:
                     raise Exception('Unknown number of wires')
                 else:
-                    # TODO: Loop through colors if num_wires > len(COLOR_CODE_XXX)
-                    if color_code == 'DIN':
-                        self.colors = tuple(COLOR_CODE_DIN[:num_wires])
-                    elif color_code == 'IEC':
-                        self.colors = tuple(COLOR_CODE_IEC[:num_wires])
-                    else:
+                    # choose color code
+                    if color_code not in COLOR_CODES:
                         raise Exception('Unknown color code')
             else:
                 if num_wires is None:
