@@ -103,6 +103,7 @@ The parser will follow later; contributions are welcome!
 * Add support for cable splicing (as connector type)
 * Display picture of connector underneath (including pin 1 location)
 * Create parser (to make WireViz work as a GraphViz extension)
+* Automatic BOM generation
 
 
 ## License
