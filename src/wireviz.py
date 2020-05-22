@@ -146,7 +146,7 @@ class Node:
         if len(self.loops) > 0:
             s = s + '\n\n{edge[style=bold]\n'
             for x in self.loops:
-                s = s + '{name}:p{port_from}:{loop_side} -> {name}:p{port_to}:{loop_side}\n'.format(name=self.name, port_from=x[0], port_to=x[1], loop_side=x[2])
+                s = s + '{name}:p{port_from}:{loop_side} -- {name}:p{port_to}:{loop_side}\n'.format(name=self.name, port_from=x[0], port_to=x[1], loop_side=x[2])
             s = s + '}'
 
         s = s + '\n'
@@ -212,7 +212,7 @@ class Cable:
                 else:
                     s = '--'
                 # print(self.colors(x[2]) if i < len(self.colors) else '-')
-                print('{}:{} -- {}({}) -> {}:{}'.format(x[0],x[1],x[2],s,x[3],x[4]))
+                print('{}:{} -- {}({}) -- {}:{}'.format(x[0],x[1],x[2],s,x[3],x[4]))
 
     def graphviz(self):
         s = ''
@@ -302,10 +302,10 @@ class Cable:
                 if search_color in color_hex:
                     s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_hex[search_color])
             if x[1] is not None:
-                t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}{via_subport}; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2], via_subport='i' if self.show_pinout == True else '')
+                t = '{from_name}:p{from_port} -- {via_name}:w{via_wire}{via_subport}; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2], via_subport='i' if self.show_pinout == True else '')
                 s = s + t
             if x[4] is not None:
-                t = '{via_name}:w{via_wire}{via_subport} -> {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4], via_subport='o' if self.show_pinout == True else '')
+                t = '{via_name}:w{via_wire}{via_subport} -- {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4], via_subport='o' if self.show_pinout == True else '')
                 s = s + t
             s = s + '}\n'
         s = s + '}'
