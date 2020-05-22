@@ -18,8 +18,10 @@ color_dict = {'BK': '#000000',
 
 class Node:
 
-    def __init__(self, name, show_name=True, num_pins=None, pinout=None, ports_left=False, ports_right=False):
+    def __init__(self, name, type=None, gender=None, show_name=True, num_pins=None, pinout=None, ports_left=False, ports_right=False):
         self.name = name
+        self.type = type
+        self.gender = gender
         self.show_name = show_name
         self.ports_left = ports_left
         self.ports_right = ports_right
@@ -61,8 +63,18 @@ class Node:
         if self.show_name == True:
             s = s + '{name} | '.format(name=self.name)
 
+        #print parameters
         s = s + '{'
+        l = []
+        if self.type is not None:
+            l.append('{}'.format(self.type))
+        if self.gender is not None:
+            l.append('{}'.format(self.gender))
+        if len(l) > 0:
+            s = s + ', '.join(l)
+        s = s + '} | '
 
+        s = s + '{'
         # print pinout
         if self.ports_left == True:
             s = s + '{'
@@ -98,8 +110,11 @@ class Node:
 
 class Cable:
 
-    def __init__(self, name, show_name=False, num_wires=None, colors=None, color_code=None, shield=False):
+    def __init__(self, name, mm2=0, awg=0, length=0, show_name=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.name = name
+        self.mm2 = mm2
+        self.awg = awg
+        self.length = length
         self.show_name = show_name
         self.shield = shield
         self.connections = []
@@ -163,6 +178,19 @@ class Cable:
         if self.show_name == True:
             s = s + '{name} | '.format(name=self.name)
 
+        #print parameters
+        s = s + '{'
+        l = []
+        if self.mm2 > 0:
+            l.append('{} mm²'.format(self.mm2))
+        if self.awg > 0:
+            l.append('{} AWG'.format(self.awg))
+        if self.length > 0:
+            l.append('{} m'.format(self.length))
+        if len(l) > 0:
+            s = s + '|'.join(l)
+        s = s + '} | '
+
         s = s + '{'
         # print pinout
         s = s + '{'
@@ -191,6 +219,7 @@ class Cable:
 
         s = s + '}}"]'
 
+        # print connections
         s = s + '\n\n{edge[style=bold]\n'
         for x in self.connections:
             s = s + '{'
