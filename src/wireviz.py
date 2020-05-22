@@ -22,6 +22,7 @@ class Node:
         self.name = name
         self.ports_left = ports_left
         self.ports_right = ports_right
+        self.loops = []
 
         if pinout is None:
             self.pinout = ("",) * num_pins
@@ -31,6 +32,18 @@ class Node:
                     raise Exception("Must provide num_pins or pinout")
                 else:
                     self.pinout = pinout
+
+    def loop(self, from_pin, to_pin, side=None):
+        if self.ports_left == True and self.ports_right == False:
+            loop_side = 'w' # west = left
+        elif self.ports_left == False and self.ports_right == True:
+            loop_side = 'e' # east = right
+        elif self.ports_left == True and self.ports_right == True:
+            if side == None:
+                raise Exception("Must specify side of loop")
+            else:
+                loop_side = side
+        self.loops.append((from_pin, to_pin, loop_side))
 
     def __repr__(self):
         return "{} = {} {}".format(self.name, len(self.pinout), self.pinout)
@@ -65,6 +78,14 @@ class Node:
 
         s = s + '}}"]'
 
+        # print loops
+        if len(self.loops) > 0:
+            s = s + '\n\n{edge[style=bold]\n'
+            for x in self.loops:
+                s = s + '{name}:p{port_from}:{loop_side} -> {name}:p{port_to}:{loop_side}\n'.format(name=self.name, port_from=x[0], port_to=x[1], loop_side=x[2])
+            s = s + '}'
+
+        s = s + '\n'
         return s
 
 class Cable:
