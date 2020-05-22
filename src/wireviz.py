@@ -26,11 +26,11 @@ class Node:
         self.loops = []
 
         if pinout is None:
-            self.pinout = ("",) * num_pins
+            self.pinout = ('',) * num_pins
         else:
             if num_pins is None:
                 if pinout is None:
-                    raise Exception("Must provide num_pins or pinout")
+                    raise Exception('Must provide num_pins or pinout')
                 else:
                     self.pinout = pinout
 
@@ -41,16 +41,16 @@ class Node:
             loop_side = 'e' # east = right
         elif self.ports_left == True and self.ports_right == True:
             if side == None:
-                raise Exception("Must specify side of loop")
+                raise Exception('Must specify side of loop')
             else:
                 loop_side = side
         self.loops.append((from_pin, to_pin, loop_side))
 
     def __repr__(self):
-        return "{} = {} {}".format(self.name, len(self.pinout), self.pinout)
+        return '{} = {} {}'.format(self.name, len(self.pinout), self.pinout)
 
     def __str__(self):
-        return "{}".format(self.name)
+        return '{}'.format(self.name)
 
     def graphviz(self):
         s = ''
@@ -104,19 +104,19 @@ class Cable:
         self.shield = shield
         self.connections = []
         if color_code is None and colors is None:
-            self.colors = ("",) * num_wires
+            self.colors = ('',) * num_wires
         else:
             if colors is None:
                 if num_wires is None:
-                    raise Exception("Unknown number of wires")
+                    raise Exception('Unknown number of wires')
                 else:
                     # TODO: Loop through colors if num_wires > len(COLOR_CODE_XXX)
-                    if color_code == "DIN":
+                    if color_code == 'DIN':
                         self.colors = tuple(COLOR_CODE_DIN[:num_wires])
-                    elif color_code == "IEC":
+                    elif color_code == 'IEC':
                         self.colors = tuple(COLOR_CODE_IEC[:num_wires])
                     else:
-                        raise Exception("Unknown color code")
+                        raise Exception('Unknown color code')
             else:
                 if num_wires is None:
                     self.colors = colors
@@ -133,7 +133,7 @@ class Cable:
         if to_pin == 'auto':
             to_pin = tuple(x+1 for x in range(len(self.colors)))
         if len(from_pin) != len(to_pin):
-            raise Exception("from_pin must have the same number of elements as to_pin")
+            raise Exception('from_pin must have the same number of elements as to_pin')
         for i, x in enumerate(from_pin):
             self.connections.append((from_name, from_pin[i], via[i], to_name, to_pin[i]))
 
@@ -141,7 +141,7 @@ class Cable:
         self.connect(from_name, 'auto', 'auto', to_name, 'auto')
 
     def __repr__(self):
-        return "{} = {} {}\n     {}".format(self.name, len(self.colors), self.colors, self.connections)
+        return '{} = {} {}\n     {}'.format(self.name, len(self.colors), self.colors, self.connections)
 
     def debug(self):
         print(self.name)
@@ -153,7 +153,7 @@ class Cable:
                 else:
                     s = '--'
                 # print(self.colors(x[2]) if i < len(self.colors) else '-')
-                print("{}:{} -- {}({}) -> {}:{}".format(x[0],x[1],x[2],s,x[3],x[4]))
+                print('{}:{} -- {}({}) -> {}:{}'.format(x[0],x[1],x[2],s,x[3],x[4]))
 
     def graphviz(self):
         s = ''
