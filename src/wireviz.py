@@ -2,6 +2,20 @@
 COLOR_CODE_DIN = ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT']
 COLOR_CODE_IEC = ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK']
 
+color_dict = {'BK': '#000000',
+              'WH': '#ffffff',
+              'GY': '#808080',
+              'PK': '#ff80c0',
+              'RD': '#ff0000',
+              'OG': '#ff8000',
+              'YE': '#ffff00',
+              'GN': '#00ff00',
+              'TQ': '#00ffff',
+              'BU': '#0000ff',
+              'VT': '#8000ff',
+              'BN': '#808000',
+              }
+
 class Node:
 
     def __init__(self, name, num_pins=None, pinout=None, ports_left=False, ports_right=False):
@@ -126,9 +140,12 @@ class Cable:
 
         s = s + '}}"]'
 
-        s = s + '\n\n{edge[style=bold]'
+        s = s + '\n\n{edge[style=bold]\n'
         for x in self.connections:
             s = s + '{'
+            search_color = self.colors[x[2]-1]
+            if search_color in color_dict:
+                s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_dict[search_color])
             t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}i; {via_name}:w{via_wire}o -> {to_name}:p{to_port}'.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4])
             s = s + t
             s = s + '}\n'
