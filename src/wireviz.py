@@ -154,10 +154,13 @@ class Node:
 
 class Cable:
 
-    def __init__(self, name, mm2=0, awg=0, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
+    def __init__(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.name = name
+        if mm2 is not None and awg is not None:
+            raise Exception('You cannot define both mm2 and awg!')
         self.mm2 = mm2
         self.awg = awg
+        self.show_equiv = show_equiv
         self.length = length
         self.show_name = show_name
         self.show_pinout = show_pinout
@@ -223,9 +226,12 @@ class Cable:
         s = s + '{'
         l = []
         l.append('{}x'.format(len(self.colors)))
-        if self.mm2 > 0:
-            l.append('{} mm²'.format(self.mm2))
-        if self.awg > 0:
+        if self.mm2 is not None:
+            e = awg_equiv(self.mm2)
+            es = ' ({} AWG)'.format(e) if e is not None else ''
+            mm ='{} mm²{}'.format(self.mm2, es)
+            l.append(mm)
+        if self.awg is not None:
             l.append('{} AWG'.format(self.awg))
         if self.shield == True:
             l.append(' + S')
@@ -305,3 +311,26 @@ class Cable:
         s = s + '}'
 
         return s
+
+def awg_equiv(mm2):
+    awg_equiv_table = {
+                        '0.09': 28,
+                        '0.14': 26,
+                        '0.25': 24,
+                        '0.34': 22,
+                        '0.5': 21,
+                        '0.75': 20,
+                        '1': 18,
+                        '1.5': 16,
+                        '2.5': 14,
+                        '4': 12,
+                        '6': 10,
+                        '10': 8,
+                        '16': 6,
+                        '25': 4,
+                        }
+    k = str(mm2)
+    if k in awg_equiv_table:
+        return awg_equiv_table[k]
+    else:
+        return None
