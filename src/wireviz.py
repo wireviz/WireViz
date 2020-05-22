@@ -2,34 +2,55 @@
 COLOR_CODE_DIN = ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT']
 COLOR_CODE_IEC = ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK']
 
-color_dict = {'BK': '#000000',
-              'WH': '#ffffff',
-              'GY': '#808080',
-              'PK': '#ff80c0',
-              'RD': '#ff0000',
-              'OG': '#ff8000',
-              'YE': '#ffff00',
-              'GN': '#00ff00',
-              'TQ': '#00ffff',
-              'BU': '#0000ff',
-              'VT': '#8000ff',
-              'BN': '#666600',
+color_hex = {
+             'BK': '#000000',
+             'WH': '#ffffff',
+             'GY': '#808080',
+             'PK': '#ff80c0',
+             'RD': '#ff0000',
+             'OG': '#ff8000',
+             'YE': '#ffff00',
+             'GN': '#00ff00',
+             'TQ': '#00ffff',
+             'BU': '#0000ff',
+             'VT': '#8000ff',
+             'BN': '#666600',
               }
+
+color_full = {
+             'BK': 'black',
+             'WH': 'white',
+             'GY': 'grey',
+             'PK': 'pink',
+             'RD': 'red',
+             'OG': 'orange',
+             'YE': 'yellow',
+             'GN': 'green',
+             'TQ': 'turquoise',
+             'BU': 'blue',
+             'VT': 'violet',
+             'BN': 'brown',
+}
+
+color_mode = 'SHORT'
 
 class Node:
 
-    def __init__(self, name, num_pins=None, pinout=None, ports_left=False, ports_right=False):
+    def __init__(self, name, type=None, gender=None, show_name=True, num_pins=None, pinout=None, ports_left=False, ports_right=False):
         self.name = name
+        self.type = type
+        self.gender = gender
+        self.show_name = show_name
         self.ports_left = ports_left
         self.ports_right = ports_right
         self.loops = []
 
         if pinout is None:
-            self.pinout = ("",) * num_pins
+            self.pinout = ('',) * num_pins
         else:
             if num_pins is None:
                 if pinout is None:
-                    raise Exception("Must provide num_pins or pinout")
+                    raise Exception('Must provide num_pins or pinout')
                 else:
                     self.pinout = pinout
 
@@ -40,21 +61,38 @@ class Node:
             loop_side = 'e' # east = right
         elif self.ports_left == True and self.ports_right == True:
             if side == None:
-                raise Exception("Must specify side of loop")
+                raise Exception('Must specify side of loop')
             else:
                 loop_side = side
         self.loops.append((from_pin, to_pin, loop_side))
 
     def __repr__(self):
-        return "{} = {} {}".format(self.name, len(self.pinout), self.pinout)
+        return '{} = {} {}'.format(self.name, len(self.pinout), self.pinout)
 
     def __str__(self):
-        return "{}".format(self.name)
+        return '{}'.format(self.name)
 
     def graphviz(self):
         s = ''
         # print header
-        s = s + '{name}[label="{name} | {{'.format(name=self.name)
+
+        s = s + '{name}[label="'.format(name=self.name)
+
+        if self.show_name == True:
+            s = s + '{name} | '.format(name=self.name)
+
+        s = s + '{'
+        l = []
+        if self.type is not None:
+            l.append('{}'.format(self.type))
+        if self.gender is not None:
+            l.append('{}'.format(self.gender))
+        l.append('{}-pin'.format(len(self.pinout)))
+        if len(l) > 0:
+            s = s + '|'.join(l)
+        s = s + '} | '
+
+        s = s + '{'
         # print pinout
         if self.ports_left == True:
             s = s + '{'
@@ -90,32 +128,34 @@ class Node:
 
 class Cable:
 
-    def __init__(self, name, show_name=False, num_wires=None, colors=None, color_code=None, shield=False):
+    def __init__(self, name, mm2=0, awg=0, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.name = name
+        self.mm2 = mm2
+        self.awg = awg
+        self.length = length
         self.show_name = show_name
+        self.show_pinout = show_pinout
         self.shield = shield
         self.connections = []
         if color_code is None and colors is None:
-            self.colors = ("",) * num_wires
+            self.colors = ('',) * num_wires
         else:
             if colors is None:
                 if num_wires is None:
-                    raise Exception("Unknown number of wires")
+                    raise Exception('Unknown number of wires')
                 else:
                     # TODO: Loop through colors if num_wires > len(COLOR_CODE_XXX)
-                    if color_code == "DIN":
+                    if color_code == 'DIN':
                         self.colors = tuple(COLOR_CODE_DIN[:num_wires])
-                    elif color_code == "IEC":
+                    elif color_code == 'IEC':
                         self.colors = tuple(COLOR_CODE_IEC[:num_wires])
                     else:
-                        raise Exception("Unknown color code")
+                        raise Exception('Unknown color code')
             else:
                 if num_wires is None:
                     self.colors = colors
                 else:
                     self.colors = colors[:num_wires]
-        # if shield == True:
-        #     self.colors = self.colors + ('Shield',)
 
     def connect(self, from_name, from_pin, via, to_name, to_pin):
         if from_pin == 'auto':
@@ -125,7 +165,7 @@ class Cable:
         if to_pin == 'auto':
             to_pin = tuple(x+1 for x in range(len(self.colors)))
         if len(from_pin) != len(to_pin):
-            raise Exception("from_pin must have the same number of elements as to_pin")
+            raise Exception('from_pin must have the same number of elements as to_pin')
         for i, x in enumerate(from_pin):
             self.connections.append((from_name, from_pin[i], via[i], to_name, to_pin[i]))
 
@@ -133,7 +173,7 @@ class Cable:
         self.connect(from_name, 'auto', 'auto', to_name, 'auto')
 
     def __repr__(self):
-        return "{} = {} {}\n     {}".format(self.name, len(self.colors), self.colors, self.connections)
+        return '{} = {} {}\n     {}'.format(self.name, len(self.colors), self.colors, self.connections)
 
     def debug(self):
         print(self.name)
@@ -145,7 +185,7 @@ class Cable:
                 else:
                     s = '--'
                 # print(self.colors(x[2]) if i < len(self.colors) else '-')
-                print("{}:{} -- {}({}) -> {}:{}".format(x[0],x[1],x[2],s,x[3],x[4]))
+                print('{}:{} -- {}({}) -> {}:{}'.format(x[0],x[1],x[2],s,x[3],x[4]))
 
     def graphviz(self):
         s = ''
@@ -155,46 +195,87 @@ class Cable:
         if self.show_name == True:
             s = s + '{name} | '.format(name=self.name)
 
-        s = s + '{'
-        # print pinout
+        #print parameters
         s = s + '{'
         l = []
-        for i,x in enumerate(self.colors,1):
-            l.append('<w{wireno}i>{wireno}'.format(wireno=i))
-        s = s + '|'.join(l)
+        l.append('{}x'.format(len(self.colors)))
+        if self.mm2 > 0:
+            l.append('{} mm²'.format(self.mm2))
+        if self.awg > 0:
+            l.append('{} AWG'.format(self.awg))
         if self.shield == True:
-            s = s + '|<wsi>'
+            l.append(' + S')
+        if self.length > 0:
+            l.append('{} m'.format(self.length))
+        if len(l) > 0:
+            s = s + '|'.join(l)
         s = s + '} | '
 
         s = s + '{'
-        s = s + '|'.join(self.colors)
-        if self.shield == True:
-            s = s + '|Shield'
+        # print pinout
+        if self.show_pinout:
+            s = s + '{'
+            l = []
+            for i,x in enumerate(self.colors,1):
+                l.append('<w{wireno}i>{wireno}'.format(wireno=i))
+            s = s + '|'.join(l)
+            if self.shield == True:
+                s = s + '|<wsi>'
+            s = s + '} | '
+
+        s = s + '{'
+        if self.show_pinout:
+            s = s + '|'.join(self.colors)
+            if self.shield == True:
+                s = s + '|Shield'
+        else:
+            l = []
+            for i,x in enumerate(self.colors,1):
+                if color_mode == 'full':
+                    x = color_full[x].lower()
+                elif color_mode == 'FULL':
+                    x = color_hex[x].upper()
+                elif color_mode == 'hex':
+                    x = color_hex[x].lower()
+                elif color_mode == 'HEX':
+                    x = color_hex[x].upper()
+                elif color_mode == 'short':
+                    x = x.lower()
+                elif color_mode == 'SHORT':
+                    x = x.upper()
+                else:
+                    raise Exception('Unknown color mode')
+                l.append('<w{wireno}>{wirecolor}'.format(wireno=i,wirecolor=x))
+            s = s + '|'.join(l)
+            if self.shield == True:
+                s = s + '|<ws>Shield'
         s = s + '}'
 
-        s = s + ' | {'
-        l = []
-        for i,x in enumerate(self.colors,1):
-            l.append('<w{wireno}o>{wireno}'.format(wireno=i))
-        s = s + '|'.join(l)
-        if self.shield == True:
-            s = s + '|<wso>'
-        s = s + '}'
+        if self.show_pinout:
+            s = s + ' | {'
+            l = []
+            for i,x in enumerate(self.colors,1):
+                l.append('<w{wireno}o>{wireno}'.format(wireno=i))
+            s = s + '|'.join(l)
+            if self.shield == True:
+                s = s + '|<wso>'
+            s = s + '}'
 
         s = s + '}}"]'
 
+        # print connections
         s = s + '\n\n{edge[style=bold]\n'
         for x in self.connections:
             s = s + '{'
             if isinstance(x[2], int):
                 search_color = self.colors[x[2]-1]
-                if search_color in color_dict:
-                    s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_dict[search_color])
+                if search_color in color_hex:
+                    s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_hex[search_color])
             if x[1] is not None:
-                t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}i; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2])
+                t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}{via_subport}; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2], via_subport='i' if self.show_pinout == True else '')
                 s = s + t
             if x[4] is not None:
-                t = '{via_name}:w{via_wire}o -> {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4])
+                t = '{via_name}:w{via_wire}{via_subport} -> {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4], via_subport='o' if self.show_pinout == True else '')
                 s = s + t
             s = s + '}\n'
         s = s + '}'

@@ -1,27 +1,23 @@
 // define connectors
 
-X1[type="D-Sub DE-9",
-   subtype="female",
-   num_pins=9,
-   pin_labels="DCD|RX|TX|DTR|GND|DSR|RTS|CTS|RI",
-   position=L
-  ]
+X1 [type="D-Sub",
+    gender="female",
+    pin_labels="DCD|RX|TX|DTR|GND|DSR|RTS|CTS|RI",
+   ]
 
-X2[type="Molex KK 254 6-pin",
-   subtype="female",
-   num_pins=6,
-   pin_labels="GND|RX|TX|NC|OUT|IN",
-   position=R
-  ]
+X2 [type="Molex KK 254",
+    gender="female",
+    pin_labels="GND|RX|TX|NC|OUT|IN",
+   ]
 
 // define wire
 
-W1[type="3x 0,25 mm² shielded",
-   length="0.2m",
-   num_wires=3,
-   colors="din47100",
-   shield=true
-  ]
+W1 [mm2=0.25,
+    length=0.2,
+    num_wires=3,
+    colors="din47100",
+    shield=true
+   ]
 
 // define connections
 
