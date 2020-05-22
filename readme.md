@@ -14,11 +14,14 @@ It is based on [GraphViz](https://www.graphviz.org/) and designed as an "extensi
   * Easy version control
   * GraphViz-like syntax
 * Understands and uses color abbreviations as per [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) (black=BK, red=RD, ...)
+  * Optionally outputs colors as abbreviation (e.g. 'YE'), full name (e.g. 'yellow') or hex value (e.g. '#ffff00'), with choice of UPPER or lower case
 * Auto-generates standard wire color schemes and allows custom ones if needed
   * [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100) (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
   * [IEC 62](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
+* Understands wire gauge in mm² or AWG
+  * Optionally auto-calculates and displays AWG equivalent when specifying mm²
 * Allows more than one connector per side, as well as loopbacks
-* Will include images of known connectors, together with their pinouts
+* Allows for easy-autorouting for 1-to-1 wiring
 
 ## Example
 

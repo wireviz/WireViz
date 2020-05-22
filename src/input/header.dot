@@ -2,7 +2,7 @@
 // https://github.com/formatc1702/WireViz
 // Daniel Rojas - 2020
 
-digraph G {
+graph G {
     graph [rankdir = LR, ranksep=2, fontname = "arial"];
-    edge [arrowhead=none, fontname = "arial"];
+    edge [fontname = "arial"];
     node [shape=record, style=rounded, fontname = "arial"];

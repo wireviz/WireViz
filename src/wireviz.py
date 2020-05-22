@@ -1,6 +1,7 @@
 
-COLOR_CODE_DIN = ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT']
-COLOR_CODE_IEC = ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK']
+COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'],
+               'IEC': ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK'],
+               'BW':  ['BK','WH']}
 
 color_hex = {
              'BK': '#000000',
@@ -41,9 +42,6 @@ class Harness:
     def add(self, object):
         self.objects[object.name] = object
         self.objects[object.name].color_mode = self.color_mode
-
-    def debug(self):
-        print(self.objects)
 
     def graphviz(self, print_to_screen=False):
         with open('output/output.dot','w') as f:
@@ -146,7 +144,7 @@ class Node:
         if len(self.loops) > 0:
             s = s + '\n\n{edge[style=bold]\n'
             for x in self.loops:
-                s = s + '{name}:p{port_from}:{loop_side} -> {name}:p{port_to}:{loop_side}\n'.format(name=self.name, port_from=x[0], port_to=x[1], loop_side=x[2])
+                s = s + '{name}:p{port_from}:{loop_side} -- {name}:p{port_to}:{loop_side}\n'.format(name=self.name, port_from=x[0], port_to=x[1], loop_side=x[2])
             s = s + '}'
 
         s = s + '\n'
@@ -154,10 +152,13 @@ class Node:
 
 class Cable:
 
-    def __init__(self, name, mm2=0, awg=0, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
+    def __init__(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.name = name
+        if mm2 is not None and awg is not None:
+            raise Exception('You cannot define both mm2 and awg!')
         self.mm2 = mm2
         self.awg = awg
+        self.show_equiv = show_equiv
         self.length = length
         self.show_name = show_name
         self.show_pinout = show_pinout
@@ -167,22 +168,30 @@ class Cable:
         if color_code is None and colors is None:
             self.colors = ('',) * num_wires
         else:
-            if colors is None:
+            if colors is None: # no custom color pallet was specified
                 if num_wires is None:
                     raise Exception('Unknown number of wires')
                 else:
-                    # TODO: Loop through colors if num_wires > len(COLOR_CODE_XXX)
-                    if color_code == 'DIN':
-                        self.colors = tuple(COLOR_CODE_DIN[:num_wires])
-                    elif color_code == 'IEC':
-                        self.colors = tuple(COLOR_CODE_IEC[:num_wires])
-                    else:
+                    if color_code is None:
+                        raise Exception('No color code')
+                    # choose color code
+                    if color_code not in COLOR_CODES:
                         raise Exception('Unknown color code')
-            else:
-                if num_wires is None:
-                    self.colors = colors
-                else:
-                    self.colors = colors[:num_wires]
+                    else:
+                        cc = COLOR_CODES[color_code]
+                n = num_wires
+            else: # custom color pallet was specified
+                cc = colors
+                if num_wires is None: # assume number of wires = number of items in custom pallet
+                    n = len(cc)
+                else: # number of wires was specified
+                    n = num_wires
+
+            cc = tuple(cc)
+            if n > len(cc):
+                 m = num_wires // len(cc) + 1
+                 cc = cc * int(m)
+            self.colors = cc[:n]
 
     def connect(self, from_name, from_pin, via, to_name, to_pin):
         if from_pin == 'auto':
@@ -199,18 +208,6 @@ class Cable:
     def connect_all_straight(self, from_name, to_name):
         self.connect(from_name, 'auto', 'auto', to_name, 'auto')
 
-    def debug(self):
-        print(self.name)
-        print(self.colors)
-        if len(self.connections) > 0:
-            for i, x in enumerate(self.connections):
-                if i < len(self.colors):
-                    s = self.colors[int(x[2]-1)]
-                else:
-                    s = '--'
-                # print(self.colors(x[2]) if i < len(self.colors) else '-')
-                print('{}:{} -- {}({}) -> {}:{}'.format(x[0],x[1],x[2],s,x[3],x[4]))
-
     def graphviz(self):
         s = ''
         # print header
@@ -223,9 +220,12 @@ class Cable:
         s = s + '{'
         l = []
         l.append('{}x'.format(len(self.colors)))
-        if self.mm2 > 0:
-            l.append('{} mm²'.format(self.mm2))
-        if self.awg > 0:
+        if self.mm2 is not None:
+            e = awg_equiv(self.mm2)
+            es = ' ({} AWG)'.format(e) if e is not None else ''
+            mm ='{} mm²{}'.format(self.mm2, es)
+            l.append(mm)
+        if self.awg is not None:
             l.append('{} AWG'.format(self.awg))
         if self.shield == True:
             l.append(' + S')
@@ -255,20 +255,23 @@ class Cable:
         else:
             l = []
             for i,x in enumerate(self.colors,1):
-                if self.color_mode == 'full':
-                    x = color_full[x].lower()
-                elif self.color_mode == 'FULL':
-                    x = color_hex[x].upper()
-                elif self.color_mode == 'hex':
-                    x = color_hex[x].lower()
-                elif self.color_mode == 'HEX':
-                    x = color_hex[x].upper()
-                elif self.color_mode == 'short':
-                    x = x.lower()
-                elif self.color_mode == 'SHORT':
-                    x = x.upper()
+                if x in color_full:
+                    if self.color_mode == 'full':
+                        x = color_full[x].lower()
+                    elif self.color_mode == 'FULL':
+                        x = color_hex[x].upper()
+                    elif self.color_mode == 'hex':
+                        x = color_hex[x].lower()
+                    elif self.color_mode == 'HEX':
+                        x = color_hex[x].upper()
+                    elif self.color_mode == 'short':
+                        x = x.lower()
+                    elif self.color_mode == 'SHORT':
+                        x = x.upper()
+                    else:
+                        raise Exception('Unknown color mode')
                 else:
-                    raise Exception('Unknown color mode')
+                    x = ''
                 l.append('<w{wireno}>{wirecolor}'.format(wireno=i,wirecolor=x))
             s = s + '|'.join(l)
             if self.shield == True:
@@ -296,12 +299,35 @@ class Cable:
                 if search_color in color_hex:
                     s = s + 'edge[color="#000000:{wire_color}:#000000"] '.format(wire_color=color_hex[search_color])
             if x[1] is not None:
-                t = '{from_name}:p{from_port} -> {via_name}:w{via_wire}{via_subport}; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2], via_subport='i' if self.show_pinout == True else '')
+                t = '{from_name}:p{from_port} -- {via_name}:w{via_wire}{via_subport}; '.format(from_name=x[0],from_port=x[1],via_name=self.name, via_wire=x[2], via_subport='i' if self.show_pinout == True else '')
                 s = s + t
             if x[4] is not None:
-                t = '{via_name}:w{via_wire}{via_subport} -> {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4], via_subport='o' if self.show_pinout == True else '')
+                t = '{via_name}:w{via_wire}{via_subport} -- {to_name}:p{to_port}'.format(via_name=self.name, via_wire=x[2],to_name=x[3],to_port=x[4], via_subport='o' if self.show_pinout == True else '')
                 s = s + t
             s = s + '}\n'
         s = s + '}'
 
         return s
+
+def awg_equiv(mm2):
+    awg_equiv_table = {
+                        '0.09': 28,
+                        '0.14': 26,
+                        '0.25': 24,
+                        '0.34': 22,
+                        '0.5': 21,
+                        '0.75': 20,
+                        '1': 18,
+                        '1.5': 16,
+                        '2.5': 14,
+                        '4': 12,
+                        '6': 10,
+                        '10': 8,
+                        '16': 6,
+                        '25': 4,
+                        }
+    k = str(mm2)
+    if k in awg_equiv_table:
+        return awg_equiv_table[k]
+    else:
+        return None
