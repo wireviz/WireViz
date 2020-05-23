@@ -34,6 +34,21 @@ color_full = {
              'BN': 'brown',
 }
 
+color_ger = {
+             'BK': 'sw',
+             'WH': 'ws',
+             'GY': 'gr',
+             'PK': 'rs',
+             'RD': 'rt',
+             'OG': 'or',
+             'YE': 'ge',
+             'GN': 'gn',
+             'TQ': 'tk',
+             'BU': 'bl',
+             'VT': 'vi',
+             'BN': 'br',
+}
+
 class Harness:
 
     def __init__(self):
@@ -265,6 +280,10 @@ class Cable:
                         x = color_hex[x].lower()
                     elif self.color_mode == 'HEX':
                         x = color_hex[x].upper()
+                    elif self.color_mode == 'ger':
+                        x = color_ger[x].lower()
+                    elif self.color_mode == 'GER':
+                        x = color_ger[x].upper()
                     elif self.color_mode == 'short':
                         x = x.lower()
                     elif self.color_mode == 'SHORT':
