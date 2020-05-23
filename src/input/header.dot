@@ -3,6 +3,6 @@
 // Daniel Rojas - 2020
 
 graph G {
-    graph [rankdir = LR, ranksep=2, fontname = "arial"];
-    edge [fontname = "arial"];
-    node [shape=record, style=rounded, fontname = "arial"];
+    graph [rankdir = "LR", ranksep=2, fontname = "arial", bgcolor="transparent"]
+    edge [fontname = "arial"]
+    node [shape="record", style="rounded,filled", fontname = "arial", fillcolor="white"]

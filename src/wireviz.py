@@ -1,8 +1,9 @@
 
-COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'],
+COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT','GYPK','RDBU','WHGN','BNGN','WHYE','YEBN','WHGY','GYBN','WHPK','PKBN'],
                'IEC': ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK'],
                'BW':  ['BK','WH']}
 
+# TODO: parse and render double-colored cables ('RDBU' etc)
 color_hex = {
              'BK': '#000000',
              'WH': '#ffffff',
@@ -223,7 +224,7 @@ class Cable:
         if self.mm2 is not None:
             e = awg_equiv(self.mm2)
             es = ' ({} AWG)'.format(e) if e is not None else ''
-            mm ='{} mm²{}'.format(self.mm2, es)
+            mm ='{} mm\u00B2{}'.format(self.mm2, es)
             l.append(mm)
         if self.awg is not None:
             l.append('{} AWG'.format(self.awg))
