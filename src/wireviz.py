@@ -151,6 +151,7 @@ class Harness:
         for f in format:
             d.format = f
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
+        d.save(filename='{}.gv'.format(filename), directory=directory)
 
 class Node:
 
