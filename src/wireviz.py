@@ -191,6 +191,8 @@ class Node:
         self.loops = []
 
         if pinout is None:
+            if num_pins is None:
+                num_pins = 1
             self.pinout = ('',) * num_pins
         else:
             if num_pins is None:
@@ -252,6 +254,9 @@ class Cable:
             via = tuple(x+1 for x in range(len(self.colors)))
         if to_pin == 'auto':
             to_pin = tuple(x+1 for x in range(len(self.colors)))
+        from_pin = int2tuple(from_pin)
+        via = int2tuple(via)
+        to_pin = int2tuple(to_pin)
         if len(from_pin) != len(to_pin):
             raise Exception('from_pin must have the same number of elements as to_pin')
         for i, x in enumerate(from_pin):
@@ -274,6 +279,13 @@ def nested(input):
                     l.append(str(x))
     s = '|'.join(l)
     return s
+
+def int2tuple(input):
+    if isinstance(input, tuple):
+        output = input
+    else:
+        output = (input,)
+    return output
 
 def translate_color(input, color_mode):
     if input == '':
