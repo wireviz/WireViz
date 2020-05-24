@@ -28,4 +28,4 @@ h.connect('W2','X1',(1,2,3,4),'auto','X3','auto')
 h.connect('W3','X1',(1,5,6,7),'auto','X4',(1,3,4,5))
 h.connect_all_straight('W4','X5','X4')
 
-h.output('output/output', format='png', view=False)
+h.output(filename='output', format=('png','svg'), view=False)
