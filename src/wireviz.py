@@ -97,9 +97,11 @@ class Harness:
             l = [n.name if n.show_name == True else '', a, p]
             dot.node(k, label=nested(l))
 
-            for x in n.loops:
-                dot.edge('{name}:p{port_from}:{loop_side}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=x[2]),
-                         '{name}:p{port_to}:{loop_side}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=x[2]))
+            if len(n.loops) > 0:
+                dot.attr('edge',color='#000000')
+                for x in n.loops:
+                    dot.edge('{name}:p{port_from}:{loop_side}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=x[2]),
+                             '{name}:p{port_to}:{loop_side}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=x[2]))
 
         for k in self.cables:
             c = self.cables[k]
