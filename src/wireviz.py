@@ -146,10 +146,11 @@ class Harness:
 
         return dot
 
-    def output(self, filename, format='pdf', view=True):
+    def output(self, filename, directory='_output', view=False, cleanup=True, format='pdf'):
         d = self.create_graph()
-        d.format = format
-        d.render(filename, view=view)
+        for f in format:
+            d.format = f
+            d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
 
 class Node:
 
