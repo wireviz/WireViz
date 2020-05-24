@@ -7,14 +7,14 @@ PINOUT_I2C = ('GND','+5V','SCL','SDA')
 COLORS_I2C = ('BK', 'RD', 'YE', 'GN')
 PINOUT_SPI_DATAONLY = ('MISO','MOSI','SCK')
 
-h.add_node('X1',type='Molex KK 254', gender='female',  pinout=('GND',
-                                                                     '+5V',
-                                                                     'SCL',
-                                                                     'SDA',
-                                                                     'MISO',
-                                                                     'MOSI',
-                                                                     'SCK',
-                                                                     'N/C'))
+h.add_node('X1', type='Molex KK 254', gender='female', pinout=('GND',
+                                                              '+5V',
+                                                              'SCL',
+                                                              'SDA',
+                                                              'MISO',
+                                                              'MOSI',
+                                                              'SCK',
+                                                              'N/C'))
 h.add_node('X2', type='Molex KK 254', gender='female', pinout=PINOUT_I2C)
 h.add_node('X3', type='Molex KK 254', gender='female', pinout=PINOUT_I2C)
 h.add_node('X4', type='Molex KK 254', gender='female', pinout=('GND','+12V')+PINOUT_SPI_DATAONLY)
