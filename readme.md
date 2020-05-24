@@ -99,7 +99,6 @@ The parser will follow later; contributions are welcome!
 
 ## To do
 
-* Automate creation of left/right side ports for connectors
 * Add simple connectors (ferrules, cable lugs)
   * no pinout
   * graphical representation?

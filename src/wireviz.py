@@ -63,8 +63,8 @@ class Harness:
     def add_cable(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
         self.cables[name] = Cable(name, mm2, awg, show_equiv, length, show_name, show_pinout, num_wires, colors, color_code, shield)
 
-    def loop(self, node_name, from_pin, to_pin, side=None):
-        self.nodes[node_name].loop(from_pin, to_pin, side)
+    def loop(self, node_name, from_pin, to_pin):
+        self.nodes[node_name].loop(from_pin, to_pin)
 
     def connect(self, cable_name, from_name, from_pin, via, to_name, to_pin):
         self.cables[cable_name].connect(from_name, from_pin, via, to_name, to_pin)
@@ -81,6 +81,15 @@ class Harness:
         dot.attr('node', shape='record', style='rounded,filled', fillcolor='white', fontname=font)
         dot.attr('edge', style='bold', fontname=font)
 
+        # prepare ports on connectors depending on which side they will connect
+        for k in self.cables:
+            c = self.cables[k]
+            for x in c.connections:
+                if x[1] is not None: # connect to left
+                    self.nodes[x[0]].ports_right = True
+                if x[4] is not None: # connect to right
+                    self.nodes[x[3]].ports_left = True
+
         for k in self.nodes:
             n = self.nodes[k]
             # a = attributes
@@ -90,18 +99,26 @@ class Harness:
             p[1] = list(n.pinout)
             for i,x in enumerate(n.pinout, 1):
                 if n.ports_left == True:
-                    p[0].append('<p{portno}>{portno}'.format(portno=i))
+                    p[0].append('<p{portno}l>{portno}'.format(portno=i))
                 if n.ports_right == True:
-                    p[2].append('<p{portno}>{portno}'.format(portno=i))
+                    p[2].append('<p{portno}r>{portno}'.format(portno=i))
             # l = label
             l = [n.name if n.show_name == True else '', a, p]
             dot.node(k, label=nested(l))
 
             if len(n.loops) > 0:
                 dot.attr('edge',color='#000000')
+                if n.ports_left == True:
+                    loop_side = 'l'
+                    loop_dir = 'w'
+                elif n.ports_right == True:
+                    loop_side = 'r'
+                    loop_dir = 'e'
+                else:
+                    raise Exception('No side for loops')
                 for x in n.loops:
-                    dot.edge('{name}:p{port_from}:{loop_side}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=x[2]),
-                             '{name}:p{port_to}:{loop_side}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=x[2]))
+                    dot.edge('{name}:p{port_from}{loop_side}:{loop_dir}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=loop_side, loop_dir=loop_dir),
+                             '{name}:p{port_to}{loop_side}:{loop_dir}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=loop_side, loop_dir=loop_dir))
 
         for k in self.cables:
             c = self.cables[k]
@@ -142,11 +159,13 @@ class Harness:
                 else: # it's a shield connection
                     dot.attr('edge',color='#000000')
                 if x[1] is not None: # connect to left
-                    dot.edge('{from_name}:p{from_port}'.format(from_name=x[0],from_port=x[1]),
+                    dot.edge('{from_name}:p{from_port}r'.format(from_name=x[0],from_port=x[1]),
                              '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='i' if c.show_pinout == True else ''))
+                    # self.nodes[x[0]].ports_right = True
                 if x[4] is not None: # connect to right
                     dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='o' if c.show_pinout == True else ''),
-                             '{to_name}:p{to_port}'.format(to_name=x[3], to_port=x[4]))
+                             '{to_name}:p{to_port}l'.format(to_name=x[3], to_port=x[4]))
+                    # self.nodes[x[3]].ports_left = True
 
         return dot
 
@@ -177,17 +196,8 @@ class Node:
                 else:
                     self.pinout = pinout
 
-    def loop(self, from_pin, to_pin, side=None):
-        if self.ports_left == True and self.ports_right == False:
-            loop_side = 'w' # west = left
-        elif self.ports_left == False and self.ports_right == True:
-            loop_side = 'e' # east = right
-        elif self.ports_left == True and self.ports_right == True:
-            if side == None:
-                raise Exception('Must specify side of loop')
-            else:
-                loop_side = side
-        self.loops.append((from_pin, to_pin, loop_side))
+    def loop(self, from_pin, to_pin):
+        self.loops.append((from_pin, to_pin))
 
 class Cable:
 
