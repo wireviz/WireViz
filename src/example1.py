@@ -12,4 +12,4 @@ h.loop('X2', 5, 6)
 # Harness.objects['W1'].connect('X1',(5,2,3),'auto','X2',(1,3,2)) # wires
 # Harness.objects['W1'].connect('X1',(5,),('s',),'X2',(None,))    # shield
 
-h.output('output/output', format='png', view=False)
+h.output(filename='output', format=('png','svg'), view=False)

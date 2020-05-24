@@ -23,4 +23,4 @@ h.add_node('X8', num_pins=6, ports_left=True)
 h.add_cable('W4', num_wires=6, length=1, mm2=1)
 h.connect_all_straight('W4','X7','X8')
 
-h.output('output/output', format='png', view=False)
+h.output(filename='output', format=('png','svg'), view=False)
