@@ -7,18 +7,18 @@ PINOUT_I2C = ('GND','+5V','SCL','SDA')
 COLORS_I2C = ('BK', 'RD', 'YE', 'GN')
 PINOUT_SPI_DATAONLY = ('MISO','MOSI','SCK')
 
-h.add_node('X1',type='Molex KK 254', gender='female',  pinout=('GND',
-                                                                     '+5V',
-                                                                     'SCL',
-                                                                     'SDA',
-                                                                     'MISO',
-                                                                     'MOSI',
-                                                                     'SCK',
-                                                                     'N/C'), ports_right=True)
-h.add_node('X2', type='Molex KK 254', gender='female', pinout=PINOUT_I2C, ports_left=True)
-h.add_node('X3', type='Molex KK 254', gender='female', pinout=PINOUT_I2C, ports_left=True)
-h.add_node('X4', type='Molex KK 254', gender='female', pinout=('GND','+12V')+PINOUT_SPI_DATAONLY, ports_left=True)
-h.add_node('X5', type='Molex Micro-Fit', gender='male', pinout=('GND','+12V'), ports_right=True)
+h.add_node('X1', type='Molex KK 254', gender='female', pinout=('GND',
+                                                              '+5V',
+                                                              'SCL',
+                                                              'SDA',
+                                                              'MISO',
+                                                              'MOSI',
+                                                              'SCK',
+                                                              'N/C'))
+h.add_node('X2', type='Molex KK 254', gender='female', pinout=PINOUT_I2C)
+h.add_node('X3', type='Molex KK 254', gender='female', pinout=PINOUT_I2C)
+h.add_node('X4', type='Molex KK 254', gender='female', pinout=('GND','+12V')+PINOUT_SPI_DATAONLY)
+h.add_node('X5', type='Molex Micro-Fit', gender='male', pinout=('GND','+12V'))
 h.add_cable('W1', mm2=0.14, show_equiv=True, length=0.2, colors=COLORS_I2C, show_name=False)
 h.add_cable('W2', mm2=0.14, show_equiv=True, length=0.2, colors=COLORS_I2C, show_name=False)
 h.add_cable('W3', mm2=0.14, show_equiv=True, length=0.2, colors=('BK','BU','OG','VT'), show_name=False)
