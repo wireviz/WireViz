@@ -57,11 +57,11 @@ class Harness:
         self.nodes = {}
         self.cables = {}
 
-    def add_node(self, name, type=None, gender=None, show_name=True, num_pins=None, pinout=None, ports_left=False, ports_right=False):
-        self.nodes[name] = Node(name, type, gender, show_name, num_pins, pinout, ports_left, ports_right)
+    def add_node(self, name, type=None, gender=None, show_name=True, num_pins=None, show_num_pins=True, pinout=None, ports_left=False, ports_right=False):
+        self.nodes[name] = Node(name, type, gender, show_name, num_pins, show_num_pins, pinout, ports_left, ports_right)
 
-    def add_cable(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
-        self.cables[name] = Cable(name, mm2, awg, show_equiv, length, show_name, show_pinout, num_wires, colors, color_code, shield)
+    def add_cable(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, show_num_wires=True, colors=None, color_code=None, shield=False):
+        self.cables[name] = Cable(name, mm2, awg, show_equiv, length, show_name, show_pinout, num_wires, show_num_wires, colors, color_code, shield)
 
     def loop(self, node_name, from_pin, to_pin):
         self.nodes[node_name].loop(from_pin, to_pin)
@@ -93,7 +93,9 @@ class Harness:
         for k in self.nodes:
             n = self.nodes[k]
             # a = attributes
-            a = [n.type, n.gender, '{}-pin'.format(len(n.pinout))]
+            a = [n.type,
+                 n.gender,
+                 '{}-pin'.format(len(n.pinout)) if n.show_num_pins == True else '']
             # p = pinout
             p = [[],[],[]]
             p[1] = list(n.pinout)
@@ -123,11 +125,11 @@ class Harness:
         for k in self.cables:
             c = self.cables[k]
             # a = attributes
-            a = ['{}x'.format(len(c.colors)),
-                 '{} mm\u00B2{}'.format(c.mm2, ' ({} AWG)'.format(awg_equiv(c.mm2)) if c.show_equiv == True else ''),
+            a = ['{}x'.format(len(c.colors)) if c.show_num_wires == True else '',
+                 '{} mm\u00B2{}'.format(c.mm2, ' ({} AWG)'.format(awg_equiv(c.mm2)) if c.show_equiv == True else '') if c.mm2 is not None else '',
                  c.awg,
                  '+ S' if c.shield == True else '',
-                 '{} m'.format(c.length)]
+                 '{} m'.format(c.length) if c.length > 0 else '']
             # p = pinout
             p = [[],[],[]]
             for i,x in enumerate(c.colors,1):
@@ -178,11 +180,12 @@ class Harness:
 
 class Node:
 
-    def __init__(self, name, type=None, gender=None, show_name=True, num_pins=None, pinout=None, ports_left=False, ports_right=False):
+    def __init__(self, name, type=None, gender=None, show_name=True, num_pins=None, show_num_pins=True, pinout=None, ports_left=False, ports_right=False):
         self.name = name
         self.type = type
         self.gender = gender
         self.show_name = show_name
+        self.show_num_pins = show_num_pins
         self.ports_left = ports_left
         self.ports_right = ports_right
         self.loops = []
@@ -201,7 +204,7 @@ class Node:
 
 class Cable:
 
-    def __init__(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, colors=None, color_code=None, shield=False):
+    def __init__(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, show_num_wires=True, colors=None, color_code=None, shield=False):
         self.name = name
         if mm2 is not None and awg is not None:
             raise Exception('You cannot define both mm2 and awg!')
@@ -211,6 +214,7 @@ class Cable:
         self.length = length
         self.show_name = show_name
         self.show_pinout = show_pinout
+        self.show_num_wires = show_num_wires
         self.shield = shield
         self.connections = []
         if color_code is None and colors is None:
