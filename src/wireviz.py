@@ -261,7 +261,9 @@ def nested(input):
     for x in input:
         if isinstance(x, list):
             if len(x) > 0:
-                l.append('{' + nested(x) + '}')
+                n = nested(x)
+                if n != '':
+                    l.append('{' + n + '}')
         else:
             if x is not None:
                 if x != '':
