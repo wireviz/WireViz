@@ -23,6 +23,8 @@ It is based on [GraphViz](https://www.graphviz.org/) and designed as an "extensi
 * Allows more than one connector per side, as well as loopbacks
 * Allows for easy-autorouting for 1-to-1 wiring
 
+_Note_: WireViz is not designed to represent the complete wiring of a system. Its main aim is to document the construction of individual wires and harnesses.
+
 ## Example
 
 WireViz input file:

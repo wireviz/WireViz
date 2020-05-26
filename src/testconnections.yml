@@ -1,0 +1,43 @@
+nodes:
+  X1:
+    # type: D-Sub
+    # gender: female
+    num_pins: 15
+  X2:
+    type: Molex KK 254
+    gender: female
+    num_pins: 10
+
+wires:
+  W1:
+    mm2: 0.25
+    length: 0.2
+    color_code: DIN
+    num_wires: 15
+    shield: true
+
+connections:
+  -
+    - X1: 1
+    - W1: 1
+    - X2: 1
+  -
+    - X1: [2,3,4]
+    - W1: [2,3,4]
+    - X2: [4,3,2]
+  -
+    - X1: [5-10]
+    - W1: [5-7,10,9,8]
+    - X2: [10-5]
+  -
+    - X1: 11
+    - W1: s
+  -
+    - X1: [1-5]
+    - W1: [11-15]
+  -
+    - W1: [12-15]
+    - X2: [2-5]
+  -
+    - X1: [12,14]
+    - X1: [13,15]

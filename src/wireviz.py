@@ -248,15 +248,9 @@ class Cable:
             self.colors = cc[:n]
 
     def connect(self, from_name, from_pin, via, to_name, to_pin):
-        if from_pin == 'auto':
-            from_pin = tuple(x+1 for x in range(len(self.colors)))
-        if via == 'auto':
-            via = tuple(x+1 for x in range(len(self.colors)))
-        if to_pin == 'auto':
-            to_pin = tuple(x+1 for x in range(len(self.colors)))
         from_pin = int2tuple(from_pin)
-        via = int2tuple(via)
-        to_pin = int2tuple(to_pin)
+        via      = int2tuple(via)
+        to_pin   = int2tuple(to_pin)
         if len(from_pin) != len(to_pin):
             raise Exception('from_pin must have the same number of elements as to_pin')
         for i, x in enumerate(from_pin):
