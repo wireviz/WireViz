@@ -1,7 +1,7 @@
 import yaml
 import wireviz
 
-filename = 'example1.yml'
+filename = '../examples/example2.yml'
 
 def check_designators(what, where):
     for i,x in enumerate(what):
@@ -124,4 +124,4 @@ for con in conlist:
     else:
         raise Exception('Wrong number of connection parameters')
 
-h.output(filename='output', format=('png',), view=False)
+h.output(filename='output', format=('png','svg'), view=False)
