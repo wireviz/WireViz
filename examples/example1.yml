@@ -1,0 +1,30 @@
+nodes:
+  X1:
+    type: D-Sub
+    gender: female
+    pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
+    random: yes
+  X2:
+    type: Molex KK 254
+    gender: female
+    pinout: [GND, RX, TX, N/C, OUT, IN]
+
+wires:
+  W1:
+    mm2: 0.25
+    length: 0.2
+    color_code: DIN
+    num_wires: 3
+    shield: true
+
+connections:
+  - # format: connector->wire->connector
+    - X1: [5,2,1]
+    - W1: [1,2,3]
+    - X2: [1,3,2]
+  - # format: connector->wire or wire->connector
+    - X1: 5
+    - W1: s
+  - # loop: connector-connector
+    - X2: 5
+    - X2: 6

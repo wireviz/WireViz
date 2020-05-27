@@ -66,8 +66,8 @@ class Harness:
     def loop(self, node_name, from_pin, to_pin):
         self.nodes[node_name].loop(from_pin, to_pin)
 
-    def connect(self, cable_name, from_name, from_pin, via, to_name, to_pin):
-        self.cables[cable_name].connect(from_name, from_pin, via, to_name, to_pin)
+    def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
+        self.cables[via_name].connect(from_name, from_pin, via_pin, to_name, to_pin)
 
     def connect_all_straight(self, cable_name, from_name, to_name):
         self.cables[cable_name].connect_all_straight(from_name, to_name)
@@ -191,6 +191,8 @@ class Node:
         self.loops = []
 
         if pinout is None:
+            if num_pins is None:
+                num_pins = 1
             self.pinout = ('',) * num_pins
         else:
             if num_pins is None:
@@ -245,17 +247,14 @@ class Cable:
                  cc = cc * int(m)
             self.colors = cc[:n]
 
-    def connect(self, from_name, from_pin, via, to_name, to_pin):
-        if from_pin == 'auto':
-            from_pin = tuple(x+1 for x in range(len(self.colors)))
-        if via == 'auto':
-            via = tuple(x+1 for x in range(len(self.colors)))
-        if to_pin == 'auto':
-            to_pin = tuple(x+1 for x in range(len(self.colors)))
+    def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
+        from_pin = int2tuple(from_pin)
+        via_pin  = int2tuple(via_pin)
+        to_pin   = int2tuple(to_pin)
         if len(from_pin) != len(to_pin):
             raise Exception('from_pin must have the same number of elements as to_pin')
         for i, x in enumerate(from_pin):
-            self.connections.append((from_name, from_pin[i], via[i], to_name, to_pin[i]))
+            self.connections.append((from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
 
     def connect_all_straight(self, from_name, to_name):
         self.connect(from_name, 'auto', 'auto', to_name, 'auto')
@@ -274,6 +273,13 @@ def nested(input):
                     l.append(str(x))
     s = '|'.join(l)
     return s
+
+def int2tuple(input):
+    if isinstance(input, tuple):
+        output = input
+    else:
+        output = (input,)
+    return output
 
 def translate_color(input, color_mode):
     if input == '':
