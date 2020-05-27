@@ -1,4 +1,4 @@
-templates:
+templates: # defining templates to be used later on
   - &molex_f
     type: Molex KK 254
     gender: female
@@ -11,11 +11,11 @@ templates:
 
 nodes:
   X1:
-    <<: *molex_f
+    <<: *molex_f # copying items from the template
     pinout: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, N/C]
   X2:
     <<: *molex_f
-    <<: *con_i2c
+    <<: *con_i2c # it is possible to copy from more than one template
   X3:
     <<: *molex_f
     <<: *con_i2c
