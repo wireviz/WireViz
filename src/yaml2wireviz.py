@@ -75,7 +75,7 @@ for con in conlist:
             raise Exception('List length mismatch')
 
         for (from_pin, via_pin, to_pin) in zip(from_pins, via_pins, to_pins):
-            h.connect(via_name, from_name, from_pin, via_pin, to_name, to_pin)
+            h.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
 
     elif len(con) == 2:
 
@@ -102,9 +102,9 @@ for con in conlist:
         if n_w == True or w_n == True:
             for (from_pin, to_pin) in zip(from_pins, to_pins):
                 if n_w:
-                    h.connect(to_name, from_name, from_pin, to_pin, None, None)
+                    h.connect(from_name, from_pin, to_name, to_pin, None, None)
                 else: # w_n
-                    h.connect(from_name, None, None, from_pin, to_name, to_pin)
+                    h.connect(None, None, from_name, from_pin, to_name, to_pin)
         elif n_n == True:
             con_name  = list(con[0].keys())[0]
             from_pins = expand(con[0][from_name])
