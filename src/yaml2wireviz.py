@@ -47,10 +47,19 @@ with open(filename, 'r') as stream:
 h = wireviz.Harness()
 # add nodes
 for k, o in input['nodes'].items():
-    h.add_node(k, type=o.get('type'), gender=o.get('gender'), num_pins=o.get('num_pins'), pinout=o.get('pinout'))
+    h.add_node(k, type=o.get('type'),
+                  gender=o.get('gender'),
+                  num_pins=o.get('num_pins'),
+                  pinout=o.get('pinout'))
 # add wires
 for k, o in input['wires'].items():
-    h.add_cable(k, mm2=o.get('mm2'), length=o.get('length'), num_wires=o.get('num_wires'), color_code=o.get('color_code'), shield=o.get('shield'))
+    h.add_cable(k, mm2=o.get('mm2'),
+                   awg=o.get('awg'),
+                   length=o.get('length'),
+                   num_wires=o.get('num_wires'),
+                   colors=o.get('colors'),
+                   color_code=o.get('color_code'),
+                   shield=o.get('shield'))
 # add connections
 conlist = input['connections']
 for con in conlist:
