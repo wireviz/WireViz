@@ -8,14 +8,14 @@ COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'G
 color_hex = {
              'BK': '#000000',
              'WH': '#ffffff',
-             'GY': '#808080',
-             'PK': '#ff80c0',
+             'GY': '#999999',
+             'PK': '#ff66cc',
              'RD': '#ff0000',
              'OG': '#ff8000',
              'YE': '#ffff00',
-             'GN': '#00ff00',
+             'GN': '#009900',
              'TQ': '#00ffff',
-             'BU': '#0000ff',
+             'BU': '#0066ff',
              'VT': '#8000ff',
              'BN': '#666600',
               }
