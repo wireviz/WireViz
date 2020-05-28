@@ -1,10 +1,12 @@
 import yaml
 import wireviz
 
+filename = '../examples/example1.yml'
 filename = '../examples/example2.yml'
+filename = '../examples/ferrules.yml'
 
 def check_designators(what, where):
-    for i,x in enumerate(what):
+    for i, x in enumerate(what):
         # print('Looking for {} in {}'.format(x,where[i]))
         if x not in input[where[i]]:
             return False
@@ -45,24 +47,33 @@ with open(filename, 'r') as stream:
         print(exc)
 
 h = wireviz.Harness()
-# add nodes
-for k, o in input['nodes'].items():
-    h.add_node(k, type=o.get('type'),
-                  gender=o.get('gender'),
-                  num_pins=o.get('num_pins'),
-                  pinout=o.get('pinout'))
-# add wires
-for k, o in input['wires'].items():
-    h.add_cable(k, mm2=o.get('mm2'),
-                   awg=o.get('awg'),
-                   length=o.get('length'),
-                   num_wires=o.get('num_wires'),
-                   colors=o.get('colors'),
-                   color_code=o.get('color_code'),
-                   shield=o.get('shield'))
+
+# add items
+sections = ['nodes','wires','ferrules','connections']
+types    = [dict, dict, dict, list]
+for sec, ty in zip(sections, types):
+    if sec in input and type(input[sec]) == ty:
+        if len(input[sec]) > 0:
+            if ty == dict:
+                for k, o in input[sec].items():
+                    if sec == 'nodes':
+                        h.add_node(name=k, **o)
+                    elif sec == 'wires':
+                        h.add_cable(name=k, **o)
+                    elif sec == 'ferrules':
+                        pass
+        else:
+            print('{} section empty'.format(sec))
+    else:
+        print('No {} section found'.format(sec))
+        if ty == dict:
+            input[sec] = {}
+        elif ty == list:
+            input[sec] = []
+
 # add connections
-conlist = input['connections']
-for con in conlist:
+ferrule_counter = 0
+for con in input['connections']:
     if len(con) == 3: # format: connector -- wire -- conector
 
         for c in con:
@@ -89,38 +100,79 @@ for con in conlist:
     elif len(con) == 2:
 
         for c in con:
-            if len(list(c.keys())) != 1: # check that each entry in con has only one key, which is the designator
-                raise Exception('Too many keys')
+            if type(c) is dict:
+                if len(list(c.keys())) != 1: # check that each entry in con has only one key, which is the designator
+                    raise Exception('Too many keys')
+
+        # hack to make the format for ferrules compatible with the formats for connectors and wires
+        if type(con[0]) == str:
+            name = con[0]
+            con[0] = {}
+            con[0][name] = name
+        if type(con[1]) == str:
+            name = con[1]
+            con[1] = {}
+            con[1][name] = name
 
         from_name = list(con[0].keys())[0]
-        to_name = list(con[1].keys())[0]
+        to_name   = list(con[1].keys())[0]
 
         n_w = check_designators([from_name, to_name],('nodes','wires'))
         w_n = check_designators([from_name, to_name],('wires','nodes'))
         n_n = check_designators([from_name, to_name],('nodes','nodes'))
 
-        if not n_w and not w_n and not n_n:
+
+        f_w = check_designators([from_name, to_name],('ferrules','wires'))
+        w_f = check_designators([from_name, to_name],('wires','ferrules'))
+
+        if not n_w and not w_n and not n_n and not f_w and not w_f:
             raise Exception('Wrong designators')
 
         from_pins = expand(con[0][from_name])
         to_pins  = expand(con[1][to_name])
 
-        if len(from_pins) != len(to_pins):
-            raise Exception('List length mismatch')
+        if n_w or w_n or n_n:
+            if len(from_pins) != len(to_pins):
+                raise Exception('List length mismatch')
 
-        if n_w == True or w_n == True:
+        if n_w or w_n:
             for (from_pin, to_pin) in zip(from_pins, to_pins):
                 if n_w:
                     h.connect(from_name, from_pin, to_name, to_pin, None, None)
                 else: # w_n
                     h.connect(None, None, from_name, from_pin, to_name, to_pin)
-        elif n_n == True:
+        elif n_n:
             con_name  = list(con[0].keys())[0]
             from_pins = expand(con[0][from_name])
             to_pins   = expand(con[1][to_name])
 
             for (from_pin, to_pin) in zip(from_pins, to_pins):
                 h.loop(con_name, from_pin, to_pin)
+        if f_w or w_f:
+            from_pins = expand(con[0][from_name])
+            to_pins   = expand(con[1][to_name])
+
+            if f_w:
+                ferrule_name = from_name
+                wire_name = to_name
+                wire_pins = to_pins
+            else:
+                ferrule_name = to_name
+                wire_name = from_name
+                wire_pins = from_pins
+
+            ferrule_params = input['ferrules'][ferrule_name]
+            for wire_pin in wire_pins:
+                ferrule_counter = ferrule_counter + 1
+                ferrule_id = 'F{}'.format(ferrule_counter)
+                h.add_node(ferrule_id, **ferrule_params)
+
+                if f_w:
+                    h.connect(ferrule_id, 1, wire_name, wire_pin, None, None)
+                else:
+                    h.connect(None, None, wire_name, wire_pin, ferrule_id, 1)
+
+
     else:
         raise Exception('Wrong number of connection parameters')
 

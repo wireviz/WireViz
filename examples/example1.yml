@@ -3,7 +3,6 @@ nodes:
     type: D-Sub
     gender: female
     pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
-    random: yes
   X2:
     type: Molex KK 254
     gender: female

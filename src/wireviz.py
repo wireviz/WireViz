@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+from typing import Any, List
 from graphviz import Graph
 
 COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'GYPK','RDBU','WHGN','BNGN','WHYE','YEBN','WHGY','GYBN','WHPK','PKBN'],
@@ -8,14 +10,14 @@ COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'G
 color_hex = {
              'BK': '#000000',
              'WH': '#ffffff',
-             'GY': '#808080',
-             'PK': '#ff80c0',
+             'GY': '#999999',
+             'PK': '#ff66cc',
              'RD': '#ff0000',
              'OG': '#ff8000',
              'YE': '#ffff00',
-             'GN': '#00ff00',
+             'GN': '#009900',
              'TQ': '#00ffff',
-             'BU': '#0000ff',
+             'BU': '#0066ff',
              'VT': '#8000ff',
              'BN': '#666600',
               }
@@ -57,11 +59,11 @@ class Harness:
         self.nodes = {}
         self.cables = {}
 
-    def add_node(self, name, type=None, gender=None, show_name=True, num_pins=None, show_num_pins=True, pinout=None, ports_left=False, ports_right=False):
-        self.nodes[name] = Node(name, type, gender, show_name, num_pins, show_num_pins, pinout, ports_left, ports_right)
+    def add_node(self, name, *args, **kwargs):
+        self.nodes[name] = Node(name, *args, **kwargs)
 
-    def add_cable(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, show_num_wires=True, colors=None, color_code=None, shield=False):
-        self.cables[name] = Cable(name, mm2, awg, show_equiv, length, show_name, show_pinout, num_wires, show_num_wires, colors, color_code, shield)
+    def add_cable(self, name, *args, **kwargs):
+        self.cables[name] = Cable(name, *args, **kwargs)
 
     def loop(self, node_name, from_pin, to_pin):
         self.nodes[node_name].loop(from_pin, to_pin)
@@ -82,38 +84,36 @@ class Harness:
         dot.attr('edge', style='bold', fontname=font)
 
         # prepare ports on connectors depending on which side they will connect
-        for k in self.cables:
-            c = self.cables[k]
+        for k, c in self.cables.items():
             for x in c.connections:
                 if x[1] is not None: # connect to left
                     self.nodes[x[0]].ports_right = True
                 if x[4] is not None: # connect to right
                     self.nodes[x[3]].ports_left = True
 
-        for k in self.nodes:
-            n = self.nodes[k]
+        for k, n in self.nodes.items():
             # a = attributes
             a = [n.type,
                  n.gender,
-                 '{}-pin'.format(len(n.pinout)) if n.show_num_pins == True else '']
+                 '{}-pin'.format(len(n.pinout)) if n.show_num_pins else '']
             # p = pinout
             p = [[],[],[]]
             p[1] = list(n.pinout)
-            for i,x in enumerate(n.pinout, 1):
-                if n.ports_left == True:
+            for i, x in enumerate(n.pinout, 1):
+                if n.ports_left:
                     p[0].append('<p{portno}l>{portno}'.format(portno=i))
-                if n.ports_right == True:
+                if n.ports_right:
                     p[2].append('<p{portno}r>{portno}'.format(portno=i))
             # l = label
-            l = [n.name if n.show_name == True else '', a, p]
+            l = [n.name if n.show_name else '', a, p]
             dot.node(k, label=nested(l))
 
             if len(n.loops) > 0:
                 dot.attr('edge',color='#000000')
-                if n.ports_left == True:
+                if n.ports_left:
                     loop_side = 'l'
                     loop_dir = 'w'
-                elif n.ports_right == True:
+                elif n.ports_right:
                     loop_side = 'r'
                     loop_dir = 'e'
                 else:
@@ -122,24 +122,23 @@ class Harness:
                     dot.edge('{name}:p{port_from}{loop_side}:{loop_dir}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=loop_side, loop_dir=loop_dir),
                              '{name}:p{port_to}{loop_side}:{loop_dir}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=loop_side, loop_dir=loop_dir))
 
-        for k in self.cables:
-            c = self.cables[k]
+        for k, c in self.cables.items():
             # a = attributes
-            a = ['{}x'.format(len(c.colors)) if c.show_num_wires == True else '',
-                 '{} mm\u00B2{}'.format(c.mm2, ' ({} AWG)'.format(awg_equiv(c.mm2)) if c.show_equiv == True else '') if c.mm2 is not None else '',
+            a = ['{}x'.format(len(c.colors)) if c.show_num_wires else '',
+                 '{} mm\u00B2{}'.format(c.mm2, ' ({} AWG)'.format(awg_equiv(c.mm2)) if c.show_equiv else '') if c.mm2 is not None else '',
                  c.awg,
-                 '+ S' if c.shield == True else '',
+                 '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
             # p = pinout
             p = [[],[],[]]
-            for i,x in enumerate(c.colors,1):
+            for i, x in enumerate(c.colors,1):
                 if c.show_pinout:
                     p[0].append('<w{wireno}i>{wireno}'.format(wireno=i))
                     p[1].append('{wirecolor}'.format(wirecolor=translate_color(x, self.color_mode)))
                     p[2].append('<w{wireno}o>{wireno}'.format(wireno=i))
                 else:
                     p[1].append('<w{wireno}>{wirecolor}'.format(wireno=i,wirecolor=translate_color(x, self.color_mode)))
-            if c.shield == True:
+            if c.shield:
                 if c.show_pinout:
                     p[0].append('<wsi>')
                     p[1].append('Shield')
@@ -147,7 +146,7 @@ class Harness:
                 else:
                     p[1].append('<ws>Shield')
             # l = label
-            l = [c.name if c.show_name == True else '', a, p]
+            l = [c.name if c.show_name else '', a, p]
             dot.node(k, label=nested(l))
 
             # connections
@@ -162,10 +161,10 @@ class Harness:
                     dot.attr('edge',color='#000000')
                 if x[1] is not None: # connect to left
                     dot.edge('{from_name}:p{from_port}r'.format(from_name=x[0],from_port=x[1]),
-                             '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='i' if c.show_pinout == True else ''))
+                             '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='i' if c.show_pinout else ''))
                     # self.nodes[x[0]].ports_right = True
                 if x[4] is not None: # connect to right
-                    dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='o' if c.show_pinout == True else ''),
+                    dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='o' if c.show_pinout else ''),
                              '{to_name}:p{to_port}l'.format(to_name=x[3], to_port=x[4]))
                     # self.nodes[x[3]].ports_left = True
 
@@ -178,74 +177,73 @@ class Harness:
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
 
+@dataclass
 class Node:
+    name: str
+    type: str = None
+    gender: str = None
+    num_pins: int = None
+    pinout: List[Any] = field(default_factory=list)
+    show_name: bool = False
+    show_num_pins: bool = False
 
-    def __init__(self, name, type=None, gender=None, show_name=True, num_pins=None, show_num_pins=True, pinout=None, ports_left=False, ports_right=False):
-        self.name = name
-        self.type = type
-        self.gender = gender
-        self.show_name = show_name
-        self.show_num_pins = show_num_pins
-        self.ports_left = ports_left
-        self.ports_right = ports_right
+    def __post_init__(self):
+        self.ports_left = False
+        self.ports_right = False
         self.loops = []
 
-        if pinout is None:
-            if num_pins is None:
-                num_pins = 1
-            self.pinout = ('',) * num_pins
+        if self.pinout:
+            if self.num_pins is not None:
+                raise Exception('You cannot specify both pinout and num_pins')
         else:
-            if num_pins is None:
-                if pinout is None:
-                    raise Exception('Must provide num_pins or pinout')
-                else:
-                    self.pinout = pinout
+            if not self.num_pins:
+                self.num_pins = 1
+            self.pinout = ['',] * self.num_pins
 
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
 
+@dataclass
 class Cable:
+    name: str
+    mm2: float = None
+    awg: int = None
+    show_equiv: bool = False
+    length: float = 0
+    num_wires: int = None
+    shield: bool = False
+    colors: List[Any] = field(default_factory=list)
+    color_code: str = None
+    show_name: bool = False
+    show_pinout: bool = False
+    show_num_wires: bool = True
 
-    def __init__(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, show_num_wires=True, colors=None, color_code=None, shield=False):
-        self.name = name
-        if mm2 is not None and awg is not None:
+    def __post_init__(self):
+        if self.mm2 and self.awg:
             raise Exception('You cannot define both mm2 and awg!')
-        self.mm2 = mm2
-        self.awg = awg
-        self.show_equiv = show_equiv
-        self.length = length
-        self.show_name = show_name
-        self.show_pinout = show_pinout
-        self.show_num_wires = show_num_wires
-        self.shield = shield
         self.connections = []
-        if color_code is None and colors is None:
-            self.colors = ('',) * num_wires
-        else:
-            if colors is None: # no custom color pallet was specified
-                if num_wires is None:
-                    raise Exception('Unknown number of wires')
-                else:
-                    if color_code is None:
-                        raise Exception('No color code')
-                    # choose color code
-                    if color_code not in COLOR_CODES:
-                        raise Exception('Unknown color code')
-                    else:
-                        cc = COLOR_CODES[color_code]
-                n = num_wires
-            else: # custom color pallet was specified
-                cc = colors
-                if num_wires is None: # assume number of wires = number of items in custom pallet
-                    n = len(cc)
-                else: # number of wires was specified
-                    n = num_wires
 
-            cc = tuple(cc)
-            if n > len(cc):
-                 m = num_wires // len(cc) + 1
-                 cc = cc * int(m)
-            self.colors = cc[:n]
+        if self.num_wires: # number of wires explicitly defined
+            if self.colors: # use custom color palette (partly or looped if needed)
+                pass
+            elif self.color_code: # use standard color palette (partly or looped if needed)
+                if self.color_code not in COLOR_CODES:
+                    raise Exception('Unknown color code')
+                self.colors = COLOR_CODES[self.color_code]
+            else: # no colors defined, add dummy colors
+                self.colors = [''] * self.num_wires
+
+            # make color code loop around if more wires than colors
+            if self.num_wires > len(self.colors):
+                 m = self.num_wires // len(self.colors) + 1
+                 self.colors = self.colors * int(m)
+            # cut off excess after looping
+            self.colors = self.colors[:self.num_wires]
+
+        else: # num_wires implicit in length of color list
+            if not self.colors:
+                raise Exception('Unknown number of wires. Must specify num_wires or colors (implicit length)')
+            self.num_wires = len(self.colors)
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
         from_pin = int2tuple(from_pin)
