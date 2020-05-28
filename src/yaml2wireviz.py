@@ -4,7 +4,7 @@ import wireviz
 filename = '../examples/ferrules.yml'
 
 def check_designators(what, where):
-    for i,x in enumerate(what):
+    for i, x in enumerate(what):
         # print('Looking for {} in {}'.format(x,where[i]))
         if x not in input[where[i]]:
             return False
@@ -142,24 +142,24 @@ if 'connections' in input:
                     if len(from_pins) != len(to_pins):
                         raise Exception('List length mismatch')
 
-                if n_w == True or w_n == True:
+                if n_w or w_n:
                     for (from_pin, to_pin) in zip(from_pins, to_pins):
                         if n_w:
                             h.connect(from_name, from_pin, to_name, to_pin, None, None)
                         else: # w_n
                             h.connect(None, None, from_name, from_pin, to_name, to_pin)
-                elif n_n == True:
+                elif n_n:
                     con_name  = list(con[0].keys())[0]
                     from_pins = expand(con[0][from_name])
                     to_pins   = expand(con[1][to_name])
 
                     for (from_pin, to_pin) in zip(from_pins, to_pins):
                         h.loop(con_name, from_pin, to_pin)
-                if f_w == True or w_f == True:
+                if f_w or w_f:
                     from_pins = expand(con[0][from_name])
                     to_pins   = expand(con[1][to_name])
 
-                    if f_w == True:
+                    if f_w:
                         ferrule_name = from_name
                         wire_name = to_name
                         wire_pins = to_pins
@@ -177,7 +177,7 @@ if 'connections' in input:
                                                num_pins=ferrule.get('num_pins'),
                                                pinout=ferrule.get('pinout'))
 
-                        if f_w == True:
+                        if f_w:
                             h.connect(ferrule_id, 1, wire_name, wire_pin, None, None)
                         else:
                             h.connect(None, None, wire_name, wire_pin, ferrule_id, 1)
