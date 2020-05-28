@@ -180,10 +180,12 @@ class Node:
     def __init__(self, name,
                        type=None,
                        gender=None,
-                       show_name=True,
                        num_pins=True,
+                       pinout=None,
+
+                       show_name=True,
                        show_num_pins=None,
-                       pinout=None):
+                       ):
         self.name = name
         self.type = type
         self.gender = gender
@@ -215,13 +217,15 @@ class Cable:
                        awg=None,
                        show_equiv=False,
                        length=0,
-                       show_name=False,
-                       show_pinout=False,
                        num_wires=None,
-                       show_num_wires=True,
+                       shield=False,
                        colors=None,
                        color_code=None,
-                       shield=False                       ):
+
+                       show_name=False,
+                       show_pinout=False,
+                       show_num_wires=True,
+                       ):
         self.name = name
         if mm2 is not None and awg is not None:
             raise Exception('You cannot define both mm2 and awg!')
