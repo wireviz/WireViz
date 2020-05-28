@@ -161,14 +161,11 @@ for con in input['connections']:
                 wire_name = from_name
                 wire_pins = from_pins
 
-            ferrule = input['ferrules'][ferrule_name]
+            ferrule_params = input['ferrules'][ferrule_name]
             for wire_pin in wire_pins:
                 ferrule_counter = ferrule_counter + 1
                 ferrule_id = 'F{}'.format(ferrule_counter)
-                h.add_node(ferrule_id, type=ferrule.get('type'),
-                                       gender=ferrule.get('gender'),
-                                       num_pins=ferrule.get('num_pins'),
-                                       pinout=ferrule.get('pinout'))
+                h.add_node(ferrule_id, **ferrule_params)
 
                 if f_w:
                     h.connect(ferrule_id, 1, wire_name, wire_pin, None, None)
