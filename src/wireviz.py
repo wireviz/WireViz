@@ -223,45 +223,27 @@ class Cable:
             raise Exception('You cannot define both mm2 and awg!')
         self.connections = []
 
-        # TODO: fix logic
+        if self.num_wires: # number of wires explicitly defined
+            if self.colors: # use custom color palette (partly or looped if needed)
+                pass
+            elif self.color_code: # use standard color palette (partly or looped if needed)
+                if self.color_code not in COLOR_CODES:
+                    raise Exception('Unknown color code')
+                self.colors = COLOR_CODES[self.color_code]
+            else: # no colors defined, add dummy colors
+                self.colors = [''] * self.num_wires
 
-        # OK:
-        # only num_wires, no colors
-        # num_wires + colors
-        # num_wires + color code
-        # colors (num_wires implicit)
+            # make color code loop around if more wires than colors
+            if self.num_wires > len(self.colors):
+                 m = self.num_wires // len(self.colors) + 1
+                 self.colors = self.colors * int(m)
+            # cut off excess after looping
+            self.colors = self.colors[:self.num_wires]
 
-        # NOK:
-        # color_code only
-        # nothing
-
-        if self.color_code is None and self.colors is None:
-            self.colors = ('',) * self.num_wires
-        else:
-            if not self.colors: # no custom color pallet was specified
-                if not self.num_wires:
-                    raise Exception('Unknown number of wires')
-                else:
-                    if not self.color_code:
-                        raise Exception('No color code')
-                    # choose color code
-                    if self.color_code not in COLOR_CODES:
-                        raise Exception('Unknown color code')
-                    else:
-                        cc = COLOR_CODES[self.color_code]
-                n = self.num_wires
-            else: # custom color pallet was specified
-                cc = self.colors
-                if self.num_wires is None: # assume number of wires = number of items in custom pallet
-                    n = len(cc)
-                else: # number of wires was specified
-                    n = self.num_wires
-
-            cc = tuple(cc)
-            if n > len(cc): # make color code loop around if more wires than colors
-                 m = self.num_wires // len(cc) + 1
-                 cc = cc * int(m)
-            self.colors = cc[:n]
+        else: # num_wires implicit in length of color list
+            if not self.colors:
+                raise Exception('Unknown number of wires. Must specify num_wires or colors (implicit length)')
+            self.num_wires = len(self.colors)
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
         from_pin = int2tuple(from_pin)
