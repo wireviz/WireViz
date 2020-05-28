@@ -1,6 +1,8 @@
 import yaml
 import wireviz
 
+filename = '../examples/example1.yml'
+filename = '../examples/example2.yml'
 filename = '../examples/ferrules.yml'
 
 def check_designators(what, where):
@@ -49,10 +51,7 @@ h = wireviz.Harness()
 if 'nodes' in input and type(input['nodes']) == dict:
     if len(input['nodes']) > 0:
         for k, o in input['nodes'].items():
-            h.add_node(k, type=o.get('type'),
-                          gender=o.get('gender'),
-                          num_pins=o.get('num_pins'),
-                          pinout=o.get('pinout'))
+            h.add_node(name=k, **o)
     else:
         print('Node list empty')
 else:
@@ -63,18 +62,21 @@ else:
 if 'wires' in input and type(input['wires']) == dict:
     if len(input['wires']) > 0:
         for k, o in input['wires'].items():
-            h.add_cable(k, mm2=o.get('mm2'),
-                           awg=o.get('awg'),
-                           length=o.get('length'),
-                           num_wires=o.get('num_wires'),
-                           colors=o.get('colors'),
-                           color_code=o.get('color_code'),
-                           shield=o.get('shield'))
+            h.add_cable(name=k, **o)
     else:
         print('Wire list empty')
 else:
     print('No wire list found')
     input['wires'] = {}
+
+if 'ferrules' in input and type(input['ferrules']) == dict:
+    if len(input['wires']) > 0:
+        pass
+    else:
+        print('Ferrule list empty')
+else:
+    print('No ferrule list found')
+    input['ferrules'] = {}
 
 # add connections
 if 'connections' in input:
@@ -128,6 +130,7 @@ if 'connections' in input:
                 n_w = check_designators([from_name, to_name],('nodes','wires'))
                 w_n = check_designators([from_name, to_name],('wires','nodes'))
                 n_n = check_designators([from_name, to_name],('nodes','nodes'))
+
 
                 f_w = check_designators([from_name, to_name],('ferrules','wires'))
                 w_f = check_designators([from_name, to_name],('wires','ferrules'))

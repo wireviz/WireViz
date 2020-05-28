@@ -57,11 +57,11 @@ class Harness:
         self.nodes = {}
         self.cables = {}
 
-    def add_node(self, name, type=None, gender=None, show_name=True, num_pins=None, show_num_pins=True, pinout=None, ports_left=False, ports_right=False):
-        self.nodes[name] = Node(name, type, gender, show_name, num_pins, show_num_pins, pinout, ports_left, ports_right)
+    def add_node(self, name, *args, **kwargs):
+        self.nodes[name] = Node(name, *args, **kwargs)
 
-    def add_cable(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, show_num_wires=True, colors=None, color_code=None, shield=False):
-        self.cables[name] = Cable(name, mm2, awg, show_equiv, length, show_name, show_pinout, num_wires, show_num_wires, colors, color_code, shield)
+    def add_cable(self, name, *args, **kwargs):
+        self.cables[name] = Cable(name, *args, **kwargs)
 
     def loop(self, node_name, from_pin, to_pin):
         self.nodes[node_name].loop(from_pin, to_pin)
@@ -177,14 +177,22 @@ class Harness:
 
 class Node:
 
-    def __init__(self, name, type=None, gender=None, show_name=True, num_pins=None, show_num_pins=True, pinout=None, ports_left=False, ports_right=False):
+    def __init__(self, name,
+                       type=None,
+                       gender=None,
+                       show_name=True,
+                       num_pins=True,
+                       show_num_pins=None,
+                       pinout=None):
         self.name = name
         self.type = type
         self.gender = gender
         self.show_name = show_name
         self.show_num_pins = show_num_pins
-        self.ports_left = ports_left
-        self.ports_right = ports_right
+        # self.pinout = []
+
+        self.ports_left = False
+        self.ports_right = False
         self.loops = []
 
         if pinout is None:
@@ -193,17 +201,27 @@ class Node:
             self.pinout = ('',) * num_pins
         else:
             if num_pins is None:
-                if pinout is None:
-                    raise Exception('Must provide num_pins or pinout')
-                else:
-                    self.pinout = pinout
+                raise Exception('Must provide num_pins or pinout')
+            else:
+                self.pinout = pinout
 
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
 
 class Cable:
 
-    def __init__(self, name, mm2=None, awg=None, show_equiv=False, length=0, show_name=False, show_pinout=False, num_wires=None, show_num_wires=True, colors=None, color_code=None, shield=False):
+    def __init__(self, name,
+                       mm2=None,
+                       awg=None,
+                       show_equiv=False,
+                       length=0,
+                       show_name=False,
+                       show_pinout=False,
+                       num_wires=None,
+                       show_num_wires=True,
+                       colors=None,
+                       color_code=None,
+                       shield=False                       ):
         self.name = name
         if mm2 is not None and awg is not None:
             raise Exception('You cannot define both mm2 and awg!')
