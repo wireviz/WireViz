@@ -1,3 +1,5 @@
+from dataclasses import dataclass, field
+from typing import Any, List
 from graphviz import Graph
 
 COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'GYPK','RDBU','WHGN','BNGN','WHYE','YEBN','WHGY','GYBN','WHPK','PKBN'],
@@ -175,94 +177,89 @@ class Harness:
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
 
+@dataclass
 class Node:
+    name: str
+    type: str = None
+    gender: str = None
+    num_pins: int = None
+    pinout: List[Any] = field(default_factory=list)
+    show_name: bool = False
+    show_num_pins: bool = False
 
-    def __init__(self, name,
-                       type=None,
-                       gender=None,
-                       num_pins=True,
-                       pinout=None,
-
-                       show_name=True,
-                       show_num_pins=None,
-                       ):
-        self.name = name
-        self.type = type
-        self.gender = gender
-        self.show_name = show_name
-        self.show_num_pins = show_num_pins
-        # self.pinout = []
-
+    def __post_init__(self):
         self.ports_left = False
         self.ports_right = False
         self.loops = []
 
-        if pinout is None:
-            if num_pins is None:
-                num_pins = 1
-            self.pinout = ('',) * num_pins
+        if self.pinout:
+            if self.num_pins is not None:
+                raise Exception('You cannot specify both pinout and num_pins')
         else:
-            if num_pins is None:
-                raise Exception('Must provide num_pins or pinout')
-            else:
-                self.pinout = pinout
+            if not self.num_pins:
+                self.num_pins = 1
+            self.pinout = ['',] * self.num_pins
 
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
 
+@dataclass
 class Cable:
+    name: str
+    mm2: float = None
+    awg: int = None
+    show_equiv: bool = False
+    length: float = 0
+    num_wires: int = None
+    shield: bool = False
+    colors: List[Any] = field(default_factory=list)
+    color_code: str = None
+    show_name: bool = False
+    show_pinout: bool = False
+    show_num_wires: bool = True
 
-    def __init__(self, name,
-                       mm2=None,
-                       awg=None,
-                       show_equiv=False,
-                       length=0,
-                       num_wires=None,
-                       shield=False,
-                       colors=None,
-                       color_code=None,
-
-                       show_name=False,
-                       show_pinout=False,
-                       show_num_wires=True,
-                       ):
-        self.name = name
-        if mm2 is not None and awg is not None:
+    def __post_init__(self):
+        if self.mm2 and self.awg:
             raise Exception('You cannot define both mm2 and awg!')
-        self.mm2 = mm2
-        self.awg = awg
-        self.show_equiv = show_equiv
-        self.length = length
-        self.show_name = show_name
-        self.show_pinout = show_pinout
-        self.show_num_wires = show_num_wires
-        self.shield = shield
         self.connections = []
-        if color_code is None and colors is None:
-            self.colors = ('',) * num_wires
+
+        # TODO: fix logic
+
+        # OK:
+        # only num_wires, no colors
+        # num_wires + colors
+        # num_wires + color code
+        # colors (num_wires implicit)
+
+        # NOK:
+        # color_code only
+        # nothing
+
+        if self.color_code is None and self.colors is None:
+            self.colors = ('',) * self.num_wires
         else:
-            if colors is None: # no custom color pallet was specified
-                if num_wires is None:
+            if not self.colors: # no custom color pallet was specified
+                if not self.num_wires:
                     raise Exception('Unknown number of wires')
                 else:
-                    if color_code is None:
+                    if not self.color_code:
                         raise Exception('No color code')
                     # choose color code
-                    if color_code not in COLOR_CODES:
+                    if self.color_code not in COLOR_CODES:
                         raise Exception('Unknown color code')
                     else:
-                        cc = COLOR_CODES[color_code]
-                n = num_wires
+                        cc = COLOR_CODES[self.color_code]
+                n = self.num_wires
             else: # custom color pallet was specified
-                cc = colors
-                if num_wires is None: # assume number of wires = number of items in custom pallet
+                cc = self.colors
+                if self.num_wires is None: # assume number of wires = number of items in custom pallet
                     n = len(cc)
                 else: # number of wires was specified
-                    n = num_wires
+                    n = self.num_wires
 
             cc = tuple(cc)
-            if n > len(cc):
-                 m = num_wires // len(cc) + 1
+            if n > len(cc): # make color code loop around if more wires than colors
+                 m = self.num_wires // len(cc) + 1
                  cc = cc * int(m)
             self.colors = cc[:n]
 
