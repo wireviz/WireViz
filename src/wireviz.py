@@ -6,7 +6,6 @@ COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'G
                'IEC': ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK'],
                'BW':  ['BK','WH']}
 
-# TODO: parse and render double-colored cables ('RDBU' etc)
 color_hex = {
              'BK': '#000000',
              'WH': '#ffffff',

@@ -27,14 +27,13 @@
 
 * Cable splicing
   * as pseudo-connector?
-* Cable bundles
 * Heatshrink / sheathing
 
 ## Visualization
 
-* New wire look?
-  * Distinguish between cables and wire bundles
+* Parse and render double-colored, striped cables ('RDBU' etc)
 * Show from/to inside wire node (better netlist)
+  * Implemented in wire bundles only
 * Display picture of connector underneath (including pin 1 location)
 
 ## Export
