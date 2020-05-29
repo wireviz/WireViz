@@ -184,8 +184,8 @@ class Node:
     gender: str = None
     num_pins: int = None
     pinout: List[Any] = field(default_factory=list)
-    show_name: bool = False
-    show_num_pins: bool = False
+    show_name: bool = True
+    show_num_pins: bool = True
 
     def __post_init__(self):
         self.ports_left = False
@@ -214,7 +214,7 @@ class Cable:
     shield: bool = False
     colors: List[Any] = field(default_factory=list)
     color_code: str = None
-    show_name: bool = False
+    show_name: bool = True
     show_pinout: bool = False
     show_num_wires: bool = True
 
