@@ -30,20 +30,20 @@ nodes:
 wires:
   W1:
     <<: *wire_i2c
-    show_name: false
+    type: bundle
   W2:
     <<: *wire_i2c
-    show_name: false
+    type: bundle
   W3:
     mm2: 0.14
     length: 0.2
+    type: bundle
     colors: [BK, BU, OG, VT]
-    show_name: false
   W4:
     mm2: 0.5
     length: 0.35
     colors: [BK, RD]
-    show_name: false
+    type: bundle
 
 connections:
   -
