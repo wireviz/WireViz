@@ -1,28 +1,59 @@
 # To-do:
 
-* Set global parameters (show_pins, ...) and allow override on per-item basis
+## Support for more connector types
+
 * Generic connectors
-  * ferrules
-  * blade terminals
-  * loose ends
-  * graphical representation?
-* Support for cable splicing (as connector type)
-* new wire look?
-  * distinguish between cables and wire bundles
-* improve nomenclature
+  * Ferrules
+  * Blade terminals
+  * Loose ends / stubs
+  * Graphical representation?
+* Inline connectors (IDC)
+  * Possibly join two logical wires into one physical wire, add up length for BOM creation
+  * Designators like W1_1, W1_2 or similar to group them?
+
+## Support for more wire types
+
+* Coax cables
+  * Graphical representation
+* Twisted pairs
+  * Logical representation
+  * Graphical representation
+* Ribbon cables
+  * Folds
+  * Splits
+  * Orientation of IDC connectors
+
+## Support for more links/connections
+
+* Cable splicing
+  * as pseudo-connector?
+* Cable bundles
+* Heatshrink / sheathing
+
+## Visualization
+
+* New wire look?
+  * Distinguish between cables and wire bundles
+* Show from/to inside wire node (better netlist)
+* Display picture of connector underneath (including pin 1 location)
+
+## Export
+
+* Export to PDF with frame, title block, ...
+* Automatic BOM generation
+
+## Other
+
+* Set global parameters (show_pins, ...) and allow override on per-item basis
+* Improve nomenclature
   * terminal (connector, ferrule, blade, loose)
   * link (cable, wire bundle)
-* show from/to inside wire node
 * Allow custom GraphViz code before/after WireViz-generated code
-* Display picture of connector underneath (including pin 1 location)
-* export to PDF with frame, title block, ...
-* Automatic BOM generation
-* Allow
-* make "unit tests" for different features/situations
-  * missing parameters
-  * connection formats
+* Make "unit tests" for different features/situations
+  * Missing parameters
+  * Connection formats
     * single wire       1
     * multiple wires    [1,2,3]
     * wire ranges       [1-10]
-  * loops
+  * Loops
   * ...
