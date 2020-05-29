@@ -195,21 +195,26 @@ class Harness:
                                  '{via_name}_w{via_wire}r'.format(via_name=c.name, via_wire=x[2]),
                                  taillabel=labeltext,
                                  labelangle='60',
-                                 labeldist='0',
-                                 labelfloat='true')
+                                 labeldist='0')
                         existing_connections.append(x[2])
 
                 if x[1] is not None: # connect to left
                     if c.type == 'bundle':
                         dot.edge('{from_name}:p{from_port}r'.format(from_name=x[0],from_port=x[1]),
-                                 '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=x[2]))
+                                 '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=x[2]),
+                                 headlabel='{}{}:{}'.format(' ' * 12,x[0],x[1]),
+                                 labelangle='-60',
+                                 labeldist='0')
                     else:
                         dot.edge('{from_name}:p{from_port}r'.format(from_name=x[0],from_port=x[1]),
                                  '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='i' if c.show_pinout else ''))
                 if x[4] is not None: # connect to right
                     if c.type == 'bundle':
                         dot.edge('{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=x[2]),
-                                 '{to_name}:p{to_port}l'.format(to_name=x[3], to_port=x[4]))
+                                 '{to_name}:p{to_port}l'.format(to_name=x[3], to_port=x[4]),
+                                 taillabel='{}:{}{}'.format(x[3],x[4],' ' * 12),
+                                 labelangle='60',
+                                 labeldist='0')
                     else:
                         dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='o' if c.show_pinout else ''),
                                  '{to_name}:p{to_port}l'.format(to_name=x[3], to_port=x[4]))
@@ -333,7 +338,7 @@ def translate_color(input, color_mode):
         if color_mode == 'full':
             output = color_full[input].lower()
         elif color_mode == 'FULL':
-            output = color_hex[input].upper()
+            output = color_full[input].upper()
         elif color_mode == 'hex':
             output = color_hex[input].lower()
         elif color_mode == 'HEX':
