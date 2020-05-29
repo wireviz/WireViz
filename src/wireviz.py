@@ -179,8 +179,13 @@ class Harness:
             # connections
             existing_connections = [] # for bundles, avoid multiple edges between a bundle's wire's start and end node
             for x in c.connections:
-                if isinstance(x[2], int): # check if it's an actual wire and not a shield
-                    search_color = c.colors[x[2]-1]
+                from_name = x[0]
+                from_port = x[1]
+                via_port  = x[2]
+                to_name   = x[3]
+                to_port   = x[4]
+                if isinstance(via_port, int): # check if it's an actual wire and not a shield
+                    search_color = c.colors[via_port-1]
                     if search_color in color_hex:
                         dot.attr('edge',color='#000000:{wire_color}:#000000'.format(wire_color=color_hex[search_color]))
                     else: # color name not found
@@ -189,35 +194,35 @@ class Harness:
                     dot.attr('edge',color='#000000')
 
                 if c.type == 'bundle':
-                    labeltext = '{sp}{color}'.format(color=translate_color(c.colors[x[2]-1], self.color_mode), sp=' ' * 35)
-                    if x[2] not in existing_connections:
-                        dot.edge('{via_name}_w{via_wire}l'.format(via_name=c.name, via_wire=x[2]),
-                                 '{via_name}_w{via_wire}r'.format(via_name=c.name, via_wire=x[2]),
+                    labeltext = '{sp}{color}'.format(color=translate_color(c.colors[via_port-1], self.color_mode), sp=' ' * 35)
+                    if via_port not in existing_connections:
+                        dot.edge('{via_name}_w{via_wire}l'.format(via_name=c.name, via_wire=via_port),
+                                 '{via_name}_w{via_wire}r'.format(via_name=c.name, via_wire=via_port),
                                  taillabel=labeltext,
                                  labelangle='60',
                                  labeldist='0')
-                        existing_connections.append(x[2])
+                        existing_connections.append(via_port)
 
-                if x[1] is not None: # connect to left
+                if from_port is not None: # connect to left
                     if c.type == 'bundle':
-                        dot.edge('{from_name}:p{from_port}r'.format(from_name=x[0],from_port=x[1]),
-                                 '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=x[2]),
-                                 headlabel='{}{}:{}'.format(' ' * 12,x[0],x[1]),
+                        dot.edge('{from_name}:p{from_port}r'.format(from_name=from_name,from_port=from_port),
+                                 '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=via_port),
+                                 headlabel='{}{}:{}'.format(' ' * 12,from_name,from_port),
                                  labelangle='-60',
                                  labeldist='0')
                     else:
-                        dot.edge('{from_name}:p{from_port}r'.format(from_name=x[0],from_port=x[1]),
-                                 '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='i' if c.show_pinout else ''))
-                if x[4] is not None: # connect to right
+                        dot.edge('{from_name}:p{from_port}r'.format(from_name=from_name,from_port=from_port),
+                                 '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=via_port, via_subport='i' if c.show_pinout else ''))
+                if to_port is not None: # connect to right
                     if c.type == 'bundle':
-                        dot.edge('{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=x[2]),
-                                 '{to_name}:p{to_port}l'.format(to_name=x[3], to_port=x[4]),
-                                 taillabel='{}:{}{}'.format(x[3],x[4],' ' * 12),
+                        dot.edge('{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=via_port),
+                                 '{to_name}:p{to_port}l'.format(to_name=to_name, to_port=to_port),
+                                 taillabel='{}:{}{}'.format(to_name,to_port,' ' * 12),
                                  labelangle='60',
                                  labeldist='0')
                     else:
-                        dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x[2], via_subport='o' if c.show_pinout else ''),
-                                 '{to_name}:p{to_port}l'.format(to_name=x[3], to_port=x[4]))
+                        dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=via_port, via_subport='o' if c.show_pinout else ''),
+                                 '{to_name}:p{to_port}l'.format(to_name=to_name, to_port=to_port))
 
         return dot
 
