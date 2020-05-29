@@ -21,7 +21,7 @@ nodes:
     <<: *con_i2c
   X4:
     <<: *molex_f
-    pinout: [GND, +12V, MISO, MOSI, flachstecker]
+    pinout: [GND, +12V, MISO, MOSI, SCK]
   X5:
     type: Molex Micro-Fit
     gender: male
@@ -62,28 +62,3 @@ connections:
     - X5: [1,2]
     - W4: [1,2]
     - X4: [1,2]
-
-#   -
-#     - X1: 1
-#     - W1: 1
-#     - X2: 1
-#   -
-#     - X1: [2,3,4]
-#     - W1: [2,3,4]
-#     - X2: [4,3,2]
-#   -
-#     - X1: [5-10]
-#     - W1: [5-7,10,9,8]
-#     - X2: [10-5]
-#   -
-#     - X1: 11
-#     - W1: s
-#   -
-#     - X1: [1-5]
-#     - W1: [11-15]
-#   -
-#     - W1: [12-15]
-#     - X2: [2-5]
-#   -
-#     - X1: [12,14]
-#     - X1: [13,15]
