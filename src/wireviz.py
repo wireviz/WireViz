@@ -94,10 +94,10 @@ class Harness:
         # prepare ports on connectors depending on which side they will connect
         for k, c in self.cables.items():
             for x in c.connections:
-                if x[1] is not None: # connect to left
-                    self.nodes[x[0]].ports_right = True
-                if x[4] is not None: # connect to right
-                    self.nodes[x[3]].ports_left = True
+                if x.from_port is not None: # connect to left
+                    self.nodes[x.from_name].ports_right = True
+                if x.to_port is not None: # connect to right
+                    self.nodes[x.to_name].ports_left = True
 
         for k, n in self.nodes.items():
             # a = attributes
@@ -126,9 +126,9 @@ class Harness:
                     loop_dir = 'e'
                 else:
                     raise Exception('No side for loops')
-                for x in n.loops:
-                    dot.edge('{name}:p{port_from}{loop_side}:{loop_dir}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=loop_side, loop_dir=loop_dir),
-                             '{name}:p{port_to}{loop_side}:{loop_dir}'.format(name=n.name, port_from=x[0], port_to=x[1], loop_side=loop_side, loop_dir=loop_dir))
+                for loop in n.loops:
+                    dot.edge('{name}:p{port_from}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir),
+                             '{name}:p{port_to}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir))
 
         for k, c in self.cables.items():
             # a = attributes
@@ -179,13 +179,8 @@ class Harness:
             # connections
             existing_connections = [] # for bundles, avoid multiple edges between a bundle's wire's start and end node
             for x in c.connections:
-                from_name = x[0]
-                from_port = x[1]
-                via_port  = x[2]
-                to_name   = x[3]
-                to_port   = x[4]
-                if isinstance(via_port, int): # check if it's an actual wire and not a shield
-                    search_color = c.colors[via_port-1]
+                if isinstance(x.via_port, int): # check if it's an actual wire and not a shield
+                    search_color = c.colors[x.via_port-1]
                     if search_color in color_hex:
                         dot.attr('edge',color='#000000:{wire_color}:#000000'.format(wire_color=color_hex[search_color]))
                     else: # color name not found
@@ -194,35 +189,35 @@ class Harness:
                     dot.attr('edge',color='#000000')
 
                 if c.type == 'bundle':
-                    labeltext = '{sp}{color}'.format(color=translate_color(c.colors[via_port-1], self.color_mode), sp=' ' * 35)
-                    if via_port not in existing_connections:
-                        dot.edge('{via_name}_w{via_wire}l'.format(via_name=c.name, via_wire=via_port),
-                                 '{via_name}_w{via_wire}r'.format(via_name=c.name, via_wire=via_port),
+                    labeltext = '{sp}{color}'.format(color=translate_color(c.colors[x.via_port-1], self.color_mode), sp=' ' * 35)
+                    if x.via_port not in existing_connections:
+                        dot.edge('{via_name}_w{via_wire}l'.format(via_name=c.name, via_wire=x.via_port),
+                                 '{via_name}_w{via_wire}r'.format(via_name=c.name, via_wire=x.via_port),
                                  taillabel=labeltext,
                                  labelangle='60',
                                  labeldist='0')
-                        existing_connections.append(via_port)
+                        existing_connections.append(x.via_port)
 
-                if from_port is not None: # connect to left
+                if x.from_port is not None: # connect to left
                     if c.type == 'bundle':
-                        dot.edge('{from_name}:p{from_port}r'.format(from_name=from_name,from_port=from_port),
-                                 '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=via_port),
-                                 headlabel='{}{}:{}'.format(' ' * 12,from_name,from_port),
+                        dot.edge('{from_name}:p{from_port}r'.format(from_name=x.from_name, from_port=x.from_port),
+                                 '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=x.via_port),
+                                 headlabel='{}{}:{}'.format(' ' * 12, x.from_name, x.from_port),
                                  labelangle='-60',
                                  labeldist='0')
                     else:
-                        dot.edge('{from_name}:p{from_port}r'.format(from_name=from_name,from_port=from_port),
-                                 '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=via_port, via_subport='i' if c.show_pinout else ''))
-                if to_port is not None: # connect to right
+                        dot.edge('{from_name}:p{from_port}r'.format(from_name=x.from_name, from_port=x.from_port),
+                                 '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else ''))
+                if x.to_port is not None: # connect to right
                     if c.type == 'bundle':
-                        dot.edge('{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=via_port),
-                                 '{to_name}:p{to_port}l'.format(to_name=to_name, to_port=to_port),
-                                 taillabel='{}:{}{}'.format(to_name,to_port,' ' * 12),
+                        dot.edge('{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=x.via_port),
+                                 '{to_name}:p{to_port}l'.format(to_name=x.to_name, to_port=x.to_port),
+                                 taillabel='{}:{}{}'.format(x.to_name, x.to_port,' ' * 12),
                                  labelangle='60',
                                  labeldist='0')
                     else:
-                        dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=via_port, via_subport='o' if c.show_pinout else ''),
-                                 '{to_name}:p{to_port}l'.format(to_name=to_name, to_port=to_port))
+                        dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else ''),
+                                 '{to_name}:p{to_port}l'.format(to_name=x.to_name, to_port=x.to_port))
 
         return dot
 
@@ -309,10 +304,19 @@ class Cable:
         if len(from_pin) != len(to_pin):
             raise Exception('from_pin must have the same number of elements as to_pin')
         for i, x in enumerate(from_pin):
-            self.connections.append((from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
+            # self.connections.append((from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
+            self.connections.append(Connection(from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
 
     def connect_all_straight(self, from_name, to_name):
         self.connect(from_name, 'auto', 'auto', to_name, 'auto')
+
+@dataclass
+class Connection:
+    from_name: Any
+    from_port: Any
+    via_port:  Any
+    to_name:   Any
+    to_port:   Any
 
 def nested(input):
     l = []
