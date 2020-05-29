@@ -4,6 +4,7 @@ import wireviz
 filename = '../examples/example1.yml'
 filename = '../examples/example2.yml'
 filename = '../examples/ferrules.yml'
+filename = '../examples/bundles.yml'
 
 def check_designators(what, where):
     for i, x in enumerate(what):

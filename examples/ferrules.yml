@@ -11,10 +11,11 @@ nodes:
 wires:
   W1:
     mm2: 0.25
+    show_equiv: true
     length: 0.2
     color_code: IEC
     num_wires: 10
-    shield: true
+    type: bundle
 
 ferrules:
   F_test:
@@ -25,9 +26,6 @@ connections:
     - X1: [1-3]
     - W1: [1-3]
     - X2: [1-3]
-  -
-    - X1: 4
-    - W1: s
   -
     - F_test
     - W1: [4-10]
