@@ -23,7 +23,9 @@ WireViz is a simple yet flexible, YAML-based markup language for documenting cab
 
 _Note_: WireViz is not designed to represent the complete wiring of a system. Its main aim is to document the construction of individual wires and harnesses.
 
-## Demo
+## Examples
+
+### Demo 01
 
 [WireViz input file](examples/demo01.yml):
 
@@ -61,14 +63,19 @@ Output file:
 
 ![Sample output diagram](examples/demo01.png)
 
-[Example 2](examples/demo02.yml)
+### Demo 02
 
 ![](examples/demo02.png)
+
+[Source](examples/demo02.yml)
+
+### More examples
+
+See the [example gallery](examples/) and included readme file.
 
 ## Status
 
 This is very much a [work in progress](todo.md).
-
 
 ## License
 
