@@ -102,35 +102,58 @@ class Harness:
                     self.nodes[x.to_name].ports_left = True
 
         for k, n in self.nodes.items():
-            # a = attributes
-            a = [n.type,
-                 n.gender,
-                 '{}-pin'.format(len(n.pinout)) if n.show_num_pins else '']
-            # p = pinout
-            p = [[],[],[]]
-            p[1] = list(n.pinout)
-            for i, x in enumerate(n.pinout, 1):
-                if n.ports_left:
-                    p[0].append('<p{portno}l>{portno}'.format(portno=i))
-                if n.ports_right:
-                    p[2].append('<p{portno}r>{portno}'.format(portno=i))
-            # l = label
-            l = [n.name if n.show_name else '', a, p]
-            dot.node(k, label=nested(l))
+            if n.category == 'ferrule':
+                infostring = '{type} {color}'.format(type=n.type,
+                                                     color=translate_color(n.color, self.color_mode) if n.color else '')
+                infostring_l = infostring if n.ports_right else ''
+                infostring_r = infostring if n.ports_left else ''
 
-            if len(n.loops) > 0:
-                dot.attr('edge',color='#000000')
-                if n.ports_left:
-                    loop_side = 'l'
-                    loop_dir = 'w'
-                elif n.ports_right:
-                    loop_side = 'r'
-                    loop_dir = 'e'
-                else:
-                    raise Exception('No side for loops')
-                for loop in n.loops:
-                    dot.edge('{name}:p{port_from}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir),
-                             '{name}:p{port_to}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir))
+                dot.node(k, shape='cds',
+                            style='filled',
+                            orientation = '0' if n.ports_left else '180',
+                            label='''<
+
+                <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
+                <TD PORT="p1l"> {infostring_l} </TD>
+                {colorbar}
+                <TD PORT="p1r"> {infostring_r} </TD>
+                </TR></TABLE>
+
+
+                >'''.format(infostring_l=infostring_l,
+                            infostring_r=infostring_r,
+                            colorbar='<TD BGCOLOR="{}" BORDER="1" SIDES="LR">  </TD>'.format(translate_color(n.color, 'HEX')) if n.color else ''))
+                # dot.node(k, label='{<p1l>A|B|{C|<p1r>D|E}}')
+            else:
+                # a = attributes
+                a = [n.type,
+                     n.gender,
+                     '{}-pin'.format(len(n.pinout)) if n.show_num_pins else '']
+                # p = pinout
+                p = [[],[],[]]
+                p[1] = list(n.pinout)
+                for i, x in enumerate(n.pinout, 1):
+                    if n.ports_left:
+                        p[0].append('<p{portno}l>{portno}'.format(portno=i))
+                    if n.ports_right:
+                        p[2].append('<p{portno}r>{portno}'.format(portno=i))
+                # l = label
+                l = [n.name if n.show_name else '', a, p]
+                dot.node(k, label=nested(l))
+
+                if len(n.loops) > 0:
+                    dot.attr('edge',color='#000000')
+                    if n.ports_left:
+                        loop_side = 'l'
+                        loop_dir = 'w'
+                    elif n.ports_right:
+                        loop_side = 'r'
+                        loop_dir = 'e'
+                    else:
+                        raise Exception('No side for loops')
+                    for loop in n.loops:
+                        dot.edge('{name}:p{port_from}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir),
+                                 '{name}:p{port_to}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir))
 
         for k, c in self.cables.items():
             # a = attributes
@@ -201,25 +224,29 @@ class Harness:
                         existing_connections.append(x.via_port)
 
                 if x.from_port is not None: # connect to left
+                    _from_port = ':p{}r'.format(x.from_port) if self.nodes[x.from_name].category != 'ferrule' else ''
+                    code_left_1 = '{from_name}{from_port}:e'.format(from_name=x.from_name, from_port=_from_port)
                     if c.type == 'bundle':
-                        dot.edge('{from_name}:p{from_port}r'.format(from_name=x.from_name, from_port=x.from_port),
-                                 '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=x.via_port),
+                        code_left_2 = '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=x.via_port)
+                        dot.edge(code_left_1, code_left_2,
                                  headlabel='{}{}:{}'.format(' ' * 12, x.from_name, x.from_port),
                                  labelangle='-60',
                                  labeldist='0')
                     else:
-                        dot.edge('{from_name}:p{from_port}r'.format(from_name=x.from_name, from_port=x.from_port),
-                                 '{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else ''))
+                        code_left_2 = '{via_name}:w{via_wire}{via_subport}:w'.format(via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else '')
+                        dot.edge(code_left_1, code_left_2)
                 if x.to_port is not None: # connect to right
+                    _to_port = ':p{}l'.format(x.to_port) if self.nodes[x.to_name].category != 'ferrule' else ''
+                    code_right_2 = '{to_name}{to_port}:w'.format(to_name=x.to_name, to_port=_to_port)
                     if c.type == 'bundle':
-                        dot.edge('{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=x.via_port),
-                                 '{to_name}:p{to_port}l'.format(to_name=x.to_name, to_port=x.to_port),
+                        code_right_1 = '{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=x.via_port)
+                        dot.edge(code_right_1, code_right_2,
                                  taillabel='{}:{}{}'.format(x.to_name, x.to_port,' ' * 12),
                                  labelangle='60',
                                  labeldist='0')
                     else:
-                        dot.edge('{via_name}:w{via_wire}{via_subport}'.format(via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else ''),
-                                 '{to_name}:p{to_port}l'.format(to_name=x.to_name, to_port=x.to_port))
+                        code_right_1 = '{via_name}:w{via_wire}{via_subport}:e'.format(via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else '')
+                        dot.edge(code_right_1, code_right_2)
 
         return dot
 
@@ -233,10 +260,12 @@ class Harness:
 @dataclass
 class Node:
     name: str
+    category: str = None
     type: str = None
     gender: str = None
     num_pins: int = None
     pinout: List[Any] = field(default_factory=list)
+    color: str = None
     show_name: bool = True
     show_num_pins: bool = True
 
@@ -455,6 +484,7 @@ def parse(file_in, file_out=None):
                             h.add_cable(name=k, **o)
                         elif sec == 'ferrules':
                             pass
+                            # h.add_node(name=k, category='ferrule', **o)
             else:
                 print('{} section empty'.format(sec))
         else:
@@ -558,7 +588,7 @@ def parse(file_in, file_out=None):
                 for wire_pin in wire_pins:
                     ferrule_counter = ferrule_counter + 1
                     ferrule_id = 'F{}'.format(ferrule_counter)
-                    h.add_node(ferrule_id, **ferrule_params)
+                    h.add_node(ferrule_id, category='ferrule', **ferrule_params)
 
                     if f_w:
                         h.connect(ferrule_id, 1, wire_name, wire_pin, None, None)
