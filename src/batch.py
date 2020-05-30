@@ -11,7 +11,7 @@ with open(readme, 'w') as file:
         print(fn)
         wireviz.parse(fn)
 
-    for i in range(1,5):
+    for i in range(1,7):
         fn = '../examples/ex{:02d}.yml'.format(i)
         print(fn)
         wireviz.parse(fn)
