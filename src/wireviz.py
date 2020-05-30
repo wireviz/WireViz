@@ -160,7 +160,7 @@ class Harness:
             if c.type == 'bundle':
                 # create subgraph for wire bundle, add to main graph afterwards
                 bun = Graph(name='cluster_{}'.format(k))
-                labeltext = ' | '.join(p for p in a if p) + '\n ' # newline to add space between label and wires
+                labeltext = '  |  '.join(p for p in a if p) + '\n ' # newline to add space between label and wires
                 bun.attr('graph', label=labeltext,
                                   style='filled, dashed',
                                   fillcolor='white')

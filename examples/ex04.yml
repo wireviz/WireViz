@@ -1,0 +1,32 @@
+# nodes:
+#   X1:
+#     type: D-Sub
+#     gender: female
+#     num_pins: 4
+#   X2:
+#     type: Molex KK 254
+#     gender: female
+#     num_pins: 3
+
+wires:
+  W1:
+    mm2: 0.25
+    show_equiv: true
+    length: 0.2
+    color_code: IEC
+    num_wires: 6
+    type: bundle
+
+ferrules:
+  ferrule_crimp:
+    type: crimp
+    show_name: false
+    show_num_pins: false
+
+connections:
+  -
+    - ferrule_crimp
+    - W1: [1-6]
+  -
+    - W1: [6-1]
+    - ferrule_crimp

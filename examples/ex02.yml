@@ -1,0 +1,38 @@
+nodes:
+  X1: &boo
+    type: Molex Micro-Fit
+    gender: male
+    pinout: [GND, VCC]
+  X2: &con_power_f # define template
+    type: Molex Micro-Fit
+    gender: female
+    pinout: [GND, VCC]
+  X3:
+    <<: *con_power_f # create from template
+  X4:
+    <<: *con_power_f # create from template
+
+wires:
+  W1: &wire_power # define template
+    colors: [BK, RD] # number of wires implicit in color list
+    mm2: 0.25
+    show_equiv: true
+    length: 0.2
+  W2:
+    <<: *wire_power # create from template
+  W3:
+    <<: *wire_power # create from template
+
+connections:
+  -
+    - X1: [1-2]
+    - W1: [1-2]
+    - X2: [1-2]
+  -
+    - X1: [1-2]
+    - W2: [1-2]
+    - X3: [1-2]
+  -
+    - X1: [1-2]
+    - W3: [1-2]
+    - X4: [1-2]
