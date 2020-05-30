@@ -23,16 +23,17 @@ WireViz is a simple yet flexible, YAML-based markup language for documenting cab
 
 _Note_: WireViz is not designed to represent the complete wiring of a system. Its main aim is to document the construction of individual wires and harnesses.
 
-## Example
+## Examples
 
-[WireViz input file](examples/example1.yml):
+### Demo 01
+
+[WireViz input file](examples/demo01.yml):
 
     nodes:
       X1:
         type: D-Sub
         gender: female
         pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
-        random: yes
       X2:
         type: Molex KK 254
         gender: female
@@ -60,16 +61,21 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
 
 Output file:
 
-![Sample output diagram](examples/example1.png)
+![Sample output diagram](examples/demo01.png)
 
-[Example 2](examples/example2.yml)
+### Demo 02
 
-![](examples/example2.png)
+![](examples/demo02.png)
+
+[Source](examples/demo02.yml)
+
+### More examples
+
+See the [example gallery](examples/) and included readme file.
 
 ## Status
 
 This is very much a [work in progress](todo.md).
-
 
 ## License
 

@@ -1,0 +1,36 @@
+nodes:
+  X1: &boo
+    type: Molex Micro-Fit
+    gender: male
+    pinout: [GND, VCC]
+  X2: &con_power_f
+    type: Molex Micro-Fit
+    gender: female
+    pinout: [GND, VCC]
+  X3:
+    <<: *con_power_f
+  X4:
+    <<: *con_power_f
+
+wires:
+  W1:
+    type: bundle # bundles are routed together, but more loosely than normal cables
+    num_wires: 6
+    colors: [BK, RD] # if number of items in color list is less than num_wires, loop colors
+    mm2: 0.25
+    show_equiv: true
+    length: 0.2
+
+connections:
+  -
+    - X1: [1-2]
+    - W1: [1-2]
+    - X2: [1-2]
+  -
+    - X1: [1-2]
+    - W1: [3,4]
+    - X3: [1-2]
+  -
+    - X1: [1-2]
+    - W1: [5,6]
+    - X4: [1-2]

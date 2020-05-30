@@ -31,19 +31,23 @@ wires:
   W1:
     <<: *wire_i2c
     type: bundle
+    show_equiv: true
   W2:
     <<: *wire_i2c
     type: bundle
+    show_equiv: true
   W3:
     mm2: 0.14
     length: 0.2
-    type: bundle
     colors: [BK, BU, OG, VT]
+    type: bundle
+    show_equiv: true
   W4:
     mm2: 0.5
     length: 0.35
     colors: [BK, RD]
     type: bundle
+    show_equiv: true
 
 connections:
   -
