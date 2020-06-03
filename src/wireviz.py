@@ -108,12 +108,13 @@ class Harness:
                 infostring_l = infostring if n.ports_right else ''
                 infostring_r = infostring if n.ports_left else ''
 
-                dot.node(k, shape='cds',
+                dot.node(k, shape='none',
                             style='filled',
+                            margin='0',
                             orientation = '0' if n.ports_left else '180',
                             label='''<
 
-                <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
+                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l"> {infostring_l} </TD>
                 {colorbar}
                 <TD PORT="p1r"> {infostring_r} </TD>
@@ -122,7 +123,7 @@ class Harness:
 
                 >'''.format(infostring_l=infostring_l,
                             infostring_r=infostring_r,
-                            colorbar='<TD BGCOLOR="{}" BORDER="1" SIDES="LR">  </TD>'.format(translate_color(n.color, 'HEX')) if n.color else ''))
+                            colorbar='<TD BGCOLOR="{}" BORDER="1" SIDES="LR" WIDTH="4"></TD>'.format(translate_color(n.color, 'HEX')) if n.color else ''))
                 # dot.node(k, label='{<p1l>A|B|{C|<p1r>D|E}}')
             else:
                 # a = attributes
