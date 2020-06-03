@@ -162,47 +162,54 @@ class Harness:
                  c.awg,
                  '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
-            # p = pinout
-            p = [[],[],[]]
-            for i, x in enumerate(c.colors,1):
-                if c.show_pinout:
-                    p[0].append('<w{wireno}i>{wireno}'.format(wireno=i))
-                    p[1].append('{wirecolor}'.format(wirecolor=translate_color(x, self.color_mode)))
-                    p[2].append('<w{wireno}o>{wireno}'.format(wireno=i))
-                else:
-                    p[1].append('<w{wireno}>{wirecolor}'.format(wireno=i,wirecolor=translate_color(x, self.color_mode)))
-            if c.shield:
-                if c.show_pinout:
-                    p[0].append('<wsi>')
-                    p[1].append('Shield')
-                    p[2].append('<wso>')
-                else:
-                    p[1].append('<ws>Shield')
-            # l = label
-            l = [c.name if c.show_name else '', a, p]
-            if c.type == 'bundle':
-                # create subgraph for wire bundle, add to main graph afterwards
-                bun = Graph(name='cluster_{}'.format(k))
-                labeltext = '  |  '.join(p for p in a if p) + '\n ' # newline to add space between label and wires
-                bun.attr('graph', label=labeltext,
-                                  style='filled, dashed',
-                                  fillcolor='white')
-                bun.attr('node', shape='point',
-                                 label='',
-                                 fixedsize='true',
-                                 width='0', height='0')
-                for i, x in enumerate(c.colors,1):
-                    bun.node('{}_w{}l'.format(k,i))
-                    bun.node('{}_w{}r'.format(k,i))
-            else:
-                dot.node(k, label=nested(l))
+            # print(a)
+            a = list(filter(None, a))
+            # print(a)
 
-            # add bundle subgraph to main graph
-            if c.type == 'bundle':
-                dot.subgraph(bun)
+            html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>' # main table
+
+            html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">' # name+attributes table
+            if (not c.show_name) or c.type != 'bundle':
+                html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(a), name=c.name)
+            html = html + '<tr>' # attribute row
+            for attrib in a:
+                html = html + '<td>{attrib}</td>'.format(attrib=attrib)
+            html = html + '</tr>' # attribute row
+            html = html + '</table></td></tr>' # name+attributes table
+
+            html = html + '<tr><td>&nbsp;</td></tr>' # spacer between attributes and wires
+
+            html = html + '<tr><td><table border="0" cellspacing="0" cellborder="0">' # conductor table
+
+            for i, x in enumerate(c.colors,1):
+                p = []
+                p.append('<!-- {}_in -->'.format(i))
+                p.append(translate_color(x, self.color_mode))
+                p.append('<!-- {}_out -->'.format(i))
+                html = html + '<tr>'
+                for bla in p:
+                    html = html + '<td>{}</td>'.format(bla)
+                html = html + '</tr>'
+                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=translate_color(x, 'hex'), port='w{}'.format(i))
+
+            if c.shield:
+                p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
+                html = html + '<tr><td>&nbsp;</td></tr>' # spacer
+                html = html + '<tr>'
+                for bla in p:
+                    html = html + '<td>{}</td>'.format(bla)
+                html = html + '</tr>'
+                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" border="2" sides="b" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=translate_color(x, 'hex'), port='ws')
+
+            html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
+
+            html = html + '</table>' # conductor table
+
+            html = html + '</td></tr></table>'  # main table
+
+            # print(html)
 
             # connections
-            existing_connections = [] # for bundles, avoid multiple edges between a bundle's wire's start and end node
             for x in c.connections:
                 if isinstance(x.via_port, int): # check if it's an actual wire and not a shield
                     search_color = c.colors[x.via_port-1]
@@ -213,40 +220,22 @@ class Harness:
                 else: # it's a shield connection
                     dot.attr('edge',color='#000000')
 
-                if c.type == 'bundle':
-                    labeltext = '{sp}{color}'.format(color=translate_color(c.colors[x.via_port-1], self.color_mode), sp=' ' * 35)
-                    if x.via_port not in existing_connections:
-                        dot.edge('{via_name}_w{via_wire}l'.format(via_name=c.name, via_wire=x.via_port),
-                                 '{via_name}_w{via_wire}r'.format(via_name=c.name, via_wire=x.via_port),
-                                 taillabel=labeltext,
-                                 labelangle='60',
-                                 labeldist='0')
-                        existing_connections.append(x.via_port)
-
                 if x.from_port is not None: # connect to left
-                    _from_port = ':p{}r'.format(x.from_port) if self.nodes[x.from_name].category != 'ferrule' else ''
-                    code_left_1 = '{from_name}{from_port}:e'.format(from_name=x.from_name, from_port=_from_port)
-                    if c.type == 'bundle':
-                        code_left_2 = '{via_name}_w{via_wire}l:w'.format(via_name=c.name, via_wire=x.via_port)
-                        dot.edge(code_left_1, code_left_2,
-                                 headlabel='{}{}:{}'.format(' ' * 12, x.from_name, x.from_port),
-                                 labelangle='-60',
-                                 labeldist='0')
-                    else:
-                        code_left_2 = '{via_name}:w{via_wire}{via_subport}:w'.format(via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else '')
-                        dot.edge(code_left_1, code_left_2)
+                    from_ferrule = self.nodes[x.from_name].category is 'ferrule'
+                    code_left_1 = '{from_name}{from_port}:e'.format(from_name=x.from_name, from_port=':p{}r'.format(x.from_port) if not from_ferrule else '')
+                    code_left_2 = '{via_name}:w{via_wire}:w'.format(via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else '')
+                    dot.edge(code_left_1, code_left_2)
+                    from_string = '{}:{}'.format(x.from_name, x.from_port) if not from_ferrule else ''
+                    html = html.replace('<!-- {}_in -->'.format(x.via_port), from_string)
                 if x.to_port is not None: # connect to right
-                    _to_port = ':p{}l'.format(x.to_port) if self.nodes[x.to_name].category != 'ferrule' else ''
-                    code_right_2 = '{to_name}{to_port}:w'.format(to_name=x.to_name, to_port=_to_port)
-                    if c.type == 'bundle':
-                        code_right_1 = '{via_name}_w{via_wire}r:e'.format(via_name=c.name, via_wire=x.via_port)
-                        dot.edge(code_right_1, code_right_2,
-                                 taillabel='{}:{}{}'.format(x.to_name, x.to_port,' ' * 12),
-                                 labelangle='60',
-                                 labeldist='0')
-                    else:
-                        code_right_1 = '{via_name}:w{via_wire}{via_subport}:e'.format(via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else '')
-                        dot.edge(code_right_1, code_right_2)
+                    to_ferrule = self.nodes[x.to_name].category is 'ferrule'
+                    code_right_1 = '{via_name}:w{via_wire}:e'.format(via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else '')
+                    code_right_2 = '{to_name}{to_port}:w'.format(to_name=x.to_name, to_port=':p{}l'.format(x.to_port) if not to_ferrule else '')
+                    dot.edge(code_right_1, code_right_2)
+                    to_string = '{}:{}'.format(x.to_name, x.to_port) if not to_ferrule else ''
+                    html = html.replace('<!-- {}_out -->'.format(x.via_port), to_string)
+
+            dot.node(c.name, label='<{html}>'.format(html=html), shape='box', style='filled,dashed' if c.type=='bundle' else '', margin='0', fillcolor='white')
 
         return dot
 
