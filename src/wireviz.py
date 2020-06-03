@@ -83,7 +83,7 @@ class Harness:
         font = 'arial'
         dot.attr('graph', rankdir='LR',
                           ranksep='2',
-                          bgcolor='transparent',
+                          bgcolor='white',
                           nodesep='0.33',
                           fontname=font)
         dot.attr('node', shape='record',
