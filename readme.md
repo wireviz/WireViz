@@ -37,7 +37,7 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
       X2:
         type: Molex KK 254
         gender: female
-        pinout: [GND, RX, TX, N/C, OUT, IN]
+        pinout: [GND, RX, TX]
 
     wires:
       W1:
@@ -48,16 +48,13 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
         shield: true
 
     connections:
-      - # format: connector->wire->connector
+      -
         - X1: [5,2,1]
         - W1: [1,2,3]
         - X2: [1,3,2]
-      - # format: connector->wire or wire->connector
+      -
         - X1: 5
         - W1: s
-      - # loop: connector-connector
-        - X2: 5
-        - X2: 6
 
 Output file:
 
