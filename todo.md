@@ -32,8 +32,6 @@
 ## Visualization
 
 * Parse and render double-colored, striped cables ('RDBU' etc)
-* Show from/to inside wire node (better netlist)
-  * Implemented in wire bundles only
 * Display picture of connector underneath (including pin 1 location)
 
 ## Export

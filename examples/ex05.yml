@@ -1,0 +1,35 @@
+# daisy chain, variant 1
+templates:
+  - &template_con
+    type: Molex KK 254
+    gender: female
+    pinout: [GND, VCC, SCL, SDA]
+  - &template_wire
+    mm2: 0.25
+    length: 0.2
+    colors: [PK, TQ, YE, VT]
+    type: bundle
+
+nodes:
+  X1:
+    <<: *template_con
+  X2:
+    <<: *template_con
+  X3:
+    <<: *template_con
+
+wires:
+  W1:
+    <<: *template_wire
+  W2:
+    <<: *template_wire
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1-4]
+  -
+    - X2: [1-4]
+    - W2: [1-4]
+    - X3: [1-4]
