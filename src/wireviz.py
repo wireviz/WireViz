@@ -136,7 +136,7 @@ class Harness:
                     if n.ports_right:
                         p[2].append('<p{portno}r>{portno}'.format(portno=i))
                 # l = label
-                l = [n.name if n.show_name else '', a, p]
+                l = [n.name if n.show_name else '', a, p, n.notes]
                 dot.node(k, label=nested(l))
 
                 if len(n.loops) > 0:
@@ -203,7 +203,13 @@ class Harness:
 
             html = html + '</table>' # conductor table
 
-            html = html + '</td></tr></table>'  # main table
+            html = html + '</td></tr>'  # main table
+            if c.notes:
+                html = html + '<tr><td cellpadding="3">{}</td></tr>'.format(c.notes) # notes table
+                html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
+                # html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
+
+            html = html + '</table>'  # main table
 
             # print(html)
 
@@ -251,6 +257,7 @@ class Node:
     type: str = None
     gender: str = None
     num_pins: int = None
+    notes: str = None
     pinout: List[Any] = field(default_factory=list)
     color: str = None
     show_name: bool = True
@@ -282,6 +289,7 @@ class Cable:
     length: float = 0
     num_wires: int = None
     shield: bool = False
+    notes: str = None
     colors: List[Any] = field(default_factory=list)
     color_code: str = None
     show_name: bool = True
