@@ -157,7 +157,7 @@ class Harness:
             # a = attributes
             a = ['{}x'.format(len(c.colors)) if c.show_num_wires else '',
                  '{} mm\u00B2{}'.format(c.mm2, ' ({} AWG)'.format(awg_equiv(c.mm2)) if c.show_equiv else '') if c.mm2 is not None else '',
-                 c.awg,
+                 '{} AWG'.format(c.awg) if c.awg else '',
                  '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
             # print(a)
