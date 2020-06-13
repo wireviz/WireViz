@@ -41,7 +41,7 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
 
     cables:
       W1:
-        mm2: 0.25
+        gauge: 0.25 mm2
         length: 0.2
         color_code: DIN
         wirecount: 3
