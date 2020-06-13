@@ -254,15 +254,15 @@ class Harness:
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
         # bom output
-        with open('{}.bom.csv'.format(filename),'w') as file:
+        with open('{}.bom.tsv'.format(filename),'w') as file:
             file.write(self.generate_bom())
         # TODO: cut list output
 
     def generate_bom(self):
         bom = ''
         # list connectors
-        bom = bom + 'Type\tGender\tPincount\tQty\n'
-        bom = bom + '---\t---\t---\t---\n'
+        bom = bom + 'Type\tGender\tPincount\tQty\tDesignators\n'
+        bom = bom + '---\t---\t---\t---\t---\n'
         types = Counter([v.type for v in self.nodes.values()])
         # print('Types:', types)
         for type in types.keys():
@@ -271,16 +271,18 @@ class Harness:
             # print('  ', 'Genders:', genders)
             for gender in genders.keys():
                 # print('  ', type, gender, '({})'.format(genders[gender]))
+                # print(keys)
                 pincounts = Counter([v.num_pins for v in self.nodes.values() if v.type == type and v.gender == gender])
                 # print('    ', 'Pincounts:', pincounts)
                 for pincount in pincounts.keys():
                     # print('    ', type, gender, pincount, 'pins :', pincounts[pincount])
-                    bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\n'.format(type=type, gender=gender, pincount=pincount, qty=pincounts[pincount])
+                    designators = [k for k,v in self.nodes.items() if v.type == type and v.gender == gender and v.num_pins == pincount]
+                    bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\t{designators}\n'.format(type=type, gender=gender, pincount=pincount, qty=pincounts[pincount], designators=', '.join(designators))
 
         bom = bom + '\n'
         # list wires
-        bom = bom + 'mm2\tWirecount\tTotal length\n'
-        bom = bom + '---\t---\t---\n'
+        bom = bom + 'mm2\tWirecount\tTotal length\tQty\tDesignators\n'
+        bom = bom + '---\t---\t---\t---\t---\n'
         # TODO: make it work with AWG as well
         mm2s = Counter([v.mm2 for v in self.cables.values()])
         for mm2 in mm2s.keys():
@@ -289,9 +291,10 @@ class Harness:
             for wirecount in wirecounts.keys():
                 # print('  ', mm2, wirecount, ':', wirecounts[wirecount])
                 lengths = [v.length for v in self.cables.values() if v.mm2 == mm2 and v.num_wires == wirecount]
+                designators = [k for k,v in self.cables.items() if v.mm2 == mm2 and v.num_wires == wirecount]
                 # print('    ', 'Lengths:', lengths)
                 # print('    ', 'Total lengths:', sum(lengths))
-                bom = bom + '{mm2}\t{wirecount}\t{len_total}\n'.format(mm2=mm2, wirecount=wirecount, len_total=round(sum(lengths),3))
+                bom = bom + '{mm2}\t{wirecount}\t{len_total}\t{qty}\t{designators}\n'.format(mm2=mm2, wirecount=wirecount, len_total=round(sum(lengths),3), qty=len(lengths), designators=', '.join(designators))
 
         return bom
 
@@ -528,7 +531,7 @@ def parse(file_in, file_out=None):
                 # print('{} section empty'.format(sec))
                 pass
         else:
-            print('No {} section found'.format(sec))
+            # print('No {} section found'.format(sec))
             if ty == dict:
                 input[sec] = {}
             elif ty == list:
