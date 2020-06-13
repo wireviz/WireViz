@@ -2,6 +2,7 @@
 import os
 from dataclasses import dataclass, field
 from typing import Any, List
+from collections import Counter
 import yaml
 from graphviz import Graph
 
@@ -246,11 +247,53 @@ class Harness:
         return dot
 
     def output(self, filename, directory='_output', view=False, cleanup=True, format='pdf'):
+        # graphical output
         d = self.create_graph()
         for f in format:
             d.format = f
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
+        # bom output
+        with open('{}.bom.csv'.format(filename),'w') as file:
+            file.write(self.generate_bom())
+        # TODO: cut list output
+
+    def generate_bom(self):
+        bom = ''
+        # list connectors
+        bom = bom + 'Type\tGender\tPincount\tQty\n'
+        bom = bom + '---\t---\t---\t---\n'
+        types = Counter([v.type for v in self.nodes.values()])
+        # print('Types:', types)
+        for type in types.keys():
+            # print(type, '({})'.format(types[type]))
+            genders = Counter([v.gender for v in self.nodes.values() if v.type == type])
+            # print('  ', 'Genders:', genders)
+            for gender in genders.keys():
+                # print('  ', type, gender, '({})'.format(genders[gender]))
+                pincounts = Counter([v.num_pins for v in self.nodes.values() if v.type == type and v.gender == gender])
+                # print('    ', 'Pincounts:', pincounts)
+                for pincount in pincounts.keys():
+                    # print('    ', type, gender, pincount, 'pins :', pincounts[pincount])
+                    bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\n'.format(type=type, gender=gender, pincount=pincount, qty=pincounts[pincount])
+
+        bom = bom + '\n'
+        # list wires
+        bom = bom + 'mm2\tWirecount\tTotal length\n'
+        bom = bom + '---\t---\t---\n'
+        # TODO: make it work with AWG as well
+        mm2s = Counter([v.mm2 for v in self.cables.values()])
+        for mm2 in mm2s.keys():
+            # print(mm2, 'mm2', '({})'.format(mm2s[mm2]))
+            wirecounts = Counter([v.num_wires for v in self.cables.values() if v.mm2 == mm2])
+            for wirecount in wirecounts.keys():
+                # print('  ', mm2, wirecount, ':', wirecounts[wirecount])
+                lengths = [v.length for v in self.cables.values() if v.mm2 == mm2 and v.num_wires == wirecount]
+                # print('    ', 'Lengths:', lengths)
+                # print('    ', 'Total lengths:', sum(lengths))
+                bom = bom + '{mm2}\t{wirecount}\t{len_total}\n'.format(mm2=mm2, wirecount=wirecount, len_total=round(sum(lengths),3))
+
+        return bom
 
 @dataclass
 class Node:
@@ -273,6 +316,8 @@ class Node:
         if self.pinout:
             if self.num_pins is not None:
                 raise Exception('You cannot specify both pinout and num_pins')
+            else:
+                self.num_pins = len(self.pinout)
         else:
             if not self.num_pins:
                 self.num_pins = 1
@@ -480,7 +525,8 @@ def parse(file_in, file_out=None):
                             pass
                             # h.add_node(name=k, category='ferrule', **o)
             else:
-                print('{} section empty'.format(sec))
+                # print('{} section empty'.format(sec))
+                pass
         else:
             print('No {} section found'.format(sec))
             if ty == dict:
@@ -593,6 +639,7 @@ def parse(file_in, file_out=None):
         else:
             raise Exception('Wrong number of connection parameters')
 
+    h.generate_bom()
     h.output(filename=file_out, format=('png','svg'), view=False)
 
 if __name__ == '__main__':
