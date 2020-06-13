@@ -284,20 +284,21 @@ class Harness:
 
         bom = bom + '\n'
         # list cables
-        bom = bom + 'Gauge\tUnit\tWirecount\tTotal length\tQty\tDesignators\n'
-        bom = bom + '---\t---\t---\t---\t---\t---\n'
+        bom = bom + 'Gauge\tUnit\tWirecount\tShield\tTotal length\tQty\tDesignators\n'
+        bom = bom + '---\t---\t---\t---\t---\t---\t---\n'
         gauges = Counter([v.gauge_and_unit for v in self.cables.values()])
         for gauge in gauges.keys():
-            wirecounts = Counter([v.wirecount for v in self.cables.values() if v.gauge_and_unit == gauge])
-            for wirecount in wirecounts.keys():
+            wirecounts_and_shields = Counter([v.wirecount_and_shield for v in self.cables.values() if v.gauge_and_unit == gauge])
+            for wirecount_and_shield in wirecounts_and_shields.keys():
                 # print('  ', gauge, wirecount, ':', wirecounts[wirecount])
-                lengths = [v.length for v in self.cables.values() if v.gauge_and_unit == gauge and v.wirecount == wirecount]
-                designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge and v.wirecount == wirecount]
+                lengths = [v.length for v in self.cables.values() if v.gauge_and_unit == gauge and v.wirecount_and_shield == wirecount_and_shield]
+                designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge and v.wirecount_and_shield == wirecount_and_shield]
                 # print('    ', 'Lengths:', lengths)
                 # print('    ', 'Total lengths:', sum(lengths))
-                bom = bom + '{gauge}\t{gauge_unit}\t{wirecount}\t{len_total}\t{qty}\t{designators}\n'.format(gauge=gauge[0],
+                bom = bom + '{gauge}\t{gauge_unit}\t{wirecount}\t{shield}\t{len_total}\t{qty}\t{designators}\n'.format(gauge=gauge[0],
                                                                                                              gauge_unit=gauge[1],
-                                                                                                             wirecount=wirecount,
+                                                                                                             wirecount=wirecount_and_shield[0],
+                                                                                                             shield=wirecount_and_shield[1],
                                                                                                              len_total=round(sum(lengths),3),
                                                                                                              qty=len(lengths),
                                                                                                              designators=', '.join(designators))
@@ -367,6 +368,7 @@ class Cable:
         else:
             pass # gauge not specified
 
+        # for BOM generation
         self.gauge_and_unit = (self.gauge, self.gauge_unit)
 
 
@@ -390,11 +392,13 @@ class Cable:
                  self.colors = self.colors * int(m)
             # cut off excess after looping
             self.colors = self.colors[:self.wirecount]
-
         else: # wirecount implicit in length of color list
             if not self.colors:
                 raise Exception('Unknown number of wires. Must specify wirecount or colors (implicit length)')
             self.wirecount = len(self.colors)
+
+        # for BOM generation
+        self.wirecount_and_shield = (self.wirecount, self.shield)
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
         from_pin = int2tuple(from_pin)
