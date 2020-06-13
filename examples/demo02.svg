@@ -126,7 +126,7 @@
 <polygon fill="none" stroke="black" points="373,-445.5 373,-468.5 505,-468.5 505,-445.5 373,-445.5"/>
 <text text-anchor="start" x="377" y="-453.3" font-family="arial" font-size="14.00">0.14 mm² (26 AWG)</text>
 <polygon fill="none" stroke="black" points="505,-445.5 505,-468.5 548,-468.5 548,-445.5 505,-445.5"/>
-<text text-anchor="start" x="509" y="-453.3" font-family="arial" font-size="14.00">0.2 m</text>
+<text text-anchor="start" x="509" y="-453.3" font-family="arial" font-size="14.00">0.4 m</text>
 <text text-anchor="start" x="447" y="-434.3" font-family="arial" font-size="14.00"> </text>
 <text text-anchor="start" x="370" y="-417.3" font-family="arial" font-size="14.00">X1:1</text>
 <text text-anchor="start" x="439.5" y="-417.3" font-family="arial" font-size="14.00">BK</text>
@@ -191,7 +191,7 @@
 <polygon fill="none" stroke="black" points="373,-264.5 373,-287.5 505,-287.5 505,-264.5 373,-264.5"/>
 <text text-anchor="start" x="377" y="-272.3" font-family="arial" font-size="14.00">0.14 mm² (26 AWG)</text>
 <polygon fill="none" stroke="black" points="505,-264.5 505,-287.5 548,-287.5 548,-264.5 505,-264.5"/>
-<text text-anchor="start" x="509" y="-272.3" font-family="arial" font-size="14.00">0.2 m</text>
+<text text-anchor="start" x="509" y="-272.3" font-family="arial" font-size="14.00">0.3 m</text>
 <text text-anchor="start" x="447" y="-253.3" font-family="arial" font-size="14.00"> </text>
 <text text-anchor="start" x="370" y="-236.3" font-family="arial" font-size="14.00">X1:1</text>
 <text text-anchor="start" x="440" y="-236.3" font-family="arial" font-size="14.00">BK</text>
@@ -358,41 +358,41 @@
 <!-- W4 -->
 <g id="node9" class="node">
 <title>W4</title>
-<polygon fill="white" stroke="black" stroke-dasharray="5,2" points="548,-107 350,-107 350,0 548,0 548,-107"/>
-<polygon fill="none" stroke="black" points="350,-83.5 350,-106.5 373,-106.5 373,-83.5 350,-83.5"/>
-<text text-anchor="start" x="354" y="-91.3" font-family="arial" font-size="14.00">2x</text>
-<polygon fill="none" stroke="black" points="373,-83.5 373,-106.5 497,-106.5 497,-83.5 373,-83.5"/>
-<text text-anchor="start" x="377" y="-91.3" font-family="arial" font-size="14.00">0.5 mm² (21 AWG)</text>
-<polygon fill="none" stroke="black" points="497,-83.5 497,-106.5 548,-106.5 548,-83.5 497,-83.5"/>
-<text text-anchor="start" x="501" y="-91.3" font-family="arial" font-size="14.00">0.35 m</text>
+<polygon fill="white" stroke="black" stroke-dasharray="5,2" points="544,-107 354,-107 354,0 544,0 544,-107"/>
+<polygon fill="none" stroke="black" points="354,-83.5 354,-106.5 377,-106.5 377,-83.5 354,-83.5"/>
+<text text-anchor="start" x="358" y="-91.3" font-family="arial" font-size="14.00">2x</text>
+<polygon fill="none" stroke="black" points="377,-83.5 377,-106.5 501,-106.5 501,-83.5 377,-83.5"/>
+<text text-anchor="start" x="381" y="-91.3" font-family="arial" font-size="14.00">0.5 mm² (21 AWG)</text>
+<polygon fill="none" stroke="black" points="501,-83.5 501,-106.5 544,-106.5 544,-83.5 501,-83.5"/>
+<text text-anchor="start" x="505" y="-91.3" font-family="arial" font-size="14.00">0.3 m</text>
 <text text-anchor="start" x="447" y="-72.3" font-family="arial" font-size="14.00"> </text>
-<text text-anchor="start" x="370.5" y="-55.3" font-family="arial" font-size="14.00">X5:1</text>
-<text text-anchor="start" x="440" y="-55.3" font-family="arial" font-size="14.00">BK</text>
-<text text-anchor="start" x="500" y="-55.3" font-family="arial" font-size="14.00">X4:1</text>
-<polygon fill="#000000" stroke="transparent" points="350,-43.5 350,-49.5 548,-49.5 548,-43.5 350,-43.5"/>
-<polyline fill="none" stroke="black" stroke-width="2" points="351,-44.5 547,-44.5 "/>
-<polyline fill="none" stroke="black" stroke-width="2" points="547,-48.5 351,-48.5 "/>
-<text text-anchor="start" x="370.5" y="-30.3" font-family="arial" font-size="14.00">X5:2</text>
-<text text-anchor="start" x="439.5" y="-30.3" font-family="arial" font-size="14.00">RD</text>
-<text text-anchor="start" x="500" y="-30.3" font-family="arial" font-size="14.00">X4:2</text>
-<polygon fill="#ff0000" stroke="transparent" stroke-width="2" points="350,-18.5 350,-24.5 548,-24.5 548,-18.5 350,-18.5"/>
-<polyline fill="none" stroke="black" stroke-width="2" points="351,-19.5 547,-19.5 "/>
-<polyline fill="none" stroke="black" stroke-width="2" points="547,-23.5 351,-23.5 "/>
-<text text-anchor="start" x="382.5" y="-5.3" font-family="arial" font-size="14.00"> </text>
+<text text-anchor="start" x="373" y="-55.3" font-family="arial" font-size="14.00">X5:1</text>
+<text text-anchor="start" x="439.5" y="-55.3" font-family="arial" font-size="14.00">BK</text>
+<text text-anchor="start" x="497" y="-55.3" font-family="arial" font-size="14.00">X4:1</text>
+<polygon fill="#000000" stroke="transparent" points="354,-43.5 354,-49.5 544,-49.5 544,-43.5 354,-43.5"/>
+<polyline fill="none" stroke="black" stroke-width="2" points="355,-44.5 543,-44.5 "/>
+<polyline fill="none" stroke="black" stroke-width="2" points="543,-48.5 355,-48.5 "/>
+<text text-anchor="start" x="373" y="-30.3" font-family="arial" font-size="14.00">X5:2</text>
+<text text-anchor="start" x="439" y="-30.3" font-family="arial" font-size="14.00">RD</text>
+<text text-anchor="start" x="497" y="-30.3" font-family="arial" font-size="14.00">X4:2</text>
+<polygon fill="#ff0000" stroke="transparent" stroke-width="2" points="354,-18.5 354,-24.5 544,-24.5 544,-18.5 354,-18.5"/>
+<polyline fill="none" stroke="black" stroke-width="2" points="355,-19.5 543,-19.5 "/>
+<polyline fill="none" stroke="black" stroke-width="2" points="543,-23.5 355,-23.5 "/>
+<text text-anchor="start" x="385" y="-5.3" font-family="arial" font-size="14.00"> </text>
 </g>
 <!-- X5&#45;&#45;W4 -->
 <g id="edge25" class="edge">
 <title>X5:e&#45;&#45;W4:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M206,-43.5C270.13,-43.5 286.12,-44.5 350,-44.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M206,-45.5C270,-45.5 286,-46.5 350,-46.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M206,-47.5C269.88,-47.5 285.87,-48.5 350,-48.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M206,-43.5C271.46,-43.5 287.79,-44.5 353,-44.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M206,-45.5C271.33,-45.5 287.67,-46.5 353,-46.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M206,-47.5C271.21,-47.5 287.54,-48.5 353,-48.5"/>
 </g>
 <!-- X5&#45;&#45;W4 -->
 <g id="edge27" class="edge">
 <title>X5:e&#45;&#45;W4:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M206,-20.5C269.88,-20.5 285.87,-19.5 350,-19.5"/>
-<path fill="none" stroke="#ff0000" stroke-width="2" d="M206,-22.5C270,-22.5 286,-21.5 350,-21.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M206,-24.5C270.13,-24.5 286.12,-23.5 350,-23.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M206,-20.5C271.21,-20.5 287.54,-19.5 353,-19.5"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M206,-22.5C271.33,-22.5 287.67,-21.5 353,-21.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M206,-24.5C271.46,-24.5 287.79,-23.5 353,-23.5"/>
 </g>
 <!-- W1&#45;&#45;X2 -->
 <g id="edge2" class="edge">
@@ -481,16 +481,16 @@
 <!-- W4&#45;&#45;X4 -->
 <g id="edge26" class="edge">
 <title>W4:e&#45;&#45;X4:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M548,-44.5C655.14,-47.17 588.64,-235.17 692,-232.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M548,-46.5C653.25,-46.5 586.75,-234.5 692,-234.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M548,-48.5C651.36,-45.83 584.86,-233.83 692,-236.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M545,-44.5C652.96,-47.15 587.82,-235.15 692,-232.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M545,-46.5C651.07,-46.5 585.93,-234.5 692,-234.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M545,-48.5C649.18,-45.85 584.04,-233.85 692,-236.5"/>
 </g>
 <!-- W4&#45;&#45;X4 -->
 <g id="edge28" class="edge">
 <title>W4:e&#45;&#45;X4:w</title>
-<path fill="none" stroke="#000000" stroke-width="2" d="M548,-19.5C655.84,-22.17 587.93,-212.17 692,-209.5"/>
-<path fill="none" stroke="#ff0000" stroke-width="2" d="M548,-21.5C653.96,-21.5 586.04,-211.5 692,-211.5"/>
-<path fill="none" stroke="#000000" stroke-width="2" d="M548,-23.5C652.07,-20.83 584.16,-210.83 692,-213.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M545,-19.5C653.66,-22.16 587.12,-212.16 692,-209.5"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M545,-21.5C651.77,-21.5 585.23,-211.5 692,-211.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M545,-23.5C649.88,-20.84 583.34,-210.84 692,-213.5"/>
 </g>
 </g>
 </svg>

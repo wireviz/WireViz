@@ -6,7 +6,6 @@ templates: # defining templates to be used later on
     pinout: [GND, +5V, SCL, SDA]
   - &wire_i2c
     gauge: 0.14 mm2
-    length: 0.2
     colors: [BK, RD, YE, GN]
 
 connectors:
@@ -31,20 +30,22 @@ cables:
   W1:
     <<: *wire_i2c
     type: bundle
+    length: 0.2
     show_equiv: true
   W2:
     <<: *wire_i2c
     type: bundle
+    length: 0.4
     show_equiv: true
   W3:
     gauge: 0.14 mm2
-    length: 0.2
+    length: 0.3
     colors: [BK, BU, OG, VT]
     type: bundle
     show_equiv: true
   W4:
     gauge: 0.5 mm2
-    length: 0.35
+    length: 0.3
     colors: [BK, RD]
     type: bundle
     show_equiv: true
