@@ -2,7 +2,7 @@ nodes:
   X1:
     type: Molex KK 254 # more information
     gender: female
-    pinout: [GND, VCC, RX, TX] # num_pins is implicit in pinout
+    pinout: [GND, VCC, RX, TX] # pincount is implicit in pinout
   X2:
     type: Molex KK 254
     gender: female

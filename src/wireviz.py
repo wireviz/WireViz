@@ -129,7 +129,7 @@ class Harness:
                 # a = attributes
                 a = [n.type,
                      n.gender,
-                     '{}-pin'.format(len(n.pinout)) if n.show_num_pins else '']
+                     '{}-pin'.format(len(n.pinout)) if n.show_pincount else '']
                 # p = pinout
                 p = [[],[],[]]
                 p[1] = list(n.pinout)
@@ -272,11 +272,11 @@ class Harness:
             for gender in genders.keys():
                 # print('  ', type, gender, '({})'.format(genders[gender]))
                 # print(keys)
-                pincounts = Counter([v.num_pins for v in self.nodes.values() if v.type == type and v.gender == gender])
+                pincounts = Counter([v.pincount for v in self.nodes.values() if v.type == type and v.gender == gender])
                 # print('    ', 'Pincounts:', pincounts)
                 for pincount in pincounts.keys():
                     # print('    ', type, gender, pincount, 'pins :', pincounts[pincount])
-                    designators = [k for k,v in self.nodes.items() if v.type == type and v.gender == gender and v.num_pins == pincount]
+                    designators = [k for k,v in self.nodes.items() if v.type == type and v.gender == gender and v.pincount == pincount]
                     bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\t{designators}\n'.format(type=type, gender=gender, pincount=pincount, qty=pincounts[pincount], designators=', '.join(designators))
 
         bom = bom + '\n'
@@ -304,12 +304,12 @@ class Node:
     category: str = None
     type: str = None
     gender: str = None
-    num_pins: int = None
+    pincount: int = None
     notes: str = None
     pinout: List[Any] = field(default_factory=list)
     color: str = None
     show_name: bool = True
-    show_num_pins: bool = True
+    show_pincount: bool = True
 
     def __post_init__(self):
         self.ports_left = False
@@ -317,14 +317,14 @@ class Node:
         self.loops = []
 
         if self.pinout:
-            if self.num_pins is not None:
-                raise Exception('You cannot specify both pinout and num_pins')
+            if self.pincount is not None:
+                raise Exception('You cannot specify both pinout and pincount')
             else:
-                self.num_pins = len(self.pinout)
+                self.pincount = len(self.pinout)
         else:
-            if not self.num_pins:
-                self.num_pins = 1
-            self.pinout = ['',] * self.num_pins
+            if not self.pincount:
+                self.pincount = 1
+            self.pinout = ['',] * self.pincount
 
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))

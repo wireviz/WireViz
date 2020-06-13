@@ -2,11 +2,11 @@
 #   X1:
 #     type: D-Sub
 #     gender: female
-#     num_pins: 4
+#     pincount: 4
 #   X2:
 #     type: Molex KK 254
 #     gender: female
-#     num_pins: 3
+#     pincount: 3
 
 wires:
   W1:
@@ -21,7 +21,7 @@ ferrules:
   ferrule_crimp:
     type: crimp
     show_name: false
-    show_num_pins: false
+    show_pincount: false
 
 connections:
   -
