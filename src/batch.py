@@ -9,12 +9,12 @@ with open(readme, 'w') as file:
     for i in range(1,3):
         fn = '../examples/demo{:02d}.yml'.format(i)
         print(fn)
-        wireviz.parse(fn)
+        wireviz.parse(fn, gen_bom=False)
 
     for i in range(1,7):
         fn = '../examples/ex{:02d}.yml'.format(i)
         print(fn)
-        wireviz.parse(fn)
+        wireviz.parse(fn, gen_bom=False)
 
         file.write('## Example {:02d}\n'.format(i))
         file.write('![](ex{:02d}.png)\n\n'.format(i))

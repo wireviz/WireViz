@@ -245,7 +245,7 @@ class Harness:
 
         return dot
 
-    def output(self, filename, directory='_output', view=False, cleanup=True, format='pdf'):
+    def output(self, filename, directory='_output', view=False, cleanup=True, format='pdf', gen_bom=False):
         # graphical output
         d = self.create_graph()
         for f in format:
@@ -253,23 +253,24 @@ class Harness:
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
         # bom output
-        # connectors
-        _con = self.bom_connectors()
-        header_con = ['Type','Gender','Pin count','Qty','Designators']
-        bom_con = tuplelist2tsv(_con, header_con)
-        with open('{}.connectors.bom.tsv'.format(filename),'w') as file:
-            file.write(bom_con)
-        # cables
-        _cbl, _cut = self.bom_cables_and_cutlist()
-        header_cbl = ['Gauge','Gauge unit','Wire count','Shield','Total length','Designators']
-        bom_cbl = tuplelist2tsv(_cbl, header_cbl)
-        with open('{}.cables.bom.tsv'.format(filename),'w') as file:
-            file.write(bom_cbl)
-        # cutlist
-        header_cut = ['Gauge','Gauge unit','Wire count','Shield','Length','Qty','Designators']
-        bom_cut = tuplelist2tsv(_cut, header_cut)
-        with open('{}.cutlist.bom.tsv'.format(filename),'w') as file:
-            file.write(bom_cut)
+        if gen_bom:
+            # connectors
+            _con = self.bom_connectors()
+            header_con = ['Type','Gender','Pin count','Qty','Designators']
+            bom_con = tuplelist2tsv(_con, header_con)
+            with open('{}.connectors.bom.tsv'.format(filename),'w') as file:
+                file.write(bom_con)
+            # cables
+            _cbl, _cut = self.bom_cables_and_cutlist()
+            header_cbl = ['Gauge','Gauge unit','Wire count','Shield','Total length','Designators']
+            bom_cbl = tuplelist2tsv(_cbl, header_cbl)
+            with open('{}.cables.bom.tsv'.format(filename),'w') as file:
+                file.write(bom_cbl)
+            # cutlist
+            header_cut = ['Gauge','Gauge unit','Wire count','Shield','Length','Qty','Designators']
+            bom_cut = tuplelist2tsv(_cut, header_cut)
+            with open('{}.cutlist.bom.tsv'.format(filename),'w') as file:
+                file.write(bom_cut)
 
     def bom_connectors(self):
         bom = []
@@ -499,7 +500,7 @@ def awg_equiv(mm2):
     else:
         return 'unknown'
 
-def parse(file_in, file_out=None):
+def parse(file_in, file_out=None, gen_bom=False):
 
     file_in = os.path.abspath(file_in)
     if not file_out:
@@ -683,7 +684,7 @@ def parse(file_in, file_out=None):
         else:
             raise Exception('Wrong number of connection parameters')
 
-    h.output(filename=file_out, format=('png','svg'), view=False)
+    h.output(filename=file_out, format=('png','svg'), gen_bom=gen_bom, view=False)
 
 def tuplelist2tsv(input, header=None):
     output = ''
@@ -701,6 +702,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('file_input', nargs='?', default='_test/test.yml')
     ap.add_argument('file_output', nargs='?', default=None)
+    ap.add_argument('--bom', action='store_const', default=False, const=True)
     args = ap.parse_args()
 
-    parse(args.file_input, args.file_output)
+    parse(args.file_input, file_out=args.file_output, gen_bom=args.bom)
