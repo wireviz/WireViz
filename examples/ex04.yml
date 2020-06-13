@@ -10,7 +10,7 @@
 
 cables:
   W1:
-    mm2: 0.25
+    gauge: 0.25 mm2
     show_equiv: true
     length: 0.2
     color_code: IEC

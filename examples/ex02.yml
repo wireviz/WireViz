@@ -15,7 +15,7 @@ connectors:
 cables:
   W1: &wire_power # define template
     colors: [BK, RD] # number of wires implicit in color list
-    mm2: 0.25
+    gauge: 0.25 # assume mm2 if no gauge unit is specified
     show_equiv: true
     length: 0.2
   W2:

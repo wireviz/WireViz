@@ -12,7 +12,7 @@ cables:
   W1:
     color_code: IEC # auto-color wires based on a standard
     wirecount: 4 # need to specify number of wires explicitly when using a color code
-    mm2: 0.25 # metric gauge, in mm^2
+    gauge: 0.25 mm2 # also accepts AWG as unit
     show_equiv: true # auto-calculate AWG equivalent from metric gauge
     length: 0.2 # length in m
     shield: true

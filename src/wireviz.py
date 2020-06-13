@@ -159,8 +159,7 @@ class Harness:
         for k, c in self.cables.items():
             # a = attributes
             a = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
-                 '{} mm\u00B2{}'.format(c.mm2, ' ({} AWG)'.format(awg_equiv(c.mm2)) if c.show_equiv else '') if c.mm2 is not None else '',
-                 '{} AWG'.format(c.awg) if c.awg else '',
+                 '{} {}{}'.format(c.gauge, c.gauge_unit, ' ({} AWG)'.format(awg_equiv(c.gauge)) if c.gauge_unit == 'mm\u00B2' and c.show_equiv else '') if c.gauge else '', # TODO: show equiv
                  '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
             # print(a)
@@ -277,24 +276,31 @@ class Harness:
                 for pincount in pincounts.keys():
                     # print('    ', type, gender, pincount, 'pins :', pincounts[pincount])
                     designators = [k for k,v in self.connectors.items() if v.type == type and v.gender == gender and v.pincount == pincount]
-                    bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\t{designators}\n'.format(type=type, gender=gender, pincount=pincount, qty=pincounts[pincount], designators=', '.join(designators))
+                    bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\t{designators}\n'.format(type=type,
+                                                                                              gender=gender,
+                                                                                              pincount=pincount,
+                                                                                              qty=pincounts[pincount],
+                                                                                              designators=', '.join(designators))
 
         bom = bom + '\n'
         # list cables
-        bom = bom + 'mm2\tWirecount\tTotal length\tQty\tDesignators\n'
-        bom = bom + '---\t---\t---\t---\t---\n'
-        # TODO: make it work with AWG as well
-        mm2s = Counter([v.mm2 for v in self.cables.values()])
-        for mm2 in mm2s.keys():
-            # print(mm2, 'mm2', '({})'.format(mm2s[mm2]))
-            wirecounts = Counter([v.wirecount for v in self.cables.values() if v.mm2 == mm2])
+        bom = bom + 'Gauge\tUnit\tWirecount\tTotal length\tQty\tDesignators\n'
+        bom = bom + '---\t---\t---\t---\t---\t---\n'
+        gauges = Counter([v.gauge_and_unit for v in self.cables.values()])
+        for gauge in gauges.keys():
+            wirecounts = Counter([v.wirecount for v in self.cables.values() if v.gauge_and_unit == gauge])
             for wirecount in wirecounts.keys():
-                # print('  ', mm2, wirecount, ':', wirecounts[wirecount])
-                lengths = [v.length for v in self.cables.values() if v.mm2 == mm2 and v.wirecount == wirecount]
-                designators = [k for k,v in self.cables.items() if v.mm2 == mm2 and v.wirecount == wirecount]
+                # print('  ', gauge, wirecount, ':', wirecounts[wirecount])
+                lengths = [v.length for v in self.cables.values() if v.gauge_and_unit == gauge and v.wirecount == wirecount]
+                designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge and v.wirecount == wirecount]
                 # print('    ', 'Lengths:', lengths)
                 # print('    ', 'Total lengths:', sum(lengths))
-                bom = bom + '{mm2}\t{wirecount}\t{len_total}\t{qty}\t{designators}\n'.format(mm2=mm2, wirecount=wirecount, len_total=round(sum(lengths),3), qty=len(lengths), designators=', '.join(designators))
+                bom = bom + '{gauge}\t{gauge_unit}\t{wirecount}\t{len_total}\t{qty}\t{designators}\n'.format(gauge=gauge[0],
+                                                                                                             gauge_unit=gauge[1],
+                                                                                                             wirecount=wirecount,
+                                                                                                             len_total=round(sum(lengths),3),
+                                                                                                             qty=len(lengths),
+                                                                                                             designators=', '.join(designators))
 
         return bom
 
@@ -333,8 +339,8 @@ class Connector:
 class Cable:
     name: str
     type: str = None
-    mm2: float = None
-    awg: int = None
+    gauge: float = None
+    gauge_unit : str = None
     show_equiv: bool = False
     length: float = 0
     wirecount: int = None
@@ -347,8 +353,25 @@ class Cable:
     show_wirecount: bool = True
 
     def __post_init__(self):
-        if self.mm2 and self.awg:
-            raise Exception('You cannot define both mm2 and awg!')
+
+        if isinstance(self.gauge, str): # gauge and unit specified
+            try:
+                g, u = self.gauge.split(' ')
+            except:
+                raise Exception('Gauge must be a number, or number and unit separated by a space')
+            self.gauge = g
+            self.gauge_unit = u.replace('mm2','mm\u00B2')
+        elif self.gauge is not None: # gauge specified, assume mm2
+            if self.gauge_unit is None:
+                self.gauge_unit = 'mm\u00B2'
+        else:
+            pass # gauge not specified
+
+        self.gauge_and_unit = (self.gauge, self.gauge_unit)
+
+
+        # print('{}\t{}\t{}'.format(self.name, self.gauge, self.gauge_unit))
+
         self.connections = []
 
         if self.wirecount: # number of wires explicitly defined
@@ -458,7 +481,7 @@ def awg_equiv(mm2):
     if k in awg_equiv_table:
         return awg_equiv_table[k]
     else:
-        return None
+        return 'unknown'
 
 def parse(file_in, file_out=None):
 
