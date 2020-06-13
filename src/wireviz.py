@@ -5,9 +5,11 @@ from typing import Any, List
 import yaml
 from graphviz import Graph
 
-COLOR_CODES = {'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'GYPK','RDBU','WHGN','BNGN','WHYE','YEBN','WHGY','GYBN','WHPK','PKBN'],
+COLOR_CODES = {
+               'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'GYPK','RDBU','WHGN','BNGN','WHYE','YEBN','WHGY','GYBN','WHPK','PKBN'],
                'IEC': ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK'],
-               'BW':  ['BK','WH']}
+               'BW':  ['BK','WH']
+              }
 
 color_hex = {
              'BK': '#000000',
