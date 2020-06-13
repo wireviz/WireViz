@@ -9,7 +9,7 @@ templates: # defining templates to be used later on
     length: 0.2
     colors: [BK, RD, YE, GN]
 
-nodes:
+connectors:
   X1:
     <<: *molex_f # copying items from the template
     pinout: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, N/C]
@@ -27,7 +27,7 @@ nodes:
     gender: male
     pinout: [GND, +12V]
 
-wires:
+cables:
   W1:
     <<: *wire_i2c
     type: bundle

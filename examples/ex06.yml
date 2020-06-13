@@ -10,7 +10,7 @@ templates:
     colors: [PK, TQ, YE, VT]
     type: bundle
 
-nodes:
+connectors:
   X1:
     <<: *template_con
   X2:
@@ -24,7 +24,7 @@ nodes:
   X6:
     <<: *template_con
 
-wires:
+cables:
   W1:
     <<: *template_wire
   W2:

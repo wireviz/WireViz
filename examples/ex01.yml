@@ -1,4 +1,4 @@
-nodes:
+connectors:
   X1:
     type: Molex KK 254 # more information
     gender: female
@@ -8,7 +8,7 @@ nodes:
     gender: female
     pinout: [GND, VCC, RX, TX]
 
-wires:
+cables:
   W1:
     color_code: IEC # auto-color wires based on a standard
     wirecount: 4 # need to specify number of wires explicitly when using a color code

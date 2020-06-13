@@ -29,7 +29,7 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
 
 [WireViz input file](examples/demo01.yml):
 
-    nodes:
+    connectors:
       X1:
         type: D-Sub
         gender: female
@@ -39,7 +39,7 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
         gender: female
         pinout: [GND, RX, TX]
 
-    wires:
+    cables:
       W1:
         mm2: 0.25
         length: 0.2

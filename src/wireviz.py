@@ -61,17 +61,17 @@ class Harness:
 
     def __init__(self):
         self.color_mode = 'SHORT'
-        self.nodes = {}
+        self.connectors = {}
         self.cables = {}
 
-    def add_node(self, name, *args, **kwargs):
-        self.nodes[name] = Node(name, *args, **kwargs)
+    def add_connector(self, name, *args, **kwargs):
+        self.connectors[name] = Connector(name, *args, **kwargs)
 
     def add_cable(self, name, *args, **kwargs):
         self.cables[name] = Cable(name, *args, **kwargs)
 
-    def loop(self, node_name, from_pin, to_pin):
-        self.nodes[node_name].loop(from_pin, to_pin)
+    def loop(self, connector_name, from_pin, to_pin):
+        self.connectors[connector_name].loop(from_pin, to_pin)
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
         self.cables[via_name].connect(from_name, from_pin, via_pin, to_name, to_pin)
@@ -97,11 +97,11 @@ class Harness:
         for k, c in self.cables.items():
             for x in c.connections:
                 if x.from_port is not None: # connect to left
-                    self.nodes[x.from_name].ports_right = True
+                    self.connectors[x.from_name].ports_right = True
                 if x.to_port is not None: # connect to right
-                    self.nodes[x.to_name].ports_left = True
+                    self.connectors[x.to_name].ports_left = True
 
-        for k, n in self.nodes.items():
+        for k, n in self.connectors.items():
             if n.category == 'ferrule':
                 infostring = '{type} {color}'.format(type=n.type,
                                                      color=translate_color(n.color, self.color_mode) if n.color else '')
@@ -228,14 +228,14 @@ class Harness:
                     dot.attr('edge',color='#000000')
 
                 if x.from_port is not None: # connect to left
-                    from_ferrule = self.nodes[x.from_name].category is 'ferrule'
+                    from_ferrule = self.connectors[x.from_name].category is 'ferrule'
                     code_left_1 = '{from_name}{from_port}:e'.format(from_name=x.from_name, from_port=':p{}r'.format(x.from_port) if not from_ferrule else '')
                     code_left_2 = '{via_name}:w{via_wire}:w'.format(via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else '')
                     dot.edge(code_left_1, code_left_2)
                     from_string = '{}:{}'.format(x.from_name, x.from_port) if not from_ferrule else ''
                     html = html.replace('<!-- {}_in -->'.format(x.via_port), from_string)
                 if x.to_port is not None: # connect to right
-                    to_ferrule = self.nodes[x.to_name].category is 'ferrule'
+                    to_ferrule = self.connectors[x.to_name].category is 'ferrule'
                     code_right_1 = '{via_name}:w{via_wire}:e'.format(via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else '')
                     code_right_2 = '{to_name}{to_port}:w'.format(to_name=x.to_name, to_port=':p{}l'.format(x.to_port) if not to_ferrule else '')
                     dot.edge(code_right_1, code_right_2)
@@ -263,24 +263,24 @@ class Harness:
         # list connectors
         bom = bom + 'Type\tGender\tPincount\tQty\tDesignators\n'
         bom = bom + '---\t---\t---\t---\t---\n'
-        types = Counter([v.type for v in self.nodes.values()])
+        types = Counter([v.type for v in self.connectors.values()])
         # print('Types:', types)
         for type in types.keys():
             # print(type, '({})'.format(types[type]))
-            genders = Counter([v.gender for v in self.nodes.values() if v.type == type])
+            genders = Counter([v.gender for v in self.connectors.values() if v.type == type])
             # print('  ', 'Genders:', genders)
             for gender in genders.keys():
                 # print('  ', type, gender, '({})'.format(genders[gender]))
                 # print(keys)
-                pincounts = Counter([v.pincount for v in self.nodes.values() if v.type == type and v.gender == gender])
+                pincounts = Counter([v.pincount for v in self.connectors.values() if v.type == type and v.gender == gender])
                 # print('    ', 'Pincounts:', pincounts)
                 for pincount in pincounts.keys():
                     # print('    ', type, gender, pincount, 'pins :', pincounts[pincount])
-                    designators = [k for k,v in self.nodes.items() if v.type == type and v.gender == gender and v.pincount == pincount]
+                    designators = [k for k,v in self.connectors.items() if v.type == type and v.gender == gender and v.pincount == pincount]
                     bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\t{designators}\n'.format(type=type, gender=gender, pincount=pincount, qty=pincounts[pincount], designators=', '.join(designators))
 
         bom = bom + '\n'
-        # list wires
+        # list cables
         bom = bom + 'mm2\tWirecount\tTotal length\tQty\tDesignators\n'
         bom = bom + '---\t---\t---\t---\t---\n'
         # TODO: make it work with AWG as well
@@ -299,7 +299,7 @@ class Harness:
         return bom
 
 @dataclass
-class Node:
+class Connector:
     name: str
     category: str = None
     type: str = None
@@ -474,6 +474,7 @@ def parse(file_in, file_out=None):
             input = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
             print(exc)
+    # print(input)
 
     def expand(input):
         # input can be:
@@ -513,20 +514,20 @@ def parse(file_in, file_out=None):
     h = Harness()
 
     # add items
-    sections = ['nodes','wires','ferrules','connections']
+    sections = ['connectors','cables','ferrules','connections']
     types    = [dict, dict, dict, list]
     for sec, ty in zip(sections, types):
         if sec in input and type(input[sec]) == ty:
             if len(input[sec]) > 0:
                 if ty == dict:
                     for k, o in input[sec].items():
-                        if sec == 'nodes':
-                            h.add_node(name=k, **o)
-                        elif sec == 'wires':
+                        if sec == 'connectors':
+                            h.add_connector(name=k, **o)
+                        elif sec == 'cables':
                             h.add_cable(name=k, **o)
                         elif sec == 'ferrules':
                             pass
-                            # h.add_node(name=k, category='ferrule', **o)
+                            # h.add_connector(name=k, category='ferrule', **o)
             else:
                 # print('{} section empty'.format(sec))
                 pass
@@ -540,7 +541,7 @@ def parse(file_in, file_out=None):
     # add connections
     ferrule_counter = 0
     for con in input['connections']:
-        if len(con) == 3: # format: connector -- wire -- conector
+        if len(con) == 3: # format: connector -- cable -- conector
 
             for c in con:
                 if len(list(c.keys())) != 1: # check that each entry in con has only one key, which is the designator
@@ -550,7 +551,8 @@ def parse(file_in, file_out=None):
             via_name  = list(con[1].keys())[0]
             to_name   = list(con[2].keys())[0]
 
-            if not check_designators([from_name,via_name,to_name],('nodes','wires','nodes')):
+            if not check_designators([from_name,via_name,to_name],('connectors','cables','connectors')):
+                print([from_name,via_name,to_name])
                 raise Exception('Bad connection definition (3)')
 
             from_pins = expand(con[0][from_name])
@@ -570,7 +572,7 @@ def parse(file_in, file_out=None):
                     if len(list(c.keys())) != 1: # check that each entry in con has only one key, which is the designator
                         raise Exception('Too many keys')
 
-            # hack to make the format for ferrules compatible with the formats for connectors and wires
+            # hack to make the format for ferrules compatible with the formats for connectors and cables
             if type(con[0]) == str:
                 name = con[0]
                 con[0] = {}
@@ -583,60 +585,60 @@ def parse(file_in, file_out=None):
             from_name = list(con[0].keys())[0]
             to_name   = list(con[1].keys())[0]
 
-            n_w = check_designators([from_name, to_name],('nodes','wires'))
-            w_n = check_designators([from_name, to_name],('wires','nodes'))
-            n_n = check_designators([from_name, to_name],('nodes','nodes'))
+            con_cbl = check_designators([from_name, to_name],('connectors','cables'))
+            cbl_con = check_designators([from_name, to_name],('cables','connectors'))
+            con_con = check_designators([from_name, to_name],('connectors','connectors'))
 
 
-            f_w = check_designators([from_name, to_name],('ferrules','wires'))
-            w_f = check_designators([from_name, to_name],('wires','ferrules'))
+            fer_cbl = check_designators([from_name, to_name],('ferrules','cables'))
+            cbl_fer = check_designators([from_name, to_name],('cables','ferrules'))
 
-            if not n_w and not w_n and not n_n and not f_w and not w_f:
+            if not con_cbl and not cbl_con and not con_con and not fer_cbl and not cbl_fer:
                 raise Exception('Wrong designators')
 
             from_pins = expand(con[0][from_name])
             to_pins  = expand(con[1][to_name])
 
-            if n_w or w_n or n_n:
+            if con_cbl or cbl_con or con_con:
                 if len(from_pins) != len(to_pins):
                     raise Exception('List length mismatch')
 
-            if n_w or w_n:
+            if con_cbl or cbl_con:
                 for (from_pin, to_pin) in zip(from_pins, to_pins):
-                    if n_w:
+                    if con_cbl:
                         h.connect(from_name, from_pin, to_name, to_pin, None, None)
-                    else: # w_n
+                    else: # cbl_con
                         h.connect(None, None, from_name, from_pin, to_name, to_pin)
-            elif n_n:
-                con_name  = list(con[0].keys())[0]
+            elif con_con:
+                cocon_coname  = list(con[0].keys())[0]
                 from_pins = expand(con[0][from_name])
                 to_pins   = expand(con[1][to_name])
 
                 for (from_pin, to_pin) in zip(from_pins, to_pins):
-                    h.loop(con_name, from_pin, to_pin)
-            if f_w or w_f:
+                    h.loop(cocon_coname, from_pin, to_pin)
+            if fer_cbl or cbl_fer:
                 from_pins = expand(con[0][from_name])
                 to_pins   = expand(con[1][to_name])
 
-                if f_w:
+                if fer_cbl:
                     ferrule_name = from_name
-                    wire_name = to_name
-                    wire_pins = to_pins
+                    cable_name = to_name
+                    cable_pins = to_pins
                 else:
                     ferrule_name = to_name
-                    wire_name = from_name
-                    wire_pins = from_pins
+                    cable_name = from_name
+                    cable_pins = from_pins
 
                 ferrule_params = input['ferrules'][ferrule_name]
-                for wire_pin in wire_pins:
+                for cable_pin in cable_pins:
                     ferrule_counter = ferrule_counter + 1
                     ferrule_id = 'F{}'.format(ferrule_counter)
-                    h.add_node(ferrule_id, category='ferrule', **ferrule_params)
+                    h.add_connector(ferrule_id, category='ferrule', **ferrule_params)
 
-                    if f_w:
-                        h.connect(ferrule_id, 1, wire_name, wire_pin, None, None)
+                    if fer_cbl:
+                        h.connect(ferrule_id, 1, cable_name, cable_pin, None, None)
                     else:
-                        h.connect(None, None, wire_name, wire_pin, ferrule_id, 1)
+                        h.connect(None, None, cable_name, cable_pin, ferrule_id, 1)
 
 
         else:

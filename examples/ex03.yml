@@ -1,4 +1,4 @@
-nodes:
+connectors:
   X1: &boo
     type: Molex Micro-Fit
     gender: male
@@ -12,7 +12,7 @@ nodes:
   X4:
     <<: *con_power_f
 
-wires:
+cables:
   W1:
     type: bundle # bundles are routed together, but more loosely than normal cables
     wirecount: 6

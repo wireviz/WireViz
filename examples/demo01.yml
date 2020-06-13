@@ -1,4 +1,4 @@
-nodes:
+connectors:
   X1:
     type: D-Sub
     gender: female
@@ -8,7 +8,7 @@ nodes:
     gender: female
     pinout: [GND, RX, TX]
 
-wires:
+cables:
   W1:
     mm2: 0.25
     length: 0.2
