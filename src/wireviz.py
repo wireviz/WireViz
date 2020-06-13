@@ -254,24 +254,79 @@ class Harness:
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
         # bom output
+        # connectors
+        _con = self.bom_connectors()
+        header_con = ['Type','Subtype','Pin count','Qty','Designators']
+        bom_con = tuplelist2tsv(_con, header_con)
+        # cables
+        _cbl, _cut = self.bom_cables_and_cutlist()
+        header_cbl = ['Gauge','Gauge unit','Wire count','Shield','Total length','Designators']
+        bom_cbl = tuplelist2tsv(_cbl, header_cbl)
+        # cutlist
+        header_cut = ['Gauge','Gauge unit','Wire count','Shield','Length','Qty','Designators']
+        bom_cut = tuplelist2tsv(_cut, header_cut)
         if gen_bom:
-            # connectors
-            _con = self.bom_connectors()
-            header_con = ['Type','Subtype','Pin count','Qty','Designators']
-            bom_con = tuplelist2tsv(_con, header_con)
             with open('{}.connectors.bom.tsv'.format(filename),'w') as file:
                 file.write(bom_con)
-            # cables
-            _cbl, _cut = self.bom_cables_and_cutlist()
-            header_cbl = ['Gauge','Gauge unit','Wire count','Shield','Total length','Designators']
-            bom_cbl = tuplelist2tsv(_cbl, header_cbl)
             with open('{}.cables.bom.tsv'.format(filename),'w') as file:
                 file.write(bom_cbl)
-            # cutlist
-            header_cut = ['Gauge','Gauge unit','Wire count','Shield','Length','Qty','Designators']
-            bom_cut = tuplelist2tsv(_cut, header_cut)
             with open('{}.cutlist.bom.tsv'.format(filename),'w') as file:
                 file.write(bom_cut)
+        # HTML documentation
+        with open('{}.html'.format(filename),'w') as file:
+            file.write('<html><body>')
+            file.write('<h1>Diagram</h1>')
+            with open('{}.svg'.format(filename),'r') as svg:
+                for l in svg:
+                    file.write(l)
+
+            file.write('<h1>BOM</h1>')
+
+            listy = flatten2d(self.bom_connectors())
+            file.write('<h2>Connectors</h2>')
+            file.write('<table border="1">')
+            file.write('<tr>')
+            for item in header_con:
+                file.write('<th>{}</th>'.format(item))
+            file.write('</tr>')
+            for row in listy:
+                file.write('<tr>')
+                for item in row:
+                    file.write('<td>{}</td>'.format(item))
+                file.write('</tr>')
+            file.write('</table>')
+
+            bom_cbl, bom_cut = self.bom_cables_and_cutlist()
+            file.write('<h2>Cables</h2>')
+            listy = flatten2d(bom_cbl)
+            file.write('<table border="1">')
+            file.write('<tr>')
+            for item in header_cbl:
+                file.write('<th>{}</th>'.format(item))
+            file.write('</tr>')
+            for row in listy:
+                file.write('<tr>')
+                for item in row:
+                    file.write('<td>{}</td>'.format(item))
+                file.write('</tr>')
+            file.write('</table>')
+
+            file.write('<h2>Cutlist</h2>')
+            listy = flatten2d(bom_cut)
+            file.write('<table border="1">')
+            file.write('<tr>')
+            for item in header_cut:
+                file.write('<th>{}</th>'.format(item))
+            file.write('</tr>')
+            for row in listy:
+                file.write('<tr>')
+                for item in row:
+                    file.write('<td>{}</td>'.format(item))
+                file.write('</tr>')
+            file.write('</table>')
+
+
+            file.write('</body></html>')
 
     def bom_connectors(self):
         bom = []
@@ -686,14 +741,16 @@ def parse(file_in, file_out=None, gen_bom=False):
 
     h.output(filename=file_out, format=('png','svg'), gen_bom=gen_bom, view=False)
 
+def flatten2d(input):
+    output = [[str(item) if not isinstance(item, List) else ', '.join(item) for item in row] for row in input]
+    return output
+
 def tuplelist2tsv(input, header=None):
     output = ''
     if header is not None:
         input.insert(0, header)
+    input = flatten2d(input)
     for row in input:
-        for i,item in enumerate(row):
-            if isinstance(item, List):
-                row[i] = ', '.join(item)
         output = output + '\t'.join(str(item) for item in row) + '\n'
     return output
 
