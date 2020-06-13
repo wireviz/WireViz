@@ -103,8 +103,9 @@ class Harness:
 
         for k, n in self.connectors.items():
             if n.category == 'ferrule':
-                infostring = '{type} {color}'.format(type=n.type,
-                                                     color=translate_color(n.color, self.color_mode) if n.color else '')
+                infostring = '{type}{subtype} {color}'.format(type=n.type,
+                                                               subtype=', {}'.format(n.subtype) if n.subtype else '',
+                                                               color=translate_color(n.color, self.color_mode) if n.color else '')
                 infostring_l = infostring if n.ports_right else ''
                 infostring_r = infostring if n.ports_left else ''
 
@@ -567,7 +568,6 @@ def parse(file_in, file_out=None, gen_bom=False):
                             h.add_cable(name=k, **o)
                         elif sec == 'ferrules':
                             pass
-                            # h.add_connector(name=k, category='ferrule', **o)
             else:
                 # print('{} section empty'.format(sec))
                 pass
@@ -702,7 +702,7 @@ if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('file_input', nargs='?', default='_test/test.yml')
     ap.add_argument('file_output', nargs='?', default=None)
-    ap.add_argument('--bom', action='store_const', default=False, const=True)
+    ap.add_argument('--bom', action='store_const', default=True, const=True)
     args = ap.parse_args()
 
     parse(args.file_input, file_out=args.file_output, gen_bom=args.bom)
