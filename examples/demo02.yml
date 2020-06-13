@@ -1,7 +1,7 @@
 templates: # defining templates to be used later on
   - &molex_f
     type: Molex KK 254
-    gender: female
+    subtype: female
   - &con_i2c
     pinout: [GND, +5V, SCL, SDA]
   - &wire_i2c
@@ -24,7 +24,7 @@ connectors:
     pinout: [GND, +12V, MISO, MOSI, SCK]
   X5:
     type: Molex Micro-Fit
-    gender: male
+    subtype: male
     pinout: [GND, +12V]
 
 cables:

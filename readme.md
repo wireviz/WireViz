@@ -32,11 +32,11 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
     connectors:
       X1:
         type: D-Sub
-        gender: female
+        subtype: female
         pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
       X2:
         type: Molex KK 254
-        gender: female
+        subtype: female
         pinout: [GND, RX, TX]
 
     cables:

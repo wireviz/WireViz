@@ -1,11 +1,11 @@
 # connectors:
 #   X1:
 #     type: D-Sub
-#     gender: female
+#     subtype: female
 #     pincount: 4
 #   X2:
 #     type: Molex KK 254
-#     gender: female
+#     subtype: female
 #     pincount: 3
 
 cables:

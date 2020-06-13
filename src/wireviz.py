@@ -128,7 +128,7 @@ class Harness:
             else:
                 # a = attributes
                 a = [n.type,
-                     n.gender,
+                     n.subtype,
                      '{}-pin'.format(len(n.pinout)) if n.show_pincount else '']
                 # p = pinout
                 p = [[],[],[]]
@@ -256,7 +256,7 @@ class Harness:
         if gen_bom:
             # connectors
             _con = self.bom_connectors()
-            header_con = ['Type','Gender','Pin count','Qty','Designators']
+            header_con = ['Type','Subtype','Pin count','Qty','Designators']
             bom_con = tuplelist2tsv(_con, header_con)
             with open('{}.connectors.bom.tsv'.format(filename),'w') as file:
                 file.write(bom_con)
@@ -276,16 +276,16 @@ class Harness:
         bom = []
         types = Counter([v.type for v in self.connectors.values()])
         for type in types.keys():
-            genders = Counter([v.gender for v in self.connectors.values() if v.type == type])
-            for gender in genders.keys():
+            subtypes = Counter([v.subtype for v in self.connectors.values() if v.type == type])
+            for subtype in subtypes.keys():
                 pincounts = Counter([v.pincount for v in self.connectors.values() if v.type == type and
-                                                                                     v.gender == gender])
+                                                                                     v.subtype == subtype])
                 for pincount in pincounts.keys():
                     designators = [k for k,v in self.connectors.items() if v.type == type and
-                                                                           v.gender == gender and
+                                                                           v.subtype == subtype and
                                                                            v.pincount == pincount]
                     qty = pincounts[pincount]
-                    bom.append([type, gender, pincount, qty, designators])
+                    bom.append([type, subtype, pincount, qty, designators])
         return bom
 
     def bom_cables_and_cutlist(self):
@@ -323,7 +323,7 @@ class Connector:
     name: str
     category: str = None
     type: str = None
-    gender: str = None
+    subtype: str = None
     pincount: int = None
     notes: str = None
     pinout: List[Any] = field(default_factory=list)
