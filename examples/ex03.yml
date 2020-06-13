@@ -15,8 +15,8 @@ nodes:
 wires:
   W1:
     type: bundle # bundles are routed together, but more loosely than normal cables
-    num_wires: 6
-    colors: [BK, RD] # if number of items in color list is less than num_wires, loop colors
+    wirecount: 6
+    colors: [BK, RD] # if number of items in color list is less than wirecount, loop colors
     mm2: 0.25
     show_equiv: true
     length: 0.2

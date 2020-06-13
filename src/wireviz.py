@@ -158,7 +158,7 @@ class Harness:
 
         for k, c in self.cables.items():
             # a = attributes
-            a = ['{}x'.format(len(c.colors)) if c.show_num_wires else '',
+            a = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
                  '{} mm\u00B2{}'.format(c.mm2, ' ({} AWG)'.format(awg_equiv(c.mm2)) if c.show_equiv else '') if c.mm2 is not None else '',
                  '{} AWG'.format(c.awg) if c.awg else '',
                  '+ S' if c.shield else '',
@@ -287,11 +287,11 @@ class Harness:
         mm2s = Counter([v.mm2 for v in self.cables.values()])
         for mm2 in mm2s.keys():
             # print(mm2, 'mm2', '({})'.format(mm2s[mm2]))
-            wirecounts = Counter([v.num_wires for v in self.cables.values() if v.mm2 == mm2])
+            wirecounts = Counter([v.wirecount for v in self.cables.values() if v.mm2 == mm2])
             for wirecount in wirecounts.keys():
                 # print('  ', mm2, wirecount, ':', wirecounts[wirecount])
-                lengths = [v.length for v in self.cables.values() if v.mm2 == mm2 and v.num_wires == wirecount]
-                designators = [k for k,v in self.cables.items() if v.mm2 == mm2 and v.num_wires == wirecount]
+                lengths = [v.length for v in self.cables.values() if v.mm2 == mm2 and v.wirecount == wirecount]
+                designators = [k for k,v in self.cables.items() if v.mm2 == mm2 and v.wirecount == wirecount]
                 # print('    ', 'Lengths:', lengths)
                 # print('    ', 'Total lengths:', sum(lengths))
                 bom = bom + '{mm2}\t{wirecount}\t{len_total}\t{qty}\t{designators}\n'.format(mm2=mm2, wirecount=wirecount, len_total=round(sum(lengths),3), qty=len(lengths), designators=', '.join(designators))
@@ -337,21 +337,21 @@ class Cable:
     awg: int = None
     show_equiv: bool = False
     length: float = 0
-    num_wires: int = None
+    wirecount: int = None
     shield: bool = False
     notes: str = None
     colors: List[Any] = field(default_factory=list)
     color_code: str = None
     show_name: bool = True
     show_pinout: bool = False
-    show_num_wires: bool = True
+    show_wirecount: bool = True
 
     def __post_init__(self):
         if self.mm2 and self.awg:
             raise Exception('You cannot define both mm2 and awg!')
         self.connections = []
 
-        if self.num_wires: # number of wires explicitly defined
+        if self.wirecount: # number of wires explicitly defined
             if self.colors: # use custom color palette (partly or looped if needed)
                 pass
             elif self.color_code: # use standard color palette (partly or looped if needed)
@@ -359,19 +359,19 @@ class Cable:
                     raise Exception('Unknown color code')
                 self.colors = COLOR_CODES[self.color_code]
             else: # no colors defined, add dummy colors
-                self.colors = [''] * self.num_wires
+                self.colors = [''] * self.wirecount
 
             # make color code loop around if more wires than colors
-            if self.num_wires > len(self.colors):
-                 m = self.num_wires // len(self.colors) + 1
+            if self.wirecount > len(self.colors):
+                 m = self.wirecount // len(self.colors) + 1
                  self.colors = self.colors * int(m)
             # cut off excess after looping
-            self.colors = self.colors[:self.num_wires]
+            self.colors = self.colors[:self.wirecount]
 
-        else: # num_wires implicit in length of color list
+        else: # wirecount implicit in length of color list
             if not self.colors:
-                raise Exception('Unknown number of wires. Must specify num_wires or colors (implicit length)')
-            self.num_wires = len(self.colors)
+                raise Exception('Unknown number of wires. Must specify wirecount or colors (implicit length)')
+            self.wirecount = len(self.colors)
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
         from_pin = int2tuple(from_pin)

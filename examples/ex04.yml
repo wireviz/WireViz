@@ -14,7 +14,7 @@ wires:
     show_equiv: true
     length: 0.2
     color_code: IEC
-    num_wires: 6
+    wirecount: 6
     type: bundle
 
 ferrules:

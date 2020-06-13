@@ -44,7 +44,7 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
         mm2: 0.25
         length: 0.2
         color_code: DIN
-        num_wires: 3
+        wirecount: 3
         shield: true
 
     connections:
