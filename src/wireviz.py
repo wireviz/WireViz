@@ -253,57 +253,69 @@ class Harness:
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
         # bom output
-        with open('{}.bom.tsv'.format(filename),'w') as file:
-            file.write(self.generate_bom())
-        # TODO: cut list output
+        # connectors
+        _con = self.bom_connectors()
+        header_con = ['Type','Gender','Pin count','Qty','Designators']
+        bom_con = tuplelist2tsv(_con, header_con)
+        with open('{}.connectors.bom.tsv'.format(filename),'w') as file:
+            file.write(bom_con)
+        # cables
+        _cbl, _cut = self.bom_cables_and_cutlist()
+        header_cbl = ['Gauge','Gauge unit','Wire count','Shield','Total length','Designators']
+        bom_cbl = tuplelist2tsv(_cbl, header_cbl)
+        with open('{}.cables.bom.tsv'.format(filename),'w') as file:
+            file.write(bom_cbl)
+        # cutlist
+        header_cut = ['Gauge','Gauge unit','Wire count','Shield','Length','Qty','Designators']
+        bom_cut = tuplelist2tsv(_cut, header_cut)
+        with open('{}.cutlist.bom.tsv'.format(filename),'w') as file:
+            file.write(bom_cut)
 
-    def generate_bom(self):
-        bom = ''
-        # list connectors
-        bom = bom + 'Type\tGender\tPincount\tQty\tDesignators\n'
-        bom = bom + '---\t---\t---\t---\t---\n'
+    def bom_connectors(self):
+        bom = []
         types = Counter([v.type for v in self.connectors.values()])
-        # print('Types:', types)
         for type in types.keys():
-            # print(type, '({})'.format(types[type]))
             genders = Counter([v.gender for v in self.connectors.values() if v.type == type])
-            # print('  ', 'Genders:', genders)
             for gender in genders.keys():
-                # print('  ', type, gender, '({})'.format(genders[gender]))
-                # print(keys)
-                pincounts = Counter([v.pincount for v in self.connectors.values() if v.type == type and v.gender == gender])
-                # print('    ', 'Pincounts:', pincounts)
+                pincounts = Counter([v.pincount for v in self.connectors.values() if v.type == type and
+                                                                                     v.gender == gender])
                 for pincount in pincounts.keys():
-                    # print('    ', type, gender, pincount, 'pins :', pincounts[pincount])
-                    designators = [k for k,v in self.connectors.items() if v.type == type and v.gender == gender and v.pincount == pincount]
-                    bom = bom + '{type}\t{gender}\t{pincount}\t{qty}\t{designators}\n'.format(type=type,
-                                                                                              gender=gender,
-                                                                                              pincount=pincount,
-                                                                                              qty=pincounts[pincount],
-                                                                                              designators=', '.join(designators))
-
-        bom = bom + '\n'
-        # list cables
-        bom = bom + 'Gauge\tUnit\tWirecount\tShield\tTotal length\tQty\tDesignators\n'
-        bom = bom + '---\t---\t---\t---\t---\t---\t---\n'
-        gauges = Counter([v.gauge_and_unit for v in self.cables.values()])
-        for gauge in gauges.keys():
-            wirecounts_and_shields = Counter([v.wirecount_and_shield for v in self.cables.values() if v.gauge_and_unit == gauge])
-            for wirecount_and_shield in wirecounts_and_shields.keys():
-                # print('  ', gauge, wirecount, ':', wirecounts[wirecount])
-                lengths = [v.length for v in self.cables.values() if v.gauge_and_unit == gauge and v.wirecount_and_shield == wirecount_and_shield]
-                designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge and v.wirecount_and_shield == wirecount_and_shield]
-                # print('    ', 'Lengths:', lengths)
-                # print('    ', 'Total lengths:', sum(lengths))
-                bom = bom + '{gauge}\t{gauge_unit}\t{wirecount}\t{shield}\t{len_total}\t{qty}\t{designators}\n'.format(gauge=gauge[0],
-                                                                                                             gauge_unit=gauge[1],
-                                                                                                             wirecount=wirecount_and_shield[0],
-                                                                                                             shield=wirecount_and_shield[1],
-                                                                                                             len_total=round(sum(lengths),3),
-                                                                                                             qty=len(lengths),
-                                                                                                             designators=', '.join(designators))
-
+                    designators = [k for k,v in self.connectors.items() if v.type == type and
+                                                                           v.gender == gender and
+                                                                           v.pincount == pincount]
+                    qty = pincounts[pincount]
+                    bom.append([type, gender, pincount, qty, designators])
         return bom
+
+    def bom_cables_and_cutlist(self):
+        bom_cbl = []
+        bom_cut = []
+        gauges_and_units = Counter([v.gauge_and_unit for v in self.cables.values()])
+        for gauge_and_unit in gauges_and_units.keys():
+            wirecounts_and_shields = Counter([v.wirecount_and_shield for v in self.cables.values() if v.gauge_and_unit == gauge_and_unit])
+            for wirecount_and_shield in wirecounts_and_shields.keys():
+                gauge       = gauge_and_unit[0]
+                gauge_unit  = gauge_and_unit[1]
+                wirecount   = wirecount_and_shield[0]
+                shield      = wirecount_and_shield[1]
+                all_lengths = [v.length for v in self.cables.values() if v.gauge_and_unit == gauge_and_unit and
+                                                                         v.wirecount_and_shield == wirecount_and_shield]
+                len_total   = round(sum(all_lengths),3) # rounding to avoid float problems
+                qty         = len(all_lengths) # number of cables that will be cut from this bom item (may be different lengths)
+                designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge_and_unit and
+                                                                   v.wirecount_and_shield == wirecount_and_shield]
+                bom_cbl.append([gauge, gauge_unit, wirecount, shield, len_total, designators])
+
+                unique_lengths = Counter([v.length for v in self.cables.values() if v.gauge_and_unit == gauge_and_unit and
+                                                                                    v.wirecount_and_shield == wirecount_and_shield])
+                for length in unique_lengths:
+                    qty = unique_lengths[length]
+                    designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge_and_unit and
+                                                                       v.wirecount_and_shield == wirecount_and_shield and
+                                                                       v.length == length]
+                    bom_cut.append([gauge, gauge_unit, wirecount, shield, length, qty, designators])
+
+        return (bom_cbl, bom_cut)
 
 @dataclass
 class Connector:
@@ -671,8 +683,18 @@ def parse(file_in, file_out=None):
         else:
             raise Exception('Wrong number of connection parameters')
 
-    h.generate_bom()
     h.output(filename=file_out, format=('png','svg'), view=False)
+
+def tuplelist2tsv(input, header=None):
+    output = ''
+    if header is not None:
+        input.insert(0, header)
+    for row in input:
+        for i,item in enumerate(row):
+            if isinstance(item, List):
+                row[i] = ', '.join(item)
+        output = output + '\t'.join(str(item) for item in row) + '\n'
+    return output
 
 if __name__ == '__main__':
     import argparse
