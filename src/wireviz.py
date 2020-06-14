@@ -125,8 +125,8 @@ class Harness:
                 >'''.format(infostring_l=infostring_l,
                             infostring_r=infostring_r,
                             colorbar='<TD BGCOLOR="{}" BORDER="1" SIDES="LR" WIDTH="4"></TD>'.format(translate_color(n.color, 'HEX')) if n.color else ''))
-                # dot.node(k, label='{<p1l>A|B|{C|<p1r>D|E}}')
-            else:
+
+            else: # not a ferrule
                 # a = attributes
                 a = [n.type,
                      n.subtype,
@@ -163,9 +163,7 @@ class Harness:
                  '{} {}{}'.format(c.gauge, c.gauge_unit, ' ({} AWG)'.format(awg_equiv(c.gauge)) if c.gauge_unit == 'mm\u00B2' and c.show_equiv else '') if c.gauge else '', # TODO: show equiv
                  '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
-            # print(a)
             a = list(filter(None, a))
-            # print(a)
 
             html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>' # main table
 
@@ -210,11 +208,8 @@ class Harness:
             if c.notes:
                 html = html + '<tr><td cellpadding="3">{}</td></tr>'.format(c.notes) # notes table
                 html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
-                # html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
 
             html = html + '</table>'  # main table
-
-            # print(html)
 
             # connections
             for x in c.connections:
@@ -318,12 +313,9 @@ class Harness:
 
     def bom_list(self):
         bom = self.bom()
-        # get all keys          (https://stackoverflow.com/a/11399555)
-        # and remove duplicates (https://stackoverflow.com/a/7961425)
-        # keys = list(dict.fromkeys([k for d in bom for k in d.keys()]))
         keys = ['item', 'qty', 'unit', 'designators']
         bom_list = []
-        bom_list.append(k.capitalize() for k in keys)
+        bom_list.append(k.capitalize() for k in keys) # create header row with keys
         for item in bom:
             item_list = [item.get(key, '') for key in keys] # fill missing values with blanks
             for i, subitem in enumerate(item_list):
@@ -395,12 +387,6 @@ class Cable:
                 self.gauge_unit = 'mm\u00B2'
         else:
             pass # gauge not specified
-
-        # for BOM generation
-        self.gauge_and_unit = (self.gauge, self.gauge_unit)
-
-
-        # print('{}\t{}\t{}'.format(self.name, self.gauge, self.gauge_unit))
 
         self.connections = []
 
@@ -525,11 +511,7 @@ def parse(file_in, file_out=None, gen_bom=False):
     file_out = os.path.abspath(file_out)
 
     with open(file_in, 'r') as stream:
-        try:
-            input = yaml.safe_load(stream)
-        except yaml.YAMLError as exc:
-            print(exc)
-    # print(input)
+        input = yaml.safe_load(stream)
 
     def expand(input):
         # input can be:
@@ -561,7 +543,6 @@ def parse(file_in, file_out=None, gen_bom=False):
 
     def check_designators(what, where):
         for i, x in enumerate(what):
-            # print('Looking for {} in {}'.format(x,where[i]))
             if x not in input[where[i]]:
                 return False
         return True
@@ -583,10 +564,8 @@ def parse(file_in, file_out=None, gen_bom=False):
                         elif sec == 'ferrules':
                             pass
             else:
-                # print('{} section empty'.format(sec))
-                pass
-        else:
-            # print('No {} section found'.format(sec))
+                pass # section exists but is empty
+        else: # section does not exist, create empty section
             if ty == dict:
                 input[sec] = {}
             elif ty == list:
