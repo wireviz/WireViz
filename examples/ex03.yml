@@ -14,7 +14,7 @@ connectors:
 
 cables:
   W1:
-    type: bundle # bundles are routed together, but more loosely than normal cables
+    category: bundle # bundles are routed together, but more loosely than normal cables
     wirecount: 6
     colors: [BK, RD] # if number of items in color list is less than wirecount, loop colors
     gauge: 0.25 mm2

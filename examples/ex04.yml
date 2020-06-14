@@ -15,7 +15,7 @@ cables:
     length: 0.2
     color_code: IEC
     wirecount: 6
-    type: bundle
+    category: bundle
 
 ferrules:
   ferrule_crimp:

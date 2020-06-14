@@ -170,7 +170,7 @@ class Harness:
             html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>' # main table
 
             html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">' # name+attributes table
-            if (not c.show_name) or c.type != 'bundle':
+            if (not c.show_name) or c.category != 'bundle':
                 html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(a), name=c.name)
             html = html + '<tr>' # attribute row
             for attrib in a:
@@ -242,7 +242,7 @@ class Harness:
                     to_string = '{}:{}'.format(x.to_name, x.to_port) if not to_ferrule else ''
                     html = html.replace('<!-- {}_out -->'.format(x.via_port), to_string)
 
-            dot.node(c.name, label='<{html}>'.format(html=html), shape='box', style='filled,dashed' if c.type=='bundle' else '', margin='0', fillcolor='white')
+            dot.node(c.name, label='<{html}>'.format(html=html), shape='box', style='filled,dashed' if c.category=='bundle' else '', margin='0', fillcolor='white')
 
         return dot
 
@@ -335,6 +335,7 @@ class Connector:
 @dataclass
 class Cable:
     name: str
+    category : str = None
     type: str = None
     gauge: float = None
     gauge_unit : str = None
