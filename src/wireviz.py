@@ -254,125 +254,52 @@ class Harness:
             d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         d.save(filename='{}.gv'.format(filename), directory=directory)
         # bom output
-        # connectors
-        _con = self.bom_connectors()
-        header_con = ['Type','Subtype','Pin count','Qty','Designators']
-        bom_con = tuplelist2tsv(_con, header_con)
-        # cables
-        _cbl, _cut = self.bom_cables_and_cutlist()
-        header_cbl = ['Gauge','Gauge unit','Wire count','Shield','Total length','Designators']
-        bom_cbl = tuplelist2tsv(_cbl, header_cbl)
-        # cutlist
-        header_cut = ['Gauge','Gauge unit','Wire count','Shield','Length','Qty','Designators']
-        bom_cut = tuplelist2tsv(_cut, header_cut)
-        if gen_bom:
-            with open('{}.connectors.bom.tsv'.format(filename),'w') as file:
-                file.write(bom_con)
-            with open('{}.cables.bom.tsv'.format(filename),'w') as file:
-                file.write(bom_cbl)
-            with open('{}.cutlist.bom.tsv'.format(filename),'w') as file:
-                file.write(bom_cut)
-        # HTML documentation
-        with open('{}.html'.format(filename),'w') as file:
-            file.write('<html><body>')
-            file.write('<h1>Diagram</h1>')
-            with open('{}.svg'.format(filename),'r') as svg:
-                for l in svg:
-                    file.write(l)
+        bom_list = self.bom_list()
+        with open('{}.bom.tsv'.format(filename),'w') as file:
+            file.write(tuplelist2tsv(bom_list))
 
-            file.write('<h1>BOM</h1>')
-
-            listy = flatten2d(self.bom_connectors())
-            file.write('<h2>Connectors</h2>')
-            file.write('<table border="1">')
-            file.write('<tr>')
-            for item in header_con:
-                file.write('<th>{}</th>'.format(item))
-            file.write('</tr>')
-            for row in listy:
-                file.write('<tr>')
-                for item in row:
-                    file.write('<td>{}</td>'.format(item))
-                file.write('</tr>')
-            file.write('</table>')
-
-            bom_cbl, bom_cut = self.bom_cables_and_cutlist()
-            file.write('<h2>Cables</h2>')
-            listy = flatten2d(bom_cbl)
-            file.write('<table border="1">')
-            file.write('<tr>')
-            for item in header_cbl:
-                file.write('<th>{}</th>'.format(item))
-            file.write('</tr>')
-            for row in listy:
-                file.write('<tr>')
-                for item in row:
-                    file.write('<td>{}</td>'.format(item))
-                file.write('</tr>')
-            file.write('</table>')
-
-            file.write('<h2>Cutlist</h2>')
-            listy = flatten2d(bom_cut)
-            file.write('<table border="1">')
-            file.write('<tr>')
-            for item in header_cut:
-                file.write('<th>{}</th>'.format(item))
-            file.write('</tr>')
-            for row in listy:
-                file.write('<tr>')
-                for item in row:
-                    file.write('<td>{}</td>'.format(item))
-                file.write('</tr>')
-            file.write('</table>')
-
-
-            file.write('</body></html>')
-
-    def bom_connectors(self):
+    def bom(self):
         bom = []
-        types = Counter([v.type for v in self.connectors.values()])
-        for type in types.keys():
-            subtypes = Counter([v.subtype for v in self.connectors.values() if v.type == type])
-            for subtype in subtypes.keys():
-                pincounts = Counter([v.pincount for v in self.connectors.values() if v.type == type and
-                                                                                     v.subtype == subtype])
-                for pincount in pincounts.keys():
-                    designators = [k for k,v in self.connectors.items() if v.type == type and
-                                                                           v.subtype == subtype and
-                                                                           v.pincount == pincount]
-                    qty = pincounts[pincount]
-                    bom.append([type, subtype, pincount, qty, designators])
+        # connectors
+        types = Counter([(v.type, v.subtype, v.pincount) for v in self.connectors.values()])
+        for type in types:
+            items = {k: v for k, v in self.connectors.items()  if (v.type, v.subtype, v.pincount) == type}
+            designators = list(items.keys())
+            shared = next(iter(items.values()))
+            name = '{}, {}, {} pins'.format(shared.type, shared.subtype, shared.pincount)
+            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators}
+            bom.append(item)
+        # cables
+        # TODO: handle bundles separately
+        types = Counter([(v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
+        for type in types:
+            # stuff = [(k, v.length) for k,v in self.cables.items() if (v.gauge, v.gauge_unit, v.wirecount, v.shield) == type]
+            items = {k: v for k, v in self.cables.items()  if (v.gauge, v.gauge_unit, v.wirecount, v.shield) == type}
+            designators = list(items.keys())
+            shared = next(iter(items.values()))
+            total_length = sum(i.length for i in items.values())
+            name = 'Cable {} x{}'.format(shared.wirecount,
+                                         ' {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else '',
+                                         ' shielded' if shared.shield else '')
+            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
+            bom.append(item)
         return bom
 
-    def bom_cables_and_cutlist(self):
-        bom_cbl = []
-        bom_cut = []
-        gauges_and_units = Counter([v.gauge_and_unit for v in self.cables.values()])
-        for gauge_and_unit in gauges_and_units.keys():
-            wirecounts_and_shields = Counter([v.wirecount_and_shield for v in self.cables.values() if v.gauge_and_unit == gauge_and_unit])
-            for wirecount_and_shield in wirecounts_and_shields.keys():
-                gauge       = gauge_and_unit[0]
-                gauge_unit  = gauge_and_unit[1]
-                wirecount   = wirecount_and_shield[0]
-                shield      = wirecount_and_shield[1]
-                all_lengths = [v.length for v in self.cables.values() if v.gauge_and_unit == gauge_and_unit and
-                                                                         v.wirecount_and_shield == wirecount_and_shield]
-                len_total   = round(sum(all_lengths),3) # rounding to avoid float problems
-                qty         = len(all_lengths) # number of cables that will be cut from this bom item (may be different lengths)
-                designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge_and_unit and
-                                                                   v.wirecount_and_shield == wirecount_and_shield]
-                bom_cbl.append([gauge, gauge_unit, wirecount, shield, len_total, designators])
-
-                unique_lengths = Counter([v.length for v in self.cables.values() if v.gauge_and_unit == gauge_and_unit and
-                                                                                    v.wirecount_and_shield == wirecount_and_shield])
-                for length in unique_lengths:
-                    qty = unique_lengths[length]
-                    designators = [k for k,v in self.cables.items() if v.gauge_and_unit == gauge_and_unit and
-                                                                       v.wirecount_and_shield == wirecount_and_shield and
-                                                                       v.length == length]
-                    bom_cut.append([gauge, gauge_unit, wirecount, shield, length, qty, designators])
-
-        return (bom_cbl, bom_cut)
+    def bom_list(self):
+        bom = self.bom()
+        # get all keys          (https://stackoverflow.com/a/11399555)
+        # and remove duplicates (https://stackoverflow.com/a/7961425)
+        # keys = list(dict.fromkeys([k for d in bom for k in d.keys()]))
+        keys = ['item', 'qty', 'unit', 'designators']
+        bom_list = []
+        bom_list.append(k.capitalize() for k in keys)
+        for item in bom:
+            item_list = [item.get(key, '') for key in keys] # fill missing values with blanks
+            for i, subitem in enumerate(item_list):
+                if isinstance(subitem, List): # convert any lists into comma separated strings
+                    item_list[i] = ', '.join(subitem)
+            bom_list.append(item_list)
+        return bom_list
 
 @dataclass
 class Connector:
