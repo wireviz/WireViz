@@ -120,7 +120,7 @@ class Harness:
             html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>' # main table
 
             html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">' # name+attributes table
-            if (not c.show_name) or c.category != 'bundle':
+            if c.show_name:
                 html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(a), name=c.name)
             html = html + '<tr>' # attribute row
             for attrib in a:
@@ -204,6 +204,30 @@ class Harness:
         bom_list = self.bom_list()
         with open('{}.bom.tsv'.format(filename),'w') as file:
             file.write(tuplelist2tsv(bom_list))
+        # HTML output
+        with open('{}.html'.format(filename),'w') as file:
+            file.write('<html><body style="font-family:Arial">')
+
+            file.write('<h1>Diagram</h1>')
+            with open('{}.svg'.format(filename),'r') as svg:
+                for l in svg:
+                    file.write(l)
+
+            file.write('<h1>Bill of Materials</h1>')
+            listy = flatten2d(bom_list)
+            file.write('<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">')
+            file.write('<tr>')
+            for item in listy[0]:
+                file.write('<th align="left" style="border:1px solid #000000; padding: 8px">{}</th>'.format(item))
+            file.write('</tr>')
+            for row in listy[1:]:
+                file.write('<tr>')
+                for i, item in enumerate(row):
+                    file.write('<td {align} style="border:1px solid #000000; padding: 4px">{content}</td>'.format(content=item, align='align="right"' if listy[0][i] == 'Qty' else ''))
+                file.write('</tr>')
+            file.write('</table>')
+
+            file.write('</body></html>')
 
     def bom(self):
         bom = []
