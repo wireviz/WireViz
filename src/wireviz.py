@@ -264,9 +264,12 @@ class Harness:
         types = Counter([(v.type, v.subtype, v.pincount) for v in self.connectors.values()])
         for type in types:
             items = {k: v for k, v in self.connectors.items()  if (v.type, v.subtype, v.pincount) == type}
-            designators = list(items.keys()).sort()
+            designators = list(items.keys())
+            designators.sort()
             shared = next(iter(items.values()))
-            name = '{}, {}, {} pins'.format(shared.type, shared.subtype, shared.pincount)
+            name = '{type}{subtype}{pincount}'.format(type = shared.type,
+                                                        subtype = ', {}'.format(shared.subtype) if shared.subtype else '',
+                                                        pincount = ', {} pins'.format(shared.pincount) if shared.category != 'ferrule' else '')
             item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators}
             bom.append(item)
         # cables
@@ -275,11 +278,12 @@ class Harness:
             items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) == type}
             shared = next(iter(items.values()))
             if shared.category != 'bundle':
-                designators = list(items.keys()).sort()
+                designators = list(items.keys())
+                designators.sort()
                 total_length = sum(i.length for i in items.values())
-                name = 'Cable {} x{}'.format(shared.wirecount,
-                                             ' {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else '',
-                                             ' shielded' if shared.shield else '')
+                name = 'Cable {wirecount} x{gauge}{shield}'.format(wirecount = shared.wirecount,
+                                                                   gauge = ' {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else '',
+                                                                   shield = ' shielded' if shared.shield else '')
                 item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
                 bom.append(item)
         # bundles (ignores wirecount)
@@ -304,11 +308,11 @@ class Harness:
             # flatten nested list
             designators = [item for sublist in designators for item in sublist] # https://stackoverflow.com/a/952952
             # remove duplicates
-            designators = list(dict.fromkeys(designators)).sort()
+            designators = list(dict.fromkeys(designators))
+            designators.sort()
             total_length = sum(i['length'] for i in items)
             name = 'Wire {} {} {}'.format(shared['gauge'], shared['gauge_unit'], shared['color'])
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-            print('item', item)
             bom.append(item)
         return bom
 
