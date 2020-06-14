@@ -19,7 +19,7 @@ cables:
 
 ferrules:
   ferrule_crimp:
-    type: crimp
+    type: Crimp ferrule
     show_name: false
     show_pincount: false
 
