@@ -207,18 +207,22 @@ class Harness:
 
     def bom(self):
         bom = []
+        bom_connectors = []
+        bom_cables = []
         # connectors
         types = Counter([(v.type, v.subtype, v.pincount) for v in self.connectors.values()])
         for type in types:
             items = {k: v for k, v in self.connectors.items()  if (v.type, v.subtype, v.pincount) == type}
+            shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
-            shared = next(iter(items.values()))
             name = '{type}{subtype}{pincount}'.format(type = shared.type,
                                                         subtype = ', {}'.format(shared.subtype) if shared.subtype else '',
                                                         pincount = ', {} pins'.format(shared.pincount) if shared.category != 'ferrule' else '')
-            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators}
-            bom.append(item)
+            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.category != 'ferrule' else ''}
+            bom_connectors.append(item)
+            bom_connectors = sorted(bom_connectors, key=lambda k: k['item']) # https://stackoverflow.com/a/73050
+        bom.extend(bom_connectors)
         # cables
         types = Counter([(v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
         for type in types:
@@ -232,7 +236,7 @@ class Harness:
                                                                    gauge = ' {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else '',
                                                                    shield = ' shielded' if shared.shield else '')
                 item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-                bom.append(item)
+                bom_cables.append(item)
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
@@ -260,14 +264,16 @@ class Harness:
             total_length = sum(i['length'] for i in items)
             name = 'Wire {} {} {}'.format(shared['gauge'], shared['gauge_unit'], shared['color'])
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-            bom.append(item)
+            bom_cables.append(item)
+            bom_cables = sorted(bom_cables, key=lambda k: k['item']) # https://stackoverflow.com/a/73050
+        bom.extend(bom_cables)
         return bom
 
     def bom_list(self):
         bom = self.bom()
         keys = ['item', 'qty', 'unit', 'designators']
         bom_list = []
-        bom_list.append(k.capitalize() for k in keys) # create header row with keys
+        bom_list.append([k.capitalize() for k in keys]) # create header row with keys
         for item in bom:
             item_list = [item.get(key, '') for key in keys] # fill missing values with blanks
             for i, subitem in enumerate(item_list):
