@@ -1,18 +1,18 @@
-nodes:
+connectors:
   X1:
     type: Molex KK 254 # more information
-    gender: female
-    pinout: [GND, VCC, RX, TX] # num_pins is implicit in pinout
+    subtype: female
+    pinout: [GND, VCC, RX, TX] # pincount is implicit in pinout
   X2:
     type: Molex KK 254
-    gender: female
+    subtype: female
     pinout: [GND, VCC, RX, TX]
 
-wires:
+cables:
   W1:
     color_code: IEC # auto-color wires based on a standard
-    num_wires: 4 # need to specify number of wires explicitly when using a color code
-    mm2: 0.25 # metric gauge, in mm^2
+    wirecount: 4 # need to specify number of wires explicitly when using a color code
+    gauge: 0.25 mm2 # also accepts AWG as unit
     show_equiv: true # auto-calculate AWG equivalent from metric gauge
     length: 0.2 # length in m
     shield: true

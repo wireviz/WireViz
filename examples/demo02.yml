@@ -1,15 +1,20 @@
 templates: # defining templates to be used later on
   - &molex_f
     type: Molex KK 254
-    gender: female
+    subtype: female
   - &con_i2c
     pinout: [GND, +5V, SCL, SDA]
   - &wire_i2c
-    mm2: 0.14
-    length: 0.2
+    category: bundle
+    gauge: 0.14 mm2
     colors: [BK, RD, YE, GN]
 
-nodes:
+ferrules:
+  ferrule_crimp:
+    type: Crimp ferrule
+    subtype: 0.25 mm²
+
+connectors:
   X1:
     <<: *molex_f # copying items from the template
     pinout: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, N/C]
@@ -22,31 +27,26 @@ nodes:
   X4:
     <<: *molex_f
     pinout: [GND, +12V, MISO, MOSI, SCK]
-  X5:
-    type: Molex Micro-Fit
-    gender: male
-    pinout: [GND, +12V]
 
-wires:
+cables:
   W1:
     <<: *wire_i2c
-    type: bundle
+    length: 0.2
     show_equiv: true
   W2:
     <<: *wire_i2c
-    type: bundle
+    length: 0.4
     show_equiv: true
   W3:
-    mm2: 0.14
-    length: 0.2
+    category: bundle
+    gauge: 0.14 mm2
+    length: 0.3
     colors: [BK, BU, OG, VT]
-    type: bundle
     show_equiv: true
   W4:
-    mm2: 0.5
-    length: 0.35
+    gauge: 0.25 mm2
+    length: 0.3
     colors: [BK, RD]
-    type: bundle
     show_equiv: true
 
 connections:
@@ -63,6 +63,8 @@ connections:
     - W3: [1-4]
     - X4: [1,3-5]
   -
-    - X5: [1,2]
+    - ferrule_crimp
+    - W4: [1,2]
+  -
     - W4: [1,2]
     - X4: [1,2]

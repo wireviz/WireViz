@@ -7,7 +7,7 @@ graph {
 	F1 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> crimp  </TD>
+                <TD PORT="p1l"> Crimp ferrule  </TD>
                 
                 <TD PORT="p1r">  </TD>
                 </TR></TABLE>
@@ -17,7 +17,7 @@ graph {
 	F2 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> crimp  </TD>
+                <TD PORT="p1l"> Crimp ferrule  </TD>
                 
                 <TD PORT="p1r">  </TD>
                 </TR></TABLE>
@@ -27,7 +27,7 @@ graph {
 	F3 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> crimp  </TD>
+                <TD PORT="p1l"> Crimp ferrule  </TD>
                 
                 <TD PORT="p1r">  </TD>
                 </TR></TABLE>
@@ -37,7 +37,7 @@ graph {
 	F4 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> crimp  </TD>
+                <TD PORT="p1l"> Crimp ferrule  </TD>
                 
                 <TD PORT="p1r">  </TD>
                 </TR></TABLE>
@@ -47,7 +47,7 @@ graph {
 	F5 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> crimp  </TD>
+                <TD PORT="p1l"> Crimp ferrule  </TD>
                 
                 <TD PORT="p1r">  </TD>
                 </TR></TABLE>
@@ -57,7 +57,7 @@ graph {
 	F6 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> crimp  </TD>
+                <TD PORT="p1l"> Crimp ferrule  </TD>
                 
                 <TD PORT="p1r">  </TD>
                 </TR></TABLE>
@@ -69,7 +69,7 @@ graph {
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
                 
-                <TD PORT="p1r"> crimp  </TD>
+                <TD PORT="p1r"> Crimp ferrule  </TD>
                 </TR></TABLE>
 
 
@@ -79,7 +79,7 @@ graph {
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
                 
-                <TD PORT="p1r"> crimp  </TD>
+                <TD PORT="p1r"> Crimp ferrule  </TD>
                 </TR></TABLE>
 
 
@@ -89,7 +89,7 @@ graph {
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
                 
-                <TD PORT="p1r"> crimp  </TD>
+                <TD PORT="p1r"> Crimp ferrule  </TD>
                 </TR></TABLE>
 
 
@@ -99,7 +99,7 @@ graph {
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
                 
-                <TD PORT="p1r"> crimp  </TD>
+                <TD PORT="p1r"> Crimp ferrule  </TD>
                 </TR></TABLE>
 
 
@@ -109,7 +109,7 @@ graph {
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
                 
-                <TD PORT="p1r"> crimp  </TD>
+                <TD PORT="p1r"> Crimp ferrule  </TD>
                 </TR></TABLE>
 
 
@@ -119,7 +119,7 @@ graph {
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
                 
-                <TD PORT="p1r"> crimp  </TD>
+                <TD PORT="p1r"> Crimp ferrule  </TD>
                 </TR></TABLE>
 
 
@@ -148,5 +148,5 @@ graph {
 	W1:w2:e -- F11:w
 	edge [color="#000000:#666600:#000000"]
 	W1:w1:e -- F12:w
-	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td>6x</td><td>0.25 mm² (24 AWG)</td><td>0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>BN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#666600" border="2" sides="tb" port="w1"></td></tr><tr><td></td><td>RD</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff0000" border="2" sides="tb" port="w2"></td></tr><tr><td></td><td>OG</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff8000" border="2" sides="tb" port="w3"></td></tr><tr><td></td><td>YE</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ffff00" border="2" sides="tb" port="w4"></td></tr><tr><td></td><td>GN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#00ff00" border="2" sides="tb" port="w5"></td></tr><tr><td></td><td>BU</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#0066ff" border="2" sides="tb" port="w6"></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
+	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="3">W1</td></tr><tr><td>6x</td><td>0.25 mm² (24 AWG)</td><td>0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>BN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#666600" border="2" sides="tb" port="w1"></td></tr><tr><td></td><td>RD</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff0000" border="2" sides="tb" port="w2"></td></tr><tr><td></td><td>OG</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff8000" border="2" sides="tb" port="w3"></td></tr><tr><td></td><td>YE</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ffff00" border="2" sides="tb" port="w4"></td></tr><tr><td></td><td>GN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#00ff00" border="2" sides="tb" port="w5"></td></tr><tr><td></td><td>BU</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#0066ff" border="2" sides="tb" port="w6"></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
 }

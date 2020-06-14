@@ -20,6 +20,7 @@ WireViz is a simple yet flexible, YAML-based markup language for documenting cab
   * Optionally auto-calculates and displays AWG equivalent when specifying mm²
 * Allows more than one connector per side, as well as loopbacks
 * Allows for easy-autorouting for 1-to-1 wiring
+* Generates BOM (Bill of Materials)
 
 _Note_: WireViz is not designed to represent the complete wiring of a system. Its main aim is to document the construction of individual wires and harnesses.
 
@@ -29,45 +30,45 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
 
 [WireViz input file](examples/demo01.yml):
 
-    nodes:
+    connectors:
       X1:
         type: D-Sub
-        gender: female
+        subtype: female
         pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
       X2:
         type: Molex KK 254
-        gender: female
-        pinout: [GND, RX, TX, N/C, OUT, IN]
+        subtype: female
+        pinout: [GND, RX, TX]
 
-    wires:
+    cables:
       W1:
-        mm2: 0.25
+        gauge: 0.25 mm2
         length: 0.2
         color_code: DIN
-        num_wires: 3
+        wirecount: 3
         shield: true
 
     connections:
-      - # format: connector->wire->connector
+      -
         - X1: [5,2,1]
         - W1: [1,2,3]
         - X2: [1,3,2]
-      - # format: connector->wire or wire->connector
+      -
         - X1: 5
         - W1: s
-      - # loop: connector-connector
-        - X2: 5
-        - X2: 6
 
 Output file:
 
 ![Sample output diagram](examples/demo01.png)
 
+[Bill of Materials](examples/demo01.bom.tsv) (auto-generated)
+
 ### Demo 02
 
 ![](examples/demo02.png)
 
-[Source](examples/demo02.yml)
+[Source](examples/demo02.yml) - [Bill of Materials](examples/demo02.bom.tsv)
+
 
 ### More examples
 
@@ -76,6 +77,10 @@ See the [example gallery](examples/) and included readme file.
 ## Status
 
 This is very much a [work in progress](todo.md).
+
+## Requirements
+
+Developed and tested using Python 3.7; might not work with older Python versions.
 
 ## License
 

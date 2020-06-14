@@ -2,15 +2,15 @@
 templates:
   - &template_con
     type: Molex KK 254
-    gender: female
+    subtype: female
     pinout: [GND, VCC, SCL, SDA]
   - &template_wire
-    mm2: 0.25
+    gauge: 0.25 mm2
     length: 0.2
     colors: [PK, TQ, YE, VT]
-    type: bundle
+    category: bundle
 
-nodes:
+connectors:
   X1:
     <<: *template_con
   X2:
@@ -24,7 +24,7 @@ nodes:
   X6:
     <<: *template_con
 
-wires:
+cables:
   W1:
     <<: *template_wire
   W2:

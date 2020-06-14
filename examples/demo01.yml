@@ -1,19 +1,19 @@
-nodes:
+connectors:
   X1:
     type: D-Sub
-    gender: female
+    subtype: female
     pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
   X2:
     type: Molex KK 254
-    gender: female
+    subtype: female
     pinout: [GND, RX, TX]
 
-wires:
+cables:
   W1:
-    mm2: 0.25
+    gauge: 0.25 mm2
     length: 0.2
     color_code: DIN
-    num_wires: 3
+    wirecount: 3
     shield: true
 
 connections:

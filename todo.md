@@ -2,11 +2,6 @@
 
 ## Support for more connector types
 
-* Generic connectors
-  * Ferrules
-  * Blade terminals
-  * Loose ends / stubs
-  * Graphical representation?
 * Inline connectors (IDC)
   * Possibly join two logical wires into one physical wire, add up length for BOM creation
   * Designators like W1_1, W1_2 or similar to group them?
@@ -37,14 +32,10 @@
 ## Export
 
 * Export to PDF with frame, title block, ...
-* Automatic BOM generation
 
 ## Other
 
 * Set global parameters (show_pins, ...) and allow override on per-item basis
-* Improve nomenclature
-  * terminal (connector, ferrule, blade, loose)
-  * link (cable, wire bundle)
 * Allow custom GraphViz code before/after WireViz-generated code
 * Make "unit tests" for different features/situations
   * Missing parameters
