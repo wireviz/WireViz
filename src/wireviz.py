@@ -6,56 +6,8 @@ from collections import Counter
 import yaml
 from graphviz import Graph
 
-COLOR_CODES = {
-               'DIN': ['WH','BN','GN','YE','GY','PK','BU','RD','BK','VT'], # ,'GYPK','RDBU','WHGN','BNGN','WHYE','YEBN','WHGY','GYBN','WHPK','PKBN'],
-               'IEC': ['BN','RD','OG','YE','GN','BU','VT','GY','WH','BK'],
-               'BW':  ['BK','WH']
-              }
-
-color_hex = {
-             'BK': '#000000',
-             'WH': '#ffffff',
-             'GY': '#999999',
-             'PK': '#ff66cc',
-             'RD': '#ff0000',
-             'OG': '#ff8000',
-             'YE': '#ffff00',
-             'GN': '#00ff00',
-             'TQ': '#00ffff',
-             'BU': '#0066ff',
-             'VT': '#8000ff',
-             'BN': '#666600',
-              }
-
-color_full = {
-             'BK': 'black',
-             'WH': 'white',
-             'GY': 'grey',
-             'PK': 'pink',
-             'RD': 'red',
-             'OG': 'orange',
-             'YE': 'yellow',
-             'GN': 'green',
-             'TQ': 'turquoise',
-             'BU': 'blue',
-             'VT': 'violet',
-             'BN': 'brown',
-}
-
-color_ger = {
-             'BK': 'sw',
-             'WH': 'ws',
-             'GY': 'gr',
-             'PK': 'rs',
-             'RD': 'rt',
-             'OG': 'or',
-             'YE': 'ge',
-             'GN': 'gn',
-             'TQ': 'tk',
-             'BU': 'bl',
-             'VT': 'vi',
-             'BN': 'br',
-}
+import wv_colors
+from wv_helper import nested, int2tuple, awg_equiv, flatten2d, tuplelist2tsv
 
 class Harness:
 
@@ -105,7 +57,7 @@ class Harness:
             if n.category == 'ferrule':
                 infostring = '{type}{subtype} {color}'.format(type=n.type,
                                                                subtype=', {}'.format(n.subtype) if n.subtype else '',
-                                                               color=translate_color(n.color, self.color_mode) if n.color else '')
+                                                               color=wv_colors.translate_color(n.color, self.color_mode) if n.color else '')
                 infostring_l = infostring if n.ports_right else ''
                 infostring_r = infostring if n.ports_left else ''
 
@@ -124,7 +76,7 @@ class Harness:
 
                 >'''.format(infostring_l=infostring_l,
                             infostring_r=infostring_r,
-                            colorbar='<TD BGCOLOR="{}" BORDER="1" SIDES="LR" WIDTH="4"></TD>'.format(translate_color(n.color, 'HEX')) if n.color else ''))
+                            colorbar='<TD BGCOLOR="{}" BORDER="1" SIDES="LR" WIDTH="4"></TD>'.format(wv_colors.translate_color(n.color, 'HEX')) if n.color else ''))
 
             else: # not a ferrule
                 # a = attributes
@@ -183,13 +135,13 @@ class Harness:
             for i, x in enumerate(c.colors,1):
                 p = []
                 p.append('<!-- {}_in -->'.format(i))
-                p.append(translate_color(x, self.color_mode))
+                p.append(wv_colors.translate_color(x, self.color_mode))
                 p.append('<!-- {}_out -->'.format(i))
                 html = html + '<tr>'
                 for bla in p:
                     html = html + '<td>{}</td>'.format(bla)
                 html = html + '</tr>'
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=translate_color(x, 'hex'), port='w{}'.format(i))
+                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=wv_colors.translate_color(x, 'hex'), port='w{}'.format(i))
 
             if c.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
@@ -198,7 +150,7 @@ class Harness:
                 for bla in p:
                     html = html + '<td>{}</td>'.format(bla)
                 html = html + '</tr>'
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" border="2" sides="b" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=translate_color(x, 'hex'), port='ws')
+                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" border="2" sides="b" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=wv_colors.translate_color(x, 'hex'), port='ws')
 
             html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
 
@@ -215,8 +167,8 @@ class Harness:
             for x in c.connections:
                 if isinstance(x.via_port, int): # check if it's an actual wire and not a shield
                     search_color = c.colors[x.via_port-1]
-                    if search_color in color_hex:
-                        dot.attr('edge',color='#000000:{wire_color}:#000000'.format(wire_color=color_hex[search_color]))
+                    if search_color in wv_colors.color_hex:
+                        dot.attr('edge',color='#000000:{wire_color}:#000000'.format(wire_color=wv_colors.color_hex[search_color]))
                     else: # color name not found
                         dot.attr('edge',color='#000000')
                 else: # it's a shield connection
@@ -394,9 +346,9 @@ class Cable:
             if self.colors: # use custom color palette (partly or looped if needed)
                 pass
             elif self.color_code: # use standard color palette (partly or looped if needed)
-                if self.color_code not in COLOR_CODES:
+                if self.color_code not in wv_colors.COLOR_CODES:
                     raise Exception('Unknown color code')
-                self.colors = COLOR_CODES[self.color_code]
+                self.colors = wv_colors.COLOR_CODES[self.color_code]
             else: # no colors defined, add dummy colors
                 self.colors = [''] * self.wirecount
 
@@ -431,75 +383,6 @@ class Connection:
     via_port:  Any
     to_name:   Any
     to_port:   Any
-
-def nested(input):
-    l = []
-    for x in input:
-        if isinstance(x, list):
-            if len(x) > 0:
-                n = nested(x)
-                if n != '':
-                    l.append('{' + n + '}')
-        else:
-            if x is not None:
-                if x != '':
-                    l.append(str(x))
-    s = '|'.join(l)
-    return s
-
-def int2tuple(input):
-    if isinstance(input, tuple):
-        output = input
-    else:
-        output = (input,)
-    return output
-
-def translate_color(input, color_mode):
-    if input == '':
-        output = ''
-    else:
-        if color_mode == 'full':
-            output = color_full[input].lower()
-        elif color_mode == 'FULL':
-            output = color_full[input].upper()
-        elif color_mode == 'hex':
-            output = color_hex[input].lower()
-        elif color_mode == 'HEX':
-            output = color_hex[input].upper()
-        elif color_mode == 'ger':
-            output = color_ger[input].lower()
-        elif color_mode == 'GER':
-            output = color_ger[input].upper()
-        elif color_mode == 'short':
-            output = input.lower()
-        elif color_mode == 'SHORT':
-            output = input.upper()
-        else:
-            raise Exception('Unknown color mode')
-    return output
-
-def awg_equiv(mm2):
-    awg_equiv_table = {
-                        '0.09': 28,
-                        '0.14': 26,
-                        '0.25': 24,
-                        '0.34': 22,
-                        '0.5': 21,
-                        '0.75': 20,
-                        '1': 18,
-                        '1.5': 16,
-                        '2.5': 14,
-                        '4': 12,
-                        '6': 10,
-                        '10': 8,
-                        '16': 6,
-                        '25': 4,
-                        }
-    k = str(mm2)
-    if k in awg_equiv_table:
-        return awg_equiv_table[k]
-    else:
-        return 'unknown'
 
 def parse(file_in, file_out=None, gen_bom=False):
 
@@ -678,19 +561,6 @@ def parse(file_in, file_out=None, gen_bom=False):
             raise Exception('Wrong number of connection parameters')
 
     h.output(filename=file_out, format=('png','svg'), gen_bom=gen_bom, view=False)
-
-def flatten2d(input):
-    output = [[str(item) if not isinstance(item, List) else ', '.join(item) for item in row] for row in input]
-    return output
-
-def tuplelist2tsv(input, header=None):
-    output = ''
-    if header is not None:
-        input.insert(0, header)
-    input = flatten2d(input)
-    for row in input:
-        output = output + '\t'.join(str(item) for item in row) + '\n'
-    return output
 
 if __name__ == '__main__':
     import argparse
