@@ -264,24 +264,51 @@ class Harness:
         types = Counter([(v.type, v.subtype, v.pincount) for v in self.connectors.values()])
         for type in types:
             items = {k: v for k, v in self.connectors.items()  if (v.type, v.subtype, v.pincount) == type}
-            designators = list(items.keys())
+            designators = list(items.keys()).sort()
             shared = next(iter(items.values()))
             name = '{}, {}, {} pins'.format(shared.type, shared.subtype, shared.pincount)
             item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators}
             bom.append(item)
         # cables
-        # TODO: handle bundles separately
-        types = Counter([(v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
+        types = Counter([(v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
         for type in types:
-            # stuff = [(k, v.length) for k,v in self.cables.items() if (v.gauge, v.gauge_unit, v.wirecount, v.shield) == type]
-            items = {k: v for k, v in self.cables.items()  if (v.gauge, v.gauge_unit, v.wirecount, v.shield) == type}
-            designators = list(items.keys())
+            items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) == type}
             shared = next(iter(items.values()))
-            total_length = sum(i.length for i in items.values())
-            name = 'Cable {} x{}'.format(shared.wirecount,
-                                         ' {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else '',
-                                         ' shielded' if shared.shield else '')
+            if shared.category != 'bundle':
+                designators = list(items.keys()).sort()
+                total_length = sum(i.length for i in items.values())
+                name = 'Cable {} x{}'.format(shared.wirecount,
+                                             ' {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else '',
+                                             ' shielded' if shared.shield else '')
+                item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
+                bom.append(item)
+        # bundles (ignores wirecount)
+        wirelist = []
+        # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
+        types = Counter([(v.category, v.gauge, v.gauge_unit, v.length) for v in self.cables.values()])
+        for type in types:
+            items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.length) == type}
+            shared = next(iter(items.values()))
+            # filter out cables that are not bundles
+            if shared.category == 'bundle':
+                for bundle in items.values():
+                    # add each wire from each bundle to the wirelist
+                    for color in bundle.colors:
+                        wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designators': list(items.keys())})
+        # join similar wires from all the bundles to a single BOM item
+        types = Counter([(v['gauge'], v['gauge_unit'], v['color']) for v in wirelist])
+        for type in types:
+            items = [v for v in wirelist if (v['gauge'], v['gauge_unit'], v['color']) == type]
+            shared = items[0]
+            designators = [i['designators'] for i in items]
+            # flatten nested list
+            designators = [item for sublist in designators for item in sublist] # https://stackoverflow.com/a/952952
+            # remove duplicates
+            designators = list(dict.fromkeys(designators)).sort()
+            total_length = sum(i['length'] for i in items)
+            name = 'Wire {} {} {}'.format(shared['gauge'], shared['gauge_unit'], shared['color'])
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
+            print('item', item)
             bom.append(item)
         return bom
 
