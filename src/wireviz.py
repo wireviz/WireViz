@@ -96,7 +96,7 @@ class Harness:
                 dot.node(k, label=nested(l))
 
                 if len(n.loops) > 0:
-                    dot.attr('edge',color='#000000')
+                    dot.attr('edge',color='#000000:#ffffff:#000000')
                     if n.ports_left:
                         loop_side = 'l'
                         loop_dir = 'w'
@@ -141,7 +141,8 @@ class Harness:
                 for bla in p:
                     html = html + '<td>{}</td>'.format(bla)
                 html = html + '</tr>'
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=wv_colors.translate_color(x, 'hex'), port='w{}'.format(i))
+                bgcolor = wv_colors.translate_color(x, 'hex')
+                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port='w{}'.format(i))
 
             if c.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
@@ -170,7 +171,7 @@ class Harness:
                     if search_color in wv_colors.color_hex:
                         dot.attr('edge',color='#000000:{wire_color}:#000000'.format(wire_color=wv_colors.color_hex[search_color]))
                     else: # color name not found
-                        dot.attr('edge',color='#000000')
+                        dot.attr('edge',color='#000000:#ffffff:#000000')
                 else: # it's a shield connection
                     dot.attr('edge',color='#000000')
 
