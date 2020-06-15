@@ -115,9 +115,10 @@ Output:
 
 ![](tutorial03.png)
 
-## Templates (II), American standards, daisy chaining (I)
+## Templates (II), notes,American standards, daisy chaining (I)
 
 * Overriding template parameters
+* Add nodes to connectors (and cables)
 * American standards: AWG gauge and IEC colors
 * Linear daisy-chain
 
@@ -145,9 +146,11 @@ cables:
     length: 0.3
     gauge: 24 AWG # specifying guage in AWG directly
     color_code: IEC # IEC 62 colors also supported
+    notes: This cable is a bit longer
   W2:
     <<: *template_cbl
     length: 0.1
+    notes: This cable is a bit shorter
 
 connections:
   -
@@ -195,7 +198,6 @@ cables:
     length: 0.3
     gauge: 0.5 mm
     colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
-    notes: hello!
 
 connections:
   - # attach ferrules

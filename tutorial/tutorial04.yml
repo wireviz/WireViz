@@ -19,9 +19,11 @@ cables:
     length: 0.3
     gauge: 24 AWG # specifying guage in AWG directly
     color_code: IEC # IEC 62 colors also supported
+    notes: This cable is a bit longer
   W2:
     <<: *template_cbl
     length: 0.1
+    notes: This cable is a bit shorter
 
 connections:
   -

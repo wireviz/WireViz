@@ -16,7 +16,6 @@ cables:
     length: 0.3
     gauge: 0.5 mm
     colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
-    notes: hello!
 
 connections:
   - # attach ferrules

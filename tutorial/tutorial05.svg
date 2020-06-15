@@ -50,7 +50,7 @@
 <!-- W1 -->
 <g id="node6" class="node">
 <title>W1</title>
-<polygon fill="white" stroke="black" stroke-dasharray="5,2" points="466,-228 345,-228 345,-12 466,-12 466,-228"/>
+<polygon fill="white" stroke="black" stroke-dasharray="5,2" points="466,-228 345,-228 345,-48 466,-48 466,-228"/>
 <polygon fill="none" stroke="black" points="345.5,-205 345.5,-228 466.5,-228 466.5,-205 345.5,-205"/>
 <text text-anchor="start" x="395" y="-212.8" font-family="arial" font-size="14.00">W1</text>
 <polygon fill="none" stroke="black" points="345.5,-182 345.5,-205 368.5,-205 368.5,-182 345.5,-182"/>
@@ -81,8 +81,6 @@
 <polyline fill="none" stroke="black" stroke-width="2" points="346.5,-68 465.5,-68 "/>
 <polyline fill="none" stroke="black" stroke-width="2" points="465.5,-72 346.5,-72 "/>
 <text text-anchor="start" x="357" y="-53.8" font-family="arial" font-size="14.00"> </text>
-<text text-anchor="start" x="389.5" y="-33.8" font-family="arial" font-size="14.00">hello!</text>
-<text text-anchor="start" x="404" y="-15.8" font-family="arial" font-size="14.00"> </text>
 </g>
 <!-- _F1&#45;&#45;W1 -->
 <g id="edge1" class="edge">
