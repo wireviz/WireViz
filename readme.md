@@ -72,9 +72,10 @@ Output file:
 [Source](examples/demo02.yml) - [Bill of Materials](examples/demo02.bom.tsv)
 
 
-### More examples
+### Tutorial and example gallery
 
-See the [example gallery](examples/) and included readme file.
+See the [tutorial page](tutorial/readme.md) for sample code,
+as well as the [example gallery](examples/readme.md) to see more of what WireViz can do.
 
 ## Status
 

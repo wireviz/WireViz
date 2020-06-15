@@ -35,6 +35,8 @@
 
 ## Other
 
+* Imrpove tutorial texts
+* Create syntax reference / cheat sheet
 * Set global parameters (show_pins, ...) and allow override on per-item basis
 * Allow custom GraphViz code before/after WireViz-generated code
 * Make "unit tests" for different features/situations
