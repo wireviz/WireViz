@@ -33,12 +33,14 @@ if tutorials:
 
             with open(os.path.abspath('../tutorial/tutorial{:02d}.md'.format(i)), 'r') as info:
                 for line in info:
-                    file.write('{}'.format(line))
+                    file.write(line)
             file.write('\n[Source](tutorial{:02d}.yml):\n\n'.format(i))
 
             with open(os.path.abspath('../tutorial/tutorial{:02d}.yml'.format(i)), 'r') as src:
+                file.write('```yaml\n')
                 for line in src:
-                    file.write('    {}'.format(line))
+                    file.write(line)
+                file.write('```\n')
             file.write('\n')
 
             file.write('\nOutput:\n\n'.format(i))
