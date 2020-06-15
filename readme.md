@@ -71,15 +71,30 @@ Output file:
 
 [Source](examples/demo02.yml) - [Bill of Materials](examples/demo02.bom.tsv)
 
-
 ### Tutorial and example gallery
 
 See the [tutorial page](tutorial/readme.md) for sample code,
 as well as the [example gallery](examples/readme.md) to see more of what WireViz can do.
 
+## Usage
+
+```
+$ python3 wireviz.py ~/path/to/file/mywire.yml
+```
+
+This will output the following files
+
+```
+mywire.gv         GraphViz output
+mywire.svg        Wiring diagram as vector image
+mywire.png        Wiring diagram as raster image
+mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
+mywire.html       HTML page with wiring diagram and BOM embedded
+```
+
 ## Status
 
-This is very much a [work in progress](todo.md).
+This is very much a [work in progress](todo.md). Source code, API, syntax and functionality may change wildly at any time.
 
 ## Requirements
 
