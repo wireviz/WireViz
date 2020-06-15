@@ -3,7 +3,7 @@ connectors:
     pinout: [+12V, GND, GND, +5V]
     type: Molex 8981
     subtype: female
-  F_10_1: # manually define a ferrule (with unique identifier)
+  F_10_1: # manually define a ferrule (with unique designator)
     category: ferrule
     type: Ferrule, crimp
     subtype: 1.0 mm²
@@ -19,7 +19,7 @@ cables:
   W1:
     category: bundle # budnle
     length: 0.3
-    gauge: 0.5 mm
+    gauge: 0.5 mm2
     colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
 
 connections:

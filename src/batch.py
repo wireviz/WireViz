@@ -33,7 +33,7 @@ if tutorials:
 
             with open(os.path.abspath('../tutorial/tutorial{:02d}.md'.format(i)), 'r') as info:
                 for line in info:
-                    file.write(line)
+                    file.write(line.replace('## ', '## {} - '.format(i)))
             file.write('\n[Source](tutorial{:02d}.yml):\n\n'.format(i))
 
             with open(os.path.abspath('../tutorial/tutorial{:02d}.yml'.format(i)), 'r') as src:
@@ -47,4 +47,4 @@ if tutorials:
 
             file.write('![](tutorial{:02d}.png)\n\n'.format(i))
 
-            # file.write('[Bill of Materials](tutorial{:02d}.bom.tsv)\n\n\n'.format(i))
+            file.write('[Bill of Materials](tutorial{:02d}.bom.tsv)\n\n\n'.format(i))

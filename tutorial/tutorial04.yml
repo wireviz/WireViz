@@ -17,7 +17,7 @@ cables:
   W1: &template_cbl
     wirecount: 4
     length: 0.3
-    gauge: 24 AWG # specifying guage in AWG directly
+    gauge: 24 AWG # specify gauge in AWG directly
     color_code: IEC # IEC 62 colors also supported
     notes: This cable is a bit longer
   W2:

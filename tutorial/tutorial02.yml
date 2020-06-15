@@ -15,7 +15,7 @@ cables:
     # more cable parameters:
     length: 1
     gauge: 0.25 mm2
-    show_equiv: true
+    show_equiv: true # auto-calculate AWG equivalent
     colors: [WH, BN, GN, YE]
 
 connections:

@@ -1,5 +1,5 @@
 # WireViz Tutorial
-## Bare-bones example
+## 1 - Bare-bones example
 
 * Minimum working example
 * Only 1-to-1 sequential wiring
@@ -30,10 +30,13 @@ Output:
 
 ![](tutorial01.png)
 
-## Adding parameters and colors
+[Bill of Materials](tutorial01.bom.tsv)
+
+
+## 2 - Adding parameters and colors
 
 * Parameters for connectors and cables
-* Auto-calculate AWG from mm2
+* Auto-calculate equivalent AWG from mm2
 * Non-sequential wiring
 
 [Source](tutorial02.yml):
@@ -56,7 +59,7 @@ cables:
     # more cable parameters:
     length: 1
     gauge: 0.25 mm2
-    show_equiv: true
+    show_equiv: true # auto-calculate AWG equivalent
     colors: [WH, BN, GN, YE]
 
 connections:
@@ -72,7 +75,10 @@ Output:
 
 ![](tutorial02.png)
 
-## Pinouts, shielding, templates (I)
+[Bill of Materials](tutorial02.bom.tsv)
+
+
+## 3 - Pinouts, shielding, templates (I)
 
 * Connector pinouts
   * Pincount implicit in pinout
@@ -115,12 +121,16 @@ Output:
 
 ![](tutorial03.png)
 
-## Templates (II), notes,American standards, daisy chaining (I)
+[Bill of Materials](tutorial03.bom.tsv)
+
+
+## 4 - Templates (II), notes, American standards, daisy chaining (I)
 
 * Overriding template parameters
-* Add nodes to connectors (and cables)
+* Add nodes to connectors and cables
 * American standards: AWG gauge and IEC colors
 * Linear daisy-chain
+  * Convenient for shorter chains
 
 [Source](tutorial04.yml):
 
@@ -144,7 +154,7 @@ cables:
   W1: &template_cbl
     wirecount: 4
     length: 0.3
-    gauge: 24 AWG # specifying guage in AWG directly
+    gauge: 24 AWG # specify gauge in AWG directly
     color_code: IEC # IEC 62 colors also supported
     notes: This cable is a bit longer
   W2:
@@ -168,13 +178,21 @@ Output:
 
 ![](tutorial04.png)
 
-## Ferrules, wire bundles, custom wire colors
+[Bill of Materials](tutorial04.bom.tsv)
+
+
+## 5 - Ferrules, wire bundles, custom wire colors
 
 * Ferrules
+  * Simpler than connectors
+  * Compact graphical representation
+  * Only one pin, only one connection, no designator
+  * Define once, auto-generate where needed
 * Wire bundles
   * Internally treated as cables
-  * Different treatment in BOM
-* Custom colors
+  * Different treatment in BOM: Each wire is listed individually
+  * Represented with dashed outline
+* Custom wire colors
   * Wirecount can be implicit in color list
 
 [Source](tutorial05.yml):
@@ -196,12 +214,12 @@ cables:
   W1:
     category: bundle # bundle
     length: 0.3
-    gauge: 0.5 mm
+    gauge: 0.5 mm2
     colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
 
 connections:
   - # attach ferrules
-    - F1
+    - F1 # no need for list of connections; one ferrule per wire is auto-generated and attached
     - W1: [1-4] # a new ferrule is auto-generated for each wire
   - # attach connectors (separetely from ferrules)
     - W1: [1-4]
@@ -213,10 +231,14 @@ Output:
 
 ![](tutorial05.png)
 
-## Custom ferrules
+[Bill of Materials](tutorial05.bom.tsv)
+
+
+## 6 - Custom ferrules
 
 * Custom ferrules
   * Allows attaching more than one wire to a ferrule
+  * Requires defining them as regular connectors with unique designators, adding `category: ferrule` parameter
 
 [Source](tutorial06.yml):
 
@@ -226,7 +248,7 @@ connectors:
     pinout: [+12V, GND, GND, +5V]
     type: Molex 8981
     subtype: female
-  F_10_1: # manually define a ferrule (with unique identifier)
+  F_10_1: # manually define a ferrule (with unique designator)
     category: ferrule
     type: Ferrule, crimp
     subtype: 1.0 mm²
@@ -242,7 +264,7 @@ cables:
   W1:
     category: bundle # budnle
     length: 0.3
-    gauge: 0.5 mm
+    gauge: 0.5 mm2
     colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
 
 connections:
@@ -266,9 +288,13 @@ Output:
 
 ![](tutorial06.png)
 
-## Daisy chaining (II)
+[Bill of Materials](tutorial06.bom.tsv)
+
+
+## 7 - Daisy chaining (II)
 
 * Zig-zag daisy chain
+  * Convenient for longer chains
 
 [Source](tutorial07.yml):
 
@@ -331,4 +357,7 @@ connections:
 Output:
 
 ![](tutorial07.png)
+
+[Bill of Materials](tutorial07.bom.tsv)
+
 
