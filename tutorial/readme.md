@@ -38,12 +38,12 @@ Output:
 
     connectors:
       X1:
-        pinout: [GND, VCC, RX, TX]
+        pincount: 4
         # More connector parameters:
         type: Molex KK 254
         subtype: female
       X2:
-        pinout: [GND, VCC, RX, TX]
+        pincount: 4
         type: Molex KK 254
         subtype: female
     
@@ -68,7 +68,7 @@ Output:
 
 ![](tutorial02.png)
 
-## Pinouts, shielding and templates
+## Pinouts, shielding, templates (I)
 
 * Connector pinouts
   * Pincount implicit in pinout
@@ -109,7 +109,7 @@ Output:
 
 ![](tutorial03.png)
 
-## Templates (cont.), American standards, daisy chaining
+## Templates (II), American standards, daisy chaining (I)
 
 * Overriding template parameters
 * American standards: AWG gauge and IEC colors
@@ -157,85 +157,16 @@ Output:
 
 ![](tutorial04.png)
 
-## Daisy chaining (II)
-
-* Zig-zag daisy chain
-
-[Source](tutorial05.yml):
-
-    templates:
-      - &template_con
-        type: Molex KK 254
-        subtype: female
-        pinout: [GND, VCC, SCL, SDA]
-      - &template_wire
-        gauge: 0.25 mm2
-        length: 0.2
-        colors: [PK, TQ, YE, VT]
-        category: bundle
-    
-    connectors:
-      X1:
-        <<: *template_con
-      X2:
-        <<: *template_con
-      X3:
-        <<: *template_con
-      X4:
-        <<: *template_con
-      X5:
-        <<: *template_con
-      X6:
-        <<: *template_con
-    
-    cables:
-      W1:
-        <<: *template_wire
-      W2:
-        <<: *template_wire
-      W3:
-        <<: *template_wire
-      W4:
-        <<: *template_wire
-      W5:
-        <<: *template_wire
-    
-    connections:
-      -
-        - X1: [1-4]
-        - W1: [1-4]
-        - X2: [1-4]
-      -
-        - X3: [1-4]
-        - W2: [1-4]
-        - X2: [1-4]
-      -
-        - X3: [1-4]
-        - W3: [1-4]
-        - X4: [1-4]
-      -
-        - X5: [1-4]
-        - W4: [1-4]
-        - X4: [1-4]
-      -
-        - X5: [1-4]
-        - W5: [1-4]
-        - X6: [1-4]
-
-
-Output:
-
-![](tutorial05.png)
-
-## Ferrules, wire bundles, custom colors
+## Ferrules, wire bundles, custom wire colors
 
 * Ferrules
 * Wire bundles
   * Internally treated as cables
   * Different treatment in BOM
 * Custom colors
+  * Wirecount can be implicit in color list
 
-[Source](tutorial06.yml):
+[Source](tutorial05.yml):
 
     connectors:
       X1:
@@ -251,7 +182,7 @@ Output:
     
     cables:
       W1:
-        category: bundle # budnle
+        category: bundle # bundle
         length: 0.3
         gauge: 0.5 mm
         colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
@@ -268,14 +199,14 @@ Output:
 
 Output:
 
-![](tutorial06.png)
+![](tutorial05.png)
 
 ## Custom ferrules
 
 * Custom ferrules
   * Allows attaching more than one wire to a ferrule
 
-[Source](tutorial07.yml):
+[Source](tutorial06.yml):
 
     connectors:
       X1:
@@ -315,6 +246,70 @@ Output:
       -
         - F_10_1: 1
         - W1: 3
+
+
+Output:
+
+![](tutorial06.png)
+
+## Daisy chaining (II)
+
+* Zig-zag daisy chain
+
+[Source](tutorial07.yml):
+
+    connectors:
+      X1: &template_con
+        type: Molex KK 254
+        subtype: female
+        pinout: [GND, VCC, SCL, SDA]
+      X2:
+        <<: *template_con
+      X3:
+        <<: *template_con
+      X4:
+        <<: *template_con
+      X5:
+        <<: *template_con
+      X6:
+        <<: *template_con
+    
+    cables:
+      W1: &template_wire
+        gauge: 0.25 mm2
+        length: 0.2
+        colors: [TQ, PK, YE, VT]
+        category: bundle
+      W2:
+        <<: *template_wire
+      W3:
+        <<: *template_wire
+      W4:
+        <<: *template_wire
+      W5:
+        <<: *template_wire
+    
+    connections:
+      -
+        - X1: [1-4]
+        - W1: [1-4]
+        - X2: [1-4]
+      -
+        - X3: [1-4]
+        - W2: [1-4]
+        - X2: [1-4]
+      -
+        - X3: [1-4]
+        - W3: [1-4]
+        - X4: [1-4]
+      -
+        - X5: [1-4]
+        - W4: [1-4]
+        - X4: [1-4]
+      -
+        - X5: [1-4]
+        - W5: [1-4]
+        - X6: [1-4]
 
 
 Output:

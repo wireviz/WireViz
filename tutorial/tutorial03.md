@@ -1,4 +1,4 @@
-## Pinouts, shielding and templates
+## Pinouts, shielding, templates (I)
 
 * Connector pinouts
   * Pincount implicit in pinout

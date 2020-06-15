@@ -1,4 +1,4 @@
-## Templates (cont.), American standards, daisy chaining
+## Templates (II), American standards, daisy chaining (I)
 
 * Overriding template parameters
 * American standards: AWG gauge and IEC colors

@@ -1,4 +1,3 @@
-## Custom ferrules
+## Daisy chaining (II)
 
-* Custom ferrules
-  * Allows attaching more than one wire to a ferrule
+* Zig-zag daisy chain

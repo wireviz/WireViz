@@ -1,3 +1,8 @@
-## Daisy chaining (II)
+## Ferrules, wire bundles, custom wire colors
 
-* Zig-zag daisy chain
+* Ferrules
+* Wire bundles
+  * Internally treated as cables
+  * Different treatment in BOM
+* Custom colors
+  * Wirecount can be implicit in color list

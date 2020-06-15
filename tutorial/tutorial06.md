@@ -1,7 +1,4 @@
-## Ferrules, wire bundles, custom colors
+## Custom ferrules
 
-* Ferrules
-* Wire bundles
-  * Internally treated as cables
-  * Different treatment in BOM
-* Custom colors
+* Custom ferrules
+  * Allows attaching more than one wire to a ferrule

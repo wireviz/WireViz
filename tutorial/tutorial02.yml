@@ -1,11 +1,11 @@
 connectors:
   X1:
-    pinout: [GND, VCC, RX, TX]
+    pincount: 4
     # More connector parameters:
     type: Molex KK 254
     subtype: female
   X2:
-    pinout: [GND, VCC, RX, TX]
+    pincount: 4
     type: Molex KK 254
     subtype: female
 
