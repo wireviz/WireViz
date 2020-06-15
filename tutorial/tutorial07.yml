@@ -1,0 +1,52 @@
+connectors:
+  X1: &template_con
+    type: Molex KK 254
+    subtype: female
+    pinout: [GND, VCC, SCL, SDA]
+  X2:
+    <<: *template_con
+  X3:
+    <<: *template_con
+  X4:
+    <<: *template_con
+  X5:
+    <<: *template_con
+  X6:
+    <<: *template_con
+
+cables:
+  W1: &template_wire
+    gauge: 0.25 mm2
+    length: 0.2
+    colors: [TQ, PK, YE, VT]
+    category: bundle
+  W2:
+    <<: *template_wire
+  W3:
+    <<: *template_wire
+  W4:
+    <<: *template_wire
+  W5:
+    <<: *template_wire
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1-4]
+  -
+    - X3: [1-4]
+    - W2: [1-4]
+    - X2: [1-4]
+  -
+    - X3: [1-4]
+    - W3: [1-4]
+    - X4: [1-4]
+  -
+    - X5: [1-4]
+    - W4: [1-4]
+    - X4: [1-4]
+  -
+    - X5: [1-4]
+    - W5: [1-4]
+    - X6: [1-4]

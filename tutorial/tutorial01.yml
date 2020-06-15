@@ -1,0 +1,16 @@
+connectors:
+  X1:
+    pincount: 4
+  X2:
+    pincount: 4
+
+cables:
+  W1:
+    wirecount: 4
+    length: 1
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1-4]

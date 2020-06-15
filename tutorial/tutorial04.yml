@@ -1,0 +1,36 @@
+connectors:
+  X1: &template_con
+    pinout: [GND, VCC, SCL, SDA]
+    type: Molex KK 254
+    subtype: male
+    notes: to microcontroller # add notes
+  X2:
+    <<: *template_con # use template
+    subtype: female   # but override certain parameters
+    notes: to accelerometer
+  X3:
+    <<: *template_con
+    subtype: female
+    notes: to temperature sensor
+
+cables:
+  W1: &template_cbl
+    wirecount: 4
+    length: 0.3
+    gauge: 24 AWG # specify gauge in AWG directly
+    color_code: IEC # IEC 62 colors also supported
+    notes: This cable is a bit longer
+  W2:
+    <<: *template_cbl
+    length: 0.1
+    notes: This cable is a bit shorter
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1-4]
+  - # daisy chain connectors (in line)
+    - X2: [1-4]
+    - W2: [1-4]
+    - X3: [1-4]

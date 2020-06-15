@@ -96,7 +96,7 @@ class Harness:
                 dot.node(k, label=nested(l))
 
                 if len(n.loops) > 0:
-                    dot.attr('edge',color='#000000')
+                    dot.attr('edge',color='#000000:#ffffff:#000000')
                     if n.ports_left:
                         loop_side = 'l'
                         loop_dir = 'w'
@@ -141,7 +141,8 @@ class Harness:
                 for bla in p:
                     html = html + '<td>{}</td>'.format(bla)
                 html = html + '</tr>'
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=wv_colors.translate_color(x, 'hex'), port='w{}'.format(i))
+                bgcolor = wv_colors.translate_color(x, 'hex')
+                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port='w{}'.format(i))
 
             if c.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
@@ -170,19 +171,19 @@ class Harness:
                     if search_color in wv_colors.color_hex:
                         dot.attr('edge',color='#000000:{wire_color}:#000000'.format(wire_color=wv_colors.color_hex[search_color]))
                     else: # color name not found
-                        dot.attr('edge',color='#000000')
+                        dot.attr('edge',color='#000000:#ffffff:#000000')
                 else: # it's a shield connection
                     dot.attr('edge',color='#000000')
 
                 if x.from_port is not None: # connect to left
-                    from_ferrule = self.connectors[x.from_name].category is 'ferrule'
+                    from_ferrule = self.connectors[x.from_name].category == 'ferrule'
                     code_left_1 = '{from_name}{from_port}:e'.format(from_name=x.from_name, from_port=':p{}r'.format(x.from_port) if not from_ferrule else '')
                     code_left_2 = '{via_name}:w{via_wire}:w'.format(via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else '')
                     dot.edge(code_left_1, code_left_2)
                     from_string = '{}:{}'.format(x.from_name, x.from_port) if not from_ferrule else ''
                     html = html.replace('<!-- {}_in -->'.format(x.via_port), from_string)
                 if x.to_port is not None: # connect to right
-                    to_ferrule = self.connectors[x.to_name].category is 'ferrule'
+                    to_ferrule = self.connectors[x.to_name].category == 'ferrule'
                     code_right_1 = '{via_name}:w{via_wire}:e'.format(via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else '')
                     code_right_2 = '{to_name}{to_port}:w'.format(to_name=x.to_name, to_port=':p{}l'.format(x.to_port) if not to_ferrule else '')
                     dot.edge(code_right_1, code_right_2)
@@ -240,9 +241,10 @@ class Harness:
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
-            name = '{type}{subtype}{pincount}'.format(type = shared.type,
-                                                        subtype = ', {}'.format(shared.subtype) if shared.subtype else '',
-                                                        pincount = ', {} pins'.format(shared.pincount) if shared.category != 'ferrule' else '')
+            name = 'Connector{type}{subtype}{pincount}{color}'.format(type = ', {}'.format(shared.type) if shared.type else '',
+                                                      subtype = ', {}'.format(shared.subtype) if shared.subtype else '',
+                                                      pincount = ', {} pins'.format(shared.pincount) if shared.category != 'ferrule' else '',
+                                                      color = ', {}'.format(shared.color) if shared.color else '')
             item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.category != 'ferrule' else ''}
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item']) # https://stackoverflow.com/a/73050
@@ -256,8 +258,8 @@ class Harness:
                 designators = list(items.keys())
                 designators.sort()
                 total_length = sum(i.length for i in items.values())
-                name = 'Cable {wirecount} x{gauge}{shield}'.format(wirecount = shared.wirecount,
-                                                                   gauge = ' {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else '',
+                name = 'Cable, {wirecount}{gauge}{shield}'.format(wirecount = shared.wirecount,
+                                                                   gauge = ' x {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else ' wires',
                                                                    shield = ' shielded' if shared.shield else '')
                 item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
                 bom_cables.append(item)
@@ -286,7 +288,8 @@ class Harness:
             designators = list(dict.fromkeys(designators))
             designators.sort()
             total_length = sum(i['length'] for i in items)
-            name = 'Wire {} {} {}'.format(shared['gauge'], shared['gauge_unit'], shared['color'])
+            name = 'Wire, {gauge}{color}'.format(gauge='{} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
+                                                 color=', {}'.format(shared['color']) if shared['color'] != '' else '')
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
             bom_cables.append(item)
             bom_cables = sorted(bom_cables, key=lambda k: k['item']) # https://stackoverflow.com/a/73050
@@ -578,7 +581,7 @@ def parse(file_in, file_out=None, gen_bom=False):
                 ferrule_params = input['ferrules'][ferrule_name]
                 for cable_pin in cable_pins:
                     ferrule_counter = ferrule_counter + 1
-                    ferrule_id = 'F{}'.format(ferrule_counter)
+                    ferrule_id = '_F{}'.format(ferrule_counter)
                     h.add_connector(ferrule_id, category='ferrule', **ferrule_params)
 
                     if fer_cbl:

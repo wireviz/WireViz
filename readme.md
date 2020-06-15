@@ -30,32 +30,34 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
 
 [WireViz input file](examples/demo01.yml):
 
-    connectors:
-      X1:
-        type: D-Sub
-        subtype: female
-        pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
-      X2:
-        type: Molex KK 254
-        subtype: female
-        pinout: [GND, RX, TX]
+```yaml
+connectors:
+  X1:
+    type: D-Sub
+    subtype: female
+    pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
+  X2:
+    type: Molex KK 254
+    subtype: female
+    pinout: [GND, RX, TX]
 
-    cables:
-      W1:
-        gauge: 0.25 mm2
-        length: 0.2
-        color_code: DIN
-        wirecount: 3
-        shield: true
+cables:
+  W1:
+    gauge: 0.25 mm2
+    length: 0.2
+    color_code: DIN
+    wirecount: 3
+    shield: true
 
-    connections:
-      -
-        - X1: [5,2,1]
-        - W1: [1,2,3]
-        - X2: [1,3,2]
-      -
-        - X1: 5
-        - W1: s
+connections:
+  -
+    - X1: [5,2,1]
+    - W1: [1,2,3]
+    - X2: [1,3,2]
+  -
+    - X1: 5
+    - W1: s
+```
 
 Output file:
 
@@ -70,9 +72,10 @@ Output file:
 [Source](examples/demo02.yml) - [Bill of Materials](examples/demo02.bom.tsv)
 
 
-### More examples
+### Tutorial and example gallery
 
-See the [example gallery](examples/) and included readme file.
+See the [tutorial page](tutorial/readme.md) for sample code,
+as well as the [example gallery](examples/readme.md) to see more of what WireViz can do.
 
 ## Status
 

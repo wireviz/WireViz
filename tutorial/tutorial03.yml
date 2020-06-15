@@ -1,0 +1,25 @@
+connectors:
+  X1: &template1 # define a template for later use
+    pinout: [GND, VCC, RX, TX] # pincount implicit in pinout
+    type: Molex KK 254
+    subtype: female
+  X2:
+    <<: *template1 # reuse template
+
+cables:
+  W1:
+    wirecount: 4
+    length: 1
+    gauge: 0.25 mm2
+    show_equiv: true
+    color_code: DIN # auto-assign colors based on DIN 47100
+    shield: true # add cable shielding
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1,2,4,3]
+  - # connect the shielding to a pin
+    - X1: 1
+    - W1: s

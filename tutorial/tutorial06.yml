@@ -1,0 +1,38 @@
+connectors:
+  X1:
+    pinout: [+12V, GND, GND, +5V]
+    type: Molex 8981
+    subtype: female
+  F_10_1: # manually define a ferrule (with unique designator)
+    category: ferrule
+    type: Ferrule, crimp
+    subtype: 1.0 mm²
+    color: YE
+
+ferrules: # ferrules
+  F_05:
+    type: Ferrule, crimp
+    subtype: 0.5 mm²
+    color: OG # optional color
+
+cables:
+  W1:
+    category: bundle # budnle
+    length: 0.3
+    gauge: 0.5 mm2
+    colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
+
+connections:
+  - # attach ferrules
+    - F_05
+    - W1: [1,4] # a new ferrule is auto-generated for each wire
+  - # attach connectors (separetely from ferrules)
+    - W1: [1-4]
+    - X1: [1-4]
+  -
+    - F_10_1: 1 # manually defined ferrules are treated like regular connectors,
+                # thus requiring a pin number
+    - W1: 2
+  -
+    - F_10_1: 1
+    - W1: 3

@@ -1,0 +1,26 @@
+connectors:
+  X1:
+    pincount: 4
+    # More connector parameters:
+    type: Molex KK 254
+    subtype: female
+  X2:
+    pincount: 4
+    type: Molex KK 254
+    subtype: female
+
+cables:
+  W1:
+    wirecount: 4
+    # more cable parameters:
+    length: 1
+    gauge: 0.25 mm2
+    show_equiv: true # auto-calculate AWG equivalent
+    colors: [WH, BN, GN, YE]
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    # non-sequential wiring:
+    - X2: [1,2,4,3]
