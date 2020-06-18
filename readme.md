@@ -2,7 +2,7 @@
 
 ## Summary
 
-WireViz is a simple yet flexible, YAML-based markup language for documenting cables, wiring harnesses and connector pinouts with beautiful graphical output (SVG, PNG, ...) thanks to [GraphViz](https://www.graphviz.org/).
+WireViz is a tool for easily documenting cables, wiring harnesses and connector pinouts. It takes plain text, YAML-formatted files as input and produces beautiful graphical output (SVG, PNG, ...) thanks to [GraphViz](https://www.graphviz.org/). It handles automatic BOM (Bill of Materials) creation and has a lot of extra features.
 
 ## Features
 
