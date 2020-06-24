@@ -24,6 +24,16 @@ WireViz is a tool for easily documenting cables, wiring harnesses and connector 
 
 _Note_: WireViz is not designed to represent the complete wiring of a system. Its main aim is to document the construction of individual wires and harnesses.
 
+## Installation
+
+Installation can be done using pip after cloning the repository:
+
+```
+git clone <repo url>
+cd <working copy>
+pip3 install -e .
+```
+
 ## Examples
 
 ### Demo 01
