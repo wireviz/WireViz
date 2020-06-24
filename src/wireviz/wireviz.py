@@ -13,7 +13,7 @@ if __name__== '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import wv_colors
-from wireviz.wv_helper import nested, int2tuple, awg_equiv, flatten2d, tuplelist2tsv
+from wireviz.wv_helper import nested, int2tuple, mm2_equiv, awg_equiv, flatten2d, tuplelist2tsv
 
 class Harness:
 
@@ -117,8 +117,16 @@ class Harness:
 
         for k, c in self.cables.items():
             # a = attributes
+            if c.show_equiv:
+                if c.gauge_unit == 'mm\u00B2':
+                    gauge_equiv = ' ({} AWG)'.format(awg_equiv(c.gauge))
+                else:
+                    gauge_equiv = ' ({} mm\u00B2)'.format(mm2_equiv(c.gauge))
+            else:
+                gauge_equiv = ''
+
             a = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
-                 '{} {}{}'.format(c.gauge, c.gauge_unit, ' ({} AWG)'.format(awg_equiv(c.gauge)) if c.gauge_unit == 'mm\u00B2' and c.show_equiv else '') if c.gauge else '', # TODO: show equiv
+                 '{} {}{}'.format(c.gauge, c.gauge_unit, gauge_equiv) if c.gauge else '',
                  '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
             a = list(filter(None, a))
