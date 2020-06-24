@@ -1,2 +1,22 @@
 .DS_Store
 temp/
+
+.vscode/
+
+.idea/
+
+
+# IntelliJ Stuff
+# Default ignored files
+/shelf/
+/workspace.xml
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+
+
+# Windows
+thumbs.db
+desktop.ini
