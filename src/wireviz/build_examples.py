@@ -1,5 +1,11 @@
-import wireviz
+#!/usr/bin/python3
+
 import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from wireviz import wireviz
 
 demos     = 2 # 2
 examples  = 6 # 6
@@ -7,15 +13,15 @@ tutorials = 7 # 7
 
 if demos:
     for i in range(1,demos+1):
-        fn = '../examples/demo{:02d}.yml'.format(i)
+        fn = '../../examples/demo{:02d}.yml'.format(i)
         print(fn)
         wireviz.parse(fn, gen_bom=True)
 
 if examples:
-    with open(os.path.abspath('../examples/readme.md'), 'w') as file:
+    with open(os.path.abspath('../../examples/readme.md'), 'w') as file:
         file.write('# Example gallery\n')
         for i in range(1,examples+1):
-            fn = '../examples/ex{:02d}.yml'.format(i)
+            fn = '../../examples/ex{:02d}.yml'.format(i)
             print(fn)
             wireviz.parse(fn, gen_bom=True)
 
@@ -24,19 +30,19 @@ if examples:
             file.write('[Source](ex{:02d}.yml) - [Bill of Materials](ex{:02d}.bom.tsv)\n\n\n'.format(i,i))
 
 if tutorials:
-    with open(os.path.abspath('../tutorial/readme.md'), 'w') as file:
+    with open(os.path.abspath('../../tutorial/readme.md'), 'w') as file:
         file.write('# WireViz Tutorial\n')
         for i in range(1,tutorials+1):
-            fn = '../tutorial/tutorial{:02d}.yml'.format(i)
+            fn = '../../tutorial/tutorial{:02d}.yml'.format(i)
             print(fn)
             wireviz.parse(fn, gen_bom=True)
 
-            with open(os.path.abspath('../tutorial/tutorial{:02d}.md'.format(i)), 'r') as info:
+            with open(os.path.abspath('../../tutorial/tutorial{:02d}.md'.format(i)), 'r') as info:
                 for line in info:
                     file.write(line.replace('## ', '## {} - '.format(i)))
             file.write('\n[Source](tutorial{:02d}.yml):\n\n'.format(i))
 
-            with open(os.path.abspath('../tutorial/tutorial{:02d}.yml'.format(i)), 'r') as src:
+            with open(os.path.abspath('../../tutorial/tutorial{:02d}.yml'.format(i)), 'r') as src:
                 file.write('```yaml\n')
                 for line in src:
                     file.write(line)
