@@ -4,11 +4,20 @@ templates:
     type: Molex KK 254
     subtype: female
     pinout: [GND, VCC, SCL, SDA]
+
   - &template_wire
     gauge: 0.25 mm2
     length: 0.2
     colors: [PK, TQ, YE, VT]
     category: bundle
+    show_equiv: true
+
+  - &template_awg_wire
+    gauge: 24 AWG
+    length: 0.2
+    colors: [PK, TQ, YE, VT]
+    category: bundle
+    show_equiv: true
 
 connectors:
   X1:
@@ -32,9 +41,9 @@ cables:
   W3:
     <<: *template_wire
   W4:
-    <<: *template_wire
+    <<: *template_awg_wire
   W5:
-    <<: *template_wire
+    <<: *template_awg_wire
 
 connections:
   -
