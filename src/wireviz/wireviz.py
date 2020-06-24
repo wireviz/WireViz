@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+import argparse
 import os
 from dataclasses import dataclass, field
 from typing import Any, List
@@ -6,8 +8,8 @@ from collections import Counter
 import yaml
 from graphviz import Graph
 
-import wv_colors
-from wv_helper import nested, int2tuple, awg_equiv, flatten2d, tuplelist2tsv
+from wireviz import wv_colors
+from wireviz.wv_helper import nested, int2tuple, awg_equiv, flatten2d, tuplelist2tsv
 
 class Harness:
 
@@ -620,8 +622,7 @@ def parse(file_in, file_out=None, gen_bom=False):
 
     h.output(filename=file_out, format=('png','svg'), gen_bom=gen_bom, view=False)
 
-if __name__ == '__main__':
-    import argparse
+def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('file_input', nargs='?', default='_test/test.yml')
     ap.add_argument('file_output', nargs='?', default=None)
@@ -629,3 +630,6 @@ if __name__ == '__main__':
     args = ap.parse_args()
 
     parse(args.file_input, file_out=args.file_output, gen_bom=args.bom)
+
+if __name__ == '__main__':
+    main()

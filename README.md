@@ -94,7 +94,7 @@ mywire.html       HTML page with wiring diagram and BOM embedded
 
 ## Status
 
-This is very much a [work in progress](todo.md). Source code, API, syntax and functionality may change wildly at any time.
+This is very much a [work in progress](TODO). Source code, API, syntax and functionality may change wildly at any time.
 
 ## Requirements
 
