@@ -128,6 +128,8 @@ class Harness:
             html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">' # name+attributes table
             if c.show_name:
                 html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(a), name=c.name)
+            if c.specified_cable:
+                html = html + '<tr><td colspan="{colspan}">{specified}</td></tr>'.format(colspan=len(a), specified=c.specified_cable)
             html = html + '<tr>' # attribute row
             for attrib in a:
                 html = html + '<td>{attrib}</td>'.format(attrib=attrib)
@@ -264,9 +266,11 @@ class Harness:
                 designators = list(items.keys())
                 designators.sort()
                 total_length = sum(i.length for i in items.values())
-                name = 'Cable, {wirecount}{gauge}{shield}'.format(wirecount = shared.wirecount,
+                name = 'Cable, {specified_cable}{wirecount}{gauge}{shield}'.format(wirecount = shared.wirecount,
                                                                    gauge = ' x {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else ' wires',
-                                                                   shield = ' shielded' if shared.shield else '')
+                                                                   shield = ' shielded' if shared.shield else '',
+                                                                   specified_cable = '{}, '.format(shared.specified_cable) if shared.specified_cable else '')
+
                 item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
                 bom_cables.append(item)
         # bundles (ignores wirecount)
@@ -357,6 +361,7 @@ class Cable:
     length: float = 0
     wirecount: int = None
     shield: bool = False
+    specified_cable: str = None
     notes: str = None
     colors: List[Any] = field(default_factory=list)
     color_code: str = None
