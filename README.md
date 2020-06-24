@@ -36,6 +36,14 @@ pip3 install -e .
 
 ## Examples
 
+### (re)building the example projects
+
+If you would like to rebuild all of the included demos, examples and tutorials, use the ```build_examples.py``` script:
+
+```cd src/wireviz
+./build_examples.py
+```
+
 ### Demo 01
 
 [WireViz input file](examples/demo01.yml):
