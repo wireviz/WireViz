@@ -90,7 +90,7 @@ class Harness:
 
             else: # not a ferrule
                 # a = attributes
-                a = [n.type,
+                a = [n.part_number, n.type,
                      n.subtype,
                      '{}-pin'.format(n.pincount) if n.show_pincount else '']
                 # p = pinout
@@ -123,7 +123,8 @@ class Harness:
 
         for k, c in self.cables.items():
             # a = attributes
-            a = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
+            a = [c.part_number,
+                 '{}x'.format(len(c.colors)) if c.show_wirecount else '',
                  '{} {}{}'.format(c.gauge, c.gauge_unit, ' ({} AWG)'.format(awg_equiv(c.gauge)) if c.gauge_unit == 'mm\u00B2' and c.show_equiv else '') if c.gauge else '', # TODO: show equiv
                  '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
@@ -253,11 +254,14 @@ class Harness:
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
+            part_number = shared.part_number
             name = 'Connector{type}{subtype}{pincount}{color}'.format(type = ', {}'.format(shared.type) if shared.type else '',
                                                       subtype = ', {}'.format(shared.subtype) if shared.subtype else '',
                                                       pincount = ', {} pins'.format(shared.pincount) if shared.category != 'ferrule' else '',
                                                       color = ', {}'.format(shared.color) if shared.color else '')
             item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.category != 'ferrule' else ''}
+            if part_number is not None:  # set part number only if it exists
+                item['part number'] = part_number
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item']) # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
@@ -269,11 +273,14 @@ class Harness:
             if shared.category != 'bundle':
                 designators = list(items.keys())
                 designators.sort()
+                part_number = shared.part_number
                 total_length = sum(i.length for i in items.values())
                 name = 'Cable, {wirecount}{gauge}{shield}'.format(wirecount = shared.wirecount,
                                                                    gauge = ' x {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else ' wires',
                                                                    shield = ' shielded' if shared.shield else '')
                 item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
+                if part_number is not None:  # set part number only if it exists
+                    item['part number'] = part_number
                 bom_cables.append(item)
         # bundles (ignores wirecount)
         wirelist = []
@@ -309,6 +316,9 @@ class Harness:
     def bom_list(self):
         bom = self.bom()
         keys = ['item', 'qty', 'unit', 'designators']
+        # check if any part numbers are set
+        if any("part number" in x for x in bom):
+            keys.append("part number")
         bom_list = []
         bom_list.append([k.capitalize() for k in keys]) # create header row with keys
         for item in bom:
@@ -322,6 +332,7 @@ class Harness:
 @dataclass
 class Connector:
     name: str
+    part_number: str = None
     category: str = None
     type: str = None
     subtype: str = None
@@ -372,6 +383,7 @@ class Connector:
 @dataclass
 class Cable:
     name: str
+    part_number: str = None
     category : str = None
     type: str = None
     gauge: float = None
