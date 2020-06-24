@@ -1,2 +1,39 @@
-.DS_Store
-temp/
+*.py[cod]
+
+# C/C++ extensions
+*.o
+*.so
+*.gch
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+
+# Installer logs
+pip-log.txt
+
+# Vim
+*.swp
+*.un~
+
+# Atom
+.cache
+
+# Generated documentation
+docs/_build/*
+
+# tests
+.coverage
+.hypothesis
+.pytest_cache
