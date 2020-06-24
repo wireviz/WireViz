@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+"""Invoke wireviz from the command line."""
+
+import argparse
+
+import wireviz
+
+
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument('file_input', nargs='?', default='_test/test.yml')
+    ap.add_argument('file_output', nargs='?', default=None)
+    ap.add_argument('--bom', action='store_const', default=True, const=True)
+    args = ap.parse_args()
+
+    wireviz.parse(args.file_input, file_out=args.file_output, gen_bom=args.bom)
