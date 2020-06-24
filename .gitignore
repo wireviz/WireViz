@@ -1,2 +1,9 @@
 .DS_Store
-temp/
+.eggs
+__pycache__
+.*.swp
+*.egg-info
+*.pyc
+build
+data
+dist
