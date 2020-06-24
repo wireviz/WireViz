@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
-from dataclasses import dataclass, field
-from typing import Any, List
 from collections import Counter
-import yaml
+from dataclasses import dataclass, field
 from graphviz import Graph
+import os
+from typing import Any, List
+import yaml
+
+if __name__== '__main__':
+    import sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import wv_colors
 from wireviz.wv_helper import nested, int2tuple, awg_equiv, flatten2d, tuplelist2tsv
@@ -622,14 +626,26 @@ def parse(file_in, file_out=None, gen_bom=False):
 
     h.output(filename=file_out, format=('png','svg'), gen_bom=gen_bom, view=False)
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('file_input', nargs='?', default='_test/test.yml')
-    ap.add_argument('file_output', nargs='?', default=None)
-    ap.add_argument('--bom', action='store_const', default=True, const=True)
-    args = ap.parse_args()
+def parse_cmdline():
+    parser = argparse.ArgumentParser(
+            description='Generate cable and wiring harness documentation from YAML descriptions'
+            )
 
-    parse(args.file_input, file_out=args.file_output, gen_bom=args.bom)
+    parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
+
+    parser.add_argument('-o', '--output_file',  action='store', type=str, metavar='OUTPUT')
+
+    parser.add_argument('--generate-bom', action='store_true', default=True)
+
+    args = parser.parse_args()
+
+    return args
+
+def main():
+
+    args = parse_cmdline()
+
+    parse(args.input_file, file_out=args.output_file, gen_bom=args.generate_bom)
 
 if __name__ == '__main__':
     main()
