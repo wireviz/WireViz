@@ -142,26 +142,37 @@ class Harness:
                 for bla in p:
                     html = html + '<td>{}</td>'.format(bla)
                 html = html + '</tr>'
-                bgcolor = ":".join(wv_colors.translate_color(x, 'hex').split(':')[:2])
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port='w{}'.format(i))
-
+                colors = wv_colors.translate_color(x,'hex').split(':')
+                rowheight = 6 #/ len(colors)
+                collen = len(p) / len(colors)
+                html = html + '<tr cellpadding="0" cellspacing="0" border="0"><td border="2" sides="tb" colspan="{colspan}" cellspacing="0" cellpadding="0" port="{port}"><table cellspacing="0" cellpadding="0" border="0"><tr>'.format(colspan=len(p), port='w{}'.format(i))
+                for j, bgcolor in enumerate(colors,1):
+                    # todo border 2
+                    # port="{port}"
+                    # html = html + '<td colspan="{colspan}" cellpadding="0" height="{rowheight}" bgcolor="{bgcolor}" border="1" sides="tb" {port}></td>'.format(
+                    #     colspan=collen, bgcolor=bgcolor if bgcolor != '' else wv_colors.default_color,
+                    #     port='port="w{}"'.format(i) if j == len(colors) else '', rowheight=rowheight)
+                    html = html + '<td colspan="{colspan}" cellspacing="0" cellpadding="0" height="{rowheight}" bgcolor="{bgcolor}" ></td>'.format(
+                        colspan=collen, bgcolor=bgcolor if bgcolor != '' else wv_colors.default_color, rowheight=rowheight)
+                html = html + '</tr></table></td></tr>'
             if c.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
-                html = html + '<tr><td>&nbsp;</td></tr>' # spacer
+                html = html + '<tr><td></td></tr>'  # spacer
                 html = html + '<tr>'
                 for bla in p:
                     html = html + '<td>{}</td>'.format(bla)
                 html = html + '</tr>'
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" border="2" sides="b" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=wv_colors.translate_color(x, 'hex'), port='ws')
+                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" border="2" sides="b" port="{port}"></td></tr>'.format(
+                    colspan=len(p), bgcolor=wv_colors.translate_color(wv_colors.shield_color, 'hex'), port='ws')
 
-            html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
+            html = html + '<tr><td></td></tr>'  # spacer at the end
 
             html = html + '</table>' # conductor table
 
             html = html + '</td></tr>'  # main table
             if c.notes:
                 html = html + '<tr><td cellpadding="3">{}</td></tr>'.format(c.notes) # notes table
-                html = html + '<tr><td>&nbsp;</td></tr>' # spacer at the end
+                html = html + '<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
             html = html + '</table>'  # main table
 

@@ -18,12 +18,16 @@ COLOR_CODES = {
     'T568B': ['WHOG', 'OG', 'WHGN', 'BU', 'WHBU', 'GN', 'WHBN', 'BN'],
 }
 
-_default_color = '#ffffff'
+default_color = '#ffffff'
 
 # default_bkgnd_color = '#ffffff' # white
 default_bknd_color = '#fffbf8'  # off-white beige-ish
 
-color_hex = {
+# Convention: Color names should be 2 letters long, to allow for multicolored wires
+
+shield_color = 'TI'
+
+_color_hex = {
     'BK': '#000000',
     'WH': '#ffffff',
     'GY': '#999999',

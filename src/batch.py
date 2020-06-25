@@ -1,8 +1,8 @@
 import wireviz
 import os
 
-demos     = 0 # 2
-examples  = 0 # 6
+demos     = 2 # 2
+examples  = 7 # 7
 tutorials = 7 # 7
 
 if demos:
