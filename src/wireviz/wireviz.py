@@ -450,17 +450,17 @@ class Connection:
 
 def parse(yaml_input, file_out=None, generate_bom=False):
 
-    input = yaml.safe_load(yaml_input)
+    yaml_data = yaml.safe_load(yaml_input)
 
-    def expand(input):
-        # input can be:
+    def expand(yaml_data):
+        # yaml_data can be:
         # - a singleton (normally str or int)
         # - a list of str or int
         # if str is of the format '#-#', it is treated as a range (inclusive) and expanded
         output = []
-        if not isinstance(input, list):
-            input = [input,]
-        for e in input:
+        if not isinstance(yaml_data, list):
+            yaml_data = [yaml_data,]
+        for e in yaml_data:
             e = str(e)
             if '-' in e: # list of pins
                 a, b = tuple(map(int, e.split('-')))
@@ -482,7 +482,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
 
     def check_designators(what, where):
         for i, x in enumerate(what):
-            if x not in input[where[i]]:
+            if x not in yaml_data[where[i]]:
                 return False
         return True
 
@@ -492,10 +492,10 @@ def parse(yaml_input, file_out=None, generate_bom=False):
     sections = ['connectors','cables','ferrules','connections']
     types    = [dict, dict, dict, list]
     for sec, ty in zip(sections, types):
-        if sec in input and type(input[sec]) == ty:
-            if len(input[sec]) > 0:
+        if sec in yaml_data and type(yaml_data[sec]) == ty:
+            if len(yaml_data[sec]) > 0:
                 if ty == dict:
-                    for k, o in input[sec].items():
+                    for k, o in yaml_data[sec].items():
                         if sec == 'connectors':
                             h.add_connector(name=k, **o)
                         elif sec == 'cables':
@@ -506,13 +506,13 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                 pass # section exists but is empty
         else: # section does not exist, create empty section
             if ty == dict:
-                input[sec] = {}
+                yaml_data[sec] = {}
             elif ty == list:
-                input[sec] = []
+                yaml_data[sec] = []
 
     # add connections
     ferrule_counter = 0
-    for con in input['connections']:
+    for con in yaml_data['connections']:
         if len(con) == 3: # format: connector -- cable -- conector
 
             for c in con:
@@ -601,7 +601,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                     cable_name = from_name
                     cable_pins = from_pins
 
-                ferrule_params = input['ferrules'][ferrule_name]
+                ferrule_params = yaml_data['ferrules'][ferrule_name]
                 for cable_pin in cable_pins:
                     ferrule_counter = ferrule_counter + 1
                     ferrule_id = '_F{}'.format(ferrule_counter)
