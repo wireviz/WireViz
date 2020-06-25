@@ -5,11 +5,11 @@ from collections import Counter
 from dataclasses import dataclass, field
 from graphviz import Graph
 import os
+import sys
 from typing import Any, List
 import yaml
 
 if __name__== '__main__':
-    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import wv_colors
@@ -448,17 +448,9 @@ class Connection:
     to_name:   Any
     to_port:   Any
 
-def parse(file_in, file_out=None, gen_bom=False):
+def parse(yaml_input, file_out=None, generate_bom=False):
 
-    file_in = os.path.abspath(file_in)
-    if not file_out:
-        file_out = file_in
-        pre, ext = os.path.splitext(file_out)
-        file_out = pre # extension will be added by graphviz output function
-    file_out = os.path.abspath(file_out)
-
-    with open(file_in, 'r') as stream:
-        input = yaml.safe_load(stream)
+    input = yaml.safe_load(yaml_input)
 
     def expand(input):
         # input can be:
@@ -624,7 +616,7 @@ def parse(file_in, file_out=None, gen_bom=False):
         else:
             raise Exception('Wrong number of connection parameters')
 
-    h.output(filename=file_out, format=('png','svg'), gen_bom=gen_bom, view=False)
+    h.output(filename=file_out, format=('png','svg'), gen_bom=generate_bom, view=False)
 
 def parse_cmdline():
     parser = argparse.ArgumentParser(
@@ -637,6 +629,8 @@ def parse_cmdline():
 
     parser.add_argument('--generate-bom', action='store_true', default=True)
 
+    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
+
     args = parser.parse_args()
 
     return args
@@ -645,7 +639,30 @@ def main():
 
     args = parse_cmdline()
 
-    parse(args.input_file, file_out=args.output_file, gen_bom=args.generate_bom)
+    if not os.path.exists(args.input_file):
+        print('Error: input file {} inaccessible or does not exist, check path'.format(args.input_file))
+        sys.exit(1)
+
+    with open(args.input_file) as fh:
+        yaml_input = fh.read()
+
+    if args.prepend_file:
+        if not os.path.exists(args.prepend_file):
+            print('Error: prepend input file {} inaccessible or does not exist, check path'.format(args.prepend_file))
+            sys.exit(1)
+        with open(args.prepend_file) as fh:
+            prepend = fh.read()
+            yaml_input = prepend + yaml_input
+
+    if not args.output_file:
+        file_out = args.input_file
+        pre, _ = os.path.splitext(file_out)
+        file_out = pre # extension will be added by graphviz output function
+    else:
+        file_out = args.output_file
+    file_out = os.path.abspath(file_out)
+
+    parse(yaml_input, file_out=file_out, generate_bom=args.generate_bom)
 
 if __name__ == '__main__':
     main()
