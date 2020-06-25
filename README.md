@@ -26,7 +26,9 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
 
 ## Installation
 
-Installation can be done using pip after cloning the repository:
+WireWiz requires the ```graphviz``` package as well as it's python bindings. Graphviz itself is installed using your regular package manager, e.g. ```apt-get install graphviz```. The Graphviz python bindings are automatically installed as dependencies by the install script.
+
+Installation of the WireWiz package and its python dependencies can be done using pip after cloning the repository:
 
 ```
 git clone <repo url>
@@ -97,7 +99,7 @@ as well as the [example gallery](examples/readme.md) to see more of what WireViz
 ## Usage
 
 ```
-$ python3 wireviz.py ~/path/to/file/mywire.yml
+$ wireviz ~/path/to/file/mywire.yml
 ```
 
 This will output the following files
@@ -116,7 +118,7 @@ This is very much a [work in progress](TODO). Source code, API, syntax and funct
 
 ## Requirements
 
-Developed and tested using Python 3.7; might not work with older Python versions.
+Developed and tested using Python 3.7; might not work with older Python versions. Ubuntu 18.04 LTS users in particular may need to separately install Python 3.7 or above, as that comes with Python 3.6 as the included system Python install.
 
 ## License
 
