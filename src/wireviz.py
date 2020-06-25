@@ -144,7 +144,7 @@ class Harness:
                 html = html + '</tr>'
                 bgcolors = ('#000000:' + wv_colors.translate_color(x, 'hex') +':#000000').split(':')
                 html = html + '<tr><td colspan="{colspan}" border="0" cellspacing="0" cellpadding="0" port="{port}" height="{height}"><table cellspacing="0" cellborder="0" border = "0">'.format(colspan=len(p), port ='w{}'.format(i), height = '{}'.format(2*len(bgcolors)))
-                for j, bgcolor in enumerate(bgcolors):
+                for j, bgcolor in enumerate(bgcolors[::-1]): # Reverse to match the curved wires when more than 2 colors
                     html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="2" bgcolor="{bgcolor}" border="0"></td></tr>'.format(colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff')
                 html = html + '</table></td></tr>'
 
