@@ -142,8 +142,9 @@ class Harness:
                 for bla in p:
                     html = html + '<td>{}</td>'.format(bla)
                 html = html + '</tr>'
-                bgcolor = ":".join(wv_colors.translate_color(x, 'hex').split(':')[:2])
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port='w{}'.format(i))
+                bgcolors = ('#000000:' + wv_colors.translate_color(x, 'hex') + ':#000000').split(':')
+                for j, bgcolor in enumerate(bgcolors):
+                    html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="2" bgcolor="{bgcolor}" border="0"{port}></td></tr>'.format(colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port=' port="w{}"'.format(i) if j == len(bgcolors)//2 else '')
 
             if c.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
