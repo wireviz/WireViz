@@ -49,8 +49,8 @@ _color_hex = {
     'PE': '#54aa85:#f7f854:#54aa85',
 }
 
-# TODO: Add a helper method for this, that can deal with banded wires
-color_full = {
+
+_color_full = {
     'BK': 'black',
     'WH': 'white',
     'GY': 'grey',
@@ -65,11 +65,11 @@ color_full = {
     'BN': 'brown',
     'SL': 'slate',
     'CU': 'bare copper',
-    'TI': 'tinned copper',
+    'TI': 'tinned copper',  # Could be changed to SN, as that's the elemental symbol
 }
 
-# TODO Help wanted! Need help translating colors/banded colors to german shortcodes
-color_ger = {
+# TODO Help wanted: can someone check the german translation?
+_color_ger = {
     'BK': 'sw',
     'WH': 'ws',
     'GY': 'gr',
@@ -82,43 +82,50 @@ color_ger = {
     'BU': 'bl',
     'VT': 'vi',
     'BN': 'br',
+    # To the best of my ability, likely incorrect:
+
+    # Slate --> Schieferfarbe --> SI ??
+    'SL': 'si',
+    # Copper
+    'CU': 'ku',
+    # Tinned
+    'TI': 'si'
 }
+
 
 
 def get_color_hex(input):
     if len(input) == 4:  # give wires with EXACTLY 2 colors that striped/banded look
         input = input + input[:2]
-    output = ''
-    for i in range(0, len(input), 2):  # Split into 2 letter chunks
-        if input[i:i + 2] in color_hex:
-            output += color_hex[input[i:i + 2]]
-            if i + 2 != len(input):
-                output += ':'
+    try:
+        output = ":".join([_color_hex[input[i:i + 2]] for i in range(0, len(input), 2)])
+    except KeyError:
+        raise Exception('Unknown Color Name')
     if output == '':
-        output = _default_color
+        output = default_color
     return output
 
 
 def translate_color(input, color_mode):
     if input == '':
-        output = ''
+        return ''
+    upper = color_mode.isupper()
+    if not (color_mode.isupper() or color_mode.islower()):
+        raise Exception('Unknown color mode capitalization')
+
+    color_mode = color_mode.lower()
+    if color_mode == 'full':
+        output = "/".join([_color_full[input[i:i+2]] for i in range(0,len(input),2)])
+    elif color_mode == 'hex':
+        output = get_color_hex(input)
+    elif color_mode == 'ger':
+        output = "".join([_color_ger[input[i:i+2]] for i in range(o,len(input),2)])
+    elif color_mode == 'short':
+        output = input
     else:
-        if color_mode == 'full':
-            output = color_full[input].lower()
-        elif color_mode == 'FULL':
-            output = color_full[input].upper()
-        elif color_mode == 'hex':
-            output = get_color_hex(input).lower()
-        elif color_mode == 'HEX':
-            output = get_color_hex(input).upper()
-        elif color_mode == 'ger':
-            output = color_ger[input].lower()
-        elif color_mode == 'GER':
-            output = color_ger[input].upper()
-        elif color_mode == 'short':
-            output = input.lower()
-        elif color_mode == 'SHORT':
-            output = input.upper()
-        else:
-            raise Exception('Unknown color mode')
-    return output
+        raise Exception('Unknown color mode')
+    if upper:
+        return output.upper()
+    else:
+        return output.lower()
+
