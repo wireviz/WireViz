@@ -128,6 +128,9 @@ class Harness:
             html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">' # name+attributes table
             if c.show_name:
                 html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(a), name=c.name)
+            if c.type: # If the cable (or wires in a bundle) has a named type (e.g. product number+name)?
+                # TODO: If product number becomes a separate attribute, it could fit into the same table row.
+                html = html + '<tr><td colspan="{colspan}">{type}</td></tr>'.format(colspan=len(a), type=c.type)
             html = html + '<tr>' # attribute row
             for attrib in a:
                 html = html + '<td>{attrib}</td>'.format(attrib=attrib)
@@ -256,15 +259,16 @@ class Harness:
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item']) # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
         # cables
-        types = Counter([(v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
+        types = Counter([(v.type, v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
         for type in types:
-            items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) == type}
+            items = {k: v for k, v in self.cables.items() if (v.type, v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) == type}
             shared = next(iter(items.values()))
             if shared.category != 'bundle':
                 designators = list(items.keys())
                 designators.sort()
                 total_length = sum(i.length for i in items.values())
-                name = 'Cable, {wirecount}{gauge}{shield}'.format(wirecount = shared.wirecount,
+                name = 'Cable{type}, {wirecount}{gauge}{shield}'.format(type = ', {}'.format(shared.type) if shared.type else '',
+                                                                   wirecount = shared.wirecount,
                                                                    gauge = ' x {} {}'.format(shared.gauge, shared.gauge_unit) if shared.gauge else ' wires',
                                                                    shield = ' shielded' if shared.shield else '')
                 item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
@@ -272,20 +276,21 @@ class Harness:
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        types = Counter([(v.category, v.gauge, v.gauge_unit, v.length) for v in self.cables.values()])
+        types = Counter([(v.type, v.category, v.gauge, v.gauge_unit, v.length) for v in self.cables.values()])
         for type in types:
-            items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.length) == type}
+            items = {k: v for k, v in self.cables.items() if (v.type, v.category, v.gauge, v.gauge_unit, v.length) == type}
             shared = next(iter(items.values()))
             # filter out cables that are not bundles
             if shared.category == 'bundle':
                 for bundle in items.values():
                     # add each wire from each bundle to the wirelist
                     for color in bundle.colors:
-                        wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designators': list(items.keys())})
+                        wirelist.append({'type': shared.type, 'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit,
+                                         'length': shared.length, 'color': color, 'designators': list(items.keys())})
         # join similar wires from all the bundles to a single BOM item
-        types = Counter([(v['gauge'], v['gauge_unit'], v['color']) for v in wirelist])
+        types = Counter([(v['type'], v['gauge'], v['gauge_unit'], v['color']) for v in wirelist])
         for type in types:
-            items = [v for v in wirelist if (v['gauge'], v['gauge_unit'], v['color']) == type]
+            items = [v for v in wirelist if (v['type'], v['gauge'], v['gauge_unit'], v['color']) == type]
             shared = items[0]
             designators = [i['designators'] for i in items]
             # flatten nested list
@@ -294,7 +299,8 @@ class Harness:
             designators = list(dict.fromkeys(designators))
             designators.sort()
             total_length = sum(i['length'] for i in items)
-            name = 'Wire{gauge}{color}'.format(gauge=', {} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
+            name = 'Wire{type}{gauge}{color}'.format(type=', {}'.format(shared['type']) if shared['type'] else '',
+                                                 gauge=', {} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
                                                  color=', {}'.format(shared['color']) if shared['color'] != '' else '')
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
             bom_cables.append(item)
