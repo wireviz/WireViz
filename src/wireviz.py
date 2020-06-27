@@ -82,16 +82,23 @@ class Harness:
                 # a = attributes
                 a = [n.type,
                      n.subtype,
-                     '{}-pin'.format(len(n.pinout)) if n.show_pincount else '']
+                     '{}-pin'.format(n.pincount) if n.show_pincount else '']
                 # p = pinout
                 p = [[],[],[]]
                 p[1] = list(n.pinout)
-                for i, x in enumerate(n.pinout, 1):
-                    if n.ports_left:
-                        p[0].append('<p{portno}l>{portno}'.format(portno=i))
-                    if n.ports_right:
-                        p[2].append('<p{portno}r>{portno}'.format(portno=i))
-                # l = label
+                if (n.pinnumbers):
+                    for i in n.pinnumbers:
+                        if n.ports_left:
+                            p[0].append('<p{portno}l>{portno}'.format(portno=i))
+                        if n.ports_right:
+                            p[2].append('<p{portno}r>{portno}'.format(portno=i))
+                else:
+                    for i, x in enumerate(n.pinout, 1):
+                        if n.ports_left:
+                            p[0].append('<p{portno}l>{portno}'.format(portno=i))
+                        if n.ports_right:
+                            p[2].append('<p{portno}r>{portno}'.format(portno=i))
+                    # l = label
                 l = [n.name if n.show_name else '', a, p, n.notes]
                 dot.node(k, label=nested(l))
 
@@ -318,6 +325,7 @@ class Connector:
     pincount: int = None
     notes: str = None
     pinout: List[Any] = field(default_factory=list)
+    pinnumbers: List[Any] = field(default_factory=list)
     color: str = None
     show_name: bool = True
     show_pincount: bool = True
@@ -327,15 +335,20 @@ class Connector:
         self.ports_right = False
         self.loops = []
 
-        if self.pinout:
-            if self.pincount is not None:
-                raise Exception('You cannot specify both pinout and pincount')
-            else:
+        if self.pincount is None:
+            if self.pinout:
                 self.pincount = len(self.pinout)
-        else:
-            if not self.pincount:
-                self.pincount = 1
-            self.pinout = ['',] * self.pincount
+            elif self.pinnumbers:
+                self.pincount = len(self.pinnumbers)
+            else:
+                raise Exception('You need to specify at least one, pincount, pinout or pinnumbers')
+
+        if self.pinout and self.pinnumbers:
+            if len(self.pinout) != len(self.pinnumbers):
+                raise Exception('Given pinout and pinnumbers size mismatch')
+
+        if not self.pinout and not self.pinnumbers:
+            self.pinnumbers = list(range(1,self.pincount + 1))
 
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
