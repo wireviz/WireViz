@@ -347,6 +347,9 @@ class Connector:
             if len(self.pinout) != len(self.pinnumbers):
                 raise Exception('Given pinout and pinnumbers size mismatch')
 
+        if not self.pinout and not self.pinnumbers:
+            self.pinnumbers = list(range(1,self.pincount + 1))
+
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
 
