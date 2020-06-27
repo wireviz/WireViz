@@ -35,3 +35,21 @@
 [Source](ex06.yml) - [Bill of Materials](ex06.bom.tsv)
 
 
+## Example 07
+![](ex07.png)
+
+[Source](ex07.yml) - [Bill of Materials](ex07.bom.tsv)
+
+
+## Example 08
+![](ex08.png)
+
+[Source](ex08.yml) - [Bill of Materials](ex08.bom.tsv)
+
+
+## Example 09
+![](ex09.png)
+
+[Source](ex09.yml) - [Bill of Materials](ex09.bom.tsv)
+
+

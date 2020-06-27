@@ -27,6 +27,10 @@ class Harness:
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
         self.cables[via_name].connect(from_name, from_pin, via_pin, to_name, to_pin)
+        if from_name in self.connectors:
+            self.connectors[from_name].activate_pin(from_pin)
+        if to_name in self.connectors:
+            self.connectors[to_name].activate_pin(to_pin)
 
     def create_graph(self):
         dot = Graph()
@@ -85,20 +89,15 @@ class Harness:
                      '{}-pin'.format(n.pincount) if n.show_pincount else '']
                 # p = pinout
                 p = [[],[],[]]
-                p[1] = list(n.pinout)
-                if (n.pinnumbers):
-                    for i in n.pinnumbers:
-                        if n.ports_left:
-                            p[0].append('<p{portno}l>{portno}'.format(portno=i))
-                        if n.ports_right:
-                            p[2].append('<p{portno}r>{portno}'.format(portno=i))
-                else:
-                    for i, x in enumerate(n.pinout, 1):
-                        if n.ports_left:
-                            p[0].append('<p{portno}l>{portno}'.format(portno=i))
-                        if n.ports_right:
-                            p[2].append('<p{portno}r>{portno}'.format(portno=i))
-                    # l = label
+                for pinnumber, pinname in zip(n.pinnumbers, n.pinout):
+                    if n.hide_disconnected_pins and not n.visible_pins.get(pinnumber, False):
+                        continue
+                    p[1].append(pinname)
+                    if n.ports_left:
+                        p[0].append('<p{portno}l>{portno}'.format(portno=pinnumber))
+                    if n.ports_right:
+                        p[2].append('<p{portno}r>{portno}'.format(portno=pinnumber))
+                # l = label
                 l = [n.name if n.show_name else '', a, p, n.notes]
                 dot.node(k, label=nested(l))
 
@@ -295,7 +294,7 @@ class Harness:
             designators = list(dict.fromkeys(designators))
             designators.sort()
             total_length = sum(i['length'] for i in items)
-            name = 'Wire, {gauge}{color}'.format(gauge='{} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
+            name = 'Wire{gauge}{color}'.format(gauge=', {} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
                                                  color=', {}'.format(shared['color']) if shared['color'] != '' else '')
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
             bom_cables.append(item)
@@ -329,17 +328,21 @@ class Connector:
     color: str = None
     show_name: bool = True
     show_pincount: bool = True
+    hide_disconnected_pins: bool = False
 
     def __post_init__(self):
         self.ports_left = False
         self.ports_right = False
         self.loops = []
+        self.visible_pins = {}
 
         if self.pincount is None:
             if self.pinout:
                 self.pincount = len(self.pinout)
             elif self.pinnumbers:
                 self.pincount = len(self.pinnumbers)
+            elif self.category == 'ferrule':
+                self.pincount = 1
             else:
                 raise Exception('You need to specify at least one, pincount, pinout or pinnumbers')
 
@@ -347,11 +350,20 @@ class Connector:
             if len(self.pinout) != len(self.pinnumbers):
                 raise Exception('Given pinout and pinnumbers size mismatch')
 
-        if not self.pinout and not self.pinnumbers:
+        # create default lists for pinnumbers (sequential) and pinouts (blank) if not specified
+        if not self.pinnumbers:
             self.pinnumbers = list(range(1,self.pincount + 1))
+        if not self.pinout:
+            self.pinout = [''] * self.pincount
 
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
+        if self.hide_disconnected_pins:
+            self.visible_pins[from_pin] = True
+            self.visible_pins[to_pin] = True
+
+    def activate_pin(self, pin):
+        self.visible_pins[pin] = True
 
 @dataclass
 class Cable:
