@@ -1,15 +1,19 @@
+# contributed by @elliotmr
+
 connectors:
   X1:
     type: TE 776164-1
     subtype: female
     hide_disconnected_pins: True
     pincount: 35
+    notes: Unconnected pins are not shown
 
   X2:
     type: D-Sub
     subtype: female
     pincount: 9
     hide_disconnected_pins: True
+    notes: Unconnected pins are not shown
 
 cables:
   C1:

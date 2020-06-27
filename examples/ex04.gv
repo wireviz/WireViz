@@ -4,7 +4,7 @@ graph {
 	graph [bgcolor=white fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor=white fontname=arial shape=record style=filled]
 	edge [fontname=arial style=bold]
-	F1 [label=<
+	_F1 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l"> Crimp ferrule  </TD>
@@ -14,7 +14,7 @@ graph {
 
 
                 > margin=0 orientation=180 shape=none style=filled]
-	F2 [label=<
+	_F2 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l"> Crimp ferrule  </TD>
@@ -24,7 +24,7 @@ graph {
 
 
                 > margin=0 orientation=180 shape=none style=filled]
-	F3 [label=<
+	_F3 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l"> Crimp ferrule  </TD>
@@ -34,7 +34,7 @@ graph {
 
 
                 > margin=0 orientation=180 shape=none style=filled]
-	F4 [label=<
+	_F4 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l"> Crimp ferrule  </TD>
@@ -44,7 +44,7 @@ graph {
 
 
                 > margin=0 orientation=180 shape=none style=filled]
-	F5 [label=<
+	_F5 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l"> Crimp ferrule  </TD>
@@ -54,7 +54,7 @@ graph {
 
 
                 > margin=0 orientation=180 shape=none style=filled]
-	F6 [label=<
+	_F6 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l"> Crimp ferrule  </TD>
@@ -64,7 +64,7 @@ graph {
 
 
                 > margin=0 orientation=180 shape=none style=filled]
-	F7 [label=<
+	_F7 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
@@ -74,7 +74,7 @@ graph {
 
 
                 > margin=0 orientation=0 shape=none style=filled]
-	F8 [label=<
+	_F8 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
@@ -84,7 +84,7 @@ graph {
 
 
                 > margin=0 orientation=0 shape=none style=filled]
-	F9 [label=<
+	_F9 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
@@ -94,7 +94,7 @@ graph {
 
 
                 > margin=0 orientation=0 shape=none style=filled]
-	F10 [label=<
+	_F10 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
@@ -104,7 +104,7 @@ graph {
 
 
                 > margin=0 orientation=0 shape=none style=filled]
-	F11 [label=<
+	_F11 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
@@ -114,7 +114,7 @@ graph {
 
 
                 > margin=0 orientation=0 shape=none style=filled]
-	F12 [label=<
+	_F12 [label=<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
                 <TD PORT="p1l">  </TD>
@@ -125,28 +125,28 @@ graph {
 
                 > margin=0 orientation=0 shape=none style=filled]
 	edge [color="#000000:#666600:#000000"]
-	F1:e -- W1:w1:w
+	_F1:e -- W1:w1:w
 	edge [color="#000000:#ff0000:#000000"]
-	F2:e -- W1:w2:w
+	_F2:e -- W1:w2:w
 	edge [color="#000000:#ff8000:#000000"]
-	F3:e -- W1:w3:w
+	_F3:e -- W1:w3:w
 	edge [color="#000000:#ffff00:#000000"]
-	F4:e -- W1:w4:w
+	_F4:e -- W1:w4:w
 	edge [color="#000000:#00ff00:#000000"]
-	F5:e -- W1:w5:w
+	_F5:e -- W1:w5:w
 	edge [color="#000000:#0066ff:#000000"]
-	F6:e -- W1:w6:w
+	_F6:e -- W1:w6:w
 	edge [color="#000000:#0066ff:#000000"]
-	W1:w6:e -- F7:w
+	W1:w6:e -- _F7:w
 	edge [color="#000000:#00ff00:#000000"]
-	W1:w5:e -- F8:w
+	W1:w5:e -- _F8:w
 	edge [color="#000000:#ffff00:#000000"]
-	W1:w4:e -- F9:w
+	W1:w4:e -- _F9:w
 	edge [color="#000000:#ff8000:#000000"]
-	W1:w3:e -- F10:w
+	W1:w3:e -- _F10:w
 	edge [color="#000000:#ff0000:#000000"]
-	W1:w2:e -- F11:w
+	W1:w2:e -- _F11:w
 	edge [color="#000000:#666600:#000000"]
-	W1:w1:e -- F12:w
+	W1:w1:e -- _F12:w
 	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="3">W1</td></tr><tr><td>6x</td><td>0.25 mm² (24 AWG)</td><td>0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>BN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#666600" border="2" sides="tb" port="w1"></td></tr><tr><td></td><td>RD</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff0000" border="2" sides="tb" port="w2"></td></tr><tr><td></td><td>OG</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff8000" border="2" sides="tb" port="w3"></td></tr><tr><td></td><td>YE</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ffff00" border="2" sides="tb" port="w4"></td></tr><tr><td></td><td>GN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#00ff00" border="2" sides="tb" port="w5"></td></tr><tr><td></td><td>BU</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#0066ff" border="2" sides="tb" port="w6"></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
 }

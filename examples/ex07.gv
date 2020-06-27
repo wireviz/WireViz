@@ -4,8 +4,8 @@ graph {
 	graph [bgcolor=white fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor=white fontname=arial shape=record style=filled]
 	edge [fontname=arial style=bold]
-	X1 [label="X1|{TE 776164-1|female|35-pin}|{{<p5r>5|<p6r>6}}"]
-	X2 [label="X2|{D-Sub|female|9-pin}|{{<p2l>2|<p7l>7}}"]
+	X1 [label="X1|{TE 776164-1|female|35-pin}|{{<p5r>5|<p6r>6}}|Unconnected pins are not shown"]
+	X2 [label="X2|{D-Sub|female|9-pin}|{{<p2l>2|<p7l>7}}|Unconnected pins are not shown"]
 	edge [color="#000000:#ffff00:#000000"]
 	X1:p5r:e -- C1:w1:w
 	C1:w1:e -- X2:p7l:w
