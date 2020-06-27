@@ -294,7 +294,7 @@ class Harness:
             designators = list(dict.fromkeys(designators))
             designators.sort()
             total_length = sum(i['length'] for i in items)
-            name = 'Wire, {gauge}{color}'.format(gauge='{} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
+            name = 'Wire{gauge}{color}'.format(gauge=', {} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
                                                  color=', {}'.format(shared['color']) if shared['color'] != '' else '')
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
             bom_cables.append(item)
