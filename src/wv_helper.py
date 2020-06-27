@@ -16,6 +16,8 @@ def awg_equiv(mm2):
                         '10': 8,
                         '16': 6,
                         '25': 4,
+                        '35': 2,
+                        '50': 1,
                         }
     k = str(mm2)
     if k in awg_equiv_table:
