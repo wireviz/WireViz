@@ -1,0 +1,25 @@
+connectors:
+  X1:
+    type: TE 776164-1
+    subtype: female
+    hide_disconnected_pins: True
+    pincount: 35
+
+  X2:
+    type: D-Sub
+    subtype: female
+    pincount: 9
+    hide_disconnected_pins: True
+
+cables:
+  C1:
+    wirecount: 2
+    gauge: 20 AWG
+    colors: [YE, GN]
+    length: 1
+
+connections:
+  -
+    - X1: [5,6]
+    - C1: [1,2]
+    - X2: [7,2]
