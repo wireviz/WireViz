@@ -27,6 +27,10 @@ class Harness:
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
         self.cables[via_name].connect(from_name, from_pin, via_pin, to_name, to_pin)
+        if from_name in self.connectors:
+            self.connectors[from_name].activate_pin(from_pin)
+        if to_name in self.connectors:
+            self.connectors[to_name].activate_pin(to_pin)
 
     def create_graph(self):
         dot = Graph()
@@ -85,6 +89,7 @@ class Harness:
                      '{}-pin'.format(n.pincount) if n.show_pincount else '']
                 # p = pinout
                 p = [[],[],[]]
+                # from dev branch
                 p[1] = list(n.pinout)
                 if (n.pinnumbers):
                     for i in n.pinnumbers:
@@ -99,6 +104,16 @@ class Harness:
                         if n.ports_right:
                             p[2].append('<p{portno}r>{portno}'.format(portno=i))
                     # l = label
+                # from hide_unconnected branch
+                for i, x in enumerate(n.pinout, 1):
+                    if n.hide_disconnected_pins and not n.visible_pins.get(i, False):
+                        continue
+                    p[1].append(x)
+                    if n.ports_left:
+                        p[0].append('<p{portno}l>{portno}'.format(portno=i))
+                    if n.ports_right:
+                        p[2].append('<p{portno}r>{portno}'.format(portno=i))
+                # l = label
                 l = [n.name if n.show_name else '', a, p, n.notes]
                 dot.node(k, label=nested(l))
 
@@ -329,11 +344,13 @@ class Connector:
     color: str = None
     show_name: bool = True
     show_pincount: bool = True
+    hide_disconnected_pins: bool = False
 
     def __post_init__(self):
         self.ports_left = False
         self.ports_right = False
         self.loops = []
+        self.visible_pins = {}
 
         if self.pincount is None:
             if self.pinout:
@@ -352,6 +369,12 @@ class Connector:
 
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
+        if self.hide_disconnected_pins:
+            self.visible_pins[from_pin] = True
+            self.visible_pins[to_pin] = True
+
+    def activate_pin(self, pin):
+        self.visible_pins[pin] = True
 
 @dataclass
 class Cable:
