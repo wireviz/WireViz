@@ -341,6 +341,8 @@ class Connector:
                 self.pincount = len(self.pinout)
             elif self.pinnumbers:
                 self.pincount = len(self.pinnumbers)
+            elif self.category == 'ferrule':
+                self.pincount = 1
             else:
                 raise Exception('You need to specify at least one, pincount, pinout or pinnumbers')
 
