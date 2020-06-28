@@ -618,6 +618,18 @@ def parse(yaml_input, file_out=None, generate_bom=False):
 
     h.output(filename=file_out, format=('png','svg'), gen_bom=generate_bom, view=False)
 
+def parse_file(yaml_file, file_out=None, generate_bom=False):
+    with open(yaml_file, 'r') as file:
+        yaml_input = file.read()
+
+    if not file_out:
+        fn, fext = os.path.splitext(yaml_file)
+        file_out = fn
+    file_out = os.path.abspath(file_out)
+
+    parse(yaml_input, file_out=file_out, generate_bom=generate_bom)
+
+
 def parse_cmdline():
     parser = argparse.ArgumentParser(
             description='Generate cable and wiring harness documentation from YAML descriptions'
