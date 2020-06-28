@@ -1,13 +1,19 @@
 #!/usr/bin/env python3
-import os
-from dataclasses import dataclass, field
-from typing import Any, List
-from collections import Counter
-import yaml
-from graphviz import Graph
 
-import wv_colors
-from wv_helper import nested, int2tuple, awg_equiv, flatten2d, tuplelist2tsv
+import argparse
+from collections import Counter
+from dataclasses import dataclass, field
+from graphviz import Graph
+import os
+import sys
+from typing import Any, List
+import yaml
+
+if __name__== '__main__':
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from wireviz import wv_colors
+from wireviz.wv_helper import nested, int2tuple, awg_equiv, flatten2d, tuplelist2tsv
 
 class Harness:
 
@@ -442,27 +448,19 @@ class Connection:
     to_name:   Any
     to_port:   Any
 
-def parse(file_in, file_out=None, gen_bom=False):
+def parse(yaml_input, file_out=None, generate_bom=False):
 
-    file_in = os.path.abspath(file_in)
-    if not file_out:
-        file_out = file_in
-        pre, ext = os.path.splitext(file_out)
-        file_out = pre # extension will be added by graphviz output function
-    file_out = os.path.abspath(file_out)
+    yaml_data = yaml.safe_load(yaml_input)
 
-    with open(file_in, 'r') as stream:
-        input = yaml.safe_load(stream)
-
-    def expand(input):
-        # input can be:
+    def expand(yaml_data):
+        # yaml_data can be:
         # - a singleton (normally str or int)
         # - a list of str or int
         # if str is of the format '#-#', it is treated as a range (inclusive) and expanded
         output = []
-        if not isinstance(input, list):
-            input = [input,]
-        for e in input:
+        if not isinstance(yaml_data, list):
+            yaml_data = [yaml_data,]
+        for e in yaml_data:
             e = str(e)
             if '-' in e: # list of pins
                 a, b = tuple(map(int, e.split('-')))
@@ -484,7 +482,7 @@ def parse(file_in, file_out=None, gen_bom=False):
 
     def check_designators(what, where):
         for i, x in enumerate(what):
-            if x not in input[where[i]]:
+            if x not in yaml_data[where[i]]:
                 return False
         return True
 
@@ -494,10 +492,10 @@ def parse(file_in, file_out=None, gen_bom=False):
     sections = ['connectors','cables','ferrules','connections']
     types    = [dict, dict, dict, list]
     for sec, ty in zip(sections, types):
-        if sec in input and type(input[sec]) == ty:
-            if len(input[sec]) > 0:
+        if sec in yaml_data and type(yaml_data[sec]) == ty:
+            if len(yaml_data[sec]) > 0:
                 if ty == dict:
-                    for k, o in input[sec].items():
+                    for k, o in yaml_data[sec].items():
                         if sec == 'connectors':
                             h.add_connector(name=k, **o)
                         elif sec == 'cables':
@@ -508,13 +506,13 @@ def parse(file_in, file_out=None, gen_bom=False):
                 pass # section exists but is empty
         else: # section does not exist, create empty section
             if ty == dict:
-                input[sec] = {}
+                yaml_data[sec] = {}
             elif ty == list:
-                input[sec] = []
+                yaml_data[sec] = []
 
     # add connections
     ferrule_counter = 0
-    for con in input['connections']:
+    for con in yaml_data['connections']:
         if len(con) == 3: # format: connector -- cable -- conector
 
             for c in con:
@@ -603,7 +601,7 @@ def parse(file_in, file_out=None, gen_bom=False):
                     cable_name = from_name
                     cable_pins = from_pins
 
-                ferrule_params = input['ferrules'][ferrule_name]
+                ferrule_params = yaml_data['ferrules'][ferrule_name]
                 for cable_pin in cable_pins:
                     ferrule_counter = ferrule_counter + 1
                     ferrule_id = '_F{}'.format(ferrule_counter)
@@ -618,14 +616,65 @@ def parse(file_in, file_out=None, gen_bom=False):
         else:
             raise Exception('Wrong number of connection parameters')
 
-    h.output(filename=file_out, format=('png','svg'), gen_bom=gen_bom, view=False)
+    h.output(filename=file_out, format=('png','svg'), gen_bom=generate_bom, view=False)
+
+def parse_file(yaml_file, file_out=None, generate_bom=False):
+    with open(yaml_file, 'r') as file:
+        yaml_input = file.read()
+
+    if not file_out:
+        fn, fext = os.path.splitext(yaml_file)
+        file_out = fn
+    file_out = os.path.abspath(file_out)
+
+    parse(yaml_input, file_out=file_out, generate_bom=generate_bom)
+
+
+def parse_cmdline():
+    parser = argparse.ArgumentParser(
+            description='Generate cable and wiring harness documentation from YAML descriptions'
+            )
+
+    parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
+
+    parser.add_argument('-o', '--output_file',  action='store', type=str, metavar='OUTPUT')
+
+    parser.add_argument('--generate-bom', action='store_true', default=True)
+
+    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
+
+    args = parser.parse_args()
+
+    return args
+
+def main():
+
+    args = parse_cmdline()
+
+    if not os.path.exists(args.input_file):
+        print('Error: input file {} inaccessible or does not exist, check path'.format(args.input_file))
+        sys.exit(1)
+
+    with open(args.input_file) as fh:
+        yaml_input = fh.read()
+
+    if args.prepend_file:
+        if not os.path.exists(args.prepend_file):
+            print('Error: prepend input file {} inaccessible or does not exist, check path'.format(args.prepend_file))
+            sys.exit(1)
+        with open(args.prepend_file) as fh:
+            prepend = fh.read()
+            yaml_input = prepend + yaml_input
+
+    if not args.output_file:
+        file_out = args.input_file
+        pre, _ = os.path.splitext(file_out)
+        file_out = pre # extension will be added by graphviz output function
+    else:
+        file_out = args.output_file
+    file_out = os.path.abspath(file_out)
+
+    parse(yaml_input, file_out=file_out, generate_bom=args.generate_bom)
 
 if __name__ == '__main__':
-    import argparse
-    ap = argparse.ArgumentParser()
-    ap.add_argument('file_input', nargs='?', default='_test/test.yml')
-    ap.add_argument('file_output', nargs='?', default=None)
-    ap.add_argument('--bom', action='store_const', default=True, const=True)
-    args = ap.parse_args()
-
-    parse(args.file_input, file_out=args.file_output, gen_bom=args.bom)
+    main()
