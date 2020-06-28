@@ -513,7 +513,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
     # add connections
     ferrule_counter = 0
     for con in yaml_data['connections']:
-        if len(con) == 3: # format: connector -- cable -- conector
+        if len(con) == 3: # format: connector -- cable -- connector
 
             for c in con:
                 if len(list(c.keys())) != 1: # check that each entry in con has only one key, which is the designator

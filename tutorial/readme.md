@@ -221,7 +221,7 @@ connections:
   - # attach ferrules
     - F1 # no need for list of connections; one ferrule per wire is auto-generated and attached
     - W1: [1-4] # a new ferrule is auto-generated for each wire
-  - # attach connectors (separetely from ferrules)
+  - # attach connectors (separately from ferrules)
     - W1: [1-4]
     - X1: [1-4]
 ```
@@ -262,7 +262,7 @@ ferrules: # ferrules
 
 cables:
   W1:
-    category: bundle # budnle
+    category: bundle # bundle
     length: 0.3
     gauge: 0.5 mm2
     colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
@@ -271,7 +271,7 @@ connections:
   - # attach ferrules
     - F_05
     - W1: [1,4] # a new ferrule is auto-generated for each wire
-  - # attach connectors (separetely from ferrules)
+  - # attach connectors (separately from ferrules)
     - W1: [1-4]
     - X1: [1-4]
   -
