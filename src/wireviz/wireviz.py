@@ -287,15 +287,13 @@ class Harness:
                 for bundle in items.values():
                     # add each wire from each bundle to the wirelist
                     for color in bundle.colors:
-                        wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designators': list(items.keys())})
+                        wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name})
         # join similar wires from all the bundles to a single BOM item
         types = Counter([(v['gauge'], v['gauge_unit'], v['color']) for v in wirelist])
         for type in types:
             items = [v for v in wirelist if (v['gauge'], v['gauge_unit'], v['color']) == type]
             shared = items[0]
-            designators = [i['designators'] for i in items]
-            # flatten nested list
-            designators = [item for sublist in designators for item in sublist] # https://stackoverflow.com/a/952952
+            designators = [i['designator'] for i in items]
             # remove duplicates
             designators = list(dict.fromkeys(designators))
             designators.sort()
