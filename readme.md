@@ -76,6 +76,13 @@ Output file:
 See the [tutorial page](tutorial/readme.md) for sample code,
 as well as the [example gallery](examples/readme.md) to see more of what WireViz can do.
 
+## Installation
+
+Install dependencies
+```
+$ pip3 install -r requirements.txt
+```
+
 ## Usage
 
 ```
