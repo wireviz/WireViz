@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from graphviz import Graph
 import os
 import sys
-from typing import Any, List
+from typing import Any, List, Optional
 import yaml
 
 if __name__ == '__main__':
@@ -340,14 +340,14 @@ class Harness:
 @dataclass
 class Connector:
     name: str
-    category: str = None
-    type: str = None
-    subtype: str = None
-    pincount: int = None
-    notes: str = None
+    category: Optional[str] = None
+    type: Optional[str] = None
+    subtype: Optional[str] = None
+    pincount: Optional[int] = None
+    notes: Optional[str] = None
     pinout: List[Any] = field(default_factory=list)
     pinnumbers: List[Any] = field(default_factory=list)
-    color: str = None
+    color: Optional[str] = None
     show_name: bool = True
     show_pincount: bool = True
     hide_disconnected_pins: bool = False
@@ -391,17 +391,17 @@ class Connector:
 @dataclass
 class Cable:
     name: str
-    category: str = None
-    type: str = None
-    gauge: float = None
-    gauge_unit: str = None
+    category: Optional[str] = None
+    type: Optional[str] = None
+    gauge: Optional[float] = None
+    gauge_unit: Optional[str] = None
     show_equiv: bool = False
     length: float = 0
-    wirecount: int = None
+    wirecount: Optional[int] = None
     shield: bool = False
-    notes: str = None
+    notes: Optional[str] = None
     colors: List[Any] = field(default_factory=list)
-    color_code: str = None
+    color_code: Optional[str] = None
     show_name: bool = True
     show_pinout: bool = False
     show_wirecount: bool = True
