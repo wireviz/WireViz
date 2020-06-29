@@ -59,27 +59,27 @@ class Harness:
                  fontname=font)
 
         # prepare ports on connectors depending on which side they will connect
-        for _, c in self.cables.items():
-            for x in c.connections:
-                if x.from_port is not None:  # connect to left
-                    self.connectors[x.from_name].ports_right = True
-                if x.to_port is not None:  # connect to right
-                    self.connectors[x.to_name].ports_left = True
+        for _, cable in self.cables.items():
+            for connection in cable.connections:
+                if connection.from_port is not None:  # connect to left
+                    self.connectors[connection.from_name].ports_right = True
+                if connection.to_port is not None:  # connect to right
+                    self.connectors[connection.to_name].ports_left = True
 
-        for k, n in self.connectors.items():
-            if n.category == 'ferrule':
-                subtype = f', {n.subtype}' if n.subtype else ''
-                color = wv_colors.translate_color(n.color, self.color_mode) if n.color else ''
-                infostring = f'{n.maintype}{subtype} {color}'
-                infostring_l = infostring if n.ports_right else ''
-                infostring_r = infostring if n.ports_left else ''
+        for key, connector in self.connectors.items():
+            if connector.category == 'ferrule':
+                subtype = f', {connector.subtype}' if connector.subtype else ''
+                color = wv_colors.translate_color(connector.color, self.color_mode) if connector.color else ''
+                infostring = f'{connector.maintype}{subtype} {color}'
+                infostring_l = infostring if connector.ports_right else ''
+                infostring_r = infostring if connector.ports_left else ''
 
                 # INFO: Leaving this one as a string.format form because f-strings do not work well with triple quotes
-                colorbar = f'<TD BGCOLOR="{wv_colors.translate_color(n.color, "HEX")}" BORDER="1" SIDES="LR" WIDTH="4"></TD>' if n.color else ''
-                dot.node(k, shape='none',
+                colorbar = f'<TD BGCOLOR="{wv_colors.translate_color(connector.color, "HEX")}" BORDER="1" SIDES="LR" WIDTH="4"></TD>' if connector.color else ''
+                dot.node(key, shape='none',
                          style='filled',
                          margin='0',
-                         orientation='0' if n.ports_left else '180',
+                         orientation='0' if connector.ports_left else '180',
                          label='''<
 
                 <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
@@ -92,52 +92,52 @@ class Harness:
                 >'''.format(infostring_l=infostring_l, infostring_r=infostring_r, colorbar=colorbar))
 
             else:  # not a ferrule
-                attributes = [n.maintype,
-                              n.subtype,
-                              f'{n.pincount}-pin' if n.show_pincount else'']
+                attributes = [connector.maintype,
+                              connector.subtype,
+                              f'{connector.pincount}-pin' if connector.show_pincount else'']
                 pinouts = [[], [], []]
-                for pinnumber, pinname in zip(n.pinnumbers, n.pinout):
-                    if n.hide_disconnected_pins and not n.visible_pins.get(pinnumber, False):
+                for pinnumber, pinname in zip(connector.pinnumbers, connector.pinout):
+                    if connector.hide_disconnected_pins and not connector.visible_pins.get(pinnumber, False):
                         continue
                     pinouts[1].append(pinname)
-                    if n.ports_left:
+                    if connector.ports_left:
                         pinouts[0].append(f'<p{pinnumber}l>{pinnumber}')
-                    if n.ports_right:
+                    if connector.ports_right:
                         pinouts[2].append(f'<p{pinnumber}r>{pinnumber}')
-                label = [n.name if n.show_name else '', attributes, pinouts, n.notes]
-                dot.node(k, label=nested(label))
+                label = [connector.name if connector.show_name else '', attributes, pinouts, connector.notes]
+                dot.node(key, label=nested(label))
 
-                if len(n.loops) > 0:
+                if len(connector.loops) > 0:
                     dot.attr('edge', color='#000000:#ffffff:#000000')
-                    if n.ports_left:
+                    if connector.ports_left:
                         loop_side = 'l'
                         loop_dir = 'w'
-                    elif n.ports_right:
+                    elif connector.ports_right:
                         loop_side = 'r'
                         loop_dir = 'e'
                     else:
                         raise Exception('No side for loops')
-                    for loop in n.loops:
+                    for loop in connector.loops:
 
                         # FIXME: Original string.format style had some unused arguments (port_to for 1st arg,
                         # port_from for 2nd arg). De we need them back?
 
-                        dot.edge(f'{n.name}:p{loop[0]}{loop_side}:{loop_dir}',
-                                 f'{n.name}:p{loop[1]}{loop_side}:{loop_dir}')
+                        dot.edge(f'{connector.name}:p{loop[0]}{loop_side}:{loop_dir}',
+                                 f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
-        for _, c in self.cables.items():
-            awg_fmt = f' ({awg_equiv(c.gauge)} AWG)' if c.gauge_unit == 'mm\u00B2' and c.show_equiv else ''
-            attributes = [f'{len(c.colors)}x' if c.show_wirecount else '',
-                          f'{c.gauge} {c.gauge_unit}{awg_fmt}' if c.gauge else '',  # TODO: show equiv
-                          '+ S' if c.shield else '',
-                          f'{c.length} m' if c.length > 0 else '']
+        for _, cable in self.cables.items():
+            awg_fmt = f' ({awg_equiv(cable.gauge)} AWG)' if cable.gauge_unit == 'mm\u00B2' and cable.show_equiv else ''
+            attributes = [f'{len(cable.colors)}x' if cable.show_wirecount else '',
+                          f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else '',  # TODO: show equiv
+                          '+ S' if cable.shield else '',
+                          f'{cable.length} m' if cable.length > 0 else '']
             attributes = list(filter(None, attributes))
 
             html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>'  # main table
 
             html = f'{html}<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
-            if c.show_name:
-                html = f'{html}<tr><td colspan="{len(attributes)}">{c.name}</td></tr>'
+            if cable.show_name:
+                html = f'{html}<tr><td colspan="{len(attributes)}">{cable.name}</td></tr>'
             html = f'{html}<tr>'  # attribute row
             for attrib in attributes:
                 html = f'{html}<td>{attrib}</td>'
@@ -148,20 +148,20 @@ class Harness:
 
             html = f'{html}<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
 
-            for i, x in enumerate(c.colors, 1):
+            for i, connection in enumerate(cable.colors, 1):
                 p = []
                 p.append(f'<!-- {i}_in -->')
-                p.append(wv_colors.translate_color(x, self.color_mode))
+                p.append(wv_colors.translate_color(connection, self.color_mode))
                 p.append(f'<!-- {i}_out -->')
                 html = f'{html}<tr>'
                 for bla in p:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
-                bgcolor = wv_colors.translate_color(x, 'hex')
+                bgcolor = wv_colors.translate_color(connection, 'hex')
                 bgcolor = bgcolor if bgcolor != '' else '#ffffff'
                 html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="w{i}"></td></tr>'
 
-            if c.shield:
+            if cable.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
                 html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer
                 html = f'{html}<tr>'
@@ -177,16 +177,16 @@ class Harness:
             html = f'{html}</table>'  # conductor table
 
             html = f'{html}</td></tr>'  # main table
-            if c.notes:
-                html = f'{html}<tr><td cellpadding="3">{c.notes}</td></tr>'  # notes table
+            if cable.notes:
+                html = f'{html}<tr><td cellpadding="3">{cable.notes}</td></tr>'  # notes table
                 html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
             html = f'{html}</table>'  # main table
 
             # connections
-            for x in c.connections:
-                if isinstance(x.via_port, int):  # check if it's an actual wire and not a shield
-                    search_color = c.colors[x.via_port - 1]
+            for connection in cable.connections:
+                if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
+                    search_color = cable.colors[connection.via_port - 1]
                     if search_color in wv_colors.color_hex:
                         dot.attr('edge', color=f'#000000:{wv_colors.color_hex[search_color]}:#000000')
                     else:  # color name not found
@@ -194,30 +194,30 @@ class Harness:
                 else:  # it's a shield connection
                     dot.attr('edge', color='#000000')
 
-                if x.from_port is not None:  # connect to left
-                    from_ferrule = self.connectors[x.from_name].category == 'ferrule'
-                    port = f':p{x.from_port}r' if not from_ferrule else ''
-                    code_left_1 = f'{x.from_name}{port}:e'
+                if connection.from_port is not None:  # connect to left
+                    from_ferrule = self.connectors[connection.from_name].category == 'ferrule'
+                    port = f':p{connection.from_port}r' if not from_ferrule else ''
+                    code_left_1 = f'{connection.from_name}{port}:e'
                     # FIXME: Uncomment, then add to end of f-string if needed
                     # via_subport = 'i' if c.show_pinout else ''
-                    code_left_2 = f'{c.name}:w{x.via_port}:w'
+                    code_left_2 = f'{cable.name}:w{connection.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
-                    from_string = f'{x.from_name}:{x.from_port}' if not from_ferrule else ''
-                    html = html.replace(f'<!-- {x.via_port}_in -->', from_string)
-                if x.to_port is not None:  # connect to right
-                    to_ferrule = self.connectors[x.to_name].category == 'ferrule'
+                    from_string = f'{connection.from_name}:{connection.from_port}' if not from_ferrule else ''
+                    html = html.replace(f'<!-- {connection.via_port}_in -->', from_string)
+                if connection.to_port is not None:  # connect to right
+                    to_ferrule = self.connectors[connection.to_name].category == 'ferrule'
 
                     # FIXME: Add in if it was supposed to be here. the add to fstring two lines down
                     # via_subport = 'o' if c.show_pinout else ''
-                    code_right_1 = f'{c.name}:w{x.via_port}:e'
-                    to_port = f':p{x.to_port}l' if not to_ferrule else ''
-                    code_right_2 = f'{x.to_name}{to_port}:w'
+                    code_right_1 = f'{cable.name}:w{connection.via_port}:e'
+                    to_port = f':p{connection.to_port}l' if not to_ferrule else ''
+                    code_right_2 = f'{connection.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
-                    to_string = f'{x.to_name}:{x.to_port}' if not to_ferrule else ''
-                    html = html.replace(f'<!-- {x.via_port}_out -->', to_string)
+                    to_string = f'{connection.to_name}:{connection.to_port}' if not to_ferrule else ''
+                    html = html.replace(f'<!-- {connection.via_port}_out -->', to_string)
 
-            dot.node(c.name, label=f'<{html}>', shape='box',
-                     style='filled,dashed' if c.category == 'bundle' else '', margin='0', fillcolor='white')
+            dot.node(cable.name, label=f'<{html}>', shape='box',
+                     style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
 
         return dot
 
@@ -518,11 +518,11 @@ def parse(yaml_input, file_out=None, generate_bom=False):
         if sec in yaml_data and type(yaml_data[sec]) == ty:
             if len(yaml_data[sec]) > 0:
                 if ty == dict:
-                    for k, o in yaml_data[sec].items():
+                    for key, o in yaml_data[sec].items():
                         if sec == 'connectors':
-                            harness.add_connector(name=k, **o)
+                            harness.add_connector(name=key, **o)
                         elif sec == 'cables':
-                            harness.add_cable(name=k, **o)
+                            harness.add_cable(name=key, **o)
                         elif sec == 'ferrules':
                             pass
             else:
@@ -535,24 +535,24 @@ def parse(yaml_input, file_out=None, generate_bom=False):
 
     # add connections
     ferrule_counter = 0
-    for con in yaml_data['connections']:
-        if len(con) == 3:  # format: connector -- cable -- connector
+    for connections in yaml_data['connections']:
+        if len(connections) == 3:  # format: connector -- cable -- connector
 
-            for c in con:
-                if len(list(c.keys())) != 1:  # check that each entry in con has only one key, which is the designator
+            for connection in connections:
+                if len(list(connection.keys())) != 1:  # check that each entry in con has only one key, which is the designator
                     raise Exception('Too many keys')
 
-            from_name = list(con[0].keys())[0]
-            via_name = list(con[1].keys())[0]
-            to_name = list(con[2].keys())[0]
+            from_name = list(connections[0].keys())[0]
+            via_name = list(connections[1].keys())[0]
+            to_name = list(connections[2].keys())[0]
 
             if not check_designators([from_name, via_name, to_name], ('connectors', 'cables', 'connectors')):
                 print([from_name, via_name, to_name])
                 raise Exception('Bad connection definition (3)')
 
-            from_pins = expand(con[0][from_name])
-            via_pins = expand(con[1][via_name])
-            to_pins = expand(con[2][to_name])
+            from_pins = expand(connections[0][from_name])
+            via_pins = expand(connections[1][via_name])
+            to_pins = expand(connections[2][to_name])
 
             if len(from_pins) != len(via_pins) or len(via_pins) != len(to_pins):
                 raise Exception('List length mismatch')
@@ -560,25 +560,25 @@ def parse(yaml_input, file_out=None, generate_bom=False):
             for (from_pin, via_pin, to_pin) in zip(from_pins, via_pins, to_pins):
                 harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
 
-        elif len(con) == 2:
+        elif len(connections) == 2:
 
-            for c in con:
-                if type(c) is dict:
-                    if len(list(c.keys())) != 1:  # check that each entry in con has only one key, which is the designator
+            for connection in connections:
+                if type(connection) is dict:
+                    if len(list(connection.keys())) != 1:  # check that each entry in con has only one key, which is the designator
                         raise Exception('Too many keys')
 
             # hack to make the format for ferrules compatible with the formats for connectors and cables
-            if type(con[0]) == str:
-                name = con[0]
-                con[0] = {}
-                con[0][name] = name
-            if type(con[1]) == str:
-                name = con[1]
-                con[1] = {}
-                con[1][name] = name
+            if type(connections[0]) == str:
+                name = connections[0]
+                connections[0] = {}
+                connections[0][name] = name
+            if type(connections[1]) == str:
+                name = connections[1]
+                connections[1] = {}
+                connections[1][name] = name
 
-            from_name = list(con[0].keys())[0]
-            to_name = list(con[1].keys())[0]
+            from_name = list(connections[0].keys())[0]
+            to_name = list(connections[1].keys())[0]
 
             con_cbl = check_designators([from_name, to_name], ('connectors', 'cables'))
             cbl_con = check_designators([from_name, to_name], ('cables', 'connectors'))
@@ -590,8 +590,8 @@ def parse(yaml_input, file_out=None, generate_bom=False):
             if not con_cbl and not cbl_con and not con_con and not fer_cbl and not cbl_fer:
                 raise Exception('Wrong designators')
 
-            from_pins = expand(con[0][from_name])
-            to_pins = expand(con[1][to_name])
+            from_pins = expand(connections[0][from_name])
+            to_pins = expand(connections[1][to_name])
 
             if con_cbl or cbl_con or con_con:
                 if len(from_pins) != len(to_pins):
@@ -604,15 +604,15 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                     else:  # cbl_con
                         harness.connect(None, None, from_name, from_pin, to_name, to_pin)
             elif con_con:
-                cocon_coname = list(con[0].keys())[0]
-                from_pins = expand(con[0][from_name])
-                to_pins = expand(con[1][to_name])
+                cocon_coname = list(connections[0].keys())[0]
+                from_pins = expand(connections[0][from_name])
+                to_pins = expand(connections[1][to_name])
 
                 for (from_pin, to_pin) in zip(from_pins, to_pins):
                     harness.loop(cocon_coname, from_pin, to_pin)
             if fer_cbl or cbl_fer:
-                from_pins = expand(con[0][from_name])
-                to_pins = expand(con[1][to_name])
+                from_pins = expand(connections[0][from_name])
+                to_pins = expand(connections[1][to_name])
 
                 if fer_cbl:
                     ferrule_name = from_name
