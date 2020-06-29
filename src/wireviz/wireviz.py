@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 
 import argparse
 from collections import Counter
@@ -73,6 +75,7 @@ class Harness:
                 infostring_r = infostring if n.ports_left else ''
 
                 # INFO: Leaving this one as a string.format form because f-strings do not work well with triple quotes
+                colorbar = f'<TD BGCOLOR="{wv_colors.translate_color(n.color, "HEX")}" BORDER="1" SIDES="LR" WIDTH="4"></TD>' if n.color else ''
                 dot.node(k, shape='none',
                          style='filled',
                          margin='0',
@@ -86,9 +89,7 @@ class Harness:
                 </TR></TABLE>
 
 
-                >'''.format(infostring_l=infostring_l,
-                                infostring_r=infostring_r,
-                                colorbar=f'<TD BGCOLOR="{wv_colors.translate_color(n.color, "HEX")}" BORDER="1" SIDES="LR" WIDTH="4"></TD>' if n.color else ''))
+                >'''.format(infostring_l=infostring_l, infostring_r=infostring_r, colorbar=colorbar))
 
             else:  # not a ferrule
                 attributes = [n.type,
@@ -124,7 +125,7 @@ class Harness:
                         dot.edge(f'{n.name}:p{loop[0]}{loop_side}:{loop_dir}',
                                  f'{n.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
-        for k, c in self.cables.items():
+        for _, c in self.cables.items():
             awg_fmt = f' ({awg_equiv(c.gauge)} AWG)' if c.gauge_unit == 'mm\u00B2' and c.show_equiv else ''
             attributes = [f'{len(c.colors)}x' if c.show_wirecount else '',
                           f'{c.gauge} {c.gauge_unit}{awg_fmt}' if c.gauge else '',  # TODO: show equiv
@@ -207,9 +208,9 @@ class Harness:
                     to_ferrule = self.connectors[x.to_name].category == 'ferrule'
 
                     # FIXME: Add in if it was supposed to be here. the add to fstring two lines down
-                    #via_subport = 'o' if c.show_pinout else ''
+                    # via_subport = 'o' if c.show_pinout else ''
                     code_right_1 = f'{c.name}:w{x.via_port}:e'
-                    to_port = f":p{x.to_port}l" if not to_ferrule else ""
+                    to_port = f':p{x.to_port}l' if not to_ferrule else ''
                     code_right_2 = f'{x.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
                     to_string = f'{x.to_name}:{x.to_port}' if not to_ferrule else ''
@@ -481,7 +482,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
         # if str is of the format '#-#', it is treated as a range (inclusive) and expanded
         output = []
         if not isinstance(yaml_data, list):
-            yaml_data = [yaml_data, ]
+            yaml_data = [yaml_data]
         for e in yaml_data:
             e = str(e)
             if '-' in e:  # list of pins
@@ -653,7 +654,7 @@ def parse_file(yaml_file, file_out=None, generate_bom=False):
 
 def parse_cmdline():
     parser = argparse.ArgumentParser(
-        description='Generate cable and wiring harness documentation from YAML descriptions'
+        description='Generate cable and wiring harness documentation from YAML descriptions',
     )
 
     parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
