@@ -4,7 +4,7 @@ graph {
 	graph [bgcolor=white fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor=white fontname=arial shape=record style=filled]
 	edge [fontname=arial style=bold]
-	Key [label="Key|{Phone Connector|male 3.5|3-pin}|{{Dot|Dash|Ground}|{<pTr>T|<pRr>R|<pSr>S}}"]
+	Key [label="Key|{Phone Connector|male 3.5}|{{Dot|Dash|Ground}|{<pTr>T|<pRr>R|<pSr>S}}"]
 	edge [color="#000000:#ffffff:#000000"]
 	Key:pSr:e -- W1:w1:w
 	edge [color="#000000:#666600:#000000"]
