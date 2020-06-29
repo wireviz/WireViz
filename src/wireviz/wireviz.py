@@ -70,7 +70,7 @@ class Harness:
             if n.category == 'ferrule':
                 subtype = f', {n.subtype}' if n.subtype else ''
                 color = wv_colors.translate_color(n.color, self.color_mode) if n.color else ''
-                infostring = f'{n.type}{subtype} {color}'
+                infostring = f'{n.maintype}{subtype} {color}'
                 infostring_l = infostring if n.ports_right else ''
                 infostring_r = infostring if n.ports_left else ''
 
@@ -92,7 +92,7 @@ class Harness:
                 >'''.format(infostring_l=infostring_l, infostring_r=infostring_r, colorbar=colorbar))
 
             else:  # not a ferrule
-                attributes = [n.type,
+                attributes = [n.maintype,
                               n.subtype,
                               f'{n.pincount}-pin' if n.show_pincount else'']
                 pinouts = [[], [], []]
@@ -263,13 +263,13 @@ class Harness:
         bom_connectors = []
         bom_cables = []
         # connectors
-        types = Counter([(v.type, v.subtype, v.pincount) for v in self.connectors.values()])
-        for type in types:
-            items = {k: v for k, v in self.connectors.items() if (v.type, v.subtype, v.pincount) == type}
+        types = Counter([(v.maintype, v.subtype, v.pincount) for v in self.connectors.values()])
+        for maintype in types:
+            items = {k: v for k, v in self.connectors.items() if (v.maintype, v.subtype, v.pincount) == maintype}
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
-            conn_type = f', {shared.type}' if shared.type else ''
+            conn_type = f', {shared.maintype}' if shared.maintype else ''
             conn_subtype = f', {shared.subtype}' if shared.subtype else ''
             conn_pincount = f', {shared.pincount} pins' if shared.category != 'ferrule' else ''
             conn_color = f', {shared.color}' if shared.color else ''
@@ -281,9 +281,9 @@ class Harness:
         bom.extend(bom_connectors)
         # cables
         types = Counter([(v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
-        for type in types:
+        for maintype in types:
             items = {k: v for k, v in self.cables.items() if (
-                v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) == type}
+                v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) == maintype}
             shared = next(iter(items.values()))
             if shared.category != 'bundle':
                 designators = list(items.keys())
@@ -298,8 +298,8 @@ class Harness:
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
         types = Counter([(v.category, v.gauge, v.gauge_unit, v.length) for v in self.cables.values()])
-        for type in types:
-            items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.length) == type}
+        for maintype in types:
+            items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.length) == maintype}
             shared = next(iter(items.values()))
             # filter out cables that are not bundles
             if shared.category == 'bundle':
@@ -310,8 +310,8 @@ class Harness:
                                          'length': shared.length, 'color': color, 'designator': bundle.name})
         # join similar wires from all the bundles to a single BOM item
         types = Counter([(v['gauge'], v['gauge_unit'], v['color']) for v in wirelist])
-        for type in types:
-            items = [v for v in wirelist if (v['gauge'], v['gauge_unit'], v['color']) == type]
+        for maintype in types:
+            items = [v for v in wirelist if (v['gauge'], v['gauge_unit'], v['color']) == maintype]
             shared = items[0]
             designators = [i['designator'] for i in items]
             # remove duplicates
@@ -345,7 +345,7 @@ class Harness:
 class Connector:
     name: str
     category: Optional[str] = None
-    type: Optional[str] = None
+    maintype: Optional[str] = None
     subtype: Optional[str] = None
     pincount: Optional[int] = None
     notes: Optional[str] = None
@@ -396,7 +396,7 @@ class Connector:
 class Cable:
     name: str
     category: Optional[str] = None
-    type: Optional[str] = None
+    maintype: Optional[str] = None
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
     show_equiv: bool = False
