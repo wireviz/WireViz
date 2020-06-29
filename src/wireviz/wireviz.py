@@ -661,9 +661,7 @@ def parse_cmdline():
 
     parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
 
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
 
 
 def main():
