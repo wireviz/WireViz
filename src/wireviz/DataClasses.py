@@ -83,7 +83,12 @@ class Cable:
             except Exception:
                 raise Exception('Gauge must be a number, or number and unit separated by a space')
             self.gauge = g
-            self.gauge_unit = u.replace('mm2', 'mm\u00B2')
+
+            if u.upper() == 'AWG':
+                self.gauge_unit = u.upper()
+            else:
+                self.gauge_unit = u.replace('mm2', 'mm\u00B2')
+
         elif self.gauge is not None:  # gauge specified, assume mm2
             if self.gauge_unit is None:
                 self.gauge_unit = 'mm\u00B2'
