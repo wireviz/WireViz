@@ -6,6 +6,7 @@ connectors:
     subtype: male 3.5
     pinnumbers: [T, R, S]
     pinout: [Dot, Dash, Ground]
+    show_pincount: false
 
 cables:
   W1:
