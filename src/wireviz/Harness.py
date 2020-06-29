@@ -114,13 +114,15 @@ class Harness:
 
         for _, cable in self.cables.items():
 
+            awg_fmt = ''
             if cable.show_equiv:
+                # Only convert units we actually know about, i.e. currently
+                # mm2 and awg --- other units _are_ technically allowed,
+                # and passed through as-is.
                 if cable.gauge_unit =='mm\u00B2':
                     awg_fmt = f' ({awg_equiv(cable.gauge)} AWG)'
-                else:
+                elif cable.gauge_unit.upper() == 'AWG':
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
-            else:
-                awg_fmt = ''
 
             attributes = [f'{len(cable.colors)}x' if cable.show_wirecount else '',
                           f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else '',
