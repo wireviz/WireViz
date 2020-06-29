@@ -17,7 +17,7 @@ WireViz is a tool for easily documenting cables, wiring harnesses and connector 
   * [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100) (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
   * [IEC 62](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
 * Understands wire gauge in mm² or AWG
-  * Optionally auto-calculates and displays AWG equivalent when specifying mm²
+  * Optionally auto-calculates equivalent gauge between mm² and AWG
 * Allows more than one connector per side, as well as loopbacks
 * Allows for easy-autorouting for 1-to-1 wiring
 * Generates BOM (Bill of Materials)
