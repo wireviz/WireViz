@@ -411,7 +411,7 @@ class Cable:
         if isinstance(self.gauge, str):  # gauge and unit specified
             try:
                 g, u = self.gauge.split(' ')
-            except:
+            except Exception:
                 raise Exception('Gauge must be a number, or number and unit separated by a space')
             self.gauge = g
             self.gauge_unit = u.replace('mm2', 'mm\u00B2')
@@ -494,7 +494,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
             else:
                 try:
                     x = int(e)
-                except:
+                except Exception:
                     x = e
                 output.append(x)
         return output
