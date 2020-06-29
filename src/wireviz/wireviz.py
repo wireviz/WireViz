@@ -66,9 +66,9 @@ class Harness:
 
         for k, n in self.connectors.items():
             if n.category == 'ferrule':
-                infostring = '{type}{subtype} {color}'.format(type=n.type,
-                                                              subtype=', {}'.format(n.subtype) if n.subtype else '',
-                                                              color=wv_colors.translate_color(n.color, self.color_mode) if n.color else '')
+                subtype = f', {n.subtype}' if n.subtype else ''
+                color = wv_colors.translate_color(n.color, self.color_mode) if n.color else ''
+                infostring = f'{n.type}{subtype} {color}'
                 infostring_l = infostring if n.ports_right else ''
                 infostring_r = infostring if n.ports_left else ''
 
@@ -93,7 +93,7 @@ class Harness:
                 # a = attributes
                 attributes = [n.type,
                      n.subtype,
-                     '{}-pin'.format(n.pincount) if n.show_pincount else '']
+                     f'{n.pincount}-pin' if n.show_pincount else'']
                 # p = pinout
                 pinouts = [[], [], []]
                 for pinnumber, pinname in zip(n.pinnumbers, n.pinout):
@@ -101,9 +101,9 @@ class Harness:
                         continue
                     pinouts[1].append(pinname)
                     if n.ports_left:
-                        pinouts[0].append('<p{portno}l>{portno}'.format(portno=pinnumber))
+                        pinouts[0].append(f'<p{pinnumber}l>{pinnumber}')
                     if n.ports_right:
-                        pinouts[2].append('<p{portno}r>{portno}'.format(portno=pinnumber))
+                        pinouts[2].append(f'<p{pinnumber}r>{pinnumber}')
                 # l = label
                 label = [n.name if n.show_name else '', attributes, pinouts, n.notes]
                 dot.node(k, label=nested(label))
@@ -128,17 +128,17 @@ class Harness:
                  '{} {}{}'.format(c.gauge, c.gauge_unit, ' ({} AWG)'.format(awg_equiv(c.gauge)) if c.gauge_unit ==
                                   'mm\u00B2' and c.show_equiv else '') if c.gauge else '',  # TODO: show equiv
                  '+ S' if c.shield else '',
-                 '{} m'.format(c.length) if c.length > 0 else '']
+                 f'{c.length} m' if c.length > 0 else '']
             attributes = list(filter(None, attributes))
 
             html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>'  # main table
 
             html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
             if c.show_name:
-                html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(attributes), name=c.name)
+                html = f'{html}<tr><td colspan="{len(attributes)}">{c.name}</td></tr>'
             html = html + '<tr>'  # attribute row
             for attrib in attributes:
-                html = html + '<td>{attrib}</td>'.format(attrib=attrib)
+                html = f'{html}<td>{attrib}</td>'
             html = html + '</tr>'  # attribute row
             html = html + '</table></td></tr>'  # name+attributes table
 
@@ -148,23 +148,23 @@ class Harness:
 
             for i, x in enumerate(c.colors, 1):
                 p = []
-                p.append('<!-- {}_in -->'.format(i))
+                p.append(f'<!-- {i}_in -->')
                 p.append(wv_colors.translate_color(x, self.color_mode))
-                p.append('<!-- {}_out -->'.format(i))
-                html = html + '<tr>'
+                p.append(f'<!-- {i}_out -->')
+                html = f'{html}<tr>'
                 for bla in p:
-                    html = html + '<td>{}</td>'.format(bla)
-                html = html + '</tr>'
+                    html = f'{html}<td>{bla}</td>'
+                html = f'{html}</tr>'
                 bgcolor = wv_colors.translate_color(x, 'hex')
                 html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(
-                    colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port='w{}'.format(i))
+                    colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port=f'w{i}')
 
             if c.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
-                html = html + '<tr><td>&nbsp;</td></tr>'  # spacer
-                html = html + '<tr>'
+                html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer
+                html = f'{html}<tr>'
                 for bla in p:
-                    html = html + '<td>{}</td>'.format(bla)
+                    html = html + f'<td>{bla}</td>'
                 html = html + '</tr>'
                 html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" border="2" sides="b" port="{port}"></td></tr>'.format(
                     colspan=len(p), bgcolor=wv_colors.translate_color(x, 'hex'), port='ws')
@@ -175,7 +175,7 @@ class Harness:
 
             html = html + '</td></tr>'  # main table
             if c.notes:
-                html = html + '<tr><td cellpadding="3">{}</td></tr>'.format(c.notes)  # notes table
+                html = html + f'<tr><td cellpadding="3">{c.notes}</td></tr>'  # notes table
                 html = html + '<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
             html = html + '</table>'  # main table
@@ -195,23 +195,23 @@ class Harness:
                 if x.from_port is not None:  # connect to left
                     from_ferrule = self.connectors[x.from_name].category == 'ferrule'
                     code_left_1 = '{from_name}{from_port}:e'.format(
-                        from_name=x.from_name, from_port=':p{}r'.format(x.from_port) if not from_ferrule else '')
+                        from_name=x.from_name, from_port=f':p{x.from_port}r' if not from_ferrule else '')
                     code_left_2 = '{via_name}:w{via_wire}:w'.format(
                         via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else '')
                     dot.edge(code_left_1, code_left_2)
-                    from_string = '{}:{}'.format(x.from_name, x.from_port) if not from_ferrule else ''
-                    html = html.replace('<!-- {}_in -->'.format(x.via_port), from_string)
+                    from_string = f'{x.from_name}:{x.from_port}' if not from_ferrule else ''
+                    html = html.replace(f'<!-- {x.via_port}_in -->', from_string)
                 if x.to_port is not None:  # connect to right
                     to_ferrule = self.connectors[x.to_name].category == 'ferrule'
                     code_right_1 = '{via_name}:w{via_wire}:e'.format(
                         via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else '')
                     code_right_2 = '{to_name}{to_port}:w'.format(
-                        to_name=x.to_name, to_port=':p{}l'.format(x.to_port) if not to_ferrule else '')
+                        to_name=x.to_name, to_port=f':p{x.to_port}l' if not to_ferrule else '')
                     dot.edge(code_right_1, code_right_2)
-                    to_string = '{}:{}'.format(x.to_name, x.to_port) if not to_ferrule else ''
-                    html = html.replace('<!-- {}_out -->'.format(x.via_port), to_string)
+                    to_string = f'{x.to_name}:{x.to_port}' if not to_ferrule else ''
+                    html = html.replace(f'<!-- {x.via_port}_out -->', to_string)
 
-            dot.node(c.name, label='<{html}>'.format(html=html), shape='box',
+            dot.node(c.name, label=f'<{html}>', shape='box',
                      style='filled,dashed' if c.category == 'bundle' else '', margin='0', fillcolor='white')
 
         return dot
@@ -222,17 +222,17 @@ class Harness:
         for f in format:
             digraph.format = f
             digraph.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
-        digraph.save(filename='{}.gv'.format(filename), directory=directory)
+        digraph.save(filename=f'{filename}.gv', directory=directory)
         # bom output
         bom_list = self.bom_list()
-        with open('{}.bom.tsv'.format(filename), 'w') as file:
+        with open(f'{filename}.bom.tsv', 'w') as file:
             file.write(tuplelist2tsv(bom_list))
         # HTML output
-        with open('{}.html'.format(filename), 'w') as file:
+        with open(f'{filename}.html', 'w') as file:
             file.write('<html><body style="font-family:Arial">')
 
             file.write('<h1>Diagram</h1>')
-            with open('{}.svg'.format(filename), 'r') as svg:
+            with open(f'{filename}.svg') as svg:
                 for svgLine in svg:
                     file.write(svgLine)
 
@@ -241,7 +241,7 @@ class Harness:
             file.write('<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">')
             file.write('<tr>')
             for item in listy[0]:
-                file.write('<th align="left" style="border:1px solid #000000; padding: 8px">{}</th>'.format(item))
+                file.write(f'<th align="left" style="border:1px solid #000000; padding: 8px">{item}</th>')
             file.write('</tr>')
             for row in listy[1:]:
                 file.write('<tr>')
@@ -264,12 +264,12 @@ class Harness:
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
-            name = 'Connector{type}{subtype}{pincount}{color}'.format(type=', {}'.format(shared.type) if shared.type else '',
+            name = 'Connector{type}{subtype}{pincount}{color}'.format(type=f', {shared.type}' if shared.type else '',
                                                                       subtype=', {}'.format(
                                                                           shared.subtype) if shared.subtype else '',
                                                                       pincount=', {} pins'.format(
                                                                           shared.pincount) if shared.category != 'ferrule' else '',
-                                                                      color=', {}'.format(shared.color) if shared.color else '')
+                                                                      color=f', {shared.color}' if shared.color else '')
             item = {'item': name, 'qty': len(designators), 'unit': '',
                     'designators': designators if shared.category != 'ferrule' else ''}
             bom_connectors.append(item)
@@ -622,7 +622,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                 ferrule_params = yaml_data['ferrules'][ferrule_name]
                 for cable_pin in cable_pins:
                     ferrule_counter = ferrule_counter + 1
-                    ferrule_id = '_F{}'.format(ferrule_counter)
+                    ferrule_id = f'_F{ferrule_counter}'
                     harness.add_connector(ferrule_id, category='ferrule', **ferrule_params)
 
                     if fer_cbl:
@@ -669,7 +669,7 @@ def main():
     args = parse_cmdline()
 
     if not os.path.exists(args.input_file):
-        print('Error: input file {} inaccessible or does not exist, check path'.format(args.input_file))
+        print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
     with open(args.input_file) as fh:
@@ -677,7 +677,7 @@ def main():
 
     if args.prepend_file:
         if not os.path.exists(args.prepend_file):
-            print('Error: prepend input file {} inaccessible or does not exist, check path'.format(args.prepend_file))
+            print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
             sys.exit(1)
         with open(args.prepend_file) as fh:
             prepend = fh.read()
