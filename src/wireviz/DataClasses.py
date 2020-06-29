@@ -10,7 +10,7 @@ from wireviz import wv_colors
 class Connector:
     name: str
     category: Optional[str] = None
-    maintype: Optional[str] = None
+    type: Optional[str] = None
     subtype: Optional[str] = None
     pincount: Optional[int] = None
     notes: Optional[str] = None
@@ -61,7 +61,7 @@ class Connector:
 class Cable:
     name: str
     category: Optional[str] = None
-    maintype: Optional[str] = None
+    type: Optional[str] = None
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
     show_equiv: bool = False

@@ -61,7 +61,7 @@ class Harness:
             if connector.category == 'ferrule':
                 subtype = f', {connector.subtype}' if connector.subtype else ''
                 color = wv_colors.translate_color(connector.color, self.color_mode) if connector.color else ''
-                infostring = f'{connector.maintype}{subtype} {color}'
+                infostring = f'{connector.type}{subtype} {color}'
                 infostring_l = infostring if connector.ports_right else ''
                 infostring_r = infostring if connector.ports_left else ''
 
@@ -83,7 +83,7 @@ class Harness:
                 >'''.format(infostring_l=infostring_l, infostring_r=infostring_r, colorbar=colorbar))
 
             else:  # not a ferrule
-                attributes = [connector.maintype,
+                attributes = [connector.type,
                               connector.subtype,
                               f'{connector.pincount}-pin' if connector.show_pincount else'']
                 pinouts = [[], [], []]
@@ -215,7 +215,7 @@ class Harness:
     def output(self, filename, directory='_output', view=False, cleanup=True, fmt='pdf', gen_bom=False):
         # graphical output
         digraph = self.create_graph()
-        for f in format:
+        for f in fmt:
             digraph.format = f
             digraph.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
         digraph.save(filename=f'{filename}.gv', directory=directory)
@@ -254,13 +254,13 @@ class Harness:
         bom_connectors = []
         bom_cables = []
         # connectors
-        types = Counter([(v.maintype, v.subtype, v.pincount) for v in self.connectors.values()])
+        types = Counter([(v.type, v.subtype, v.pincount) for v in self.connectors.values()])
         for maintype in types:
-            items = {k: v for k, v in self.connectors.items() if (v.maintype, v.subtype, v.pincount) == maintype}
+            items = {k: v for k, v in self.connectors.items() if (v.type, v.subtype, v.pincount) == maintype}
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
-            conn_type = f', {shared.maintype}' if shared.maintype else ''
+            conn_type = f', {shared.type}' if shared.type else ''
             conn_subtype = f', {shared.subtype}' if shared.subtype else ''
             conn_pincount = f', {shared.pincount} pins' if shared.category != 'ferrule' else ''
             conn_color = f', {shared.color}' if shared.color else ''
