@@ -4,7 +4,7 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, tuplelist2tsv, nested, flatten2d
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d
 from collections import Counter
 from typing import List
 
@@ -113,9 +113,17 @@ class Harness:
                                  f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
         for _, cable in self.cables.items():
-            awg_fmt = f' ({awg_equiv(cable.gauge)} AWG)' if cable.gauge_unit == 'mm\u00B2' and cable.show_equiv else ''
+
+            if cable.show_equiv:
+                if cable.gauge_unit =='mm\u00B2':
+                    awg_fmt = f' ({awg_equiv(cable.gauge)} AWG)'
+                else:
+                    awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
+            else:
+                awg_fmt = ''
+
             attributes = [f'{len(cable.colors)}x' if cable.show_wirecount else '',
-                          f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else '',  # TODO: show equiv
+                          f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else '',
                           '+ S' if cable.shield else '',
                           f'{cable.length} m' if cable.length > 0 else '']
             attributes = list(filter(None, attributes))
