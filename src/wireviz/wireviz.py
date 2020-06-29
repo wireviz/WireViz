@@ -72,6 +72,7 @@ class Harness:
                 infostring_l = infostring if n.ports_right else ''
                 infostring_r = infostring if n.ports_left else ''
 
+                # INFO: Leaving this one as a string.format form because f-strings do not work well with triple quotes
                 dot.node(k, shape='none',
                          style='filled',
                          margin='0',
@@ -87,14 +88,12 @@ class Harness:
 
                 >'''.format(infostring_l=infostring_l,
                                 infostring_r=infostring_r,
-                                colorbar='<TD BGCOLOR="{}" BORDER="1" SIDES="LR" WIDTH="4"></TD>'.format(wv_colors.translate_color(n.color, 'HEX')) if n.color else ''))
+                                colorbar=f'<TD BGCOLOR="{wv_colors.translate_color(n.color, "HEX")}" BORDER="1" SIDES="LR" WIDTH="4"></TD>' if n.color else ''))
 
             else:  # not a ferrule
-                # a = attributes
                 attributes = [n.type,
-                     n.subtype,
-                     f'{n.pincount}-pin' if n.show_pincount else'']
-                # p = pinout
+                              n.subtype,
+                              f'{n.pincount}-pin' if n.show_pincount else'']
                 pinouts = [[], [], []]
                 for pinnumber, pinname in zip(n.pinnumbers, n.pinout):
                     if n.hide_disconnected_pins and not n.visible_pins.get(pinnumber, False):
@@ -104,7 +103,6 @@ class Harness:
                         pinouts[0].append(f'<p{pinnumber}l>{pinnumber}')
                     if n.ports_right:
                         pinouts[2].append(f'<p{pinnumber}r>{pinnumber}')
-                # l = label
                 label = [n.name if n.show_name else '', attributes, pinouts, n.notes]
                 dot.node(k, label=nested(label))
 
@@ -119,32 +117,35 @@ class Harness:
                     else:
                         raise Exception('No side for loops')
                     for loop in n.loops:
-                        dot.edge('{name}:p{port_from}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir),
-                                 '{name}:p{port_to}{loop_side}:{loop_dir}'.format(name=n.name, port_from=loop[0], port_to=loop[1], loop_side=loop_side, loop_dir=loop_dir))
+
+                        # FIXME: Original string.format style had some unused arguments (port_to for 1st arg,
+                        # port_from for 2nd arg). De we need them back?
+
+                        dot.edge(f'{n.name}:p{loop[0]}{loop_side}:{loop_dir}',
+                                 f'{n.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
         for k, c in self.cables.items():
-            # a = attributes
-            attributes = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
-                 '{} {}{}'.format(c.gauge, c.gauge_unit, ' ({} AWG)'.format(awg_equiv(c.gauge)) if c.gauge_unit ==
-                                  'mm\u00B2' and c.show_equiv else '') if c.gauge else '',  # TODO: show equiv
-                 '+ S' if c.shield else '',
-                 f'{c.length} m' if c.length > 0 else '']
+            awg_fmt = f' ({awg_equiv(c.gauge)} AWG)' if c.gauge_unit == 'mm\u00B2' and c.show_equiv else ''
+            attributes = [f'{len(c.colors)}x' if c.show_wirecount else '',
+                          f'{c.gauge} {c.gauge_unit}{awg_fmt}' if c.gauge else '',  # TODO: show equiv
+                          '+ S' if c.shield else '',
+                          f'{c.length} m' if c.length > 0 else '']
             attributes = list(filter(None, attributes))
 
             html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>'  # main table
 
-            html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
+            html = f'{html}<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
             if c.show_name:
                 html = f'{html}<tr><td colspan="{len(attributes)}">{c.name}</td></tr>'
-            html = html + '<tr>'  # attribute row
+            html = f'{html}<tr>'  # attribute row
             for attrib in attributes:
                 html = f'{html}<td>{attrib}</td>'
-            html = html + '</tr>'  # attribute row
-            html = html + '</table></td></tr>'  # name+attributes table
+            html = f'{html}</tr>'  # attribute row
+            html = f'{html}</table></td></tr>'  # name+attributes table
 
-            html = html + '<tr><td>&nbsp;</td></tr>'  # spacer between attributes and wires
+            html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer between attributes and wires
 
-            html = html + '<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
+            html = f'{html}<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
 
             for i, x in enumerate(c.colors, 1):
                 p = []
@@ -156,8 +157,8 @@ class Harness:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
                 bgcolor = wv_colors.translate_color(x, 'hex')
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="{port}"></td></tr>'.format(
-                    colspan=len(p), bgcolor=bgcolor if bgcolor != '' else '#ffffff', port=f'w{i}')
+                bgcolor = bgcolor if bgcolor != '' else '#ffffff'
+                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="w{i}"></td></tr>'
 
             if c.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
@@ -165,28 +166,28 @@ class Harness:
                 html = f'{html}<tr>'
                 for bla in p:
                     html = html + f'<td>{bla}</td>'
-                html = html + '</tr>'
-                html = html + '<tr><td colspan="{colspan}" cellpadding="0" height="6" border="2" sides="b" port="{port}"></td></tr>'.format(
-                    colspan=len(p), bgcolor=wv_colors.translate_color(x, 'hex'), port='ws')
+                html = f'{html}</tr>'
 
-            html = html + '<tr><td>&nbsp;</td></tr>'  # spacer at the end
+                # FIXME, original string.format had a unused bgcolor argument. Do we need it back
+                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" border="2" sides="b" port="ws"></td></tr>'
 
-            html = html + '</table>'  # conductor table
+            html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
-            html = html + '</td></tr>'  # main table
+            html = f'{html}</table>'  # conductor table
+
+            html = f'{html}</td></tr>'  # main table
             if c.notes:
-                html = html + f'<tr><td cellpadding="3">{c.notes}</td></tr>'  # notes table
-                html = html + '<tr><td>&nbsp;</td></tr>'  # spacer at the end
+                html = f'{html}<tr><td cellpadding="3">{c.notes}</td></tr>'  # notes table
+                html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
-            html = html + '</table>'  # main table
+            html = f'{html}</table>'  # main table
 
             # connections
             for x in c.connections:
                 if isinstance(x.via_port, int):  # check if it's an actual wire and not a shield
                     search_color = c.colors[x.via_port - 1]
                     if search_color in wv_colors.color_hex:
-                        dot.attr('edge', color='#000000:{wire_color}:#000000'.format(
-                            wire_color=wv_colors.color_hex[search_color]))
+                        dot.attr('edge', color=f'#000000:{wv_colors.color_hex[search_color]}:#000000')
                     else:  # color name not found
                         dot.attr('edge', color='#000000:#ffffff:#000000')
                 else:  # it's a shield connection
@@ -194,19 +195,22 @@ class Harness:
 
                 if x.from_port is not None:  # connect to left
                     from_ferrule = self.connectors[x.from_name].category == 'ferrule'
-                    code_left_1 = '{from_name}{from_port}:e'.format(
-                        from_name=x.from_name, from_port=f':p{x.from_port}r' if not from_ferrule else '')
-                    code_left_2 = '{via_name}:w{via_wire}:w'.format(
-                        via_name=c.name, via_wire=x.via_port, via_subport='i' if c.show_pinout else '')
+                    port = f':p{x.from_port}r' if not from_ferrule else ''
+                    code_left_1 = f'{x.from_name}{port}:e'
+                    # FIXME: Uncomment, then add to end of f-string if needed
+                    # via_subport = 'i' if c.show_pinout else ''
+                    code_left_2 = f'{c.name}:w{x.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
                     from_string = f'{x.from_name}:{x.from_port}' if not from_ferrule else ''
                     html = html.replace(f'<!-- {x.via_port}_in -->', from_string)
                 if x.to_port is not None:  # connect to right
                     to_ferrule = self.connectors[x.to_name].category == 'ferrule'
-                    code_right_1 = '{via_name}:w{via_wire}:e'.format(
-                        via_name=c.name, via_wire=x.via_port, via_subport='o' if c.show_pinout else '')
-                    code_right_2 = '{to_name}{to_port}:w'.format(
-                        to_name=x.to_name, to_port=f':p{x.to_port}l' if not to_ferrule else '')
+
+                    # FIXME: Add in if it was supposed to be here. the add to fstring two lines down
+                    #via_subport = 'o' if c.show_pinout else ''
+                    code_right_1 = f'{c.name}:w{x.via_port}:e'
+                    to_port = f":p{x.to_port}l" if not to_ferrule else ""
+                    code_right_2 = f'{x.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
                     to_string = f'{x.to_name}:{x.to_port}' if not to_ferrule else ''
                     html = html.replace(f'<!-- {x.via_port}_out -->', to_string)
@@ -246,8 +250,8 @@ class Harness:
             for row in listy[1:]:
                 file.write('<tr>')
                 for i, item in enumerate(row):
-                    file.write('<td {align} style="border:1px solid #000000; padding: 4px">{content}</td>'.format(
-                        content=item, align='align="right"' if listy[0][i] == 'Qty' else ''))
+                    align = 'align="right"' if listy[0][i] == 'Qty' else ''
+                    file.write(f'<td {align} style="border:1px solid #000000; padding: 4px"><{item}</td>')
                 file.write('</tr>')
             file.write('</table>')
 
@@ -264,12 +268,11 @@ class Harness:
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
-            name = 'Connector{type}{subtype}{pincount}{color}'.format(type=f', {shared.type}' if shared.type else '',
-                                                                      subtype=', {}'.format(
-                                                                          shared.subtype) if shared.subtype else '',
-                                                                      pincount=', {} pins'.format(
-                                                                          shared.pincount) if shared.category != 'ferrule' else '',
-                                                                      color=f', {shared.color}' if shared.color else '')
+            conn_type = f', {shared.type}' if shared.type else ''
+            conn_subtype = f', {shared.subtype}' if shared.subtype else ''
+            conn_pincount = f', {shared.pincount} pins' if shared.category != 'ferrule' else ''
+            conn_color = f', {shared.color}' if shared.color else ''
+            name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
             item = {'item': name, 'qty': len(designators), 'unit': '',
                     'designators': designators if shared.category != 'ferrule' else ''}
             bom_connectors.append(item)
@@ -285,10 +288,9 @@ class Harness:
                 designators = list(items.keys())
                 designators.sort()
                 total_length = sum(i.length for i in items.values())
-                name = 'Cable, {wirecount}{gauge}{shield}'.format(wirecount=shared.wirecount,
-                                                                  gauge=' x {} {}'.format(
-                                                                      shared.gauge, shared.gauge_unit) if shared.gauge else ' wires',
-                                                                  shield=' shielded' if shared.shield else '')
+                gauge_name = f' x {shared.gauge} {shared.gauge_unit}'if shared.gauge else ' wires'
+                shield_name = ' shielded' if shared.shield else ''
+                name = f'Cable, {shared.wirecount}{gauge_name}{shield_name}'
                 item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
                 bom_cables.append(item)
         # bundles (ignores wirecount)
@@ -315,8 +317,9 @@ class Harness:
             designators = list(dict.fromkeys(designators))
             designators.sort()
             total_length = sum(i['length'] for i in items)
-            name = 'Wire{gauge}{color}'.format(gauge=', {} {}'.format(shared['gauge'], shared['gauge_unit']) if shared['gauge'] else '',
-                                               color=', {}'.format(shared['color']) if shared['color'] != '' else '')
+            gauge_name = f', {shared["gauge"]} {shared["gauge_unit"]}' if shared['gauge'] else ''
+            gauge_color = f', {shared["color"]}' if shared['color'] != '' else ''
+            name = f'Wire{gauge_name}{gauge_color}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
             bom_cables.append(item)
             bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
