@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 from typing import Optional, List, Any
 from dataclasses import dataclass, field
 from wireviz.wv_helper import int2tuple
@@ -72,7 +73,6 @@ class Cable:
     colors: List[Any] = field(default_factory=list)
     color_code: Optional[str] = None
     show_name: bool = True
-    show_pinout: bool = False
     show_wirecount: bool = True
 
     def __post_init__(self):

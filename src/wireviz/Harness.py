@@ -109,10 +109,6 @@ class Harness:
                     else:
                         raise Exception('No side for loops')
                     for loop in connector.loops:
-
-                        # FIXME: Original string.format style had some unused arguments (port_to for 1st arg,
-                        # port_from for 2nd arg). De we need them back?
-
                         dot.edge(f'{connector.name}:p{loop[0]}{loop_side}:{loop_dir}',
                                  f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
@@ -159,8 +155,6 @@ class Harness:
                 for bla in p:
                     html = html + f'<td>{bla}</td>'
                 html = f'{html}</tr>'
-
-                # FIXME, original string.format had a unused bgcolor argument. Do we need it back
                 html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" border="2" sides="b" port="ws"></td></tr>'
 
             html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
@@ -189,17 +183,12 @@ class Harness:
                     from_ferrule = self.connectors[connection.from_name].category == 'ferrule'
                     port = f':p{connection.from_port}r' if not from_ferrule else ''
                     code_left_1 = f'{connection.from_name}{port}:e'
-                    # FIXME: Uncomment, then add to end of f-string if needed
-                    # via_subport = 'i' if c.show_pinout else ''
                     code_left_2 = f'{cable.name}:w{connection.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
                     from_string = f'{connection.from_name}:{connection.from_port}' if not from_ferrule else ''
                     html = html.replace(f'<!-- {connection.via_port}_in -->', from_string)
                 if connection.to_port is not None:  # connect to right
                     to_ferrule = self.connectors[connection.to_name].category == 'ferrule'
-
-                    # FIXME: Add in if it was supposed to be here. the add to fstring two lines down
-                    # via_subport = 'o' if c.show_pinout else ''
                     code_right_1 = f'{cable.name}:w{connection.via_port}:e'
                     to_port = f':p{connection.to_port}l' if not to_ferrule else ''
                     code_right_2 = f'{connection.to_name}{to_port}:w'
@@ -214,11 +203,11 @@ class Harness:
 
     def output(self, filename, directory='_output', view=False, cleanup=True, fmt='pdf', gen_bom=False):
         # graphical output
-        digraph = self.create_graph()
+        graph = self.create_graph()
         for f in fmt:
-            digraph.format = f
-            digraph.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
-        digraph.save(filename=f'{filename}.gv', directory=directory)
+            graph.format = f
+            graph.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
+        graph.save(filename=f'{filename}.gv', directory=directory)
         # bom output
         bom_list = self.bom_list()
         with open(f'{filename}.bom.tsv', 'w') as file:
