@@ -91,22 +91,22 @@ class Harness:
 
             else:  # not a ferrule
                 # a = attributes
-                a = [n.type,
+                attributes = [n.type,
                      n.subtype,
                      '{}-pin'.format(n.pincount) if n.show_pincount else '']
                 # p = pinout
-                p = [[], [], []]
+                pinouts = [[], [], []]
                 for pinnumber, pinname in zip(n.pinnumbers, n.pinout):
                     if n.hide_disconnected_pins and not n.visible_pins.get(pinnumber, False):
                         continue
-                    p[1].append(pinname)
+                    pinouts[1].append(pinname)
                     if n.ports_left:
-                        p[0].append('<p{portno}l>{portno}'.format(portno=pinnumber))
+                        pinouts[0].append('<p{portno}l>{portno}'.format(portno=pinnumber))
                     if n.ports_right:
-                        p[2].append('<p{portno}r>{portno}'.format(portno=pinnumber))
+                        pinouts[2].append('<p{portno}r>{portno}'.format(portno=pinnumber))
                 # l = label
-                l = [n.name if n.show_name else '', a, p, n.notes]
-                dot.node(k, label=nested(l))
+                label = [n.name if n.show_name else '', attributes, pinouts, n.notes]
+                dot.node(k, label=nested(label))
 
                 if len(n.loops) > 0:
                     dot.attr('edge', color='#000000:#ffffff:#000000')
@@ -124,20 +124,20 @@ class Harness:
 
         for k, c in self.cables.items():
             # a = attributes
-            a = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
+            attributes = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
                  '{} {}{}'.format(c.gauge, c.gauge_unit, ' ({} AWG)'.format(awg_equiv(c.gauge)) if c.gauge_unit ==
                                   'mm\u00B2' and c.show_equiv else '') if c.gauge else '',  # TODO: show equiv
                  '+ S' if c.shield else '',
                  '{} m'.format(c.length) if c.length > 0 else '']
-            a = list(filter(None, a))
+            attributes = list(filter(None, attributes))
 
             html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>'  # main table
 
             html = html + '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
             if c.show_name:
-                html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(a), name=c.name)
+                html = html + '<tr><td colspan="{colspan}">{name}</td></tr>'.format(colspan=len(attributes), name=c.name)
             html = html + '<tr>'  # attribute row
-            for attrib in a:
+            for attrib in attributes:
                 html = html + '<td>{attrib}</td>'.format(attrib=attrib)
             html = html + '</tr>'  # attribute row
             html = html + '</table></td></tr>'  # name+attributes table
@@ -218,11 +218,11 @@ class Harness:
 
     def output(self, filename, directory='_output', view=False, cleanup=True, format='pdf', gen_bom=False):
         # graphical output
-        d = self.create_graph()
+        digraph = self.create_graph()
         for f in format:
-            d.format = f
-            d.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
-        d.save(filename='{}.gv'.format(filename), directory=directory)
+            digraph.format = f
+            digraph.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
+        digraph.save(filename='{}.gv'.format(filename), directory=directory)
         # bom output
         bom_list = self.bom_list()
         with open('{}.bom.tsv'.format(filename), 'w') as file:
@@ -233,8 +233,8 @@ class Harness:
 
             file.write('<h1>Diagram</h1>')
             with open('{}.svg'.format(filename), 'r') as svg:
-                for l in svg:
-                    file.write(l)
+                for svgLine in svg:
+                    file.write(svgLine)
 
             file.write('<h1>Bill of Materials</h1>')
             listy = flatten2d(bom_list)
@@ -505,7 +505,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                 return False
         return True
 
-    h = Harness()
+    harness = Harness()
 
     # add items
     sections = ['connectors', 'cables', 'ferrules', 'connections']
@@ -516,9 +516,9 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                 if ty == dict:
                     for k, o in yaml_data[sec].items():
                         if sec == 'connectors':
-                            h.add_connector(name=k, **o)
+                            harness.add_connector(name=k, **o)
                         elif sec == 'cables':
-                            h.add_cable(name=k, **o)
+                            harness.add_cable(name=k, **o)
                         elif sec == 'ferrules':
                             pass
             else:
@@ -554,7 +554,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                 raise Exception('List length mismatch')
 
             for (from_pin, via_pin, to_pin) in zip(from_pins, via_pins, to_pins):
-                h.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
+                harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
 
         elif len(con) == 2:
 
@@ -596,16 +596,16 @@ def parse(yaml_input, file_out=None, generate_bom=False):
             if con_cbl or cbl_con:
                 for (from_pin, to_pin) in zip(from_pins, to_pins):
                     if con_cbl:
-                        h.connect(from_name, from_pin, to_name, to_pin, None, None)
+                        harness.connect(from_name, from_pin, to_name, to_pin, None, None)
                     else:  # cbl_con
-                        h.connect(None, None, from_name, from_pin, to_name, to_pin)
+                        harness.connect(None, None, from_name, from_pin, to_name, to_pin)
             elif con_con:
                 cocon_coname = list(con[0].keys())[0]
                 from_pins = expand(con[0][from_name])
                 to_pins = expand(con[1][to_name])
 
                 for (from_pin, to_pin) in zip(from_pins, to_pins):
-                    h.loop(cocon_coname, from_pin, to_pin)
+                    harness.loop(cocon_coname, from_pin, to_pin)
             if fer_cbl or cbl_fer:
                 from_pins = expand(con[0][from_name])
                 to_pins = expand(con[1][to_name])
@@ -623,17 +623,17 @@ def parse(yaml_input, file_out=None, generate_bom=False):
                 for cable_pin in cable_pins:
                     ferrule_counter = ferrule_counter + 1
                     ferrule_id = '_F{}'.format(ferrule_counter)
-                    h.add_connector(ferrule_id, category='ferrule', **ferrule_params)
+                    harness.add_connector(ferrule_id, category='ferrule', **ferrule_params)
 
                     if fer_cbl:
-                        h.connect(ferrule_id, 1, cable_name, cable_pin, None, None)
+                        harness.connect(ferrule_id, 1, cable_name, cable_pin, None, None)
                     else:
-                        h.connect(None, None, cable_name, cable_pin, ferrule_id, 1)
+                        harness.connect(None, None, cable_name, cable_pin, ferrule_id, 1)
 
         else:
             raise Exception('Wrong number of connection parameters')
 
-    h.output(filename=file_out, format=('png', 'svg'), gen_bom=generate_bom, view=False)
+    harness.output(filename=file_out, format=('png', 'svg'), gen_bom=generate_bom, view=False)
 
 
 def parse_file(yaml_file, file_out=None, generate_bom=False):
