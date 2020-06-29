@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from wireviz.Components import Connector, Cable
+from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
 from wireviz.wv_helper import awg_equiv, tuplelist2tsv, nested, flatten2d
