@@ -59,7 +59,7 @@ class Harness:
                  fontname=font)
 
         # prepare ports on connectors depending on which side they will connect
-        for k, c in self.cables.items():
+        for _, c in self.cables.items():
             for x in c.connections:
                 if x.from_port is not None:  # connect to left
                     self.connectors[x.from_name].ports_right = True
@@ -221,7 +221,7 @@ class Harness:
 
         return dot
 
-    def output(self, filename, directory='_output', view=False, cleanup=True, format='pdf', gen_bom=False):
+    def output(self, filename, directory='_output', view=False, cleanup=True, fmt='pdf', gen_bom=False):
         # graphical output
         digraph = self.create_graph()
         for f in format:
@@ -238,8 +238,8 @@ class Harness:
 
             file.write('<h1>Diagram</h1>')
             with open(f'{filename}.svg') as svg:
-                for svgLine in svg:
-                    file.write(svgLine)
+                for svgdata in svg:
+                    file.write(svgdata)
 
             file.write('<h1>Bill of Materials</h1>')
             listy = flatten2d(bom_list)
@@ -457,7 +457,7 @@ class Cable:
         to_pin = int2tuple(to_pin)
         if len(from_pin) != len(to_pin):
             raise Exception('from_pin must have the same number of elements as to_pin')
-        for i, x in enumerate(from_pin):
+        for i, _ in enumerate(from_pin):
             # self.connections.append((from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
             self.connections.append(Connection(from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
 
@@ -637,7 +637,7 @@ def parse(yaml_input, file_out=None, generate_bom=False):
         else:
             raise Exception('Wrong number of connection parameters')
 
-    harness.output(filename=file_out, format=('png', 'svg'), gen_bom=generate_bom, view=False)
+    harness.output(filename=file_out, fmt=('png', 'svg'), gen_bom=generate_bom, view=False)
 
 
 def parse_file(yaml_file, file_out=None, generate_bom=False):
