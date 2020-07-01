@@ -70,8 +70,8 @@ class Harness:
                                                                color=wv_colors.translate_color(n.color, self.color_mode) if n.color else '')
                 # id = identification
                 id = [n.manufacturer,
-                      'MPN:{}'.format(n.manufacturer_part_number) if n.manufacturer_part_number else '',
-                      'IPN:{}'.format(n.internal_part_number) if n.internal_part_number else '']
+                      'MPN: {}'.format(n.manufacturer_part_number) if n.manufacturer_part_number else '',
+                      'IPN: {}'.format(n.internal_part_number) if n.internal_part_number else '']
                 id = list(filter(None, id))
                 if(len(id) > 0):
                     infostring = infostring + '<br/>'
@@ -102,8 +102,8 @@ class Harness:
             else: # not a ferrule
                 # id = identification
                 id = [n.manufacturer,
-                    'MPN:{}'.format(n.manufacturer_part_number) if n.manufacturer_part_number else '',
-                    'IPN:{}'.format(n.internal_part_number) if n.internal_part_number else '']
+                    'MPN: {}'.format(n.manufacturer_part_number) if n.manufacturer_part_number else '',
+                    'IPN: {}'.format(n.internal_part_number) if n.internal_part_number else '']
                 # a = attributes
                 a = [n.type,
                      n.subtype,
@@ -139,8 +139,8 @@ class Harness:
         for k, c in self.cables.items():
             # id = identification
             id = [c.manufacturer if not isinstance(c.manufacturer, list) else '',
-                  'MPN:{}'.format(c.manufacturer_part_number) if (c.manufacturer_part_number and not isinstance(c.manufacturer_part_number, list)) else '',
-                  'IPN:{}'.format(c.internal_part_number) if (c.internal_part_number and not isinstance(c.internal_part_number, list)) else '']
+                  'MPN: {}'.format(c.manufacturer_part_number) if (c.manufacturer_part_number and not isinstance(c.manufacturer_part_number, list)) else '',
+                  'IPN: {}'.format(c.internal_part_number) if (c.internal_part_number and not isinstance(c.internal_part_number, list)) else '']
             id = list(filter(None, id))
             # a = attributes
             a = ['{}x'.format(len(c.colors)) if c.show_wirecount else '',
@@ -186,9 +186,9 @@ class Harness:
                     if isinstance(c.manufacturer, list):
                         wireid.append(c.manufacturer[i - 1])
                     if isinstance(c.manufacturer_part_number, list):
-                        wireid.append('MPN:{}'.format(c.manufacturer_part_number[i - 1]))
+                        wireid.append('MPN: {}'.format(c.manufacturer_part_number[i - 1]))
                     if isinstance(c.internal_part_number, list):
-                        wireid.append('IPN:{}'.format(c.internal_part_number[i - 1]))
+                        wireid.append('IPN: {}'.format(c.internal_part_number[i - 1]))
                     # print parameters into a table row under the wire
                     if(len(wireid) > 0):
                         html = html + '<tr><td colspan="{colspan}"><table border="0" cellspacing="0" cellborder="0"><tr>'.format(colspan=len(a))
