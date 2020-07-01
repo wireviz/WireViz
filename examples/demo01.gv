@@ -13,9 +13,9 @@ graph {
 	X1:p2r:e -- W1:w2:w
 	W1:w2:e -- X2:p3l:w
 	edge [color="#000000:#00ff00:#000000"]
-	X1:p1r:e -- W1:w3:w
+	X1:p3r:e -- W1:w3:w
 	W1:w3:e -- X2:p2l:w
 	edge [color="#000000"]
 	X1:p5r:e -- W1:ws:w
-	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="4">W1</td></tr><tr><td>3x</td><td>0.25 mm²</td><td>+ S</td><td>0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td>X1:5</td><td>WH</td><td>X2:1</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ffffff" border="2" sides="tb" port="w1"></td></tr><tr><td>X1:2</td><td>BN</td><td>X2:3</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#666600" border="2" sides="tb" port="w2"></td></tr><tr><td>X1:1</td><td>GN</td><td>X2:2</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#00ff00" border="2" sides="tb" port="w3"></td></tr><tr><td>&nbsp;</td></tr><tr><td>X1:5</td><td>Shield</td><td><!-- s_out --></td></tr><tr><td colspan="3" cellpadding="0" height="6" border="2" sides="b" port="ws"></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style=""]
+	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="4">W1</td></tr><tr><td>3x</td><td>0.25 mm²</td><td>+ S</td><td>0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td>X1:5</td><td>WH</td><td>X2:1</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ffffff" border="2" sides="tb" port="w1"></td></tr><tr><td>X1:2</td><td>BN</td><td>X2:3</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#666600" border="2" sides="tb" port="w2"></td></tr><tr><td>X1:3</td><td>GN</td><td>X2:2</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#00ff00" border="2" sides="tb" port="w3"></td></tr><tr><td>&nbsp;</td></tr><tr><td>X1:5</td><td>Shield</td><td><!-- s_out --></td></tr><tr><td colspan="3" cellpadding="0" height="6" border="2" sides="b" port="ws"></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style=""]
 }

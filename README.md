@@ -17,7 +17,7 @@ WireViz is a tool for easily documenting cables, wiring harnesses and connector 
   * [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100) (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
   * [IEC 62](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
 * Understands wire gauge in mm² or AWG
-  * Optionally auto-calculates and displays AWG equivalent when specifying mm²
+  * Optionally auto-calculates equivalent gauge between mm² and AWG
 * Allows more than one connector per side, as well as loopbacks
 * Allows for easy-autorouting for 1-to-1 wiring
 * Generates BOM (Bill of Materials)
@@ -63,7 +63,7 @@ cables:
 
 connections:
   -
-    - X1: [5,2,1]
+    - X1: [5,2,3]
     - W1: [1,2,3]
     - X2: [1,3,2]
   -
@@ -88,14 +88,6 @@ Output file:
 See the [tutorial page](tutorial/readme.md) for sample code,
 as well as the [example gallery](examples/readme.md) to see more of what WireViz can do.
 
-### (Re-)Building the example projects
-
-If you would like to rebuild all of the included demos, examples and tutorials, use the ```build_examples.py``` script:
-
-```cd src/wireviz
-./build_examples.py
-```
-
 ## Usage
 
 ```
@@ -112,6 +104,13 @@ mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 
+### (Re-)Building the example projects
+
+If you would like to rebuild all of the included demos, examples and tutorials, use the ```build_examples.py``` script:
+
+```cd src/wireviz
+./build_examples.py
+```
 ## Status
 
 This is very much a [work in progress](https://github.com/formatc1702/WireViz/projects/1). Source code, API, syntax and functionality may change wildly at any time.

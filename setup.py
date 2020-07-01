@@ -26,7 +26,7 @@ setup(
         ],
     license='GPLv3',
     keywords='cable connector hardware harness wiring wiring-diagram wiring-harness',
-    url='https://github.com/n42/WireViz',
+    url='https://github.com/formatc1702/WireViz',
     package_dir={'': 'src'},
     packages=find_packages('src'),
     entry_points={
