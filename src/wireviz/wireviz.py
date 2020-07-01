@@ -68,6 +68,17 @@ class Harness:
                 infostring = '{type}{subtype} {color}'.format(type=n.type,
                                                                subtype=', {}'.format(n.subtype) if n.subtype else '',
                                                                color=wv_colors.translate_color(n.color, self.color_mode) if n.color else '')
+                # id = identification
+                id = [n.manufacturer,
+                      'MPN:{}'.format(n.manufacturer_part_number) if n.manufacturer_part_number else '',
+                      'IPN:{}'.format(n.internal_part_number) if n.internal_part_number else '']
+                id = list(filter(None, id))
+                if(len(id) > 0):
+                    infostring = infostring + '<br/>'
+                    for attrib in id:
+                        infostring = infostring + '{attrib}, '.format(attrib=attrib)
+                    infostring = infostring[:-2]  # remove trainling comma and space
+
                 infostring_l = infostring if n.ports_right else ''
                 infostring_r = infostring if n.ports_left else ''
 
