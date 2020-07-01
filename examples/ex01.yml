@@ -16,6 +16,7 @@ cables:
     show_equiv: true # auto-calculate AWG equivalent from metric gauge
     length: 0.2 # length in m
     shield: true
+    type: Serial
 
 connections:
   -
