@@ -253,9 +253,10 @@ class Harness:
         bom_connectors = []
         bom_cables = []
         # connectors
-        types = Counter([(v.type, v.subtype, v.pincount) for v in self.connectors.values()])
-        for maintype in types:
-            items = {k: v for k, v in self.connectors.items() if (v.type, v.subtype, v.pincount) == maintype}
+        connector_group = lambda c: (c.type, c.subtype, c.pincount)
+        groups = Counter([connector_group(v) for v in self.connectors.values()])
+        for group in groups:
+            items = {k: v for k, v in self.connectors.items() if connector_group(v) == group}
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
@@ -270,10 +271,10 @@ class Harness:
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
         # cables
-        types = Counter([(v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) for v in self.cables.values()])
-        for maintype in types:
-            items = {k: v for k, v in self.cables.items() if (
-                v.category, v.gauge, v.gauge_unit, v.wirecount, v.shield) == maintype}
+        cable_group = lambda c: (c.category, c.gauge, c.gauge_unit, c.wirecount, c.shield)
+        groups = Counter([cable_group(v) for v in self.cables.values()])
+        for group in groups:
+            items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
             shared = next(iter(items.values()))
             if shared.category != 'bundle':
                 designators = list(items.keys())
@@ -287,9 +288,10 @@ class Harness:
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        types = Counter([(v.category, v.gauge, v.gauge_unit, v.length) for v in self.cables.values()])
-        for maintype in types:
-            items = {k: v for k, v in self.cables.items() if (v.category, v.gauge, v.gauge_unit, v.length) == maintype}
+        bundle_group = lambda b: (b.category, b.gauge, b.gauge_unit, b.length)
+        groups = Counter([bundle_group(v) for v in self.cables.values()])
+        for group in groups:
+            items = {k: v for k, v in self.cables.items() if bundle_group(v) == group}
             shared = next(iter(items.values()))
             # filter out cables that are not bundles
             if shared.category == 'bundle':
@@ -299,9 +301,10 @@ class Harness:
                         wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit,
                                          'length': shared.length, 'color': color, 'designator': bundle.name})
         # join similar wires from all the bundles to a single BOM item
-        types = Counter([(v['gauge'], v['gauge_unit'], v['color']) for v in wirelist])
-        for maintype in types:
-            items = [v for v in wirelist if (v['gauge'], v['gauge_unit'], v['color']) == maintype]
+        wire_group = lambda w: (w['gauge'], w['gauge_unit'], w['color'])
+        groups = Counter([wire_group(v) for v in wirelist])
+        for group in groups:
+            items = [v for v in wirelist if wire_group(v) == group]
             shared = items[0]
             designators = [i['designator'] for i in items]
             # remove duplicates
