@@ -39,7 +39,7 @@ class Harness:
         font = 'arial'
         dot.attr('graph', rankdir='LR',
                  ranksep='2',
-                 bgcolor='white',
+                 bgcolor=wv_colors.default_bknd_color,
                  nodesep='0.33',
                  fontname=font)
         dot.attr('node', shape='record',
@@ -65,7 +65,6 @@ class Harness:
                 infostring_l = infostring if connector.ports_right else ''
                 infostring_r = infostring if connector.ports_left else ''
 
-                # INFO: Leaving this one as a string.format form because f-strings do not work well with triple quotes
                 colorbar = f'<TD BGCOLOR="{wv_colors.translate_color(connector.color, "HEX")}" BORDER="1" SIDES="LR" WIDTH="4"></TD>' if connector.color else ''
                 dot.node(key, shape='none',
                          style='filled',
@@ -141,7 +140,7 @@ class Harness:
             html = f'{html}</tr>'  # attribute row
             html = f'{html}</table></td></tr>'  # name+attributes table
 
-            html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer between attributes and wires
+            html = f'{html}<tr><td></td></tr>'  # spacer between attributes and wires
 
             html = f'{html}<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
 
@@ -154,27 +153,29 @@ class Harness:
                 for bla in p:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
-                bgcolor = wv_colors.translate_color(connection, 'hex')
-                bgcolor = bgcolor if bgcolor != '' else '#ffffff'
-                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="w{i}"></td></tr>'
-
+                bgcolors = ('#000000:' + wv_colors.translate_color(connection, 'hex') + ':#000000').split(':')
+                html = f'{html}<tr><td colspan="{len(p)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
+                for j, bgcolor in enumerate(
+                        bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
+                    html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
+                html = html + '</table></td></tr>'
             if cable.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
-                html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer
+                html = f'{html}<tr><td></td></tr>'  # spacer
                 html = f'{html}<tr>'
                 for bla in p:
                     html = html + f'<td>{bla}</td>'
                 html = f'{html}</tr>'
-                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" border="2" sides="b" port="ws"></td></tr>'
+                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" bgcolor="{wv_colors.shield_color}" height="6" border="2" sides="b" port="ws"></td></tr>'
 
-            html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
+            html = f'{html}<tr><td></td></tr>'  # spacer at the end
 
             html = f'{html}</table>'  # conductor table
 
             html = f'{html}</td></tr>'  # main table
             if cable.notes:
                 html = f'{html}<tr><td cellpadding="3">{cable.notes}</td></tr>'  # notes table
-                html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
+                html = f'{html}<tr><td></td></tr>'  # spacer at the end
 
             html = f'{html}</table>'  # main table
 
@@ -182,12 +183,10 @@ class Harness:
             for connection in cable.connections:
                 if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
                     search_color = cable.colors[connection.via_port - 1]
-                    if search_color in wv_colors.color_hex:
-                        dot.attr('edge', color=f'#000000:{wv_colors.color_hex[search_color]}:#000000')
-                    else:  # color name not found
-                        dot.attr('edge', color='#000000:#ffffff:#000000')
+                    dot.attr('edge', color='#000000:{wire_color}:#000000'.format(
+                        wire_color=wv_colors.get_color_hex(search_color)))
                 else:  # it's a shield connection
-                    dot.attr('edge', color='#000000')
+                    dot.attr('edge', color=wv_colors.shield_color)
 
                 if connection.from_port is not None:  # connect to left
                     from_ferrule = self.connectors[connection.from_name].category == 'ferrule'

@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from wireviz import wireviz
 
 demos     = 2 # 2
-examples  = 9 # 9
+examples  = 10 # 10
 tutorials = 7 # 7
 
 if demos:
