@@ -1,12 +1,18 @@
 .DS_Store
-temp/
+.eggs
+__pycache__
+.*.swp
+*.egg-info
+*.pyc
+build
+data
+dist
+venv/
 
 .vscode/
 
-.idea/
 
-
-# IntelliJ Stuff
+# Jetbrains Stuff
 # Default ignored files
 /shelf/
 /workspace.xml

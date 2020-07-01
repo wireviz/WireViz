@@ -1,0 +1,25 @@
+# contributed by @cocide
+
+connectors:
+  Key:
+    type: Phone Connector
+    subtype: male 3.5
+    pinnumbers: [T, R, S]
+    pinout: [Dot, Dash, Ground]
+    show_pincount: false
+
+cables:
+  W1:
+    gauge: 24 AWG
+    length: 0.2
+    color_code: DIN
+    wirecount: 3
+    shield: true
+
+connections:
+  -
+    - Key: [S,R,T]
+    - W1: [1,2,3]
+  -
+    - Key: S
+    - W1: s
