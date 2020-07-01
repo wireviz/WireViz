@@ -271,35 +271,34 @@ class Harness:
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
         # cables
+        # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
+        # Otherwise, it can be removed from the cable_group because it will allways be empty.
         cable_group = lambda c: (c.category, c.gauge, c.gauge_unit, c.wirecount, c.shield)
-        groups = Counter([cable_group(v) for v in self.cables.values()])
+        groups = Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle'])
         for group in groups:
             items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
             shared = next(iter(items.values()))
-            if shared.category != 'bundle':
-                designators = list(items.keys())
-                designators.sort()
-                total_length = sum(i.length for i in items.values())
-                gauge_name = f' x {shared.gauge} {shared.gauge_unit}'if shared.gauge else ' wires'
-                shield_name = ' shielded' if shared.shield else ''
-                name = f'Cable, {shared.wirecount}{gauge_name}{shield_name}'
-                item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-                bom_cables.append(item)
+            designators = list(items.keys())
+            designators.sort()
+            total_length = sum(i.length for i in items.values())
+            gauge_name = f' x {shared.gauge} {shared.gauge_unit}'if shared.gauge else ' wires'
+            shield_name = ' shielded' if shared.shield else ''
+            name = f'Cable, {shared.wirecount}{gauge_name}{shield_name}'
+            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
+            bom_cables.append(item)
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        bundle_group = lambda b: (b.category, b.gauge, b.gauge_unit, b.length)
-        groups = Counter([bundle_group(v) for v in self.cables.values()])
+        bundle_group = lambda b: (b.gauge, b.gauge_unit, b.length)
+        groups = Counter([bundle_group(v) for v in self.cables.values() if v.category == 'bundle'])
         for group in groups:
             items = {k: v for k, v in self.cables.items() if bundle_group(v) == group}
             shared = next(iter(items.values()))
-            # filter out cables that are not bundles
-            if shared.category == 'bundle':
-                for bundle in items.values():
-                    # add each wire from each bundle to the wirelist
-                    for color in bundle.colors:
-                        wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit,
-                                         'length': shared.length, 'color': color, 'designator': bundle.name})
+            for bundle in items.values():
+                # add each wire from each bundle to the wirelist
+                for color in bundle.colors:
+                    wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit,
+                                     'length': shared.length, 'color': color, 'designator': bundle.name})
         # join similar wires from all the bundles to a single BOM item
         wire_group = lambda w: (w['gauge'], w['gauge_unit'], w['color'])
         groups = Counter([wire_group(v) for v in wirelist])
