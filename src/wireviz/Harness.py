@@ -350,7 +350,7 @@ class Harness:
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        bundle_group = lambda b: (b.type, b.gauge, b.gauge_unit, b.length) # TODO: Why is b.length included?
+        bundle_group = lambda b: (b.category, b.type, b.gauge, b.gauge_unit, b.length) # TODO: Why is b.length included?
         groups = Counter([bundle_group(v) for v in self.cables.values() if v.category == 'bundle'])
         for group in groups:
             items = {k: v for k, v in self.cables.items() if bundle_group(v) == group}
