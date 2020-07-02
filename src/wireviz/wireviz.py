@@ -10,6 +10,7 @@ import yaml
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+
 from wireviz.Harness import Harness
 
 

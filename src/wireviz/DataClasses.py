@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import Optional, List, Any
+from typing import Optional, List, Any, Union
 from dataclasses import dataclass, field
 from wireviz.wv_helper import int2tuple
 from wireviz import wv_colors
@@ -10,6 +10,9 @@ from wireviz import wv_colors
 @dataclass
 class Connector:
     name: str
+    manufacturer: Optional[str] = None
+    manufacturer_part_number: Optional[str] = None
+    internal_part_number: Optional[str] = None
     category: Optional[str] = None
     type: Optional[str] = None
     subtype: Optional[str] = None
@@ -61,6 +64,9 @@ class Connector:
 @dataclass
 class Cable:
     name: str
+    manufacturer: Optional[Union[str, List[str]]] = None
+    manufacturer_part_number: Optional[Union[str, List[str]]] = None
+    internal_part_number: Optional[Union[str, List[str]]] = None
     category: Optional[str] = None
     type: Optional[str] = None
     gauge: Optional[float] = None
@@ -117,6 +123,16 @@ class Cable:
             if not self.colors:
                 raise Exception('Unknown number of wires. Must specify wirecount or colors (implicit length)')
             self.wirecount = len(self.colors)
+
+        # if lists of part numbers are provided check this is a bundle and that it matches the wirecount.
+        for idfield in [self.manufacturer, self.manufacturer_part_number, self.internal_part_number]:
+            if isinstance(idfield, list):
+                if self.category == "bundle":
+                    # check the length
+                    if len(idfield) != self.wirecount:
+                        raise Exception('lists of part data must match wirecount')
+                else:
+                    raise Exception('lists of part data are only supported for bundles')
 
         # for BOM generation
         self.wirecount_and_shield = (self.wirecount, self.shield)
