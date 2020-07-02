@@ -4,6 +4,7 @@
 import argparse
 import os
 import sys
+from typing import Tuple
 
 import yaml
 
@@ -13,7 +14,19 @@ if __name__ == '__main__':
 from wireviz.Harness import Harness
 
 
-def parse(yaml_input, file_out=None, generate_bom=False):
+def parse(yaml_input, file_out=None, generate_bom=False, return_types: (None, str, Tuple[str]) = None):
+    """
+    Parses yaml input string and does the high-level harness conversion
+
+    :param yaml_input: a string containing the yaml input data
+    :param file_out:
+    :param generate_bom:
+    :param return_types: if None, then returns None; if the value is a string, then a
+        corresponding data format will be returned; if the value is a tuple of strings,
+        then for every valid format in the `return_types` tuple, another return type
+        will be generated and returned in the same order; currently supports only 'png',
+        but could easily support other types
+    """
 
     yaml_data = yaml.safe_load(yaml_input)
 
@@ -179,7 +192,21 @@ def parse(yaml_input, file_out=None, generate_bom=False):
         else:
             raise Exception('Wrong number of connection parameters')
 
-    harness.output(filename=file_out, fmt=('png', 'svg'), gen_bom=generate_bom, view=False)
+    if file_out is not None:
+        harness.output(filename=file_out, fmt=('png', 'svg'), gen_bom=generate_bom, view=False)
+
+    if return_types is not None:
+        # gather the harness data and return it as a single data type
+        if isinstance(return_types, str):
+            if return_types.lower() == 'png':
+                return harness.png
+
+        else:
+            # gather the harness data and return it as a series of tuples
+            returns = []
+            if 'png' in return_types:
+                returns.append(harness.png)
+            return tuple(returns)
 
 
 def parse_file(yaml_file, file_out=None, generate_bom=False):
