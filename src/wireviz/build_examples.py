@@ -10,7 +10,7 @@ from wireviz import wireviz
 
 demos     = 2 # 2
 examples  = 9 # 9
-tutorials = 7 # 7
+tutorials = 8 # 7
 
 if demos:
     for i in range(1,demos+1):

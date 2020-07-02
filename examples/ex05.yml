@@ -9,7 +9,7 @@ templates:
     length: 0.2
     colors: [PK, TQ, YE, VT]
     category: bundle
-    type: I²C
+    type: I2C
 
 connectors:
   X1:
