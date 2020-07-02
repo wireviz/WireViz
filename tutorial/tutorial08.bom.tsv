@@ -3,5 +3,9 @@ Connector, Molex KK 254, female, 4 pins	2		X1, X3	Molex	22013047
 Connector, Molex KK 254, female, 4 pins	1		X2	Molex	22013047	CON4
 Cable, 4 x 0.25 mm²	1	m	W1	CablesCo	ABC123	CAB1
 Wire, 0.25 mm², BK	2	m	W2	WiresCo	W1-BK	WIRE2
+Wire, 0.25 mm², BN	1	m	W1			
+Wire, 0.25 mm², OG	1	m	W1			
+Wire, 0.25 mm², RD	1	m	W1			
 Wire, 0.25 mm², RD	1	m	W2	WiresCo	W1-RD	WIRE3
+Wire, 0.25 mm², YE	1	m	W1			
 Wire, 0.25 mm², YE	1	m	W2	WiresCo	W1-YE	WIRE1
