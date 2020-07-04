@@ -343,11 +343,10 @@ class Harness:
             for bundle in items.values():
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
-                    wireinfo = {'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name,
-                                'manufacturer': bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None,
-                                'manufacturer part number': bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None,
-                                'internal part number': bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None}
-                    wirelist.append(wireinfo)
+                    wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name,
+                                     'manufacturer': bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None,
+                                     'manufacturer part number': bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None,
+                                     'internal part number': bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None})
         # join similar wires from all the bundles to a single BOM item
         wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['manufacturer part number'], w['internal part number'])
         groups = Counter([wire_group(v) for v in wirelist])
@@ -379,10 +378,7 @@ class Harness:
         bom_list.append([k.capitalize() for k in keys])  # create header row with keys
         for item in bom:
             item_list = [item.get(key, '') for key in keys]  # fill missing values with blanks
-            for i, subitem in enumerate(item_list):
-                if isinstance(subitem, List):  # convert any lists into comma separated strings
-                    item_list[i] = ', '.join(subitem)
-                if subitem is None:  # if a field is missing for some (but not all) BOM items
-                    item_list[i] = ''
+            item_list = [', '.join(subitem) if isinstance(subitem, List) else subitem for subitem in item_list]  # convert any lists into comma separated strings
+            item_list = ['' if subitem is None else subitem for subitem in item_list]  # if a field is missing for some (but not all) BOM items
             bom_list.append(item_list)
         return bom_list
