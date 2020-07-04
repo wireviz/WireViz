@@ -309,14 +309,8 @@ class Harness:
             conn_pincount = f', {shared.pincount} pins' if shared.category != 'ferrule' else ''
             conn_color = f', {shared.color}' if shared.color else ''
             name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
-            item = {'item': name, 'qty': len(designators), 'unit': '',
-                    'designators': designators if shared.category != 'ferrule' else ''}
-            # if shared.manufacturer is not None:  # set manufacturer only if it exists
-            item['manufacturer'] = shared.manufacturer
-            # if shared.manufacturer_part_number is not None:  # set part number only if it exists
-            item['manufacturer part number'] = shared.manufacturer_part_number
-            # if shared.internal_part_number is not None:  # set part number only if it exists
-            item['internal part number'] = shared.internal_part_number
+            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.category != 'ferrule' else '',
+                    'manufacturer': shared.manufacturer, 'manufacturer part number': shared.manufacturer_part_number, 'internal part number': shared.internal_part_number}
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
@@ -332,19 +326,16 @@ class Harness:
             designators.sort()
             total_length = sum(i.length for i in items.values())
             cable_type = f', {shared.type}' if shared.type else ''
-            gauge_name = f' x {shared.gauge} {shared.gauge_unit}'if shared.gauge else ' wires'
+            gauge_name = f' x {shared.gauge} {shared.gauge_unit}' if shared.gauge else ' wires'
             shield_name = ' shielded' if shared.shield else ''
             name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
-            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-            # TODO: merge following 3 lines into line above
-            item['manufacturer'] = shared.manufacturer
-            item['manufacturer part number'] = shared.manufacturer_part_number
-            item['internal part number'] = shared.internal_part_number
+            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
+                    'manufacturer': shared.manufacturer, 'manufacturer part number': shared.manufacturer_part_number, 'internal part number': shared.internal_part_number}
             bom_cables.append(item)
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        bundle_group = lambda b: (b.category, b.type, b.gauge, b.gauge_unit, b.length) # TODO: Why is b.length included?
+        bundle_group = lambda b: (b.category, b.type, b.gauge, b.gauge_unit, b.length)
         groups = Counter([bundle_group(v) for v in self.cables.values() if v.category == 'bundle'])
         for group in groups:
             items = {k: v for k, v in self.cables.items() if bundle_group(v) == group}
@@ -352,42 +343,36 @@ class Harness:
             for bundle in items.values():
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
-                    wireinfo = {'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name}
-                    # TODO: merge following 3 lines into line above
-                    wireinfo['manufacturer'] = bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None
-                    wireinfo['manufacturer part number'] = bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None
-                    wireinfo['internal part number'] = bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None
+                    wireinfo = {'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name,
+                                'manufacturer': bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None,
+                                'manufacturer part number': bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None,
+                                'internal part number': bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None}
                     wirelist.append(wireinfo)
-       # join similar wires from all the bundles to a single BOM item
+        # join similar wires from all the bundles to a single BOM item
         wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['manufacturer part number'], w['internal part number'])
         groups = Counter([wire_group(v) for v in wirelist])
         for group in groups:
             items = [v for v in wirelist if wire_group(v) == group]
             shared = items[0]
             designators = [i['designator'] for i in items]
-            # remove duplicates
-            designators = list(dict.fromkeys(designators))
+            designators = list(dict.fromkeys(designators))  # remove duplicates
             designators.sort()
             total_length = sum(i['length'] for i in items)
             wire_type = f', {shared["type"]}' if 'type' in shared else ''
             gauge_name = f', {shared["gauge"]} {shared["gauge_unit"]}' if 'gauge' in shared else ''
             gauge_color = f', {shared["color"]}' if 'color' in shared != '' else ''
             name = f'Wire{wire_type}{gauge_name}{gauge_color}'
-            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-            # TODO: merge following 3 lines into line above
-            item['manufacturer'] = shared['manufacturer']
-            item['manufacturer part number'] = shared['manufacturer part number']
-            item['internal part number'] = shared['internal part number']
+            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
+                    'manufacturer': shared['manufacturer'], 'manufacturer part number': shared['manufacturer part number'], 'internal part number': shared['internal part number']}
             bom_cables.append(item)
-            bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
+            bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
         bom.extend(bom_cables)
         return bom
 
     def bom_list(self):
         bom = self.bom()
         keys = ['item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
-        # check if any optional fields are set and add to keys if they are
-        for fieldname in ['manufacturer', 'manufacturer part number', 'internal part number']: # these BOM columns will only be included if at least one BOM item actually uses them
+        for fieldname in ['manufacturer', 'manufacturer part number', 'internal part number']: # these optional BOM columns will only be included if at least one BOM item actually uses them
             if any(fieldname in x and x.get(fieldname, None) for x in bom):
                 keys.append(fieldname)
         bom_list = []
@@ -397,7 +382,7 @@ class Harness:
             for i, subitem in enumerate(item_list):
                 if isinstance(subitem, List):  # convert any lists into comma separated strings
                     item_list[i] = ', '.join(subitem)
-                if subitem is None: # if a field is missing for some (but not all) BOM items
+                if subitem is None:  # if a field is missing for some (but not all) BOM items
                     item_list[i] = ''
             bom_list.append(item_list)
         return bom_list
