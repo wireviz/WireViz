@@ -197,17 +197,16 @@ def parse(yaml_input, file_out=None, generate_bom=False, return_types: (None, st
         harness.output(filename=file_out, fmt=('png', 'svg'), gen_bom=generate_bom, view=False)
 
     if return_types is not None:
-        # gather the harness data and return it as a single data type
-        if isinstance(return_types, str):
-            if return_types.lower() == 'png':
-                return harness.png
+        returns = []
+        if isinstance(return_types, str): # only one return type speficied
+            return_types = [return_types]
 
-        else:
-            # gather the harness data and return it as a series of tuples
-            returns = []
-            if 'png' in return_types:
-                returns.append(harness.png)
-            return tuple(returns)
+        return_types = [t.lower() for t in return_types]
+
+        if 'png' in return_types:
+            returns.append(harness.png)
+
+        return tuple(returns) if len(returns) != 1 else returns
 
 
 def parse_file(yaml_file, file_out=None, generate_bom=False):
