@@ -9,6 +9,11 @@ from collections import Counter
 from typing import List
 
 
+# Return the value indexed if it is a list, or simply the value otherwise.
+# TODO: Maybe move this to wv_helper?
+def index_if_list(value, index):
+    return value[index] if isinstance(value, list) else value
+
 class Harness:
 
     def __init__(self):
@@ -350,9 +355,9 @@ class Harness:
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
                     wirelist.append({'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
-                                     'manufacturer': bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None,
-                                     'manufacturer part number': bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None,
-                                     'internal part number': bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None})
+                                     'manufacturer': index_if_list(bundle.manufacturer, index),
+                                     'manufacturer part number': index_if_list(bundle.manufacturer_part_number, index),
+                                     'internal part number': index_if_list(bundle.internal_part_number, index)})
         # join similar wires from all the bundles to a single BOM item
         wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['manufacturer part number'], w['internal part number'])
         groups = Counter([wire_group(v) for v in wirelist])
