@@ -344,15 +344,12 @@ class Harness:
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        bundle_group = lambda b: (b.category, b.type, b.gauge, b.gauge_unit, b.length)
-        groups = Counter([bundle_group(v) for v in self.cables.values() if v.category == 'bundle'])
-        for group in groups:
-            items = {k: v for k, v in self.cables.items() if bundle_group(v) == group}
-            shared = next(iter(items.values()))
-            for bundle in items.values():
+        # TODO: Maybe rename bundle to cable or maybe loop only [c for c in self.cables.values() if c.category == 'bundle']
+        for bundle in self.cables.values():
+            if bundle.category == 'bundle':
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
-                    wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name,
+                    wirelist.append({'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
                                      'manufacturer': bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None,
                                      'manufacturer part number': bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None,
                                      'internal part number': bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None})
