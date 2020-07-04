@@ -311,23 +311,19 @@ class Harness:
             name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
             item = {'item': name, 'qty': len(designators), 'unit': '',
                     'designators': designators if shared.category != 'ferrule' else ''}
-            if shared.manufacturer is not None:  # set manufacturer only if it exists
-                item['manufacturer'] = shared.manufacturer
-            if shared.manufacturer_part_number is not None:  # set part number only if it exists
-                item['manufacturer part number'] = shared.manufacturer_part_number
-            if shared.internal_part_number is not None:  # set part number only if it exists
-                item['internal part number'] = shared.internal_part_number
+            # if shared.manufacturer is not None:  # set manufacturer only if it exists
+            item['manufacturer'] = shared.manufacturer
+            # if shared.manufacturer_part_number is not None:  # set part number only if it exists
+            item['manufacturer part number'] = shared.manufacturer_part_number
+            # if shared.internal_part_number is not None:  # set part number only if it exists
+            item['internal part number'] = shared.internal_part_number
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
         # Otherwise, it can be removed from the cable_group because it will allways be empty.
-        cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield,
-                                 c.manufacturer if not isinstance(c.manufacturer, list) else None,
-                                 c.manufacturer_part_number if not isinstance(c.manufacturer_part_number, list) else None,
-                                 c.internal_part_number if not isinstance(c.manufacturer_part_number, list) else None
-                                )
+        cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
         groups = Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle'])
         for group in groups:
             items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
@@ -340,12 +336,10 @@ class Harness:
             shield_name = ' shielded' if shared.shield else ''
             name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-            if shared.manufacturer is not None:  # set manufacturer only if it exists
-                item['manufacturer'] = shared.manufacturer
-            if shared.manufacturer_part_number is not None:  # set part number only if it exists
-                item['manufacturer part number'] = shared.manufacturer_part_number
-            if shared.internal_part_number is not None:  # set part number only if it exists
-                item['internal part number'] = shared.internal_part_number
+            # TODO: merge following 3 lines into line above
+            item['manufacturer'] = shared.manufacturer
+            item['manufacturer part number'] = shared.manufacturer_part_number
+            item['internal part number'] = shared.internal_part_number
             bom_cables.append(item)
         # bundles (ignores wirecount)
         wirelist = []
@@ -359,6 +353,7 @@ class Harness:
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
                     wireinfo = {'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name}
+                    # TODO: merge following 3 lines into line above
                     wireinfo['manufacturer'] = bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None
                     wireinfo['manufacturer part number'] = bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None
                     wireinfo['internal part number'] = bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None
@@ -379,12 +374,10 @@ class Harness:
             gauge_color = f', {shared["color"]}' if 'color' in shared != '' else ''
             name = f'Wire{wire_type}{gauge_name}{gauge_color}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators}
-            if shared['manufacturer'] is not None:  # set manufacturer only if it exists
-                item['manufacturer'] = shared['manufacturer']
-            if shared['manufacturer part number'] is not None:  # set part number only if it exists
-                item['manufacturer part number'] = shared['manufacturer part number']
-            if shared['internal part number'] is not None:  # set part number only if it exists
-                item['internal part number'] = shared['internal part number']
+            # TODO: merge following 3 lines into line above
+            item['manufacturer'] = shared['manufacturer']
+            item['manufacturer part number'] = shared['manufacturer part number']
+            item['internal part number'] = shared['internal part number']
             bom_cables.append(item)
             bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_cables)
@@ -392,10 +385,10 @@ class Harness:
 
     def bom_list(self):
         bom = self.bom()
-        keys = ['item', 'qty', 'unit', 'designators']
+        keys = ['item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
         # check if any optional fields are set and add to keys if they are
-        for fieldname in ["manufacturer", "manufacturer part number", "internal part number"]:
-            if any(fieldname in x for x in bom):
+        for fieldname in ['manufacturer', 'manufacturer part number', 'internal part number']: # these BOM columns will only be included if at least one BOM item actually uses them
+            if any(fieldname in x and x.get(fieldname, None) for x in bom):
                 keys.append(fieldname)
         bom_list = []
         bom_list.append([k.capitalize() for k in keys])  # create header row with keys
@@ -404,5 +397,7 @@ class Harness:
             for i, subitem in enumerate(item_list):
                 if isinstance(subitem, List):  # convert any lists into comma separated strings
                     item_list[i] = ', '.join(subitem)
+                if subitem is None: # if a field is missing for some (but not all) BOM items
+                    item_list[i] = ''
             bom_list.append(item_list)
         return bom_list
