@@ -325,7 +325,7 @@ class Harness:
         bom.extend(bom_connectors)
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
-        # Otherwise, it can be removed from the cable_group because it will allways be empty.
+        # The category needs to be included in cable_group to keep the bundles excluded.
         cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
         groups = Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle'])
         for group in groups:
