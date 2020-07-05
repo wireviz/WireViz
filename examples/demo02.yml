@@ -13,6 +13,7 @@ ferrules:
   ferrule_crimp:
     type: Crimp ferrule
     subtype: 0.25 mm²
+    color: YE
 
 connectors:
   X1:
