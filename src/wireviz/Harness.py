@@ -59,40 +59,27 @@ class Harness:
 
         for key, connector in self.connectors.items():
             if connector.category == 'ferrule':
-                subtype = f', {connector.subtype}' if connector.subtype else ''
-                color = wv_colors.translate_color(connector.color, self.color_mode) if connector.color else ''
-                infostring = f'{connector.type}{subtype} {color}'
 
-                # id = identification
-                identification = [connector.manufacturer,
-                                  f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else '',
-                                  f'IPN: {connector.internal_part_number}' if connector.internal_part_number else '']
-                identification = list(filter(None, identification))
-                if(len(identification) > 0):
-                    infostring = f'{infostring}<br/>'
-                    for attrib in identification:
-                        infostring = f'{infostring}{attrib}, '
-                    infostring = infostring[:-2]  # remove trainling comma and space
+                rows = [[connector.type, connector.subtype, connector.color, '<!-- colorbar -->' if connector.color else None],
+                        [connector.manufacturer,
+                        f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
+                        f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None]]
+                rows = [list(filter(None, row)) for row in rows] # remove missing attributes
 
-                infostring_l = infostring if connector.ports_right else ''
-                infostring_r = infostring if connector.ports_left else ''
+                html = '<table border="0" cellspacing="0" cellpadding="0">'
+                for row in rows:
+                    if len(row) > 0:
+                        html = f'{html}<tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
+                        for cell in row:
+                            html = f'{html}<td>{cell}</td>'
+                        html = f'{html}</tr></table></td></tr>'
+                html = f'{html}</table>'
 
-                # INFO: Leaving this one as a string.format form because f-strings do not work well with triple quotes
-                colorbar = f'<TD BGCOLOR="{wv_colors.translate_color(connector.color, "HEX")}" BORDER="1" SIDES="LR" WIDTH="4"></TD>' if connector.color else ''
-                dot.node(key, shape='none',
-                         style='filled',
-                         margin='0',
-                         orientation='0' if connector.ports_left else '180',
-                         label='''<
+                if connector.color: # add color bar next to color info, if present
+                    colorbar = f'<td bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>'
+                    html = html.replace('<td><!-- colorbar --></td>', colorbar)
 
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> {infostring_l} </TD>
-                {colorbar}
-                <TD PORT="p1r"> {infostring_r} </TD>
-                </TR></TABLE>
-
-
-                >'''.format(infostring_l=infostring_l, infostring_r=infostring_r, colorbar=colorbar))
+                dot.node(key, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
 
             else:  # not a ferrule
                 identification = [connector.manufacturer,
