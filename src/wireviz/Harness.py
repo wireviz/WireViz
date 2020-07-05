@@ -4,7 +4,7 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d, index_if_list
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks
 from collections import Counter
 from typing import List
 
@@ -74,6 +74,8 @@ class Harness:
                         infostring = f'{infostring}{attrib}, '
                     infostring = infostring[:-2]  # remove trainling comma and space
 
+                infostring = html_line_breaks(infostring)
+
                 infostring_l = infostring if connector.ports_right else ''
                 infostring_r = infostring if connector.ports_left else ''
 
@@ -99,8 +101,8 @@ class Harness:
                                   f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else '',
                                   f'IPN: {connector.internal_part_number}' if connector.internal_part_number else '']
 
-                attributes = [connector.type,
-                              connector.subtype,
+                attributes = [graphviz_line_breaks(connector.type),
+                              graphviz_line_breaks(connector.subtype),
                               f'{connector.pincount}-pin' if connector.show_pincount else'']
                 pinouts = [[], [], []]
                 for pinnumber, pinname in zip(connector.pinnumbers, connector.pinout):
@@ -111,7 +113,8 @@ class Harness:
                         pinouts[0].append(f'<p{pinnumber}l>{pinnumber}')
                     if connector.ports_right:
                         pinouts[2].append(f'<p{pinnumber}r>{pinnumber}')
-                label = [connector.name if connector.show_name else '', identification, attributes, pinouts, connector.notes]
+                print(attributes)
+                label = [connector.name if connector.show_name else '', identification, attributes, pinouts, graphviz_line_breaks(connector.notes)]
                 dot.node(key, label=nested(label))
 
                 if len(connector.loops) > 0:
@@ -145,7 +148,7 @@ class Harness:
                               f'IPN: {cable.internal_part_number}' if (cable.internal_part_number and not isinstance(cable.internal_part_number, list)) else '']
             identification = list(filter(None, identification))
 
-            attributes = [f'{cable.type}' if cable.type else '',
+            attributes = [html_line_breaks(cable.type) if cable.type else '',
                           f'{len(cable.colors)}x' if cable.show_wirecount else '',
                           f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else '',
                           '+ S' if cable.shield else '',
@@ -166,7 +169,7 @@ class Harness:
                 html = f'{html}</tr></table></td></tr>'  # end identification row
             html = f'{html}<tr>'  # attribute row
             for attrib in attributes:
-                html = f'{html}<td>{attrib}</td>'
+                html = f'{html}<td balign="left">{attrib}</td>'
             html = f'{html}</tr>'  # attribute row
             html = f'{html}</table></td></tr>'  # name+attributes table
 
@@ -217,7 +220,7 @@ class Harness:
 
             html = f'{html}</td></tr>'  # main table
             if cable.notes:
-                html = f'{html}<tr><td cellpadding="3">{cable.notes}</td></tr>'  # notes table
+                html = f'{html}<tr><td cellpadding="3" balign="left">{html_line_breaks(cable.notes)}</td></tr>'  # notes table
                 html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
             html = f'{html}</table>'  # main table

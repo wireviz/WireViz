@@ -69,3 +69,12 @@ def tuplelist2tsv(inp, header=None):
 # Return the value indexed if it is a list, or simply the value otherwise.
 def index_if_list(value, index):
     return value[index] if isinstance(value, list) else value
+
+def html_line_breaks(inp):
+    return inp.replace('\n', '<br />') if isinstance(inp, str) else inp
+
+def graphviz_line_breaks(inp):
+    return inp.replace('\n', '\\l') if isinstance(inp, str) else inp # \l generates left-aligned new lines. http://www.graphviz.org/doc/info/attrs.html#k:escString
+
+def remove_line_breaks(inp):
+    return inp.replace('\n', ' ')
