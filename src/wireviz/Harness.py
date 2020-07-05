@@ -60,10 +60,11 @@ class Harness:
         for key, connector in self.connectors.items():
             if connector.category == 'ferrule':
 
-                rows = [[connector.type, connector.subtype, connector.color, '<!-- colorbar -->' if connector.color else None],
+                rows = [[html_line_breaks(connector.type), html_line_breaks(connector.subtype), connector.color, '<!-- colorbar -->' if connector.color else None],
                         [connector.manufacturer,
                         f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
-                        f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None]]
+                        f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
+                        [html_line_breaks(connector.notes)]]
                 rows = [list(filter(None, row)) for row in rows] # remove missing attributes
 
                 html = '<table border="0" cellspacing="0" cellpadding="0">'
@@ -71,13 +72,13 @@ class Harness:
                     if len(row) > 0:
                         html = f'{html}<tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
                         for cell in row:
-                            html = f'{html}<td>{cell}</td>'
+                            html = f'{html}<td balign="left">{cell}</td>'
                         html = f'{html}</tr></table></td></tr>'
                 html = f'{html}</table>'
 
                 if connector.color: # add color bar next to color info, if present
-                    colorbar = f'<td bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>'
-                    html = html.replace('<td><!-- colorbar --></td>', colorbar)
+                    colorbar = f' bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
+                    html = html.replace('><!-- colorbar --></td>', colorbar)
 
                 dot.node(key, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
 
