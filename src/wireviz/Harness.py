@@ -4,15 +4,10 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d, index_if_list
 from collections import Counter
 from typing import List
 
-
-# Return the value indexed if it is a list, or simply the value otherwise.
-# TODO: Maybe move this to wv_helper?
-def index_if_list(value, index):
-    return value[index] if isinstance(value, list) else value
 
 class Harness:
 
@@ -349,7 +344,6 @@ class Harness:
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        # TODO: Maybe rename bundle to cable or maybe loop only [c for c in self.cables.values() if c.category == 'bundle']
         for bundle in self.cables.values():
             if bundle.category == 'bundle':
                 # add each wire from each bundle to the wirelist

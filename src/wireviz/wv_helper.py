@@ -65,3 +65,7 @@ def tuplelist2tsv(inp, header=None):
     for row in inp:
         output = output + '\t'.join(str(item) for item in row) + '\n'
     return output
+
+# Return the value indexed if it is a list, or simply the value otherwise.
+def index_if_list(value, index):
+    return value[index] if isinstance(value, list) else value
