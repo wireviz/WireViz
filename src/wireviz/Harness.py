@@ -307,8 +307,7 @@ class Harness:
         bom_cables = []
         # connectors
         connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
-        groups = Counter([connector_group(v) for v in self.connectors.values()])
-        for group in groups:
+        for group in Counter([connector_group(v) for v in self.connectors.values()]):
             items = {k: v for k, v in self.connectors.items() if connector_group(v) == group}
             shared = next(iter(items.values()))
             designators = list(items.keys())
@@ -327,8 +326,7 @@ class Harness:
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
         # The category needs to be included in cable_group to keep the bundles excluded.
         cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
-        groups = Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle'])
-        for group in groups:
+        for group in Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle']):
             items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
             shared = next(iter(items.values()))
             designators = list(items.keys())
@@ -354,8 +352,7 @@ class Harness:
                                      'internal part number': index_if_list(bundle.internal_part_number, index)})
         # join similar wires from all the bundles to a single BOM item
         wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['manufacturer part number'], w['internal part number'])
-        groups = Counter([wire_group(v) for v in wirelist])
-        for group in groups:
+        for group in Counter([wire_group(v) for v in wirelist]):
             items = [v for v in wirelist if wire_group(v) == group]
             shared = items[0]
             designators = [i['designator'] for i in items]
