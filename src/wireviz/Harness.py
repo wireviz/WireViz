@@ -264,6 +264,15 @@ class Harness:
         data.seek(0)
         return data.read()
 
+    @property
+    def svg(self):
+        from io import BytesIO
+        graph = self.create_graph()
+        data = BytesIO()
+        data.write(graph.pipe(format='svg'))
+        data.seek(0)
+        return data.read()
+
     def output(self, filename, directory='_output', view=False, cleanup=True, fmt='pdf', gen_bom=False):
         # graphical output
         graph = self.create_graph()

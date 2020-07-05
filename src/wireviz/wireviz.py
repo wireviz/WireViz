@@ -205,8 +205,10 @@ def parse(yaml_input, file_out=None, generate_bom=False, return_types: (None, st
 
         if 'png' in return_types:
             returns.append(harness.png)
+        if 'svg' in return_types:
+            returns.append(harness.svg)
 
-        return tuple(returns) if len(returns) != 1 else returns
+        return tuple(returns) if len(returns) != 1 else returns[0]
 
 
 def parse_file(yaml_file, file_out=None, generate_bom=False):
