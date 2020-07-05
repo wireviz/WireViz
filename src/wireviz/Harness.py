@@ -4,7 +4,7 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks, remove_line_breaks
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, nested_html_table, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks, remove_line_breaks
 from collections import Counter
 from typing import List
 
@@ -67,14 +67,7 @@ class Harness:
                         [html_line_breaks(connector.notes)]]
                 rows = [list(filter(None, row)) for row in rows] # remove missing attributes
 
-                html = '<table border="0" cellspacing="0" cellpadding="0">'
-                for row in rows:
-                    if len(row) > 0:
-                        html = f'{html}<tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
-                        for cell in row:
-                            html = f'{html}<td balign="left">{cell}</td>'
-                        html = f'{html}</tr></table></td></tr>'
-                html = f'{html}</table>'
+                html = nested_html_table(rows)
 
                 if connector.color: # add color bar next to color info, if present
                     colorbar = f' bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag

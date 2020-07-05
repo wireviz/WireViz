@@ -44,6 +44,20 @@ def nested(inp):
                     l.append(str(x))
     return '|'.join(l)
 
+def nested_html_table(rows):
+    # input: list of lists
+    # output: a parent table with one child table per parent list item
+    # purpose: create the appearance of one table, where cell widths are independent between rows
+    html = '<table border="0" cellspacing="0" cellpadding="0">'
+    for row in rows:
+        if len(row) > 0:
+            html = f'{html}<tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
+            for cell in row:
+                html = f'{html}<td balign="left">{cell}</td>'
+            html = f'{html}</tr></table></td></tr>'
+    html = f'{html}</table>'
+    return html
+
 
 def int2tuple(inp):
     if isinstance(inp, tuple):
