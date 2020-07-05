@@ -343,7 +343,7 @@ class Harness:
             if bundle.category == 'bundle':
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
-                    wirelist.append({'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
+                    wirelist.append({'type': bundle.type, 'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
                                      'manufacturer': index_if_list(bundle.manufacturer, index),
                                      'manufacturer part number': index_if_list(bundle.manufacturer_part_number, index),
                                      'internal part number': index_if_list(bundle.internal_part_number, index)})
@@ -356,8 +356,8 @@ class Harness:
             designators = list(dict.fromkeys(designators))  # remove duplicates
             designators.sort()
             total_length = sum(i['length'] for i in items)
-            wire_type = f', {remove_line_breaks(shared["type"])}' if 'type' in shared else ''
-            gauge_name = f', {shared["gauge"]} {shared["gauge_unit"]}' if 'gauge' in shared else ''
+            wire_type = f', {remove_line_breaks(shared["type"])}' if shared.get('type', None) else ''
+            gauge_name = f', {shared["gauge"]} {shared["gauge_unit"]}' if shared.get('gauge', None) else ''
             gauge_color = f', {shared["color"]}' if 'color' in shared != '' else ''
             name = f'Wire{wire_type}{gauge_name}{gauge_color}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
