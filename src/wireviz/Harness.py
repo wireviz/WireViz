@@ -92,7 +92,6 @@ class Harness:
                         f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
                         [html_line_breaks(connector.notes)]]
                 rows = [list(filter(None, row)) for row in rows] # remove missing attributes
-
                 html = nested_html_table(rows)
 
                 if connector.color: # add color bar next to color info, if present
@@ -102,24 +101,37 @@ class Harness:
                 dot.node(key, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
 
             else:  # not a ferrule
-                identification = [connector.manufacturer,
-                                  f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else '',
-                                  f'IPN: {connector.internal_part_number}' if connector.internal_part_number else '']
 
-                attributes = [graphviz_line_breaks(connector.type),
-                              graphviz_line_breaks(connector.subtype),
-                              f'{connector.pincount}-pin' if connector.show_pincount else'']
-                pinouts = [[], [], []]
+                rows = [[connector.name if connector.show_name else None],
+                        [html_line_breaks(connector.type),
+                         html_line_breaks(connector.subtype),
+                         f'{connector.pincount}-pin' if connector.show_pincount else None],
+                        [connector.manufacturer,
+                         f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
+                         f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
+                         '<!-- connector table -->',
+                         [html_line_breaks(connector.notes)]]
+                html = nested_html_table(rows)
+
+                pinouts = []
                 for pinnumber, pinname in zip(connector.pinnumbers, connector.pinout):
                     if connector.hide_disconnected_pins and not connector.visible_pins.get(pinnumber, False):
                         continue
-                    pinouts[1].append(pinname)
-                    if connector.ports_left:
-                        pinouts[0].append(f'<p{pinnumber}l>{pinnumber}')
-                    if connector.ports_right:
-                        pinouts[2].append(f'<p{pinnumber}r>{pinnumber}')
-                label = [connector.name if connector.show_name else '', identification, attributes, pinouts, graphviz_line_breaks(connector.notes)]
-                dot.node(key, label=nested(label))
+                    pinouts.append([f'<td port="p{pinnumber}l">{pinnumber}</td>' if connector.ports_left else None,
+                                    f'<td>{pinname}</td>' if pinname else '',
+                                    f'<td port="p{pinnumber}r">{pinnumber}</td>' if connector.ports_right else None])
+
+                pinhtml = '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
+                for i, pin in enumerate(pinouts):
+                    pinhtml = f'{pinhtml}<tr>'
+                    for column in pin:
+                        if column is not None:
+                            pinhtml = f'{pinhtml}{column}'
+                    pinhtml = f'{pinhtml}</tr>'
+                pinhtml = f'{pinhtml}</table>'
+                html = html.replace('<!-- connector table -->', pinhtml)
+
+                dot.node(key, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
 
                 if len(connector.loops) > 0:
                     dot.attr('edge', color='#000000:#ffffff:#000000')
