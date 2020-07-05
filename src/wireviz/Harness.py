@@ -60,10 +60,10 @@ class Harness:
         for key, connector in self.connectors.items():
             if connector.category == 'ferrule':
 
-                rows = [[html_line_breaks(connector.type), html_line_breaks(connector.subtype), connector.color, '<!-- colorbar -->' if connector.color else None],
-                        [connector.manufacturer,
+                rows = [[connector.manufacturer,
                         f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
                         f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
+                        [html_line_breaks(connector.type), html_line_breaks(connector.subtype), connector.color, '<!-- colorbar -->' if connector.color else None],
                         [html_line_breaks(connector.notes)]]
                 html = nested_html_table(rows)
 
@@ -76,14 +76,14 @@ class Harness:
             else:  # not a ferrule
 
                 rows = [[connector.name if connector.show_name else None],
-                        [html_line_breaks(connector.type),
-                         html_line_breaks(connector.subtype),
-                         f'{connector.pincount}-pin' if connector.show_pincount else None],
                         [connector.manufacturer,
                          f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
                          f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
-                         '<!-- connector table -->',
-                         [html_line_breaks(connector.notes)]]
+                        [html_line_breaks(connector.type),
+                         html_line_breaks(connector.subtype),
+                         f'{connector.pincount}-pin' if connector.show_pincount else None],
+                        '<!-- connector table -->',
+                        [html_line_breaks(connector.notes)]]
                 html = nested_html_table(rows)
 
                 pinouts = []
