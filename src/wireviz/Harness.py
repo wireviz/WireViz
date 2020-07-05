@@ -4,7 +4,7 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks, remove_line_breaks
 from collections import Counter
 from typing import List
 
@@ -113,7 +113,6 @@ class Harness:
                         pinouts[0].append(f'<p{pinnumber}l>{pinnumber}')
                     if connector.ports_right:
                         pinouts[2].append(f'<p{pinnumber}r>{pinnumber}')
-                print(attributes)
                 label = [connector.name if connector.show_name else '', identification, attributes, pinouts, graphviz_line_breaks(connector.notes)]
                 dot.node(key, label=nested(label))
 
@@ -324,8 +323,8 @@ class Harness:
             shared = next(iter(items.values()))
             designators = list(items.keys())
             designators.sort()
-            conn_type = f', {shared.type}' if shared.type else ''
-            conn_subtype = f', {shared.subtype}' if shared.subtype else ''
+            conn_type = f', {remove_line_breaks(shared.type)}' if shared.type else ''
+            conn_subtype = f', {remove_line_breaks(shared.subtype)}' if shared.subtype else ''
             conn_pincount = f', {shared.pincount} pins' if shared.category != 'ferrule' else ''
             conn_color = f', {shared.color}' if shared.color else ''
             name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
@@ -344,7 +343,7 @@ class Harness:
             designators = list(items.keys())
             designators.sort()
             total_length = sum(i.length for i in items.values())
-            cable_type = f', {shared.type}' if shared.type else ''
+            cable_type = f', {remove_line_breaks(shared.type)}' if shared.type else ''
             gauge_name = f' x {shared.gauge} {shared.gauge_unit}' if shared.gauge else ' wires'
             shield_name = ' shielded' if shared.shield else ''
             name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
@@ -371,7 +370,7 @@ class Harness:
             designators = list(dict.fromkeys(designators))  # remove duplicates
             designators.sort()
             total_length = sum(i['length'] for i in items)
-            wire_type = f', {shared["type"]}' if 'type' in shared else ''
+            wire_type = f', {remove_line_breaks(shared["type"])}' if 'type' in shared else ''
             gauge_name = f', {shared["gauge"]} {shared["gauge_unit"]}' if 'gauge' in shared else ''
             gauge_color = f', {shared["color"]}' if 'color' in shared != '' else ''
             name = f'Wire{wire_type}{gauge_name}{gauge_color}'

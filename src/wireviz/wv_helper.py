@@ -77,4 +77,4 @@ def graphviz_line_breaks(inp):
     return inp.replace('\n', '\\l') if isinstance(inp, str) else inp # \l generates left-aligned new lines. http://www.graphviz.org/doc/info/attrs.html#k:escString
 
 def remove_line_breaks(inp):
-    return inp.replace('\n', ' ')
+    return inp.replace('\n', ' ').rstrip() if isinstance(inp, str) else inp
