@@ -4,7 +4,7 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, nested_html_table, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks, remove_line_breaks
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested_html_table, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks, remove_line_breaks
 from collections import Counter
 from typing import List
 
@@ -65,7 +65,6 @@ class Harness:
                         f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
                         f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
                         [html_line_breaks(connector.notes)]]
-                rows = [list(filter(None, row)) for row in rows] # remove missing attributes
                 html = nested_html_table(rows)
 
                 if connector.color: # add color bar next to color info, if present

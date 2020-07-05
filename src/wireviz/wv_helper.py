@@ -30,20 +30,6 @@ def awg_equiv(mm2):
 def mm2_equiv(awg):
     return mm2_equiv_table.get(str(awg), 'Unknown')
 
-def nested(inp):
-    l = []
-    for x in inp:
-        if isinstance(x, list):
-            if len(x) > 0:
-                n = nested(x)
-                if n != '':
-                    l.append('{' + n + '}')
-        else:
-            if x is not None:
-                if x != '':
-                    l.append(str(x))
-    return '|'.join(l)
-
 def nested_html_table(rows):
     # input: list, each item may be scalar or list
     # output: a parent table with one child table per parent item that is list, and one cell per parent item that is scalar
@@ -57,7 +43,7 @@ def nested_html_table(rows):
                     if cell is not None:
                         html = f'{html}<td balign="left">{cell}</td>'
                 html = f'{html}</tr></table></td></tr>'
-        else:
+        elif row is not None:
             html = f'{html}<tr><td>{row}</td></tr>'
     html = f'{html}</table>'
     return html
