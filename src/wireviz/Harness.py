@@ -4,7 +4,7 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, flatten2d, index_if_list
 from collections import Counter
 from typing import List
 
@@ -316,8 +316,7 @@ class Harness:
         bom_cables = []
         # connectors
         connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
-        groups = Counter([connector_group(v) for v in self.connectors.values()])
-        for group in groups:
+        for group in Counter([connector_group(v) for v in self.connectors.values()]):
             items = {k: v for k, v in self.connectors.items() if connector_group(v) == group}
             shared = next(iter(items.values()))
             designators = list(items.keys())
@@ -334,10 +333,9 @@ class Harness:
         bom.extend(bom_connectors)
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
-        # Otherwise, it can be removed from the cable_group because it will allways be empty.
+        # The category needs to be included in cable_group to keep the bundles excluded.
         cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
-        groups = Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle'])
-        for group in groups:
+        for group in Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle']):
             items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
             shared = next(iter(items.values()))
             designators = list(items.keys())
@@ -353,22 +351,17 @@ class Harness:
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        bundle_group = lambda b: (b.category, b.type, b.gauge, b.gauge_unit, b.length)
-        groups = Counter([bundle_group(v) for v in self.cables.values() if v.category == 'bundle'])
-        for group in groups:
-            items = {k: v for k, v in self.cables.items() if bundle_group(v) == group}
-            shared = next(iter(items.values()))
-            for bundle in items.values():
+        for bundle in self.cables.values():
+            if bundle.category == 'bundle':
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
-                    wirelist.append({'gauge': shared.gauge, 'gauge_unit': shared.gauge_unit, 'length': shared.length, 'color': color, 'designator': bundle.name,
-                                     'manufacturer': bundle.manufacturer[index] if isinstance(bundle.manufacturer, list) else None,
-                                     'manufacturer part number': bundle.manufacturer_part_number[index] if isinstance(bundle.manufacturer_part_number, list) else None,
-                                     'internal part number': bundle.internal_part_number[index] if isinstance(bundle.internal_part_number, list) else None})
+                    wirelist.append({'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
+                                     'manufacturer': index_if_list(bundle.manufacturer, index),
+                                     'manufacturer part number': index_if_list(bundle.manufacturer_part_number, index),
+                                     'internal part number': index_if_list(bundle.internal_part_number, index)})
         # join similar wires from all the bundles to a single BOM item
         wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['manufacturer part number'], w['internal part number'])
-        groups = Counter([wire_group(v) for v in wirelist])
-        for group in groups:
+        for group in Counter([wire_group(v) for v in wirelist]):
             items = [v for v in wirelist if wire_group(v) == group]
             shared = items[0]
             designators = [i['designator'] for i in items]
