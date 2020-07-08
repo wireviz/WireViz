@@ -3,15 +3,14 @@ version: '2'
 services:
   wireviz:
     build: .
-#        ports:
-#        - "80:80"
+#    ports:
+#      - "8086:80"
     restart: unless-stopped
-    env_file:
-      - environment.env
     labels:
+      - "traefik.backend=wireviz"
       - "traefik.enable=true"
-      - "traefik.http.routers.gitlabsvgbadges.rule=Host(`wireviz.docker.lab`)"
-      - "traefik.http.services.gitlabsvgbadges.loadbalancer.server.port=80"
+      - "traefik.http.routers.wekan.rule=Host(`wireviz.docker.lab`)"
+      - "traefik.http.services.wekan.loadbalancer.server.port=80"
       - "traefik.docker.network=traefik_proxy"
     networks:
       - traefik_proxy
