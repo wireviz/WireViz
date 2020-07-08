@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+  wirewiz:
+    build: .
+#        ports:
+#        - "80:80"
+    restart: unless-stopped
+    env_file:
+      - environment.env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitlabsvgbadges.rule=Host(`wirewiz.docker.lab`)"
+      - "traefik.http.services.gitlabsvgbadges.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik_proxy"
+    networks:
+      - traefik_proxy
+
+networks:
+  traefik_proxy:
+    external:
+      name: traefik_proxy
