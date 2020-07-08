@@ -1,1 +1,7 @@
-.
+Flask
+requests
+flask-restplus
+Werkzeug==0.16.1
+dataclasses
+pyyaml
+graphviz

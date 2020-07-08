@@ -23,6 +23,7 @@ setup(
     install_requires=[
         'pyyaml',
         'graphviz',
+
         ],
     license='GPLv3',
     keywords='cable connector hardware harness wiring wiring-diagram wiring-harness',

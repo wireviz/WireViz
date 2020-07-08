@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<title>RFC 3161 Timestamp Server</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+<body>
+
+<!-- Header -->
+<header class="w3-container w3-theme w3-padding" id="myHeader">
+    <!--i onclick="w3_open()" class="fa fa-bars w3-xlarge w3-button w3-theme"></i-->
+    <div class="w3-center">
+        <h4>by Jürgen "EL BOSSO" Key</h4>
+        <h1 class="w3-xxxlarge w3-animate-bottom">RFC 3161 Timestamp Server</h1>
+        <div class="w3-padding-16">
+            <a class="w3-btn w3-large w3-theme-dark w3-hover-teal" href="https://github.com/elbosso/rfc3161timestampingserver">Visit project website!</a>
+        </div>
+        <div class="w3-padding-16">
+            <a class="w3-btn w3-large w3-theme-dark w3-hover-teal" href="https://elbosso.github.io">Visit authors website!</a>
+        </div>
+    </div>
+</header>
+
+<div class="w3-row-padding w3-margin-top">
+    <div class="w3-twothird">
+        <div class="w3-card w3-container" style="min-height:500px">
+            <h3>Usage</h3>
+            <p>The OpenSSL configuration provided as ressource can be used with
+                <a href="https://www.openssl.org/" rel="nofollow">OpenSSL</a> to create a certificate
+                request like so:</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">openssl ts -query -config tsa.conf -cert -sha512 -data &lt;path&gt;/&lt;some_file&gt; -no_nonce -out &lt;request_path&gt;/&lt;request&gt;.tsq</div>
+            <p>This request can be sent using a HTTP POST request as multipart form data
+                (for example from a file upload form inside a web page):</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">curl -F "tsq=@&lt;request&gt;.tsq" http://&lt;host&gt;:&lt;port&gt;/ &gt;&lt;reply&gt;.tsr</div>
+            <p>The file <em>reply.tsr</em> contains the timestamp. Alternatively,
+                this also works with a POST request containing the timestamp query in
+                the body of said request having the correct mime-type:</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">curl -H "Content-Type: application/timestamp-query" --data-binary '@&lt;request&gt;.tsq' http://&lt;host&gt;:&lt;port&gt;/ &gt;&lt;reply&gt;.tsr</div>
+            <p>The content of the timestamp (useful for ascertaining the time and date
+                for example) can be displayed for example with the help of
+                OpenSSL command line tools like so:</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">openssl ts -config tsa.conf -reply -in &lt;reply&gt;.tsr -text</div>
+            <p>To verify the timestamp, OpenSSL can help too:</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">openssl ts -verify -config tsa.conf -queryfile &lt;request&gt;.tsq -in &lt;reply&gt;.tsr -CAfile chain.pem</div>
+        </div>
+    </div>
+
+    <div class="w3-third" style="min-height:500px">
+        <div class="w3-card-padding w3-container" >
+            <h3>Ressources</h3>
+            <p><a href="/tsa.crt">Timestamping Authority (TSA) Certificate</a></p>
+            <p><a href="/chain.pem">Certificate Chain for TSA</a></p>
+            <p><a href="/tsa.conf">OpenSSL configuration for client operations</a></p>
+            <p></p>
+        </div>
+        <div class="w3-card-padding w3-container">
+            <h3>Search timestamp...</h3>
+            <form action="/query" method="post">
+                <div class="w3-row-padding w3-tiny w3-margin-top"><textarea rows="3" style="width: 100%; height: 100%" name="msgDigestHex"></textarea></div>
+                <div class="w3-row-padding w3-margin-top"><input type="submit" title="Find..." value="Find..."/></div>
+            </form>
+        </div>
+        <div class="w3-card-padding w3-container">
+            <h3>Request timestamp...</h3>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <div class="w3-row-padding w3-margin-top"><input name="tsq" type="file" accept="application/timestamp-query"></div>
+                <div class="w3-row-padding w3-margin-top"><input type="submit" title="Request Timestamp" value="Request Timestamp"/></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<footer class="w3-container w3-theme-dark">
+    <!--h3>Footer</h3-->
+    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+    <!--div style="position:relative;bottom:55px;" class="w3-tooltip w3-right">
+        Go To Top&nbsp;
+        <a class="w3-text-white" href="#myHeader">
+    <i class="fa fa-chevron-circle-up"></i></a>
+    </div>
+    <p>Remember to check out our&nbsp;&nbsp;<a href="w3css_references.asp" class="w3-btn w3-theme" target="_blank">W3.CSS Reference</a></p-->
+</footer>
+
+
+</body>
+</html>
