@@ -22,21 +22,21 @@ RUN apt-get update && apt-get install -y apache2 \
  && rm -rf /var/lib/apt/lists/*
 
 # Copy over and install the requirements
-COPY ../requirements.txt /var/www/apache-flask/app/requirements.txt
+COPY ./requirements.txt /var/www/apache-flask/app/requirements.txt
 RUN pip3 install -r /var/www/apache-flask/app/requirements.txt
 
 # Copy over the apache configuration file and enable the site
-COPY ./apache-flask.conf /etc/apache2/sites-available/apache-flask.conf
+COPY ./src/apache-flask.conf /etc/apache2/sites-available/apache-flask.conf
 RUN a2ensite apache-flask
 RUN a2enmod headers
 
 # Copy over the wsgi file
-COPY ./apache-flask.wsgi /var/www/apache-flask/apache-flask.wsgi
+COPY ./src/apache-flask.wsgi /var/www/apache-flask/apache-flask.wsgi
 
-COPY ./run.py /var/www/apache-flask/run.py
-COPY ./app /var/www/apache-flask/app/
-COPY ./wirewiz /var/www/apache-flask/wirewiz/
-COPY ./static /var/www/apache-flask/static/
+COPY ./src/run.py /var/www/apache-flask/run.py
+COPY ./src/app /var/www/apache-flask/app/
+COPY ./src/wireviz /var/www/apache-flask/wireviz/
+COPY ./src/static /var/www/apache-flask/static/
 
 RUN a2dissite 000-default.conf
 RUN a2ensite apache-flask.conf

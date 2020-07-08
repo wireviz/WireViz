@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<title>WireViz Server</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-teal.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+<body>
+
+<!-- Header -->
+<header class="w3-container w3-theme w3-padding" id="myHeader">
+    <!--i onclick="w3_open()" class="fa fa-bars w3-xlarge w3-button w3-theme"></i-->
+    <div class="w3-center">
+        <h4>by Jürgen "EL BOSSO" Key</h4>
+        <h1 class="w3-xxxlarge w3-animate-bottom">WireViz Server</h1>
+        <div class="w3-padding-16">
+            <a class="w3-btn w3-large w3-theme-dark w3-hover-teal" href="https://github.com/elbosso/WireViz">Visit project website!</a>
+        </div>
+        <div class="w3-padding-16">
+            <a class="w3-btn w3-large w3-theme-dark w3-hover-teal" href="https://elbosso.github.io">Visit authors website!</a>
+        </div>
+    </div>
+</header>
+
+<div class="w3-row-padding w3-margin-top">
+    <div class="w3-twothird">
+        <div class="w3-card w3-container" style="min-height:500px">
+            <h3>Usage</h3>
+            <p>You get a nice PNG image like so:</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">curl -X POST "http://&lt;host&gt;:&lt;port&gt;/wireviz/" -H  "Content-Type: multipart/form-data" -H "accept: image/png" -F "yml_file=@&lt;input_file&gt;.yml;type=application/x-yaml" -o &lt;output_file&gt;.png</div>
+            <p>You get a nice SVG image like so:</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">curl -X POST "http://&lt;host&gt;:&lt;port&gt;/wireviz/" -H  "Content-Type: multipart/form-data" -H "accept: image/svg+xml" -F "yml_file=@&lt;input_file&gt;.yml;type=application/x-yaml" -o &lt;output_file&gt;.svg</div>
+            <p>If there is no preference specified - the result will be a nice PNG image:</p>
+            <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">curl -X POST "http://&lt;host&gt;:&lt;port&gt;/wireviz/" -H  "Content-Type: multipart/form-data" -F "yml_file=@&lt;input_file&gt;.yml;type=application/x-yaml" -o &lt;output_file&gt;.png</div>
+        </div>
+    </div>
+
+    <div class="w3-third" style="min-height:500px">
+        <div class="w3-card-padding w3-container" >
+            <h3>Ressources</h3>
+            <p><a href="/demo01.yml">Demo file for testing purposes</a></p>
+            <p></p>
+        </div>
+        <div class="w3-card-padding w3-container">
+            <h3>Request PNG...</h3>
+            <form action="/wireviz/" method="post" enctype="multipart/form-data">
+                <div class="w3-row-padding w3-margin-top"><input name="yml_file" type="file" accept="application/x-yaml"></div>
+                <div class="w3-row-padding w3-margin-top"><input type="submit" title="Request PNG rendering" value="Request PNG rendering"/></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer -->
+<footer class="w3-container w3-theme-dark">
+    <!--h3>Footer</h3-->
+    <p>Powered by <a href="https://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+    <!--div style="position:relative;bottom:55px;" class="w3-tooltip w3-right">
+        Go To Top&nbsp;
+        <a class="w3-text-white" href="#myHeader">
+    <i class="fa fa-chevron-circle-up"></i></a>
+    </div>
+    <p>Remember to check out our&nbsp;&nbsp;<a href="w3css_references.asp" class="w3-btn w3-theme" target="_blank">W3.CSS Reference</a></p-->
+</footer>
+
+
+</body>
+</html>
