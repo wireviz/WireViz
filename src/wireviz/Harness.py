@@ -26,6 +26,30 @@ class Harness:
         self.connectors[connector_name].loop(from_pin, to_pin)
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
+
+        for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]): # check from and to connectors
+            if name is not None and name in self.connectors:
+                connector = self.connectors[name]
+                if pin in connector.pinnumbers and pin in connector.pinout:
+                    if connector.pinnumbers.index(pin) == connector.pinout.index(pin):
+                        # TODO: Maybe issue a warning? It's not worthy of an exception if it's unambiguous, but maybe risky?
+                        pass
+                    else:
+                        raise Exception(f'{name}:{pin} is defined both in pinout and pinnumbers, for different pins.')
+                if pin in connector.pinout:
+                    if connector.pinout.count(pin) > 1:
+                        raise Exception(f'{name}:{pin} is defined more than once.')
+                    else:
+                        index = connector.pinout.index(pin)
+                        pin = connector.pinnumbers[index] # map pin name to pin number
+                        if name == from_name:
+                            from_pin = pin
+                        if name == to_name:
+                            to_pin = pin
+                        # TODO: what happens with loops?
+                if not pin in connector.pinnumbers:
+                    raise Exception(f'{name}:{pin} not found.')
+
         self.cables[via_name].connect(from_name, from_pin, via_pin, to_name, to_pin)
         if from_name in self.connectors:
             self.connectors[from_name].activate_pin(from_pin)
