@@ -36,6 +36,7 @@ COPY ./src/apache-flask.wsgi /var/www/apache-flask/apache-flask.wsgi
 COPY ./src/run.py /var/www/apache-flask/run.py
 COPY ./src/app /var/www/apache-flask/app/
 COPY ./src/wireviz /var/www/apache-flask/wireviz/
+COPY ./src/app/static/index.html /var/www/
 
 RUN a2dissite 000-default.conf
 RUN a2ensite apache-flask.conf

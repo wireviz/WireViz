@@ -33,18 +33,20 @@
             <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">curl -X POST "http://&lt;host&gt;:&lt;port&gt;/wireviz/" -H  "Content-Type: multipart/form-data" -H "accept: image/svg+xml" -F "yml_file=@&lt;input_file&gt;.yml;type=application/x-yaml" -o &lt;output_file&gt;.svg</div>
             <p>If there is no preference specified - the result will be a nice PNG image:</p>
             <div class="w3-panel w3-leftbar w3-sand w3-tiny w3-mono">curl -X POST "http://&lt;host&gt;:&lt;port&gt;/wireviz/" -H  "Content-Type: multipart/form-data" -F "yml_file=@&lt;input_file&gt;.yml;type=application/x-yaml" -o &lt;output_file&gt;.png</div>
+            <p>If you want, you can also play around with the <a
+            href="/wsgi/doc/">Swagger UI!</a></p>
         </div>
     </div>
 
     <div class="w3-third" style="min-height:500px">
         <div class="w3-card-padding w3-container" >
             <h3>Ressources</h3>
-            <p><a href="/demo01.yml">Demo file for testing purposes</a></p>
+            <p><a href="/static/demo01.yml">Demo file for testing purposes</a></p>
             <p></p>
         </div>
         <div class="w3-card-padding w3-container">
             <h3>Request PNG...</h3>
-            <form action="/wireviz/" method="post" enctype="multipart/form-data">
+            <form action="/wsgi/wireviz/" method="post" enctype="multipart/form-data">
                 <div class="w3-row-padding w3-margin-top"><input name="yml_file" type="file" accept="application/x-yaml"></div>
                 <div class="w3-row-padding w3-margin-top"><input type="submit" title="Request PNG rendering" value="Request PNG rendering"/></div>
             </form>
