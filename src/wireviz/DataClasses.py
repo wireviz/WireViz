@@ -51,6 +51,9 @@ class Connector:
         if not self.pinout:
             self.pinout = [''] * self.pincount
 
+        if len(self.pinnumbers) != len(set(self.pinnumbers)):
+            raise Exception('Pin numbers are not unique')
+
     def loop(self, from_pin, to_pin):
         self.loops.append((from_pin, to_pin))
         if self.hide_disconnected_pins:
