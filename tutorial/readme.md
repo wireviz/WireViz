@@ -203,9 +203,9 @@ connectors:
     pinout: [+12V, GND, GND, +5V]
     type: Molex 8981
     subtype: female
-
-ferrules: # ferrules
   F1:
+    category: ferrule
+    autogenerate: true
     type: Ferrule, crimp
     subtype: 0.5 mm²
     color: OG # optional color
@@ -253,9 +253,9 @@ connectors:
     type: Ferrule, crimp
     subtype: 1.0 mm²
     color: YE
-
-ferrules: # ferrules
   F_05:
+    category: ferrule
+    autogenerate: true
     type: Ferrule, crimp
     subtype: 0.5 mm²
     color: OG # optional color

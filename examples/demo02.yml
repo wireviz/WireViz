@@ -9,11 +9,6 @@ templates: # defining templates to be used later on
     gauge: 0.14 mm2
     colors: [BK, RD, YE, GN]
 
-ferrules:
-  ferrule_crimp:
-    type: Crimp ferrule
-    subtype: 0.25 mm²
-
 connectors:
   X1:
     <<: *molex_f # copying items from the template
@@ -27,6 +22,11 @@ connectors:
   X4:
     <<: *molex_f
     pinout: [GND, +12V, MISO, MOSI, SCK]
+  ferrule_crimp:
+    category: ferrule
+    autogenerate: true
+    type: Crimp ferrule
+    subtype: 0.25 mm²
 
 cables:
   W1:
