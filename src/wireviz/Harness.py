@@ -4,7 +4,9 @@
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
 from wireviz import wv_colors
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, nested_html_table, flatten2d, index_if_list, html_line_breaks, graphviz_line_breaks, remove_line_breaks
+from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, \
+    nested_html_table, flatten2d, index_if_list, html_line_breaks, \
+    graphviz_line_breaks, remove_line_breaks
 from collections import Counter
 from typing import List
 
@@ -27,7 +29,8 @@ class Harness:
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
 
-        for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]): # check from and to connectors
+        # check from and to connectors
+        for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):
             if name is not None and name in self.connectors:
                 connector = self.connectors[name]
                 if pin in connector.pinnumbers and pin in connector.pinout:
@@ -278,7 +281,7 @@ class Harness:
         data.seek(0)
         return data.read()
 
-    def output(self, filename, directory='_output', view=False, cleanup=True, fmt='pdf', gen_bom=False):
+    def output(self, filename, directory='_output', view=False, cleanup=True, fmt=('pdf', )):
         # graphical output
         graph = self.create_graph()
         for f in fmt:
