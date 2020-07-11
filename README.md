@@ -110,7 +110,13 @@ If you would like to rebuild all of the included demos, examples and tutorials, 
 
 ```cd src/wireviz
 ./build_examples.py
+
 ```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md)
+
 ## Status
 
 This is very much a [work in progress](https://github.com/formatc1702/WireViz/projects/1). Source code, API, syntax and functionality may change wildly at any time.
@@ -123,4 +129,4 @@ Ubuntu 18.04 LTS users in particular may need to separately install Python 3.7 o
 
 ## License
 
-GNU GPLv3
+[GPL-3.0](LICENSE)
