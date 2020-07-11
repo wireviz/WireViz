@@ -25,11 +25,11 @@ class Connector:
     show_pincount: bool = True
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
+    loops: List[Any] = field(default_factory=list)
 
     def __post_init__(self):
         self.ports_left = False
         self.ports_right = False
-        self.loops = []
         self.visible_pins = {}
 
         if self.pincount is None:
@@ -55,11 +55,12 @@ class Connector:
         if len(self.pinnumbers) != len(set(self.pinnumbers)):
             raise Exception('Pin numbers are not unique')
 
-    def loop(self, from_pin, to_pin):
-        self.loops.append((from_pin, to_pin))
-        if self.hide_disconnected_pins:
-            self.visible_pins[from_pin] = True
-            self.visible_pins[to_pin] = True
+        for loop in self.loops:
+            # TODO: check that pins to connect actually exist
+            # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
+            # TODO: include properties of wire used to create the loop
+            if len(loop) != 2:
+                raise Exception('Loops must be between exactly two pins!')
 
     def activate_pin(self, pin):
         self.visible_pins[pin] = True

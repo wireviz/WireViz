@@ -22,9 +22,6 @@ class Harness:
     def add_cable(self, name, *args, **kwargs):
         self.cables[name] = Cable(name, *args, **kwargs)
 
-    def loop(self, connector_name, from_pin, to_pin):
-        self.connectors[connector_name].loop(from_pin, to_pin)
-
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
 
         for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]): # check from and to connectors
@@ -46,7 +43,6 @@ class Harness:
                             from_pin = pin
                         if name == to_name:
                             to_pin = pin
-                        # TODO: what happens with loops?
                 if not pin in connector.pinnumbers:
                     raise Exception(f'{name}:{pin} not found.')
 
