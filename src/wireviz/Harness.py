@@ -28,9 +28,7 @@ class Harness:
         self.connectors[connector_name].loop(from_pin, to_pin)
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
-
-        # check from and to connectors
-        for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):
+        for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):  # check from and to connectors
             if name is not None and name in self.connectors:
                 connector = self.connectors[name]
                 if pin in connector.pinnumbers and pin in connector.pinout:
