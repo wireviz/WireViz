@@ -16,7 +16,7 @@ if demos:
     for i in range(1,demos+1):
         fn = '../../examples/demo{:02d}.yml'.format(i)
         print(fn)
-        wireviz.parse_file(fn, generate_bom=True)
+        wireviz.parse_file(fn)
 
 if examples:
     with open(os.path.abspath('../../examples/readme.md'), 'w') as file:
@@ -24,7 +24,7 @@ if examples:
         for i in range(1,examples+1):
             fn = '../../examples/ex{:02d}.yml'.format(i)
             print(fn)
-            wireviz.parse_file(fn, generate_bom=True)
+            wireviz.parse_file(fn)
 
             file.write('## Example {:02d}\n'.format(i))
             file.write('![](ex{:02d}.png)\n\n'.format(i))
@@ -36,7 +36,7 @@ if tutorials:
         for i in range(1,tutorials+1):
             fn = '../../tutorial/tutorial{:02d}.yml'.format(i)
             print(fn)
-            wireviz.parse_file(fn, generate_bom=True)
+            wireviz.parse_file(fn)
 
             with open(os.path.abspath('../../tutorial/tutorial{:02d}.md'.format(i)), 'r') as info:
                 for line in info:

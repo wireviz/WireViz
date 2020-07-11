@@ -15,13 +15,12 @@ if __name__ == '__main__':
 from wireviz.Harness import Harness
 
 
-def parse(yaml_input, file_out=None, generate_bom=False, return_types: (None, str, Tuple[str]) = None):
+def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = None):
     """
     Parses yaml input string and does the high-level harness conversion
 
     :param yaml_input: a string containing the yaml input data
     :param file_out:
-    :param generate_bom:
     :param return_types: if None, then returns None; if the value is a string, then a
         corresponding data format will be returned; if the value is a tuple of strings,
         then for every valid format in the `return_types` tuple, another return type
@@ -194,7 +193,7 @@ def parse(yaml_input, file_out=None, generate_bom=False, return_types: (None, st
             raise Exception('Wrong number of connection parameters')
 
     if file_out is not None:
-        harness.output(filename=file_out, fmt=('png', 'svg'), gen_bom=generate_bom, view=False)
+        harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
 
     if return_types is not None:
         returns = []
@@ -211,7 +210,7 @@ def parse(yaml_input, file_out=None, generate_bom=False, return_types: (None, st
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def parse_file(yaml_file, file_out=None, generate_bom=False):
+def parse_file(yaml_file, file_out=None):
     with open(yaml_file, 'r') as file:
         yaml_input = file.read()
 
@@ -220,7 +219,7 @@ def parse_file(yaml_file, file_out=None, generate_bom=False):
         file_out = fn
     file_out = os.path.abspath(file_out)
 
-    parse(yaml_input, file_out=file_out, generate_bom=generate_bom)
+    parse(yaml_input, file_out=file_out)
 
 
 def parse_cmdline():
@@ -261,7 +260,7 @@ def main():
         file_out = args.output_file
     file_out = os.path.abspath(file_out)
 
-    parse(yaml_input, file_out=file_out, generate_bom=args.generate_bom)
+    parse(yaml_input, file_out=file_out)
 
 
 if __name__ == '__main__':
