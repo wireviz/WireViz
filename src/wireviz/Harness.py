@@ -17,7 +17,7 @@ class Harness:
         self.color_mode = 'SHORT'
         self.connectors = {}
         self.cables = {}
-        self.bom_items = []
+        self.additional_bom_items = []
 
     def add_connector(self, name, *args, **kwargs):
         self.connectors[name] = Connector(name, *args, **kwargs)
@@ -26,7 +26,7 @@ class Harness:
         self.cables[name] = Cable(name, *args, **kwargs)
 
     def add_bom_item(self, item):
-        self.bom_items.append(item)
+        self.additional_bom_items.append(item)
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
         for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):  # check from and to connectors
@@ -385,7 +385,7 @@ class Harness:
             bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
         bom.extend(bom_cables)
 
-        for item in self.bom_items:
+        for item in self.additional_bom_items:
             name = item['description'] if item.get('description', None) else ''
             if isinstance(item.get('designators', None), List):
                 item['designators'].sort()  # sort designators if a list is provided
