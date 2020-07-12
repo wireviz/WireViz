@@ -387,7 +387,9 @@ class Harness:
 
         for item in self.bom_items:
             name = item['description'] if item.get('description', None) else ''
-            item = {'item': name, 'qty': item.get('qty', None), 'unit': item.get('unit', None), 'designators': item.get('designators'),
+            if isinstance(item.get('designators', None), List):
+                item['designators'].sort()  # sort designators if a list is provided
+            item = {'item': name, 'qty': item.get('qty', None), 'unit': item.get('unit', None), 'designators': item.get('designators', None),
                     'manufacturer': item.get('manufacturer', None), 'manufacturer part number': item.get('manufacturer_part_number', None), 'internal part number': item.get('internal_part_number', None)}
             bom_extra.append(item)
         bom_extra = sorted(bom_extra, key=lambda k: k['item'])
