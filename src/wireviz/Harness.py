@@ -9,6 +9,7 @@ from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, nested, \
     graphviz_line_breaks, remove_line_breaks
 from collections import Counter
 from typing import List
+from pathlib import Path
 
 
 class Harness:
@@ -279,13 +280,13 @@ class Harness:
         data.seek(0)
         return data.read()
 
-    def output(self, filename, directory='_output', view=False, cleanup=True, fmt=('pdf', )):
+    def output(self, filename: (str, Path), view=False, cleanup=True, fmt=('pdf', )):
         # graphical output
         graph = self.create_graph()
         for f in fmt:
             graph.format = f
-            graph.render(filename=filename, directory=directory, view=view, cleanup=cleanup)
-        graph.save(filename=f'{filename}.gv', directory=directory)
+            graph.render(filename=filename, view=view, cleanup=cleanup)
+        graph.save(filename=f'{filename}.gv')
         # bom output
         bom_list = self.bom_list()
         with open(f'{filename}.bom.tsv', 'w') as file:
