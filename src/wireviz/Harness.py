@@ -17,12 +17,16 @@ class Harness:
         self.color_mode = 'SHORT'
         self.connectors = {}
         self.cables = {}
+        self.additional_bom_items = []
 
     def add_connector(self, name, *args, **kwargs):
         self.connectors[name] = Connector(name, *args, **kwargs)
 
     def add_cable(self, name, *args, **kwargs):
         self.cables[name] = Cable(name, *args, **kwargs)
+
+    def add_bom_item(self, item):
+        self.additional_bom_items.append(item)
 
     def connect(self, from_name, from_pin, via_name, via_pin, to_name, to_pin):
         for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):  # check from and to connectors
@@ -316,6 +320,7 @@ class Harness:
         bom = []
         bom_connectors = []
         bom_cables = []
+        bom_extra = []
         # connectors
         connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
         for group in Counter([connector_group(v) for v in self.connectors.values()]):
@@ -379,6 +384,16 @@ class Harness:
             bom_cables.append(item)
             bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
         bom.extend(bom_cables)
+
+        for item in self.additional_bom_items:
+            name = item['description'] if item.get('description', None) else ''
+            if isinstance(item.get('designators', None), List):
+                item['designators'].sort()  # sort designators if a list is provided
+            item = {'item': name, 'qty': item.get('qty', None), 'unit': item.get('unit', None), 'designators': item.get('designators', None),
+                    'manufacturer': item.get('manufacturer', None), 'manufacturer part number': item.get('manufacturer_part_number', None), 'internal part number': item.get('internal_part_number', None)}
+            bom_extra.append(item)
+        bom_extra = sorted(bom_extra, key=lambda k: k['item'])
+        bom.extend(bom_extra)
         return bom
 
     def bom_list(self):

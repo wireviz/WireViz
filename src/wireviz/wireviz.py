@@ -169,6 +169,11 @@ def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = Non
                         to_pin    = connection_list[i+1][j][1]
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
 
+    if "additional_bom_items" in yaml_data:
+        for line in yaml_data["additional_bom_items"]:
+            harness.add_bom_item(line)
+
+
     if file_out is not None:
         harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
 
