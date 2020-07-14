@@ -25,8 +25,10 @@ def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = Non
     :param return_types: if None, then returns None; if the value is a string, then a
         corresponding data format will be returned; if the value is a tuple of strings,
         then for every valid format in the `return_types` tuple, another return type
-        will be generated and returned in the same order; currently supports only 'png',
-        but could easily support other types
+        will be generated and returned in the same order; currently supports:
+         - "png" - will return the PNG data
+         - "svg" - will return the SVG data
+         - "harness" - will return the `Harness` instance
     """
 
     yaml_data = yaml.safe_load(yaml_input)
@@ -173,7 +175,6 @@ def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = Non
         for line in yaml_data["additional_bom_items"]:
             harness.add_bom_item(line)
 
-
     if file_out is not None:
         harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
 
@@ -188,6 +189,8 @@ def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = Non
             returns.append(harness.png)
         if 'svg' in return_types:
             returns.append(harness.svg)
+        if 'harness' in return_types:
+            returns.append(harness)
 
         return tuple(returns) if len(returns) != 1 else returns[0]
 
