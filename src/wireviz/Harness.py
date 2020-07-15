@@ -26,10 +26,10 @@ class Harness:
     def add_cable(self, name: str, *args, **kwargs) -> None:
         self.cables[name] = Cable(name, *args, **kwargs)
 
-    def add_bom_item(self, item: str) -> None:
+    def add_bom_item(self, item: dict) -> None:
         self.additional_bom_items.append(item)
 
-    def connect(self, from_name: str, from_pin: int, via_name: str, via_pin: (int, str), to_name: str, to_pin: int) -> None:
+    def connect(self, from_name: str, from_pin: (int, str), via_name: str, via_pin: (int, str), to_name: str, to_pin: (int, str)) -> None:
         for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):  # check from and to connectors
             if name is not None and name in self.connectors:
                 connector = self.connectors[name]
