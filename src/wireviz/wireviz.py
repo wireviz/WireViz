@@ -185,12 +185,13 @@ def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = Non
 
         return_types = [t.lower() for t in return_types]
 
-        if 'png' in return_types:
-            returns.append(harness.png)
-        if 'svg' in return_types:
-            returns.append(harness.svg)
-        if 'harness' in return_types:
-            returns.append(harness)
+        for rt in return_types:
+            if rt == 'png':
+                returns.append(harness.png)
+            if rt == 'svg':
+                returns.append(harness.svg)
+            if rt == 'harness':
+                returns.append(harness)
 
         return tuple(returns) if len(returns) != 1 else returns[0]
 
