@@ -117,7 +117,7 @@ def html_line_breaks(inp):
     return inp.replace('\n', '<br />') if isinstance(inp, str) else inp
 
 def graphviz_line_breaks(inp):
-    return inp.replace('\n', '\\l') if isinstance(inp, str) else inp # \l generates left-aligned new lines. http://www.graphviz.org/doc/info/attrs.html#k:escString
+    return inp.replace('\n', '\\n') if isinstance(inp, str) else inp # \n generates centered new lines. http://www.graphviz.org/doc/info/attrs.html#k:escString
 
 def remove_line_breaks(inp):
     return inp.replace('\n', ' ').rstrip() if isinstance(inp, str) else inp
