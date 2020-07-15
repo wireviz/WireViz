@@ -3,8 +3,9 @@
 
 import argparse
 import os
+from pathlib import Path
 import sys
-from typing import Tuple
+from typing import Any, Tuple
 
 import yaml
 
@@ -16,7 +17,7 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand
 
 
-def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = None):
+def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
@@ -196,7 +197,7 @@ def parse(yaml_input, file_out=None, return_types: (None, str, Tuple[str]) = Non
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def parse_file(yaml_file, file_out=None):
+def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
     with open(yaml_file, 'r') as file:
         yaml_input = file.read()
 
