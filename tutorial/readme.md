@@ -203,9 +203,9 @@ connectors:
     pinout: [+12V, GND, GND, +5V]
     type: Molex 8981
     subtype: female
-
-ferrules: # ferrules
   F1:
+    category: ferrule
+    autogenerate: true
     type: Ferrule, crimp
     subtype: 0.5 mm²
     color: OG # optional color
@@ -253,9 +253,9 @@ connectors:
     type: Ferrule, crimp
     subtype: 1.0 mm²
     color: YE
-
-ferrules: # ferrules
   F_05:
+    category: ferrule
+    autogenerate: true
     type: Ferrule, crimp
     subtype: 0.5 mm²
     color: OG # optional color
@@ -359,5 +359,65 @@ Output:
 ![](tutorial07.png)
 
 [Bill of Materials](tutorial07.bom.tsv)
+
+
+## 8 - Part numbers
+
+* Part number information can be added to parts
+  * Only provided fields will be added to the diagram and bom
+* Bundles can have part information specified by wire
+
+[Source](tutorial08.yml):
+
+```yaml
+connectors:
+  X1: &template1 # define a template for later use
+    type: Molex KK 254
+    pincount: 4
+    subtype: female
+    manufacturer: Molex
+    manufacturer_part_number: 22013047
+  X2:
+    <<: *template1 # reuse template
+    internal_part_number: CON4
+  X3:
+    <<: *template1 # reuse template
+
+cables:
+  W1:
+    wirecount: 4
+    length: 1
+    gauge: 0.25 mm2
+    color_code: IEC
+    manufacturer: CablesCo
+    manufacturer_part_number: ABC123
+    internal_part_number: CAB1
+  W2:
+    category: bundle
+    length: 1
+    gauge: 0.25 mm2
+    colors: [YE, BK, BK, RD]
+    manufacturer: [WiresCo,WiresCo,WiresCo,WiresCo]
+    manufacturer_part_number: [W1-YE,W1-BK,W1-BK,W1-RD]
+    internal_part_number: [WIRE1,WIRE2,WIRE2,WIRE3]
+
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1-4]
+  -
+    - X1: [1-4]
+    - W2: [1-4]
+    - X3: [1-4]
+```
+
+
+Output:
+
+![](tutorial08.png)
+
+[Bill of Materials](tutorial08.bom.tsv)
 
 
