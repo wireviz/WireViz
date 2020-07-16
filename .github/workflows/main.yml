@@ -1,6 +1,6 @@
 name: Create Examples
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -23,3 +23,10 @@ jobs:
         pip install .
     - name: Create Examples
       run: PYTHONPATH=$(pwd)/src:$PYTHONPATH cd src/wireviz/ && python build_examples.py
+    - name: Upload examples, demos, and tutorials
+      uses: actions/upload-artifact@v2
+      with:
+        name: examples-and-tutorials
+        path: |
+          examples/
+          tutorial/
