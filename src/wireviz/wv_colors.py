@@ -29,7 +29,7 @@ default_bknd_color = '#fffbf8'  # off-white beige-ish
 
 # Convention: Color names should be 2 letters long, to allow for multicolored wires
 
-shield_color = '#aaaaaa:#84878c' # SN
+shield_color = '#aaaaaa' # Tinned wire
 
 _color_hex = {
     'BK': '#000000',
@@ -43,13 +43,17 @@ _color_hex = {
     'TQ': '#00ffff',
     'BU': '#0066ff',
     'VT': '#8000ff',
-    'BN': '#a52a2a',
+    'BN': '#895956',
     'SL': '#708090',
     # Faux-copper look, for bare CU wire
-    'CU': '#d6775e:#895956',
+    'CU': '#d6775e',
     # Silvery look for tinned bare wire
-    'SN': '#aaaaaa:#84878c',
-    # Yellow-green PE wire
+    'SN': '#aaaaaa',
+    # Darker silver for silvered wire
+    'AG': '#84878c',
+    # Golden color for gold
+    'AU': '#ffcf80',
+    # Yellow-green PE wire (matching actual wire colors, should prevent confusion with a yellow-green dual color wire
     'PE': '#54aa85:#f7f854:#54aa85',
 }
 
@@ -69,6 +73,9 @@ _color_full = {
     'SL': 'slate',
     'CU': 'bare copper',
     'SN': 'tinned copper',
+    'AG': 'silver wire',
+    'AU': 'gold wire',
+    'PE': 'earth'
 }
 
 # TODO Help wanted: can someone check the german translation?
@@ -90,9 +97,15 @@ _color_ger = {
     # Slate --> Schieferfarbe --> SI ??
     'SL': 'si',
     # Copper
-    'CU': 'ku',
+    'CU': 'cu',
     # Tinned
-    'SN': 'si'
+    'SN': 'sn',
+    # Silver
+    'AG': 'ag',
+    # Gold
+    'AU': 'au',
+    # Earth
+    'PE': 'pe'
 }
 
 
