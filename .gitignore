@@ -8,3 +8,6 @@ build
 data
 dist
 venv/
+desktop.ini
+thumbs.db
+
