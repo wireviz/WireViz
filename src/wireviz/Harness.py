@@ -3,7 +3,8 @@
 
 from wireviz.DataClasses import Connector, Cable
 from graphviz import Graph
-from wireviz import wv_colors
+from wireviz import wv_colors, wv_helper
+from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks
@@ -78,11 +79,11 @@ class Harness:
 
         # prepare ports on connectors depending on which side they will connect
         for _, cable in self.cables.items():
-            for connection in cable.connections:
-                if connection.from_port is not None:  # connect to left
-                    self.connectors[connection.from_name].ports_right = True
-                if connection.to_port is not None:  # connect to right
-                    self.connectors[connection.to_name].ports_left = True
+            for connection_color in cable.connections:
+                if connection_color.from_port is not None:  # connect to left
+                    self.connectors[connection_color.from_name].ports_right = True
+                if connection_color.to_port is not None:  # connect to right
+                    self.connectors[connection_color.to_name].ports_left = True
 
         for key, connector in self.connectors.items():
             if connector.category == 'ferrule':
@@ -193,18 +194,22 @@ class Harness:
 
             html = f'{html}<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
 
-            for i, connection in enumerate(cable.colors, 1):
+            for i, connection_color in enumerate(cable.colors, 1):
                 p = []
                 p.append(f'<!-- {i}_in -->')
-                p.append(wv_colors.translate_color(connection, self.color_mode))
+                p.append(wv_colors.translate_color(connection_color, self.color_mode))
                 p.append(f'<!-- {i}_out -->')
                 html = f'{html}<tr>'
                 for bla in p:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
-                bgcolor = wv_colors.translate_color(connection, 'hex')
-                bgcolor = bgcolor if bgcolor != '' else '#ffffff'
-                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" bgcolor="{bgcolor}" border="2" sides="tb" port="w{i}"></td></tr>'
+
+
+                bgcolors = ['#000000'] + get_color_hex(connection_color) + ['#000000']
+                html = f'{html}<tr><td colspan="{len(p)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
+                for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
+                    html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
+                html = html + '</table></td></tr>'
                 if(cable.category == 'bundle'):  # for bundles individual wires can have part information
                     # create a list of wire parameters
                     wireidentification = []
@@ -220,6 +225,7 @@ class Harness:
                         for attrib in wireidentification:
                             html = f'{html}<td>{attrib}</td>'
                         html = f'{html}</tr></table></td></tr>'
+                # html = html + '</table></td></tr>'
 
             if cable.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
@@ -242,32 +248,28 @@ class Harness:
             html = f'{html}</table>'  # main table
 
             # connections
-            for connection in cable.connections:
-                if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
-                    search_color = cable.colors[connection.via_port - 1]
-                    if search_color in wv_colors.color_hex:
-                        dot.attr('edge', color=f'#000000:{wv_colors.color_hex[search_color]}:#000000')
-                    else:  # color name not found
-                        dot.attr('edge', color='#000000:#ffffff:#000000')
+            for connection_color in cable.connections:
+                if isinstance(connection_color.via_port, int):  # check if it's an actual wire and not a shield
+                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1]) + ['#000000']))
                 else:  # it's a shield connection
                     dot.attr('edge', color='#000000')
 
-                if connection.from_port is not None:  # connect to left
-                    from_ferrule = self.connectors[connection.from_name].category == 'ferrule'
-                    port = f':p{connection.from_port}r' if not from_ferrule else ''
-                    code_left_1 = f'{connection.from_name}{port}:e'
-                    code_left_2 = f'{cable.name}:w{connection.via_port}:w'
+                if connection_color.from_port is not None:  # connect to left
+                    from_ferrule = self.connectors[connection_color.from_name].category == 'ferrule'
+                    port = f':p{connection_color.from_port}r' if not from_ferrule else ''
+                    code_left_1 = f'{connection_color.from_name}{port}:e'
+                    code_left_2 = f'{cable.name}:w{connection_color.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
-                    from_string = f'{connection.from_name}:{connection.from_port}' if not from_ferrule else ''
-                    html = html.replace(f'<!-- {connection.via_port}_in -->', from_string)
-                if connection.to_port is not None:  # connect to right
-                    to_ferrule = self.connectors[connection.to_name].category == 'ferrule'
-                    code_right_1 = f'{cable.name}:w{connection.via_port}:e'
-                    to_port = f':p{connection.to_port}l' if not to_ferrule else ''
-                    code_right_2 = f'{connection.to_name}{to_port}:w'
+                    from_string = f'{connection_color.from_name}:{connection_color.from_port}' if not from_ferrule else ''
+                    html = html.replace(f'<!-- {connection_color.via_port}_in -->', from_string)
+                if connection_color.to_port is not None:  # connect to right
+                    to_ferrule = self.connectors[connection_color.to_name].category == 'ferrule'
+                    code_right_1 = f'{cable.name}:w{connection_color.via_port}:e'
+                    to_port = f':p{connection_color.to_port}l' if not to_ferrule else ''
+                    code_right_2 = f'{connection_color.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
-                    to_string = f'{connection.to_name}:{connection.to_port}' if not to_ferrule else ''
-                    html = html.replace(f'<!-- {connection.via_port}_out -->', to_string)
+                    to_string = f'{connection_color.to_name}:{connection_color.to_port}' if not to_ferrule else ''
+                    html = html.replace(f'<!-- {connection_color.via_port}_out -->', to_string)
 
             dot.node(cable.name, label=f'<{html}>', shape='box',
                      style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
