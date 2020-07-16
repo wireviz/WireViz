@@ -106,14 +106,14 @@ def get_color_hex(input):
         print("Unknown Color Specified", file=sys.stderr)
         output = default_color
         #raise Exception('Unknown Color Name')
-    if input == '':
+    if input == None:
         output = default_color
     return output
 
 
 def translate_color(input, color_mode):
-    if input == '':
-        return ''
+    if not input:
+        return None
     upper = color_mode.isupper()
     if not (color_mode.isupper() or color_mode.islower()):
         raise Exception('Unknown color mode capitalization')

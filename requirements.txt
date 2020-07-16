@@ -1,3 +1,17 @@
 .
 graphviz
 pyyaml
+wireviz
+toml
+setuptools
+isort
+appdirs
+pylint
+astroid
+mccabe
+six
+wrapt
+chardet
+pip
+wheel
+lxml
