@@ -97,25 +97,28 @@ _color_ger = {
 
 
 
-def get_color_hex(input):
-    if input is None:
-        return None
+def get_color_hex(input, pad=True):
+    if input is None or input == '':
+        # print('Unspecified color requested', file=sys.stderr)
+        return [default_color]
     if len(input) == 4:  # give wires with EXACTLY 2 colors that striped/banded look
         input = input + input[:2]
+    # hacky style fix: give single color wires a triple-up so that wires are the same size
+    if pad and len(input) == 2:
+        input = input + input + input
     try:
-        output = ":".join([_color_hex[input[i:i + 2]] for i in range(0, len(input), 2)])
+        output = [_color_hex[input[i:i + 2]] for i in range(0, len(input), 2)]
     except KeyError:
         print("Unknown Color Specified", file=sys.stderr)
-        output = default_color
+        output = [default_color]
         # raise Exception('Unknown Color Name')
-    if input == '':
-        output = default_color
     return output
 
 
 def translate_color(input, color_mode):
     if input == '' or input is None:
-        return None
+        # print('Unspecified color requested', file=sys.stderr)
+        return default_color
     upper = color_mode.isupper()
     if not (color_mode.isupper() or color_mode.islower()):
         raise Exception('Unknown color mode capitalization')
@@ -124,9 +127,9 @@ def translate_color(input, color_mode):
     if color_mode == 'full':
         output = "/".join([_color_full[input[i:i+2]] for i in range(0,len(input),2)])
     elif color_mode == 'hex':
-        output = get_color_hex(input)
+        output = ':'.join(get_color_hex(input, pad=False))
     elif color_mode == 'ger':
-        output = "".join([_color_ger[input[i:i+2]] for i in range(o,len(input),2)])
+        output = "".join([_color_ger[input[i:i+2]] for i in range(0,len(input),2)])
     elif color_mode == 'short':
         output = input
     else:

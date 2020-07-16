@@ -3,6 +3,8 @@
 
 from typing import List
 
+from wireviz import wv_colors
+
 awg_equiv_table = {
     '0.09': '28',
     '0.14': '26',
@@ -111,3 +113,4 @@ def graphviz_line_breaks(inp):
 
 def remove_line_breaks(inp):
     return inp.replace('\n', ' ').rstrip() if isinstance(inp, str) else inp
+
