@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
 
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand
+from wireviz.wv_helper import expand, open_file_read
 
 
 def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
@@ -198,7 +198,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
 
 def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
-    with open(yaml_file, 'r') as file:
+    with open_file_read(yaml_file) as file:
         yaml_input = file.read()
 
     if not file_out:
@@ -228,14 +228,14 @@ def main():
         print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
-    with open(args.input_file) as fh:
+    with open_file_read(args.input_file) as fh:
         yaml_input = fh.read()
 
     if args.prepend_file:
         if not os.path.exists(args.prepend_file):
             print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
             sys.exit(1)
-        with open(args.prepend_file) as fh:
+        with open_file_read(args.prepend_file) as fh:
             prepend = fh.read()
             yaml_input = prepend + yaml_input
 

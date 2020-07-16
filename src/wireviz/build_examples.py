@@ -5,6 +5,9 @@ import os
 import sys
 from fnmatch import fnmatch
 
+# noinspection PyUnresolvedReferences
+from wv_helper import open_file_write, open_file_read
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import wireviz
@@ -25,7 +28,7 @@ def build_demos():
             wireviz.parse_file(abspath)
 
 def build_examples():
-    with open(os.path.join(examples_path, readme), 'w') as file:
+    with open_file_write(os.path.join(examples_path, readme)) as file:
         file.write('# Example gallery\n')
         for fn in os.listdir(examples_path):
             if fnmatch(fn, "ex*.yml"):
@@ -43,7 +46,7 @@ def build_examples():
                 file.write(f'[Source]({fn}) - [Bill of Materials]({outfile_name}.bom.tsv)\n\n\n')
 
 def build_tutorials():
-    with open(os.path.join(tutorials_path, readme), 'w') as file:
+    with open_file_write(os.path.join(tutorials_path, readme)) as file:
         file.write('# WireViz Tutorial\n')
         for fn in os.listdir(tutorials_path):
             if fnmatch(fn, "tutorial*.yml"):
@@ -55,12 +58,12 @@ def build_tutorials():
 
                 outfile_name = abspath.split(".yml")[0]
 
-                with open(outfile_name + '.md', 'r') as info:
+                with open_file_read(outfile_name + '.md') as info:
                     for line in info:
                         file.write(line.replace('## ', '## {} - '.format(i)))
                 file.write(f'\n[Source]({fn}):\n\n')
 
-                with open(abspath, 'r') as src:
+                with open_file_read(abspath) as src:
                     file.write('```yaml\n')
                     for line in src:
                         file.write(line)
