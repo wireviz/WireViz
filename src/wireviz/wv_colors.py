@@ -1,13 +1,37 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import sys
 
 COLOR_CODES = {
-    'DIN': ['WH', 'BN', 'GN', 'YE', 'GY', 'PK', 'BU', 'RD', 'BK', 'VT'], # ,'GYPK','RDBU','WHGN','BNGN','WHYE','YEBN','WHGY','GYBN','WHPK','PKBN'],
+    'DIN': ['WH', 'BN', 'GN', 'YE', 'GY', 'PK', 'BU', 'RD', 'BK', 'VT', 'GYPK', 'RDBU', 'WHGN', 'BNGN', 'WHYE', 'YEBN',
+            'WHGY', 'GYBN', 'WHPK', 'PKBN', 'WHBU', 'BNBU', 'WHRD', 'BNRD', 'WHBK', 'BNBK', 'GYGN', 'YEGY', 'PKGN',
+            'YEPK', 'GNBU', 'YEBU', 'GNRD', 'YERD', 'GNBK', 'YEBK', 'GYBU', 'PKBU', 'GYRD', 'PKRD', 'GYBK', 'PKBK',
+            'BUBK', 'RDBK', 'WHBNBK', 'YEGNBK', 'GYPKBK', 'RDBUBK', 'WHGNBK', 'BNGNBK', 'WHYEBK', 'YEBNBK', 'WHGYBK',
+            'GYBNBK', 'WHPKBK', 'PKBNBK', 'WHBUBK', 'BNBUBK', 'WHRDBK', 'BNRDBK'],
     'IEC': ['BN', 'RD', 'OG', 'YE', 'GN', 'BU', 'VT', 'GY', 'WH', 'BK'],
     'BW': ['BK', 'WH'],
+    'TEL': ['BUWH', 'WHBU', 'OGWH', 'WHOG', 'GNWH', 'WHGN', 'BNWH', 'WHBN', 'SLWH', 'WHSL', 'BURD', 'RDBU', 'OGRD',
+            'RDOG', 'GNRD', 'RDGN', 'BNRD', 'RDBN', 'SLRD', 'RDSL', 'BUBK', 'BKBU', 'OGBK', 'BKOG', 'GNBK', 'BKGN',
+            'BNBK', 'BKBN', 'SLBK', 'BKSL', 'BUYW', 'YWBU', 'OGYW', 'YWOG', 'GNYW', 'YWGN', 'BNYW', 'YWBN', 'SLYW',
+            'YWSL', 'BUVT', 'VTBU', 'OGVT', 'VTOG', 'GNVT', 'VTGN', 'BNVT', 'VTBN', 'SLVT', 'VTSL'],
+    'TELALT': ['WHBU', 'BU', 'WHOG', 'OG', 'WHGN', 'GN', 'WHBN', 'BN', 'WHSL', 'SL', 'RDBU', 'BURD', 'RDOG', 'OGRD',
+               'RDGN', 'GNRD', 'RDBN', 'BNRD', 'RDSL', 'SLRD', 'BKBU', 'BUBK', 'BKOG', 'OGBK', 'BKGN', 'GNBK', 'BKBN',
+               'BNBK', 'BKSL', 'SLBK', 'YWBU', 'BUYW', 'YWOG', 'OGYW', 'YWGN', 'GNYW', 'YWBN', 'BNYW', 'YWSL', 'SLYW',
+               'VTBU', 'BUVT', 'VTOG', 'OGVT', 'VTGN', 'GNVT', 'VTBN', 'BNVT', 'VTSL', 'SLVT'],
+    'T568A': ['WHGN', 'GN', 'WHOG', 'BU', 'WHBU', 'OG', 'WHBN', 'BN'],
+    'T568B': ['WHOG', 'OG', 'WHGN', 'BU', 'WHBU', 'GN', 'WHBN', 'BN'],
 }
 
-color_hex = {
+default_color = '#ffffff'
+
+# default_bkgnd_color = '#ffffff' # white
+default_bknd_color = '#fffbf8'  # off-white beige-ish
+
+# Convention: Color names should be 2 letters long, to allow for multicolored wires
+
+shield_color = '#aaaaaa:#84878c' # SN
+
+_color_hex = {
     'BK': '#000000',
     'WH': '#ffffff',
     'GY': '#999999',
@@ -19,10 +43,17 @@ color_hex = {
     'TQ': '#00ffff',
     'BU': '#0066ff',
     'VT': '#8000ff',
-    'BN': '#666600',
+    'BN': '#a52a2a',
+    'SL': '#708090',
+    # Faux-copper look, for bare CU wire
+    'CU': '#d6775e:#895956',
+    # Silvery look for tinned bare wire
+    'SN': '#aaaaaa:#84878c',
+    # Yellow-green PE wire
+    'PE': '#54aa85:#f7f854:#54aa85',
 }
 
-color_full = {
+_color_full = {
     'BK': 'black',
     'WH': 'white',
     'GY': 'grey',
@@ -35,9 +66,13 @@ color_full = {
     'BU': 'blue',
     'VT': 'violet',
     'BN': 'brown',
+    'SL': 'slate',
+    'CU': 'bare copper',
+    'SN': 'tinned copper',
 }
 
-color_ger = {
+# TODO Help wanted: can someone check the german translation?
+_color_ger = {
     'BK': 'sw',
     'WH': 'ws',
     'GY': 'gr',
@@ -50,29 +85,54 @@ color_ger = {
     'BU': 'bl',
     'VT': 'vi',
     'BN': 'br',
+    # To the best of my ability, likely incorrect:
+
+    # Slate --> Schieferfarbe --> SI ??
+    'SL': 'si',
+    # Copper
+    'CU': 'ku',
+    # Tinned
+    'SN': 'si'
 }
 
 
-def translate_color(inp, color_mode):
-    if inp == '':
-        output = ''
-    else:
-        if color_mode == 'full':
-            output = color_full[inp].lower()
-        elif color_mode == 'FULL':
-            output = color_full[inp].upper()
-        elif color_mode == 'hex':
-            output = color_hex[inp].lower()
-        elif color_mode == 'HEX':
-            output = color_hex[inp].upper()
-        elif color_mode == 'ger':
-            output = color_ger[inp].lower()
-        elif color_mode == 'GER':
-            output = color_ger[inp].upper()
-        elif color_mode == 'short':
-            output = inp.lower()
-        elif color_mode == 'SHORT':
-            output = inp.upper()
-        else:
-            raise Exception('Unknown color mode')
+
+def get_color_hex(input):
+    if input is None:
+        return None
+    if len(input) == 4:  # give wires with EXACTLY 2 colors that striped/banded look
+        input = input + input[:2]
+    try:
+        output = ":".join([_color_hex[input[i:i + 2]] for i in range(0, len(input), 2)])
+    except KeyError:
+        print("Unknown Color Specified", file=sys.stderr)
+        output = default_color
+        # raise Exception('Unknown Color Name')
+    if input == '':
+        output = default_color
     return output
+
+
+def translate_color(input, color_mode):
+    if input == '' or input is None:
+        return None
+    upper = color_mode.isupper()
+    if not (color_mode.isupper() or color_mode.islower()):
+        raise Exception('Unknown color mode capitalization')
+
+    color_mode = color_mode.lower()
+    if color_mode == 'full':
+        output = "/".join([_color_full[input[i:i+2]] for i in range(0,len(input),2)])
+    elif color_mode == 'hex':
+        output = get_color_hex(input)
+    elif color_mode == 'ger':
+        output = "".join([_color_ger[input[i:i+2]] for i in range(o,len(input),2)])
+    elif color_mode == 'short':
+        output = input
+    else:
+        raise Exception('Unknown color mode')
+    if upper:
+        return output.upper()
+    else:
+        return output.lower()
+
