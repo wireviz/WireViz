@@ -1,3 +1,4 @@
 .
 graphviz
 pyyaml
+setuptools
