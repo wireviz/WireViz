@@ -7,7 +7,7 @@ from wireviz import wv_colors, wv_helper
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
-    graphviz_line_breaks, remove_line_breaks
+    graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -303,15 +303,15 @@ class Harness:
         graph.save(filename=f'{filename}.gv')
         # bom output
         bom_list = self.bom_list()
-        with open(f'{filename}.bom.tsv', 'w') as file:
+        with open_file_write(f'{filename}.bom.tsv') as file:
             file.write(tuplelist2tsv(bom_list))
         # HTML output
-        with open(f'{filename}.html', 'w') as file:
+        with open_file_write(f'{filename}.html') as file:
             file.write('<!DOCTYPE html>\n')
-            file.write('<html><body style="font-family:Arial">')
+            file.write('<html><head><meta charset="UTF-8"></head><body style="font-family:Arial">')
 
             file.write('<h1>Diagram</h1>')
-            with open(f'{filename}.svg') as svg:
+            with open_file_read(f'{filename}.svg') as svg:
                 file.write(re.sub(
                     '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
                     '<!-- XML and DOCTYPE declarations from SVG file removed -->',
