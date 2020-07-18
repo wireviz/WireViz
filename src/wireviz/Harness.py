@@ -10,6 +10,7 @@ from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
 from collections import Counter
 from typing import List
 from pathlib import Path
+import re
 
 
 class Harness:
@@ -308,6 +309,10 @@ class Harness:
 
             file.write('<h1>Diagram</h1>')
             with open(f'{filename}.svg') as svg:
+                file.write(re.sub(
+                    '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
+                    '<!-- XML and DOCTYPE declarations from SVG file removed -->',
+                    svg.read(1024), 1))
                 for svgdata in svg:
                     file.write(svgdata)
 
