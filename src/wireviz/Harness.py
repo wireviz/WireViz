@@ -305,6 +305,7 @@ class Harness:
             file.write(tuplelist2tsv(bom_list))
         # HTML output
         with open(f'{filename}.html', 'w') as file:
+            file.write('<!DOCTYPE html>\n')
             file.write('<html><body style="font-family:Arial">')
 
             file.write('<h1>Diagram</h1>')
