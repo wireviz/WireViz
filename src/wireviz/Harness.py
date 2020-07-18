@@ -194,6 +194,11 @@ class Harness:
 
             html = f'{html}<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
 
+            # determine if there are double- or triple-colored wires;
+            # if so, pad single-color wires to make all wires of equal thickness
+            colorlengths = list(map(len, cable.colors))
+            pad = 4 in colorlengths or 6 in colorlengths
+
             for i, connection_color in enumerate(cable.colors, 1):
                 p = []
                 p.append(f'<!-- {i}_in -->')
@@ -204,7 +209,7 @@ class Harness:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
 
-                bgcolors = ['#000000'] + get_color_hex(connection_color) + ['#000000']
+                bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
                 html = f'{html}<tr><td colspan="{len(p)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
                 for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
                     html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
@@ -248,10 +253,10 @@ class Harness:
             # connections
             for connection_color in cable.connections:
                 if isinstance(connection_color.via_port, int):  # check if it's an actual wire and not a shield
-                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1]) + ['#000000']))
+                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1], pad=pad) + ['#000000']))
                 else:  # it's a shield connection
                     # shield is shown as a thin tinned wire
-                    dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN')[0], '#000000']))
+                    dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN', pad=False)[0], '#000000']))
                 if connection_color.from_port is not None:  # connect to left
                     from_ferrule = self.connectors[connection_color.from_name].category == 'ferrule'
                     port = f':p{connection_color.from_port}r' if not from_ferrule else ''

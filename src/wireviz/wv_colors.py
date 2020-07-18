@@ -89,7 +89,7 @@ _color_ger = {
 color_default = '#ffffff'
 
 
-def get_color_hex(input, pad=True):
+def get_color_hex(input, pad=False):
     if input is None or input == '':
         return [color_default]
     if len(input) == 4:  # give wires with EXACTLY 2 colors that striped/banded look
