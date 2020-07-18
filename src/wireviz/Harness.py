@@ -67,7 +67,7 @@ class Harness:
         font = 'arial'
         dot.attr('graph', rankdir='LR',
                  ranksep='2',
-                 bgcolor=wv_colors.default_bknd_color,
+                 bgcolor='white',
                  nodesep='0.33',
                  fontname=font)
         dot.attr('node', shape='record',
@@ -204,7 +204,6 @@ class Harness:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
 
-
                 bgcolors = ['#000000'] + get_color_hex(connection_color) + ['#000000']
                 html = f'{html}<tr><td colspan="{len(p)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
                 for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
@@ -225,7 +224,6 @@ class Harness:
                         for attrib in wireidentification:
                             html = f'{html}<td>{attrib}</td>'
                         html = f'{html}</tr></table></td></tr>'
-                # html = html + '</table></td></tr>'
 
             if cable.shield:
                 p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
@@ -252,8 +250,8 @@ class Harness:
                 if isinstance(connection_color.via_port, int):  # check if it's an actual wire and not a shield
                     dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1]) + ['#000000']))
                 else:  # it's a shield connection
-                    dot.attr('edge', color='#000000')
-
+                    # shield is shown as a thin tinned wire
+                    dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN')[0], '#000000']))
                 if connection_color.from_port is not None:  # connect to left
                     from_ferrule = self.connectors[connection_color.from_name].category == 'ferrule'
                     port = f':p{connection_color.from_port}r' if not from_ferrule else ''
