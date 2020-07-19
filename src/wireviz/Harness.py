@@ -86,34 +86,24 @@ class Harness:
                     self.connectors[connection_color.to_name].ports_left = True
 
         for key, connector in self.connectors.items():
-            if connector.category == 'ferrule':
 
-                rows = [[connector.manufacturer,
-                        f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
-                        f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
-                        [html_line_breaks(connector.type), html_line_breaks(connector.subtype), connector.color, '<!-- colorbar -->' if connector.color else None],
-                        [html_line_breaks(connector.notes)]]
-                html = nested_html_table(rows)
+            rows = [[connector.name if connector.show_name else None],
+                    [connector.manufacturer,
+                     f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
+                     f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
+                    [html_line_breaks(connector.type),
+                     html_line_breaks(connector.subtype),
+                     f'{connector.pincount}-pin' if connector.show_pincount else None,
+                     connector.color, '<!-- colorbar -->' if connector.color else None],
+                    '<!-- connector table -->' if connector.style != 'simple' else None,
+                    [html_line_breaks(connector.notes)]]
+            html = nested_html_table(rows)
 
-                if connector.color: # add color bar next to color info, if present
-                    colorbar = f' bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
-                    html = html.replace('><!-- colorbar --></td>', colorbar)
+            if connector.color: # add color bar next to color info, if present
+                colorbar = f' bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
+                html = html.replace('><!-- colorbar --></td>', colorbar)
 
-                dot.node(key, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
-
-            else:  # not a ferrule
-
-                rows = [[connector.name if connector.show_name else None],
-                        [connector.manufacturer,
-                         f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
-                         f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
-                        [html_line_breaks(connector.type),
-                         html_line_breaks(connector.subtype),
-                         f'{connector.pincount}-pin' if connector.show_pincount else None],
-                        '<!-- connector table -->',
-                        [html_line_breaks(connector.notes)]]
-                html = nested_html_table(rows)
-
+            if connector.style != 'simple':
                 pinouts = []
                 for pinnumber, pinname in zip(connector.pinnumbers, connector.pinout):
                     if connector.hide_disconnected_pins and not connector.visible_pins.get(pinnumber, False):
@@ -132,21 +122,22 @@ class Harness:
                 pinhtml = f'{pinhtml}</table>'
                 html = html.replace('<!-- connector table -->', pinhtml)
 
-                dot.node(key, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
 
-                if len(connector.loops) > 0:
-                    dot.attr('edge', color='#000000:#ffffff:#000000')
-                    if connector.ports_left:
-                        loop_side = 'l'
-                        loop_dir = 'w'
-                    elif connector.ports_right:
-                        loop_side = 'r'
-                        loop_dir = 'e'
-                    else:
-                        raise Exception('No side for loops')
-                    for loop in connector.loops:
-                        dot.edge(f'{connector.name}:p{loop[0]}{loop_side}:{loop_dir}',
-                                 f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
+            dot.node(key, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
+
+            if len(connector.loops) > 0:
+                dot.attr('edge', color='#000000:#ffffff:#000000')
+                if connector.ports_left:
+                    loop_side = 'l'
+                    loop_dir = 'w'
+                elif connector.ports_right:
+                    loop_side = 'r'
+                    loop_dir = 'e'
+                else:
+                    raise Exception('No side for loops')
+                for loop in connector.loops:
+                    dot.edge(f'{connector.name}:p{loop[0]}{loop_side}:{loop_dir}',
+                             f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
         for _, cable in self.cables.items():
 
@@ -258,20 +249,18 @@ class Harness:
                     # shield is shown as a thin tinned wire
                     dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN', pad=False)[0], '#000000']))
                 if connection_color.from_port is not None:  # connect to left
-                    from_ferrule = self.connectors[connection_color.from_name].category == 'ferrule'
-                    port = f':p{connection_color.from_port}r' if not from_ferrule else ''
-                    code_left_1 = f'{connection_color.from_name}{port}:e'
+                    from_port = f':p{connection_color.from_port}r' if self.connectors[connection_color.from_name].style != 'simple' else ''
+                    code_left_1 = f'{connection_color.from_name}{from_port}:e'
                     code_left_2 = f'{cable.name}:w{connection_color.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
-                    from_string = f'{connection_color.from_name}:{connection_color.from_port}' if not from_ferrule else ''
+                    from_string = f'{connection_color.from_name}:{connection_color.from_port}' if self.connectors[connection_color.from_name].show_name else ''
                     html = html.replace(f'<!-- {connection_color.via_port}_in -->', from_string)
                 if connection_color.to_port is not None:  # connect to right
-                    to_ferrule = self.connectors[connection_color.to_name].category == 'ferrule'
                     code_right_1 = f'{cable.name}:w{connection_color.via_port}:e'
-                    to_port = f':p{connection_color.to_port}l' if not to_ferrule else ''
+                    to_port = f':p{connection_color.to_port}l' if self.connectors[connection_color.to_name].style != 'simple' else ''
                     code_right_2 = f'{connection_color.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
-                    to_string = f'{connection_color.to_name}:{connection_color.to_port}' if not to_ferrule else ''
+                    to_string = f'{connection_color.to_name}:{connection_color.to_port}' if self.connectors[connection_color.to_name].show_name else ''
                     html = html.replace(f'<!-- {connection_color.via_port}_out -->', to_string)
 
             dot.node(cable.name, label=f'<{html}>', shape='box',
@@ -353,10 +342,10 @@ class Harness:
             designators.sort()
             conn_type = f', {remove_line_breaks(shared.type)}' if shared.type else ''
             conn_subtype = f', {remove_line_breaks(shared.subtype)}' if shared.subtype else ''
-            conn_pincount = f', {shared.pincount} pins' if shared.category != 'ferrule' else ''
+            conn_pincount = f', {shared.pincount} pins' if shared.style != 'simple' else ''
             conn_color = f', {shared.color}' if shared.color else ''
             name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
-            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.category != 'ferrule' else '',
+            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.show_name else '',
                     'manufacturer': shared.manufacturer, 'manufacturer part number': shared.manufacturer_part_number, 'internal part number': shared.internal_part_number}
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050

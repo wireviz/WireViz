@@ -37,8 +37,8 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
     harness = Harness()
 
     # add items
-    sections = ['connectors', 'cables', 'ferrules', 'connections']
-    types = [dict, dict, dict, list]
+    sections = ['connectors', 'cables', 'connections']
+    types = [dict, dict, list]
     for sec, ty in zip(sections, types):
         if sec in yaml_data and type(yaml_data[sec]) == ty:
             if len(yaml_data[sec]) > 0:
@@ -49,8 +49,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                                 harness.add_connector(name=key, **attribs)
                         elif sec == 'cables':
                             harness.add_cable(name=key, **attribs)
-                        elif sec == 'ferrules':
-                            pass
             else:
                 pass  # section exists but is empty
         else:  # section does not exist, create empty section
