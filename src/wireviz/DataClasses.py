@@ -65,6 +65,7 @@ class Connector:
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
     loops: List[Any] = field(default_factory=list)
+    ignore_in_bom: bool = False
 
     def __post_init__(self):
 
@@ -139,6 +140,7 @@ class Cable:
     color_code: Optional[str] = None
     show_name: bool = True
     show_wirecount: bool = True
+    ignore_in_bom: bool = False
 
     def __post_init__(self):
 
