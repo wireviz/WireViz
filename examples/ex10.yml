@@ -3,11 +3,11 @@ connectors:
   X1:
     type: Stewart Connector SS-37000-002
     subtype: male
-    pinout: [DA+,DA-,DB+,DC+,DC-,DB-,DD+,DD-] # pincount is implicit in pinout
+    pinlabels: [DA+,DA-,DB+,DC+,DC-,DB-,DD+,DD-] # pincount is implicit in pinout
   X2:
     type: Stewart Connector SS-37000-002
     subtype: male
-    pinout: [DB+,DB-,DA+,DD+,DD-,DA-,DC+,DC-]
+    pinlabels: [DB+,DB-,DA+,DD+,DD-,DA-,DC+,DC-]
 
 cables:
   W1:

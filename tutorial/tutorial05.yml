@@ -1,6 +1,6 @@
 connectors:
   X1:
-    pinout: [+12V, GND, GND, +5V]
+    pinlabels: [+12V, GND, GND, +5V]
     type: Molex 8981
     subtype: female
   F1:

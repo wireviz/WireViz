@@ -2,7 +2,7 @@ connectors:
   X1: &template_con
     type: Molex KK 254
     subtype: female
-    pinout: [GND, VCC, SCL, SDA]
+    pinlabels: [GND, VCC, SCL, SDA]
   X2:
     <<: *template_con
   X3:

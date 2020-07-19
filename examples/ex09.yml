@@ -5,13 +5,13 @@ connectors:
     type: D-Sub
     subtype: male
     pincount: 25
-    pinnumbers: [1,14,3,16,5,18,7,20,9,22,11,24,13]
-    pinout: [ SENSE_P_1, SENSE_N_1, SENSE_P_2, SENSE_N_2, SENSE_P_3, SENSE_N_3, SENSE_P_4,SENSE_N_4, SENSE_P_5, SENSE_N_5, SENSE_P_6, SENSE_N_6, GND ]
+    pins: [1,14,3,16,5,18,7,20,9,22,11,24,13]
+    pinlabels: [ SENSE_P_1, SENSE_N_1, SENSE_P_2, SENSE_N_2, SENSE_P_3, SENSE_N_3, SENSE_P_4,SENSE_N_4, SENSE_P_5, SENSE_N_5, SENSE_P_6, SENSE_N_6, GND ]
   X2:
     type: F48
     subtype: female
     pincount: 48
-    pinnumbers: [ z2,b2,d2,z4,b4,d4,z6,b6,d6,z8,b8,d8,z10,b10,d10,z12,b12,d12,z14,b14,d14,z16,b16,d16,z18,b18,d18,z20,b20,d20,z22,b22,d22,z24,b24,d24,z26,b26,d26,z28,b28,d28,z30,b30,d30,z32,b32,d32 ]
+    pins: [ z2,b2,d2,z4,b4,d4,z6,b6,d6,z8,b8,d8,z10,b10,d10,z12,b12,d12,z14,b14,d14,z16,b16,d16,z18,b18,d18,z20,b20,d20,z22,b22,d22,z24,b24,d24,z26,b26,d26,z28,b28,d28,z30,b30,d30,z32,b32,d32 ]
 
 cables:
   W1:

@@ -3,7 +3,7 @@ templates: # defining templates to be used later on
     type: Molex KK 254
     subtype: female
   - &con_i2c
-    pinout: [GND, +5V, SCL, SDA]
+    pinlabels: [GND, +5V, SCL, SDA]
   - &wire_i2c
     category: bundle
     gauge: 0.14 mm2
@@ -12,7 +12,7 @@ templates: # defining templates to be used later on
 connectors:
   X1:
     <<: *molex_f # copying items from the template
-    pinout: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, N/C]
+    pinlabels: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, N/C]
   X2:
     <<: *molex_f
     <<: *con_i2c # it is possible to copy from more than one template
@@ -21,7 +21,7 @@ connectors:
     <<: *con_i2c
   X4:
     <<: *molex_f
-    pinout: [GND, +12V, MISO, MOSI, SCK]
+    pinlabels: [GND, +12V, MISO, MOSI, SCK]
   ferrule_crimp:
     style: simple
     autogenerate: true

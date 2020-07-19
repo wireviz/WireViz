@@ -3,7 +3,7 @@ templates:
   - &template_con
     type: Molex KK 254
     subtype: female
-    pinout: [GND, VCC, SCL, SDA]
+    pinlabels: [GND, VCC, SCL, SDA]
   - &template_wire
     gauge: 0.25 mm2
     length: 0.2

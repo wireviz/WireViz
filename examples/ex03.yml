@@ -2,11 +2,11 @@ connectors:
   X1: &boo
     type: Molex Micro-Fit
     subtype: male
-    pinout: [GND, VCC]
+    pinlabels: [GND, VCC]
   X2: &con_power_f
     type: Molex Micro-Fit
     subtype: female
-    pinout: [GND, VCC]
+    pinlabels: [GND, VCC]
   X3:
     <<: *con_power_f
   X4:
