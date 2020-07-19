@@ -35,23 +35,23 @@ class Harness:
         for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):  # check from and to connectors
             if name is not None and name in self.connectors:
                 connector = self.connectors[name]
-                if pin in connector.pinnumbers and pin in connector.pinout:
-                    if connector.pinnumbers.index(pin) == connector.pinout.index(pin):
+                if pin in connector.pins and pin in connector.pinlabels:
+                    if connector.pins.index(pin) == connector.pinlabels.index(pin):
                         # TODO: Maybe issue a warning? It's not worthy of an exception if it's unambiguous, but maybe risky?
                         pass
                     else:
-                        raise Exception(f'{name}:{pin} is defined both in pinout and pinnumbers, for different pins.')
-                if pin in connector.pinout:
-                    if connector.pinout.count(pin) > 1:
+                        raise Exception(f'{name}:{pin} is defined both in pinlabels and pins, for different pins.')
+                if pin in connector.pinlabels:
+                    if connector.pinlabels.count(pin) > 1:
                         raise Exception(f'{name}:{pin} is defined more than once.')
                     else:
-                        index = connector.pinout.index(pin)
-                        pin = connector.pinnumbers[index] # map pin name to pin number
+                        index = connector.pinlabels.index(pin)
+                        pin = connector.pins[index] # map pin name to pin number
                         if name == from_name:
                             from_pin = pin
                         if name == to_name:
                             to_pin = pin
-                if not pin in connector.pinnumbers:
+                if not pin in connector.pins:
                     raise Exception(f'{name}:{pin} not found.')
 
         self.cables[via_name].connect(from_name, from_pin, via_pin, to_name, to_pin)
@@ -104,16 +104,16 @@ class Harness:
                 html = html.replace('><!-- colorbar --></td>', colorbar)
 
             if connector.style != 'simple':
-                pinouts = []
-                for pinnumber, pinname in zip(connector.pinnumbers, connector.pinout):
-                    if connector.hide_disconnected_pins and not connector.visible_pins.get(pinnumber, False):
+                pinlist = []
+                for pin, pinlabel in zip(connector.pins, connector.pinlabels):
+                    if connector.hide_disconnected_pins and not connector.visible_pins.get(pin, False):
                         continue
-                    pinouts.append([f'<td port="p{pinnumber}l">{pinnumber}</td>' if connector.ports_left else None,
-                                    f'<td>{pinname}</td>' if pinname else '',
-                                    f'<td port="p{pinnumber}r">{pinnumber}</td>' if connector.ports_right else None])
+                    pinlist.append([f'<td port="p{pin}l">{pin}</td>' if connector.ports_left else None,
+                                    f'<td>{pinlabel}</td>' if pinlabel else '',
+                                    f'<td port="p{pin}r">{pin}</td>' if connector.ports_right else None])
 
                 pinhtml = '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
-                for i, pin in enumerate(pinouts):
+                for i, pin in enumerate(pinlist):
                     pinhtml = f'{pinhtml}<tr>'
                     for column in pin:
                         if column is not None:

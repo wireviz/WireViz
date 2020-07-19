@@ -19,8 +19,8 @@ class Connector:
     subtype: Optional[str] = None
     pincount: Optional[int] = None
     notes: Optional[str] = None
-    pinout: List[Any] = field(default_factory=list)
-    pinnumbers: List[Any] = field(default_factory=list)
+    pinlabels: List[Any] = field(default_factory=list)
+    pins: List[Any] = field(default_factory=list)
     color: Optional[str] = None
     show_name: bool = None
     show_pincount: bool = None
@@ -39,25 +39,25 @@ class Connector:
             self.pincount = 1
 
         if self.pincount is None:
-            if self.pinout:
-                self.pincount = len(self.pinout)
-            elif self.pinnumbers:
-                self.pincount = len(self.pinnumbers)
+            if self.pinlabels:
+                self.pincount = len(self.pinlabels)
+            elif self.pins:
+                self.pincount = len(self.pins)
             else:
-                raise Exception('You need to specify at least one, pincount, pinout or pinnumbers')
+                raise Exception('You need to specify at least one, pincount, pins or pinlabels')
 
-        if self.pinout and self.pinnumbers:
-            if len(self.pinout) != len(self.pinnumbers):
-                raise Exception('Given pinout and pinnumbers size mismatch')
+        if self.pinlabels and self.pins:
+            if len(self.pinlabels) != len(self.pins):
+                raise Exception('Given pins and pinlabels size mismatch')
 
-        # create default lists for pinnumbers (sequential) and pinouts (blank) if not specified
-        if not self.pinnumbers:
-            self.pinnumbers = list(range(1, self.pincount + 1))
-        if not self.pinout:
-            self.pinout = [''] * self.pincount
+        # create default lists for pins (sequential) and pinlabels (blank) if not specified
+        if not self.pins:
+            self.pins = list(range(1, self.pincount + 1))
+        if not self.pinlabels:
+            self.pinlabels = [''] * self.pincount
 
-        if len(self.pinnumbers) != len(set(self.pinnumbers)):
-            raise Exception('Pin numbers are not unique')
+        if len(self.pins) != len(set(self.pins)):
+            raise Exception('Pins are not unique')
 
         if self.show_name is None:
             self.show_name = not self.autogenerate # hide auto-generated designators by default
