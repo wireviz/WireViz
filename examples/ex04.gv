@@ -18,27 +18,21 @@ graph {
 	_ferrule_crimp_12 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
 	edge [color="#000000:#895956:#000000"]
 	_ferrule_crimp_1:e -- W1:w1:w
+	W1:w1:e -- _ferrule_crimp_7:w
 	edge [color="#000000:#ff0000:#000000"]
 	_ferrule_crimp_2:e -- W1:w2:w
+	W1:w2:e -- _ferrule_crimp_8:w
 	edge [color="#000000:#ff8000:#000000"]
 	_ferrule_crimp_3:e -- W1:w3:w
+	W1:w3:e -- _ferrule_crimp_9:w
 	edge [color="#000000:#ffff00:#000000"]
 	_ferrule_crimp_4:e -- W1:w4:w
+	W1:w4:e -- _ferrule_crimp_10:w
 	edge [color="#000000:#00ff00:#000000"]
 	_ferrule_crimp_5:e -- W1:w5:w
+	W1:w5:e -- _ferrule_crimp_11:w
 	edge [color="#000000:#0066ff:#000000"]
 	_ferrule_crimp_6:e -- W1:w6:w
-	edge [color="#000000:#0066ff:#000000"]
-	W1:w6:e -- _ferrule_crimp_7:w
-	edge [color="#000000:#00ff00:#000000"]
-	W1:w5:e -- _ferrule_crimp_8:w
-	edge [color="#000000:#ffff00:#000000"]
-	W1:w4:e -- _ferrule_crimp_9:w
-	edge [color="#000000:#ff8000:#000000"]
-	W1:w3:e -- _ferrule_crimp_10:w
-	edge [color="#000000:#ff0000:#000000"]
-	W1:w2:e -- _ferrule_crimp_11:w
-	edge [color="#000000:#895956:#000000"]
-	W1:w1:e -- _ferrule_crimp_12:w
+	W1:w6:e -- _ferrule_crimp_12:w
 	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="3">W1</td></tr><tr><td balign="left">6x</td><td balign="left">0.25 mm² (24 AWG)</td><td balign="left">0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>BN</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w1" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#895956" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>RD</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w2" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ff0000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>OG</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w3" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ff8000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>YE</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w4" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffff00" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>GN</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w5" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#00ff00" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>BU</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w6" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#0066ff" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
 }
