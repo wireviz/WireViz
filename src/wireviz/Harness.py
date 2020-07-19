@@ -172,23 +172,25 @@ class Harness:
                           f'{cable.length} m' if cable.length > 0 else '']
             attributes = list(filter(None, attributes))
 
-            html = '<table border="0" cellspacing="0" cellpadding="0"><tr><td>'  # main table
+            html = '<table border="0" cellspacing="0" cellpadding="0">'  # main table
 
-            html = f'{html}<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
-            if cable.show_name:
-                html = f'{html}<tr><td colspan="{len(attributes)}">{cable.name}</td></tr>'
-            if(len(identification) > 0):  # print an identification row if values specified
-                html = f'{html}<tr><td colspan="{len(attributes)}" cellpadding="0"><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
-                for attrib in identification[0:-1]:
-                    html = f'{html}<td sides="R">{attrib}</td>' # all columns except last have a border on the right (sides="R")
-                if len(identification) > 0:
-                    html = f'{html}<td border="0">{identification[-1]}</td>' # last column has no border on the right because the enclosing table borders it
-                html = f'{html}</tr></table></td></tr>'  # end identification row
-            html = f'{html}<tr>'  # attribute row
-            for attrib in attributes:
-                html = f'{html}<td balign="left">{attrib}</td>'
-            html = f'{html}</tr>'  # attribute row
-            html = f'{html}</table></td></tr>'  # name+attributes table
+            if cable.show_name or len(attributes) > 0:
+                html = f'{html}<tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
+                if cable.show_name:
+                    html = '{html}<tr><td colspan="{colspan}">{name}</td></tr>'.format(html = html, colspan = len(attributes) if len(attributes) > 0 else 1, name = cable.name)
+                if(len(identification) > 0):  # print an identification row if values specified
+                    html = f'{html}<tr><td colspan="{len(attributes)}" cellpadding="0"><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
+                    for attrib in identification[0:-1]:
+                        html = f'{html}<td sides="R">{attrib}</td>' # all columns except last have a border on the right (sides="R")
+                    if len(identification) > 0:
+                        html = f'{html}<td border="0">{identification[-1]}</td>' # last column has no border on the right because the enclosing table borders it
+                    html = f'{html}</tr></table></td></tr>'  # end identification row
+                if(len(attributes) > 0):
+                    html = f'{html}<tr>'  # attribute row
+                    for attrib in attributes:
+                        html = f'{html}<td balign="left">{attrib}</td>'
+                    html = f'{html}</tr>'  # attribute row
+                html = f'{html}</table></td></tr>'  # name+attributes table
 
             html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer between attributes and wires
 
