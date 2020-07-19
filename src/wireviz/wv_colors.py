@@ -33,11 +33,15 @@ _color_hex = {
     'RD': '#ff0000',
     'OG': '#ff8000',
     'YE': '#ffff00',
+    'OL': '#708000',  # olive green
     'GN': '#00ff00',
     'TQ': '#00ffff',
+    'LB': '#a0dfff',  # light blue
     'BU': '#0066ff',
     'VT': '#8000ff',
     'BN': '#895956',
+    'BG': '#ceb673',  # beige
+    'IV': '#f5f0d0',  # ivory
     'SL': '#708090',
     'CU': '#d6775e',  # Faux-copper look, for bare CU wire
     'SN': '#aaaaaa',  # Silvery look for tinned bare wire
@@ -53,11 +57,15 @@ _color_full = {
     'RD': 'red',
     'OG': 'orange',
     'YE': 'yellow',
+    'OL': 'olive green',
     'GN': 'green',
     'TQ': 'turquoise',
+    'LB': 'light blue',
     'BU': 'blue',
     'VT': 'violet',
     'BN': 'brown',
+    'BG': 'beige',
+    'IV': 'ivory',
     'SL': 'slate',
     'CU': 'bare copper',
     'SN': 'tinned copper',
@@ -73,11 +81,15 @@ _color_ger = {
     'RD': 'rt',
     'OG': 'or',
     'YE': 'ge',
+    'OL': 'ol',  # olivgrün
     'GN': 'gn',
     'TQ': 'tk',
+    'LB': 'hb',  # hellblau
     'BU': 'bl',
     'VT': 'vi',
     'BN': 'br',
+    'BG': 'bg',  # beige
+    'IV': 'eb',  # elfenbeinfarben
     'SL': 'si',  # Slate/Schiefer?
     'CU': 'ku',  # Copper/Kupfer
     'SN': 'vz',  # Tinned/verzinkt
