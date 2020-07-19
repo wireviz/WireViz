@@ -20,7 +20,7 @@ readme = 'readme.md'
 
 
 def build_demos():
-    for fn in os.listdir(demos_path):
+    for fn in sorted(os.listdir(demos_path)):
         if fnmatch(fn, "demo*.yml"):
             abspath = os.path.join(demos_path, fn)
 
@@ -30,7 +30,7 @@ def build_demos():
 def build_examples():
     with open_file_write(os.path.join(examples_path, readme)) as file:
         file.write('# Example gallery\n')
-        for fn in os.listdir(examples_path):
+        for fn in sorted(os.listdir(examples_path)):
             if fnmatch(fn, "ex*.yml"):
                 i = ''.join(filter(str.isdigit, fn))
 
@@ -48,7 +48,7 @@ def build_examples():
 def build_tutorials():
     with open_file_write(os.path.join(tutorials_path, readme)) as file:
         file.write('# WireViz Tutorial\n')
-        for fn in os.listdir(tutorials_path):
+        for fn in sorted(os.listdir(tutorials_path)):
             if fnmatch(fn, "tutorial*.yml"):
                 i = ''.join(filter(str.isdigit, fn))
                 abspath = os.path.join(tutorials_path, fn)
@@ -81,7 +81,7 @@ def clean_examples():
 
     for filepath in [examples_path, demos_path, tutorials_path]:
         print(filepath)
-        for file in os.listdir(filepath):
+        for file in sorted(os.listdir(filepath)):
             if os.path.exists(os.path.join(filepath, file)):
                 if list(filter(file.endswith, generated_extensions)) or file == 'readme.md':
                     print('rm ' + os.path.join(filepath, file))
