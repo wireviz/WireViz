@@ -19,7 +19,7 @@ setup(
     author='Daniel Rojas',
     #author_email='',
     description='Easily document cables and wiring harnesses',
-    long_description=read(os.path.join(os.path.dirname(__file__), 'README.md')),
+    long_description=read(os.path.join(os.path.dirname(__file__), 'docs/README.md')),
     long_description_content_type='text/markdown',
     install_requires=[
         'pyyaml',
