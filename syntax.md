@@ -122,9 +122,32 @@ connections:  # list of all connections to be made
 Colors are defined via uppercase, two character strings.
 Striped/banded wires can be specified by simply concatenating multiple colors, with no space inbetween, eg. `GNYE` for green-yellow.
 
-```
-TODO: list valid colors
-```
+The following colors are understood:
+
+- `BK` ![##000000](https://via.placeholder.com/15/000000/000000?text=+) (black)
+- `WH` ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=+) (white)
+- `GY` ![##999999](https://via.placeholder.com/15/999999/000000?text=+) (grey)
+- `PK` ![##ff66cc](https://via.placeholder.com/15/ff66cc/000000?text=+) (pink)
+- `RD` ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=+) (red)
+- `OG` ![##ff8000](https://via.placeholder.com/15/ff8000/000000?text=+) (orange)
+- `YE` ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=+) (yellow)
+- `OL` ![##708000](https://via.placeholder.com/15/708000/000000?text=+) (olive green)
+- `GN` ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=+) (green)
+- `TQ` ![##00ffff](https://via.placeholder.com/15/00ffff/000000?text=+) (turquoise)
+- `LB` ![##a0dfff](https://via.placeholder.com/15/a0dfff/000000?text=+) (light blue)
+- `BU` ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=+) (blue)
+- `VT` ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=+) (violet)
+- `BN` ![##895956](https://via.placeholder.com/15/895956/000000?text=+) (brown)
+- `BG` ![##ceb673](https://via.placeholder.com/15/ceb673/000000?text=+) (beige)
+- `IV` ![##f5f0d0](https://via.placeholder.com/15/f5f0d0/000000?text=+) (ivory)
+- `SL` ![##708090](https://via.placeholder.com/15/708090/000000?text=+) (slate)
+- `CU` ![##d6775e](https://via.placeholder.com/15/d6775e/000000?text=+) (copper)
+- `SN` ![##aaaaaa](https://via.placeholder.com/15/aaaaaa/000000?text=+) (tin)
+- `SR` ![##84878c](https://via.placeholder.com/15/84878c/000000?text=+) (silver)
+- `GD` ![##ffcf80](https://via.placeholder.com/15/ffcf80/000000?text=+) (gold)
+
+<!-- color list generated with a helper script: -->
+<!-- https://gist.github.com/formatc1702/3c93fb4c5e392364899283f78672b952 -->
 
 ## Cable color codes
 
