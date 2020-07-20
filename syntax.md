@@ -28,7 +28,7 @@ connections:  # list of all connections to be made
 ## Connector attributes
 
 ```yaml
-X1:
+X1:  # unique connector designator/name
   # general information about a connector (all optional)
   type: <string>
   subtype: <string>
@@ -45,7 +45,7 @@ X1:
   # product information (all optional)
   manufacturer: <string>
   manufacturer_part_number: <string>
-  internel_part_number: <string>
+  internal_part_number: <string>
 
   # rendering information
   style: <style>         # optional; may be set to simple for single pin connectors
