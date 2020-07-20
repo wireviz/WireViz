@@ -365,7 +365,7 @@ class Harness:
                             if part['qty'] == 'pincount':
                                 qty = connector.pincount
                             elif part['qty'] == 'connectioncount':
-                                qty = connector.pincount
+                                qty = sum(1 for value in connector.visible_pins.values() if value is True)
                             else:
                                 raise ValueError('invalid aty parameter')
                     else:
