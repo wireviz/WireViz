@@ -116,5 +116,5 @@ def open_file_read(filename):
     # TODO: Intelligently determine encoding
     return open(filename, 'r', encoding='UTF-8')
 
-def open_file_write(filename):
-    return open(filename, 'w', encoding='UTF-8')
+def open_file_write(filename, newline='\n'):
+    return open(filename, 'w', encoding='UTF-8', newline=newline)

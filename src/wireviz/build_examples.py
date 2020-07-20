@@ -74,10 +74,11 @@ def build_tutorials():
 
                 file.write(f'![](tutorial{outfile_name}.png)\n\n')
 
-                file.write(f'[Bill of Materials](tutorial{outfile_name}.bom.tsv)\n\n\n')
+                file.write(f'[Bill of Materials - TSV](tutorial{outfile_name}.bom.tsv)\n\n')
+                file.write(f'[Bill of Materials - CSV](tutorial{outfile_name}.bom.csv)\n\n\n')
 
 def clean_examples():
-    generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv']
+    generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv', '.bom.csv']
 
     for filepath in [examples_path, demos_path, tutorials_path]:
         print(filepath)
