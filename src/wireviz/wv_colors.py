@@ -119,7 +119,7 @@ def get_color_hex(input, pad=False):
 
 def translate_color(input, color_mode):
     if input == '' or input is None:
-        return color_default
+        return ''
     upper = color_mode.isupper()
     if not (color_mode.isupper() or color_mode.islower()):
         raise Exception('Unknown color mode capitalization')
