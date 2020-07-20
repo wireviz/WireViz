@@ -128,12 +128,36 @@ TODO: list valid colors
 
 ## Cable color codes
 
+Supported color codes:
+
+- `DIN` for [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100)
+- `IEC` for [IEC 62](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) ("ROY G BIV")
+- `TEL` and `TELALT`  for [25-pair color code](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)
+- `T568A` and `T568B` for [TIA/EIA-568](https://en.wikipedia.org/wiki/TIA/EIA-568#Wiring)
+- `BW` for alternating black and white
+
 ## Multiline strings
 
-Accepted in the following fields:
-<!-- TODO -->
+Connectors accept multiline strings in the `type`, `subtype` and `notes` attributes.
+Cables accept multiline strings in the `type` and `notes` attributes.
 
-How to use
-<!-- TODO -->
+### Method 1
 
-Link to [yaml-multiline.info](https://yaml-multiline.info/)
+By using `|`, every following indented line is treated as a new line
+
+```yaml
+attribute: |
+  This is line 1.
+  This is line 2.
+```
+
+## Method 2
+
+By using double quoted strings, `\n` within the string is converted to a new line.
+Plain (no quotes) or single quoted strings do not convert `\n`.
+
+```yaml
+attribute: "This is line 1.\nThis is line 2."
+```
+
+See [yaml-multiline.info](https://yaml-multiline.info/) for more information.
