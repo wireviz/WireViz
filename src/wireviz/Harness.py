@@ -177,7 +177,7 @@ class Harness:
             if cable.show_name or len(attributes) > 0:
                 html = f'{html}<tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1">'  # name+attributes table
                 if cable.show_name:
-                    html = '{html}<tr><td colspan="{colspan}">{name}</td></tr>'.format(html = html, colspan = len(attributes) if len(attributes) > 0 else 1, name = cable.name)
+                    html = f'{html}<tr><td colspan="{max(len(attributes), 1)}">{cable.name}</td></tr>'
                 if(len(identification) > 0):  # print an identification row if values specified
                     html = f'{html}<tr><td colspan="{len(attributes)}" cellpadding="0"><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
                     for attrib in identification[0:-1]:
