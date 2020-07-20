@@ -3,16 +3,16 @@
 ## Main sections
 
 ```yaml
-connectors:   # dictionary of all used connectors
-  X1:         # unique connector designator/name
-    ...       # connector attributes (see below)
+connectors:  # dictionary of all used connectors
+  X1:          # unique connector designator/name
+    ...          # connector attributes (see below)
   X2:
     ...
   ...
 
-cables:       # dictionary of all used cables and wires
-  W1:         # unique cable designator/name
-    ...       # cable attributes (see below)
+cables:  # dictionary of all used cables and wires
+  W1:      # unique cable designator/name
+    ...      # cable attributes (see below)
   W2:
     ...
   ...
@@ -20,7 +20,7 @@ cables:       # dictionary of all used cables and wires
 connections:  # list of all connections to be made
               # between cables and connectors
   -
-    ...       # connection set (see below)
+    ...         # connection set (see below)
   -
     ...
 ```
@@ -194,7 +194,7 @@ Cables accept multiline strings in the `type` and `notes` attributes.
 
 ### Method 1
 
-By using `|`, every following indented line is treated as a new line
+By using `|`, every following indented line is treated as a new line.
 
 ```yaml
 attribute: |
@@ -205,10 +205,15 @@ attribute: |
 ## Method 2
 
 By using double quoted strings, `\n` within the string is converted to a new line.
-Plain (no quotes) or single quoted strings do not convert `\n`.
 
 ```yaml
 attribute: "This is line 1.\nThis is line 2."
 ```
 
+Plain (no quotes) or single quoted strings do not convert `\n`.
+
 See [yaml-multiline.info](https://yaml-multiline.info/) for more information.
+
+## Inheritance
+
+Add link to YAML spec.
