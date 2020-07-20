@@ -4,16 +4,16 @@
 
 ```yaml
 connectors:  # dictionary of all used connectors
-  X1:          # unique connector designator/name
+  <string>:    # unique connector designator/name
     ...          # connector attributes (see below)
-  X2:
+  <string>:
     ...
   ...
 
-cables:  # dictionary of all used cables and wires
-  W1:      # unique cable designator/name
-    ...      # cable attributes (see below)
-  W2:
+cables:      # dictionary of all used cables and wires
+  <string>:    # unique cable designator/name
+    ...          # cable attributes (see below)
+  <string>:
     ...
   ...
 
@@ -23,6 +23,12 @@ connections:  # list of all connections to be made
     ...         # connection set (see below)
   -
     ...
+  ...
+
+additional_bom_items:  # custom items to add to BOM
+  - <bom-item>           # BOM item (see below)
+  ...
+
 ```
 
 ## Connector attributes
@@ -57,6 +63,12 @@ connections:  # list of all connections to be made
 
   # loops and shorts (#48)
   loops: <List>  # TODO
+
+  # BOM options (all optional)
+  ignore_in_bom: <bool>  # defaults to false TODO
+  bom_items:             # list of additional BOM entries for this cable/bundle TODO
+    - <bom-item>         # BOM item (see below)
+    ...
 
   # auto-generation
   autogenerate: <bool>  # optional; defaults to false; see below
@@ -107,6 +119,12 @@ connections:  # list of all connections to be made
   colors: <List>     # list of colors (see below)
   color_code: <str>  # one of the supported cable color codes (see below)
 
+  # BOM options (all optional)
+  ignore_in_bom: <bool>  # defaults to false TODO
+  bom_items:             # list of additional BOM entries for this cable/bundle TODO
+    - <bom-item>         # BOM item (see below)
+    ...
+
   # rendering information (all optional)
   show_name: <bool>       # defaults to true
   show_wirecount: <bool>  # defaults to true
@@ -116,6 +134,34 @@ connections:  # list of all connections to be made
 ## Connection sets
 
 <!-- TODO -->
+
+## BOM items
+
+Connectors (both regular, and auto-generated), cables, and wires of a bundle are automatically added to the BOM,
+unless the `ignore_in_bom` attribute is set to `true`.
+
+Additional BOM entries can be generated in the sections marked `<bom-item>` above.
+
+<!-- TODO -->
+:warning: BOM items inside connectors/cables are not implemented yet, but should be soon (#50)
+
+```yaml
+-
+  description: <string>              
+  qty: <int/string>  # when used in the additional_bom_items section:
+                     # <int>            manually specify qty.
+                     # when used within a component:
+                     # <int>            manually specify qty.
+                     # pincount         match number of pins of connector
+                     # wirecount        match number of wires of cable/bundle
+                     # connectioncount  match number of connected pins
+  # all the following are optional:
+  unit: <string>
+  designators: <List>
+  manufacturer: <string>
+  manufacturer_part_number: <string>
+  internal_part_number: <string>
+```
 
 ## Colors
 
@@ -202,7 +248,7 @@ attribute: |
   This is line 2.
 ```
 
-## Method 2
+### Method 2
 
 By using double quoted strings, `\n` within the string is converted to a new line.
 
