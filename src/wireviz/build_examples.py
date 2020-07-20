@@ -23,25 +23,29 @@ paths['tutorial'] = {'path': Path(script_path).parent.parent.parent / 'tutorial'
 paths['demos']    = {'path': Path(script_path).parent.parent.parent / 'examples',
                      'prefix': 'demo'}
 
+input_extensions = ['.yml']
+generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv']
+extensions_not_from_graphviz = [ext for ext in generated_extensions if ext[-1] == 'v']
 readme = 'readme.md'
 
 
+def collect_filenames(description, pathkey, ext_list, extrafile = None):
+    path = paths[pathkey]['path']
+    patterns = [f"{paths[pathkey]['prefix']}*{ext}" for ext in ext_list]
+    if extrafile is not None:
+        patterns.append(extrafile)
+    print(f"{description} {path}")
+    return sorted([filename for pattern in patterns for filename in path.glob(pattern)])
+
+
 def build(dirname, build_readme, include_source, include_readme):
-    filename_list = []
-    path   = paths[dirname]['path']
-    prefix = paths[dirname]['prefix']
-    print(f'Building {path}')
-    # collect input YAML files
-    file_iterator = path.iterdir()
-    for entry in file_iterator:
-        if entry.is_file() and entry.match(f'{prefix}*.yml'):
-            filename_list.append(entry)
-    filename_list = sorted(filename_list)
     # build files
+    path = paths[dirname]['path']
     if build_readme:
         with open_file_write(path / 'readme.md') as out:
             out.write(f'# {paths[dirname]["title"]}\n\n')
-    for yaml_file in filename_list:
+    # collect and iterate input YAML files
+    for yaml_file in collect_filenames('Building', dirname, input_extensions):
         print(f'  {yaml_file}')
         wireviz.parse_file(yaml_file)
 
@@ -72,25 +76,36 @@ def build(dirname, build_readme, include_source, include_readme):
 
 
 def clean_examples():
-    generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv']
-    for k, v in paths.items():
-        filepath = v['path']
-        print(f'Cleaning {filepath}')
-        # collect files to remove
-        filename_list = []
-        file_iterator = filepath.iterdir()
-        for entry in file_iterator:
-            for ext in generated_extensions:
-                if entry.is_file() and entry.match(f'*{ext}'):
-                    filename_list.append(entry)
-        filename_list.append(filepath / readme)
-
-        filename_list = sorted(filename_list)
-        # remove files
-        for filename in filename_list:
+    for key in paths.keys():
+        # collect and remove files
+        for filename in collect_filenames('Cleaning', key, generated_extensions, readme):
             if filename.is_file():
                 print(f'  rm {filename}')
                 os.remove(filename)
+
+
+def compare_generated(include_from_graphviz = False):
+    compare_extensions = generated_extensions if include_from_graphviz else extensions_not_from_graphviz
+    for key in paths.keys():
+        # collect and compare files
+        for filename in collect_filenames('Comparing', key, compare_extensions, readme):
+            cmd = f'git --no-pager diff {filename}'
+            print(f'  {cmd}')
+            os.system(cmd)
+
+
+def restore_generated():
+    for key, value in paths.items():
+        # collect input YAML files
+        filename_list = collect_filenames('Restoring', key, input_extensions)
+        # collect files to restore
+        filename_list = [fn.with_suffix(ext) for fn in filename_list for ext in generated_extensions]
+        filename_list.append(value['path'] / readme)
+        # restore files
+        for filename in filename_list:
+            cmd = f'git checkout -- {filename}'
+            print(f'  {cmd}')
+            os.system(cmd)
 
 
 def parse_args():
@@ -112,6 +127,10 @@ def main():
                 build('tutorial', build_readme = True, include_source = True, include_readme = True)
     elif args.action == 'clean':
         clean_examples()
+    elif args.action == 'compare':
+        compare_generated()
+    elif args.action == 'restore':
+        restore_generated()
 
 
 if __name__ == '__main__':
