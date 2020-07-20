@@ -154,10 +154,38 @@ The following colors are understood:
 Supported color codes:
 
 - `DIN` for [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100)
+
+  ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=+)
+  ![##895956](https://via.placeholder.com/15/895956/000000?text=+)
+  ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=+)
+  ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=+)
+  ![##999999](https://via.placeholder.com/15/999999/000000?text=+)
+  ![##ff66cc](https://via.placeholder.com/15/ff66cc/000000?text=+)
+  ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=+)
+  ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=+)
+  ![##000000](https://via.placeholder.com/15/000000/000000?text=+)
+  ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=+)
+  ...
+
 - `IEC` for [IEC 62](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) ("ROY G BIV")
+
+  ![##895956](https://via.placeholder.com/15/895956/000000?text=+)
+  ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=+)
+  ![##ff8000](https://via.placeholder.com/15/ff8000/000000?text=+)
+  ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=+)
+  ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=+)
+  ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=+)
+  ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=+)
+  ![##999999](https://via.placeholder.com/15/999999/000000?text=+)
+  ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=+)
+  ![##000000](https://via.placeholder.com/15/000000/000000?text=+)
+  ...
+
 - `TEL` and `TELALT`  for [25-pair color code](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)
-- `T568A` and `T568B` for [TIA/EIA-568](https://en.wikipedia.org/wiki/TIA/EIA-568#Wiring)
+- `T568A` and `T568B` for [TIA/EIA-568](https://en.wikipedia.org/wiki/TIA/EIA-568#Wiring) (e.g. Ethernet)
 - `BW` for alternating black and white
+
+
 
 ## Multiline strings
 
