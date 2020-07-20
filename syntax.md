@@ -28,12 +28,17 @@ connections:  # list of all connections to be made
 ## Connector attributes
 
 ```yaml
-X1:  # unique connector designator/name
+<string>:  # unique connector designator/name
   # general information about a connector (all optional)
   type: <string>
   subtype: <string>
-  color: <colorcode>  # see below
+  color: <color>  # see below
   notes: <string>
+
+  # product information (all optional)
+  manufacturer: <string>
+  manufacturer_part_number: <string>
+  internal_part_number: <string>
 
   # pinout information
   # at least one of the following must be specified
@@ -42,18 +47,13 @@ X1:  # unique connector designator/name
   pins: <List>       # if omitted, is autofilled with [1, 2, ..., pincount]
   pinlabels: <List>  # if omitted, is autofilled with blanks
 
-  # product information (all optional)
-  manufacturer: <string>
-  manufacturer_part_number: <string>
-  internal_part_number: <string>
-
-  # rendering information
-  style: <style>         # optional; may be set to simple for single pin connectors
-  show_name: <bool>      # optional; defaults to true for regular connectors,
+  # rendering information (all optional)
+  style: <style>         # may be set to simple for single pin connectors
+  show_name: <bool>      # defaults to true for regular connectors,
                          # false for simple connectors
-  show_pincount: <bool>  # opional; defaults to true for regular connectors
+  show_pincount: <bool>  # defaults to true for regular connectors
                          # false for simple connectors
-  hide_disconnected_pins: <bool>  # optional; defaults to false
+  hide_disconnected_pins: <bool>  # defaults to false
 
   # loops and shorts (#48)
   loops: <List>  # TODO
@@ -69,20 +69,64 @@ X1:  # unique connector designator/name
 
 ## Cable attributes
 
-<!-- TODO -->
+```yaml
+<string>:  # unique cable designator/name
+  # general information about a connector (all optional)
+  category: <category>       # may be set to bundle;
+                             # generates one BOM item for every wire in the bundle
+                             # instead of a single item for the entire cable;
+                             # renders with a dashed outline
+  type: <string>
+  gauge: <int/float/string>  # allowed formats:
+                             # <int/float>      is assumed to be mm2
+                             # <int/float> mm2  is understood
+                             # <int> AWG        is understood
+                             # <string>         custom units and formats are allowed
+                             #                  but unavailable for auto-conversion
+  show_equiv: <bool>         # defaults to false; can auto-convert between mm2 and AWG
+                             # and display the result when set to true
+  length: <int/float>        # is assumed to be in meters
+  shield: <bool>             # defaults to false
+                             # the shield can be accessed in connections
+                             # using 's' as the wire number
+  notes: <string>
+
+  # product information (all optional)
+  manufacturer: <string>
+  manufacturer_part_number: <string>
+  internal_part_number: <string>
+
+  # conductor information
+  # the following combinations are permitted:
+  # wirecount only          no color information is specified
+  # colors only             wirecount is inferred from list length
+  # wirecount + color_code  colors are auto-generated based on the specified
+  #                         color code (see below) to match the wirecount
+  # wirecount + colors      colors list is trimmed or repeated to match the wirecount
+  wirecount: <int>
+  colors: <List>     # list of colors (see below)
+  color_code: <str>  # one of the supported cable color codes (see below)
+
+  # rendering information (all optional)
+  show_name: <bool>       # defaults to true
+  show_wirecount: <bool>  # defaults to true
+
+```
 
 ## Connection sets
 
 <!-- TODO -->
 
-## Color codes
+## Colors
 
-A color code is an uppercase, two character string.
-Striped/banded wires can be specified by simply concatenating multiple color codes, with no space inbetween.
+Colors are defined via uppercase, two character strings.
+Striped/banded wires can be specified by simply concatenating multiple colors, with no space inbetween, eg. `GNYE` for green-yellow.
 
 ```
 TODO: list valid colors
 ```
+
+## Cable color codes
 
 ## Multiline strings
 
