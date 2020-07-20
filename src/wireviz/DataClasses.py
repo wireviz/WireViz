@@ -66,6 +66,7 @@ class Connector:
     autogenerate: bool = False
     loops: List[Any] = field(default_factory=list)
     ignore_in_bom: bool = False
+    additional_components: List[Any] = None
 
     def __post_init__(self):
 

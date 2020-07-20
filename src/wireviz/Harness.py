@@ -332,6 +332,7 @@ class Harness:
     def bom(self):
         bom = []
         bom_connectors = []
+        bom_connectors_extra = []
         bom_cables = []
         bom_extra = []
         # connectors
@@ -351,6 +352,50 @@ class Harness:
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
+
+        connectors_extra = []
+        for connector in self.connectors.values():
+            if connector.additional_components:
+                for part in connector.additional_components:
+                    print(part)
+                    if 'qty' in part:
+                        if isinstance(part['qty'], int) or isinstance(part['qty'], float):
+                            qty = part['qty']
+                        else:  # check for special quantities
+                            if part['qty'] == 'pincount':
+                                qty = connector.pincount
+                            elif part['qty'] == 'connectioncount':
+                                qty = connector.pincount
+                            else:
+                                raise ValueError('invalid aty parameter')
+                    else:
+                        qty = 1
+                    connectors_extra.append(
+                        {
+                            'type': part['type'] if 'type' in part else None,
+                            'qty': qty,
+                            'unit': part['unit'] if 'unit' in part else None,
+                            'manufacturer': part['manufacturer'] if 'manufacturer' in part else None,
+                            'mpn': part['mpn'] if 'mpn' in part else None,
+                            'pn': part['pn'] if 'pn' in part else None,
+                            'designator': connector.name
+                        }
+                    )
+        connector_extra_group = lambda ce: (ce['type'], ce['qty'], ce['unit'], ce['manufacturer'], ce['mpn'], ce['pn'])
+        for group in Counter([connector_extra_group(v) for v in connectors_extra]):
+            items = [v for v in connectors_extra if connector_extra_group(v) == group]
+            shared = items[0]
+            designators = [i['designator'] for i in items]
+            designators = list(dict.fromkeys(designators))  # remove duplicates
+            designators.sort()
+            total_qty = sum(i['qty'] for i in items)
+
+            item = {'item': shared['type'], 'qty': round(total_qty, 3), 'unit': shared['unit'], 'designators': designators,
+                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
+            bom_connectors_extra.append(item)
+            bom_connectors_extra = sorted(bom_connectors_extra, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
+        bom.extend(bom_connectors_extra)
+
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
         # The category needs to be included in cable_group to keep the bundles excluded.
