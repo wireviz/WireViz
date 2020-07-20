@@ -322,7 +322,6 @@ class Harness:
                 file.write('<tr>')
                 for i, item in enumerate(row):
                     item_str = item.replace('\u00b2', '&sup2;')
-                    item_str = item_str.replace('\\n', '<br>')
                     align = 'align="right"' if listy[0][i] == 'Qty' else ''
                     file.write(f'<td {align} style="border:1px solid #000000; padding: 4px">{item_str}</td>')
                 file.write('</tr>')
