@@ -118,3 +118,6 @@ def open_file_read(filename):
 
 def open_file_write(filename):
     return open(filename, 'w', encoding='UTF-8')
+
+def open_file_append(filename):
+    return open(filename, 'a', encoding='UTF-8')
