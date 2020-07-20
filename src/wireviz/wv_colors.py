@@ -45,8 +45,8 @@ _color_hex = {
     'SL': '#708090',
     'CU': '#d6775e',  # Faux-copper look, for bare CU wire
     'SN': '#aaaaaa',  # Silvery look for tinned bare wire
-    'AG': '#84878c',  # Darker silver for silvered wire
-    'AU': '#ffcf80',  # Golden color for gold
+    'SR': '#84878c',  # Darker silver for silvered wire
+    'GD': '#ffcf80',  # Golden color for gold
 }
 
 _color_full = {
@@ -67,10 +67,10 @@ _color_full = {
     'BG': 'beige',
     'IV': 'ivory',
     'SL': 'slate',
-    'CU': 'bare copper',
-    'SN': 'tinned copper',
-    'AG': 'silver wire',
-    'AU': 'gold wire',
+    'CU': 'copper',
+    'SN': 'tin',
+    'SR': 'silver',
+    'GD': 'gold',
 }
 
 _color_ger = {
@@ -90,11 +90,11 @@ _color_ger = {
     'BN': 'br',
     'BG': 'bg',  # beige
     'IV': 'eb',  # elfenbeinfarben
-    'SL': 'si',  # Slate/Schiefer?
-    'CU': 'ku',  # Copper/Kupfer
-    'SN': 'vz',  # Tinned/verzinkt
-    'AG': 'ag',  # Silver
-    'AU': 'au',  # Gold
+    'SL': 'si',  # Schiefer
+    'CU': 'ku',  # Kupfer
+    'SN': 'vz',  # verzinkt
+    'SR': 'ag',  # Silber
+    'GD': 'au',  # Gold
 }
 
 
