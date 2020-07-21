@@ -357,7 +357,6 @@ class Harness:
         for connector in self.connectors.values():
             if connector.additional_components:
                 for part in connector.additional_components:
-                    print(part)
                     if 'qty' in part:
                         if isinstance(part['qty'], int) or isinstance(part['qty'], float):
                             qty = part['qty']
@@ -372,12 +371,12 @@ class Harness:
                         qty = 1
                     connectors_extra.append(
                         {
-                            'type': part['type'] if 'type' in part else None,
+                            'type': part.get('type', None),
                             'qty': qty,
-                            'unit': part['unit'] if 'unit' in part else None,
-                            'manufacturer': part['manufacturer'] if 'manufacturer' in part else None,
-                            'mpn': part['mpn'] if 'mpn' in part else None,
-                            'pn': part['pn'] if 'pn' in part else None,
+                            'unit': part.get('unit', None),
+                            'manufacturer': part.get('manufacturer', None),
+                            'mpn': part.get('mpn', None),
+                            'pn': part.get('pn', None),
                             'designator': connector.name
                         }
                     )
