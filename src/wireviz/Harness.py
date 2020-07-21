@@ -99,8 +99,29 @@ class Harness:
                      connector.color, html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
-                    [html_caption(connector.image)],
-                    [html_line_breaks(connector.notes)]]
+                    [html_caption(connector.image)]]
+            if connector.additional_components is not None:
+                rows.append(["Additional components"])
+            for extra in connector.additional_components:
+                if 'qty' in extra:
+                    if isinstance(extra['qty'], int) or isinstance(extra['qty'], float):
+                        qty = extra['qty']
+                    else:  # check for special quantities
+                        if extra['qty'] == 'pincount':
+                            qty = connector.pincount
+                        elif extra['qty'] == 'connectioncount':
+                            qty = sum(1 for value in connector.visible_pins.values() if value is True)
+                        else:
+                            raise ValueError('invalid aty parameter')
+                else:
+                    qty = 1
+                rows.append([extra["type"], qty])
+                rows.append([extra["manufacturer"],
+                             f'MPN: {extra["manufacturer_part_number"]}' if "manufacturer_part_number" in extra else None,
+                             f'IPN: {extra["internal_part_number"]}' if "internal_part_number" in extra else None],)
+                rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
+                             html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
+            rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
             if connector.style != 'simple':
