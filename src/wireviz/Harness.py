@@ -102,25 +102,22 @@ class Harness:
                     [html_caption(connector.image)]]
             if connector.additional_components is not None:
                 rows.append(["Additional components"])
-            for extra in connector.additional_components:
-                if 'qty' in extra:
-                    if isinstance(extra['qty'], int) or isinstance(extra['qty'], float):
-                        qty = extra['qty']
-                    else:  # check for special quantities
-                        if extra['qty'] == 'pincount':
-                            qty = connector.pincount
-                        elif extra['qty'] == 'connectioncount':
-                            qty = sum(1 for value in connector.visible_pins.values() if value is True)
-                        else:
-                            raise ValueError('invalid aty parameter')
-                else:
-                    qty = 1
-                rows.append([extra["type"], qty])
-                rows.append([extra["manufacturer"],
-                             f'MPN: {extra["manufacturer_part_number"]}' if "manufacturer_part_number" in extra else None,
-                             f'IPN: {extra["internal_part_number"]}' if "internal_part_number" in extra else None],)
-                rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
-                             html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
+                for extra in connector.additional_components:
+                    if 'qty' in extra:
+                        if isinstance(extra['qty'], int) or isinstance(extra['qty'], float):
+                            qty = extra['qty']
+                        else:  # check for special quantities
+                            if extra['qty'] == 'pincount':
+                                qty = connector.pincount
+                            elif extra['qty'] == 'connectioncount':
+                                qty = sum(1 for value in connector.visible_pins.values() if value is True)
+                            else:
+                                raise ValueError('invalid aty parameter')
+                    else:
+                        qty = 1
+                    rows.append([extra["type"], qty])
+                    rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
+                                 html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -193,8 +190,31 @@ class Harness:
                      cable.color, html_colorbar(cable.color)],
                     '<!-- wire table -->',
                     [html_image(cable.image)],
-                    [html_caption(cable.image)],
-                    [html_line_breaks(cable.notes)]]
+                    [html_caption(cable.image)]]
+
+            if cable.additional_components is not None:
+                rows.append(["Additional components"])
+                for extra in cable.additional_components:
+                    if 'qty' in extra:
+                        if isinstance(extra['qty'], int) or isinstance(extra['qty'], float):
+                            qty = extra['qty']
+                        else:  # check for special quantities
+                            if extra['qty'] == 'wirecount':
+                                qty = cable.wirecount
+                            elif extra['qty'] == 'terminations':
+                                qty = len(cable.connections)
+                            elif extra['qty'] == 'length':
+                                qty = cable.length
+                            elif extra['qty'] == 'total_length':
+                                qty = cable.length * cable.wirecount
+                            else:
+                                raise ValueError('invalid aty parameter {}'.format(extra["qty"]))
+                    else:
+                        qty = 1
+                    rows.append([extra["type"], qty])
+                    rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
+                                 html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
+            rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
             wirehtml = []
@@ -355,6 +375,7 @@ class Harness:
         bom_connectors = []
         bom_connectors_extra = []
         bom_cables = []
+        bom_cables_extra = []
         bom_extra = []
         # connectors
         connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.mpn, c.pn)
@@ -462,6 +483,52 @@ class Harness:
             bom_cables.append(item)
             bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
         bom.extend(bom_cables)
+
+        cables_extra = []
+        for cable in self.cables.values():
+            if cable.additional_components:
+                for part in cable.additional_components:
+                    if 'qty' in part:
+                        if isinstance(part['qty'], int) or isinstance(part['qty'], float):
+                            qty = part['qty']
+                        else:  # check for special quantities
+                            if part['qty'] == 'wirecount':
+                                qty = cable.wirecount
+                            elif part['qty'] == 'terminations':
+                                qty = len(cable.connections)
+                            elif part['qty'] == 'length':
+                                qty = cable.length
+                            elif part['qty'] == 'total_length':
+                                qty = cable.length * cable.wirecount
+                            else:
+                                raise ValueError('invalid aty parameter')
+                    else:
+                        qty = 1
+                    cables_extra.append(
+                        {
+                            'type': part.get('type', None),
+                            'qty': qty,
+                            'unit': part.get('unit', None),
+                            'manufacturer': part.get('manufacturer', None),
+                            'mpn': part.get('mpn', None),
+                            'pn': part.get('pn', None),
+                            'designator': connector.name
+                        }
+                    )
+        cables_extra_group = lambda ce: (ce['type'], ce['qty'], ce['unit'], ce['manufacturer'], ce['mpn'], ce['pn'])
+        for group in Counter([connector_extra_group(v) for v in cables_extra]):
+            items = [v for v in cables_extra if connector_extra_group(v) == group]
+            shared = items[0]
+            designators = [i['designator'] for i in items]
+            designators = list(dict.fromkeys(designators))  # remove duplicates
+            designators.sort()
+            total_qty = sum(i['qty'] for i in items)
+
+            item = {'item': shared['type'], 'qty': round(total_qty, 3), 'unit': shared['unit'], 'designators': designators,
+                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
+            bom_cables_extra.append(item)
+            bom_cables_extra = sorted(bom_cables_extra, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
+        bom.extend(bom_cables_extra)
 
         for item in self.additional_bom_items:
             name = item['description'] if item.get('description', None) else ''

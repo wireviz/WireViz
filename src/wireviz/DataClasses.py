@@ -142,6 +142,7 @@ class Cable:
     show_name: bool = True
     show_wirecount: bool = True
     ignore_in_bom: bool = False
+    additional_components: List[Any] = None
 
     def __post_init__(self):
 
