@@ -7,7 +7,8 @@ from wireviz import wv_colors, wv_helper
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
-    graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write
+    graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
+    manufacturer_info_field
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -89,8 +90,7 @@ class Harness:
 
             rows = [[connector.name if connector.show_name else None],
                     [f'P/N: {connector.pn}' if connector.pn else None,
-                     connector.manufacturer,
-                     f'MPN: {connector.mpn}' if connector.mpn else None],
+                     manufacturer_info_field(connector.manufacturer, connector.mpn)],
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
@@ -152,9 +152,8 @@ class Harness:
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
             identification = [f'P/N: {cable.pn}' if (cable.pn and not isinstance(cable.pn, list)) else '',
-                              cable.manufacturer if not isinstance(cable.manufacturer, list) else '',
-                              f'MPN: {cable.mpn}' if (cable.mpn and not isinstance(cable.mpn, list)) else '',
-                              ]
+                              manufacturer_info_field(cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
+                                                      cable.mpn if not isinstance(cable.mpn, list) else None)]
             identification = list(filter(None, identification))
 
             attributes = [html_line_breaks(cable.type) if cable.type else '',
@@ -213,10 +212,10 @@ class Harness:
                     wireidentification = []
                     if isinstance(cable.pn, list):
                         wireidentification.append(f'P/N: {cable.pn[i - 1]}')
-                    if isinstance(cable.manufacturer, list):
-                        wireidentification.append(cable.manufacturer[i - 1])
-                    if isinstance(cable.mpn, list):
-                        wireidentification.append(f'MPN: {cable.mpn[i - 1]}')
+                    manufacturer_info = manufacturer_info_field(cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
+                                                                      cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
+                    if manufacturer_info:
+                        wireidentification.append(manufacturer_info)
                     # print parameters into a table row under the wire
                     if(len(wireidentification) > 0):
                         html = f'{html}<tr><td colspan="{len(p)}"><table border="0" cellspacing="0" cellborder="0"><tr>'

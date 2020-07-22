@@ -118,3 +118,11 @@ def open_file_read(filename):
 
 def open_file_write(filename):
     return open(filename, 'w', encoding='UTF-8')
+
+
+def manufacturer_info_field(manufacturer, mpn):
+    if manufacturer:
+        part_number_component = f': {mpn}' if mpn else ''
+        return(f'{manufacturer}{part_number_component}')
+    else:
+        return(f'MPN: {mpn}' if mpn else None)
