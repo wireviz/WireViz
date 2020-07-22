@@ -296,6 +296,20 @@ class Harness:
                 if rightConn:
                     dot.edge(code_right_1, code_right_2)
 
+                if len(colors) > 1:
+                    #invis cable to break graphviz edge ordering
+                    dot.attr('edge', style='invis')
+                    if leftConn:
+                        dot.edge (connection_color.from_name, cable.name)
+                    if rightConn:
+                        dot.edge (cable.name, connection_color.to_name)
+
+                    dot.attr('edge', style="dashed", penwidth="2.0", color=colors[1])
+                    if leftConn:
+                        dot.edge(code_left_1, code_left_2)
+                    if rightConn:
+                        dot.edge(code_right_1, code_right_2)
+
             dot.node(cable.name, label=f'<{html}>', shape='box',
                      style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
 
