@@ -202,11 +202,18 @@ class Harness:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
 
-                bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
-                html = f'{html}<tr><td colspan="{len(p)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
-                for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
-                    html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
-                html = html + '</table></td></tr>'
+                colors = get_color_hex(connection_color)
+                html = f'{html}<tr><td colspan="{len(p)}" border="2" sides="tb" cellspacing="0" cellpadding="0" port="w{i}" height="6"><table cellspacing="0" cellborder="0" cellpadding="0" border="0">'
+                html = f'{html}<tr>'
+                numColors = len(colors)
+                for i in range(12) if numColors > 1 else range(1): #12 works well up to 4 colors
+                    html = f'{html}<td border="0" bgcolor="{colors[i%numColors]}"></td>'
+
+                html = html + '</tr></table></td></tr>'
+
+                #for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
+                #    html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
+                #html = html + '</table></td></tr>'
                 if(cable.category == 'bundle'):  # for bundles individual wires can have part information
                     # create a list of wire parameters
                     wireidentification = []
@@ -290,7 +297,7 @@ class Harness:
                         dot.edge (cable.name, connection_color.to_name)
 
                 #cable color
-                dot.attr('edge', style="solid", penwidth="2.0", color=colors[0])
+                dot.attr('edge', style="solid", penwidth="4.0" if isShield else "2.0", color=colors[0])
                 if leftConn:
                     dot.edge(code_left_1, code_left_2)
                 if rightConn:
