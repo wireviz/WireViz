@@ -14,17 +14,24 @@ from wv_helper import open_file_write, open_file_read, open_file_append
 
 
 readme = 'readme.md'
-groups = {}
-groups['examples'] = {'path': Path(script_path).parent.parent.parent / 'examples',
-                     'prefix': 'ex',
-                     readme: [], # Include no files
-                     'title': 'Example Gallery'}
-groups['tutorial'] = {'path': Path(script_path).parent.parent.parent / 'tutorial',
-                     'prefix': 'tutorial',
-                     readme: ['md', 'yml'], # Include .md and .yml files
-                     'title': 'WireViz Tutorial'}
-groups['demos']    = {'path': Path(script_path).parent.parent.parent / 'examples',
-                     'prefix': 'demo'}
+groups = {
+    'examples': {
+        'path': Path(script_path).parent.parent.parent / 'examples',
+        'prefix': 'ex',
+        readme: [], # Include no files
+        'title': 'Example Gallery',
+    },
+    'tutorial' : {
+        'path': Path(script_path).parent.parent.parent / 'tutorial',
+        'prefix': 'tutorial',
+        readme: ['md', 'yml'], # Include .md and .yml files
+        'title': 'WireViz Tutorial',
+    },
+    'demos' : {
+        'path': Path(script_path).parent.parent.parent / 'examples',
+        'prefix': 'demo',
+    },
+}
 
 input_extensions = ['.yml']
 generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv']
