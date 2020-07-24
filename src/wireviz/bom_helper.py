@@ -26,10 +26,17 @@ _tsv_formats = { EXCEL_TSV, WIREVIZ_TSV }
 _csv_ext = '.bom.csv'
 _tsv_ext = '.bom.tsv'
 
-def generate_bom_outputs(base_filename, bomdata, *argv):
-    expanded_csv_names =  len(_csv_formats.intersection(set(argv))) > 1
-    expanded_tsv_names = len(_tsv_formats.intersection(set(argv))) > 1
-    for fmt in argv:
+def generate_bom_outputs(base_filename, bomdata, formats=None):
+    if formats is None:
+        formats = [EXCEL_CSV, WIREVIZ_TSV]
+    elif isinstance(formats, csv.Dialect):
+        formats = [formats]
+    elif not isinstance(formats, list):
+        raise TypeError
+    expanded_csv_names =  len(_csv_formats.intersection(set(formats))) > 1
+    expanded_tsv_names = len(_tsv_formats.intersection(set(formats))) > 1
+
+    for fmt in formats:
         if fmt in _csv_formats:
             file = csv.writer(open_file_write(base_filename + ("_" + fmt.__name__ if expanded_csv_names else "") + _csv_ext, fmt.lineterminator), fmt)
 
