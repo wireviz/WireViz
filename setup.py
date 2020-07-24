@@ -6,12 +6,19 @@ from setuptools import setup, find_packages
 
 project_name = 'wireviz'
 
+# utility function to read the requirements.txt file
+with open('requirements.txt', 'r') as f:
+    requirements = f.readlines()
+    requirements = [r.strip() for r in requirements]
+    requirements = [r for r in requirements if r != '.']
+
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
 # README file and 2) it's easier to type in the README file than to put a raw
 # string in below ...
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 
 setup(
     name=project_name,
@@ -21,10 +28,7 @@ setup(
     description='Easily document cables and wiring harnesses',
     long_description=read(os.path.join(os.path.dirname(__file__), 'README.md')),
     long_description_content_type='text/markdown',
-    install_requires=[
-        'pyyaml',
-        'graphviz',
-        ],
+    install_requires=requirements,
     license='GPLv3',
     keywords='cable connector hardware harness wiring wiring-diagram wiring-harness',
     url='https://github.com/formatc1702/WireViz',
