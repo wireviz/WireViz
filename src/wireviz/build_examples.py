@@ -47,42 +47,43 @@ def collect_filenames(description, groupkey, ext_list):
     return sorted([filename for pattern in patterns for filename in path.glob(pattern)])
 
 
-def build_generated(groupkey):
-    # build files
-    path = groups[groupkey]['path']
-    build_readme = readme in groups[groupkey]
-    if build_readme:
-        include_readme = 'md' in groups[groupkey][readme]
-        include_source = 'yml' in groups[groupkey][readme]
-        with open_file_write(path / readme) as out:
-            out.write(f'# {groups[groupkey]["title"]}\n\n')
-    # collect and iterate input YAML files
-    for yaml_file in collect_filenames('Building', groupkey, input_extensions):
-        print(f'  {yaml_file}')
-        wireviz.parse_file(yaml_file)
-
+def build_generated(groupkeys):
+    for key in groupkeys:
+        # preparation
+        path = groups[key]['path']
+        build_readme = readme in groups[key]
         if build_readme:
-            i = ''.join(filter(str.isdigit, yaml_file.stem))
+            include_readme = 'md' in groups[key][readme]
+            include_source = 'yml' in groups[key][readme]
+            with open_file_write(path / readme) as out:
+                out.write(f'# {groups[key]["title"]}\n\n')
+        # collect and iterate input YAML files
+        for yaml_file in collect_filenames('Building', key, input_extensions):
+            print(f'  {yaml_file}')
+            wireviz.parse_file(yaml_file)
 
-            with open_file_append(path / readme) as out:
-                if include_readme:
-                    with open_file_read(yaml_file.with_suffix('.md')) as info:
-                        for line in info:
-                            out.write(line.replace('## ', f'## {i} - '))
-                        out.write('\n\n')
-                else:
-                    out.write(f'## Example {i}\n')
+            if build_readme:
+                i = ''.join(filter(str.isdigit, yaml_file.stem))
 
-                if include_source:
-                    with open_file_read(yaml_file) as src:
-                        out.write('```yaml\n')
-                        for line in src:
-                            out.write(line)
-                        out.write('```\n')
-                    out.write('\n')
+                with open_file_append(path / readme) as out:
+                    if include_readme:
+                        with open_file_read(yaml_file.with_suffix('.md')) as info:
+                            for line in info:
+                                out.write(line.replace('## ', f'## {i} - '))
+                            out.write('\n\n')
+                    else:
+                        out.write(f'## Example {i}\n')
 
-                out.write(f'![]({yaml_file.stem}.png)\n\n')
-                out.write(f'[Source]({yaml_file.name}) - [Bill of Materials]({yaml_file.stem}.bom.tsv)\n\n\n')
+                    if include_source:
+                        with open_file_read(yaml_file) as src:
+                            out.write('```yaml\n')
+                            for line in src:
+                                out.write(line)
+                            out.write('```\n')
+                        out.write('\n')
+
+                    out.write(f'![]({yaml_file.stem}.png)\n\n')
+                    out.write(f'[Source]({yaml_file.name}) - [Bill of Materials]({yaml_file.stem}.bom.tsv)\n\n\n')
 
 
 def clean_generated(groupkeys):
@@ -133,9 +134,7 @@ def parse_args():
 def main():
     args = parse_args()
     if args.action == 'build':
-        # TODO: Move this loop into the function for consistency?
-        for groupkey in args.groups:
-            build_generated(groupkey)
+        build_generated(args.groups)
     elif args.action == 'clean':
         clean_generated(args.groups)
     elif args.action == 'compare':
