@@ -209,8 +209,14 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
 @click.command()
 @click.argument('input_file', required=True)
 @click.option('--prepend', '-p', default=None, help='a YAML file containing a library of templates and parts that may be referenced in the `input_file`')
-@click.option('--out_types', '-o', multiple=True, default=['png'], help='the output formats to be generated')
-def main(input_file, prepend, out_types):
+@click.option('--out', '-o', multiple=True, default=['png'], help='specify one or more output types to be generated; currently supports "png" "svg"')
+def main(input_file, prepend, out):
+    """
+    Take a YAML file containing a harness specification and, utilizing GraphViz,
+    translate that specification into various output formats.  Example:
+
+        $>wireviz my_input_file.yml -o png -o svg
+    """
     if not os.path.exists(input_file):
         print(f'Error: input file {input_file} inaccessible or does not exist, check path')
         sys.exit(1)
@@ -231,14 +237,14 @@ def main(input_file, prepend, out_types):
 
     # the parse function may return a single instance or a tuple, thus, the
     # if/then determines if there is only one thing that must be saved or multiple
-    filedatas = parse(yaml_input, return_types=out_types)
+    filedatas = parse(yaml_input, return_types=out)
     if isinstance(filedatas, tuple):
-        for ext, data in zip(out_types, filedatas):
+        for ext, data in zip(out, filedatas):
             fname = f'{base_file_name}.{ext}'
             with open(fname, 'wb') as f:
                 f.write(data)
     else:
-        ext = out_types[0]
+        ext = out[0]
         data = filedatas
         fname = f'{base_file_name}.{ext}'
         with open(fname, 'wb') as f:
