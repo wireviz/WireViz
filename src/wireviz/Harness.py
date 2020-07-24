@@ -67,7 +67,7 @@ class Harness:
         font = 'arial'
         dot.attr('graph', rankdir='LR',
                  ranksep='2',
-                 bgcolor='white',
+                 bgcolor=wv_colors.COLOR_BACKGROUND,
                  nodesep='0.33',
                  fontname=font)
         dot.attr('node', shape='record',
@@ -302,7 +302,7 @@ class Harness:
         # HTML output
         with open_file_write(f'{filename}.html') as file:
             file.write('<!DOCTYPE html>\n')
-            file.write('<html><head><meta charset="UTF-8"></head><body style="font-family:Arial">')
+            file.write(f'<html><head><meta charset="UTF-8"></head><body style="font-family:Arial;background-color:{wv_colors.COLOR_BACKGROUND}">')
 
             file.write('<h1>Diagram</h1>')
             with open_file_read(f'{filename}.svg') as svg:
