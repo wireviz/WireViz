@@ -11,11 +11,14 @@ WireViz is a tool for easily documenting cables, wiring harnesses and connector 
   * Human readable
   * Easy version control
   * YAML syntax
+  * UTF-8 input and output files for special character support
 * Understands and uses color abbreviations as per [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) (black=BK, red=RD, ...)
   * Optionally outputs colors as abbreviation (e.g. 'YE'), full name (e.g. 'yellow') or hex value (e.g. '#ffff00'), with choice of UPPER or lower case
 * Auto-generates standard wire color schemes and allows custom ones if needed
   * [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100) (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
   * [IEC 62](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
+  * [25 Pair Color Code](https://en.wikipedia.org/wiki/25-pair_color_code#Color_coding) (BUWH/WHBU/OGWH/WHOG/GNWH/WHGN/BNWH/...)
+  * [TIA/EIA 568 A/B](https://en.wikipedia.org/wiki/TIA/EIA-568#Wiring)  (Subset of 25-Pair, used in CAT-5/6/...)
 * Understands wire gauge in mm² or AWG
   * Optionally auto-calculates equivalent gauge between mm² and AWG
 * Allows more than one connector per side, as well as loopbacks
@@ -47,11 +50,11 @@ connectors:
   X1:
     type: D-Sub
     subtype: female
-    pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
+    pinlabels: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
   X2:
     type: Molex KK 254
     subtype: female
-    pinout: [GND, RX, TX]
+    pinlabels: [GND, RX, TX]
 
 cables:
   W1:

@@ -11,7 +11,7 @@
 ### New features
 - Add bidirectional AWG/mm2 conversion ([#41](https://github.com/formatc1702/WireViz/pull/41))
 - Add support for part numbers ([#11](https://github.com/formatc1702/WireViz/pull/11))
-- Add support for multicolored wires ([#17](https://github.com/formatc1702/WireViz/pull/17))
+- Add support for multicolored wires ([#17](https://github.com/formatc1702/WireViz/pull/17), [#96](https://github.com/formatc1702/WireViz/pull/96))
 - Add ability to export data directly to other programs ([#55](https://github.com/formatc1702/WireViz/pull/55))
 - Add support for line breaks in various fields ([#63](https://github.com/formatc1702/WireViz/issues/63))
 - Allow using connector pin names to define connections ([#72](https://github.com/formatc1702/WireViz/issues/72))

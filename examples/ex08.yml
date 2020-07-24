@@ -4,8 +4,8 @@ connectors:
   Key:
     type: Phone Connector
     subtype: male 3.5
-    pinnumbers: [T, R, S]
-    pinout: [Dot, Dash, Ground]
+    pins: [T, R, S]
+    pinlabels: [Dot, Dash, Ground]
     show_pincount: false
 
 cables:

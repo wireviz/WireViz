@@ -2,11 +2,11 @@ connectors:
   X1:
     type: D-Sub
     subtype: female
-    pinout: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
+    pinlabels: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
   X2:
     type: Molex KK 254
     subtype: female
-    pinout: [GND, RX, TX]
+    pinlabels: [GND, RX, TX]
 
 cables:
   W1:

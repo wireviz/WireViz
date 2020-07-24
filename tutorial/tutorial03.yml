@@ -1,6 +1,6 @@
 connectors:
   X1: &template1 # define a template for later use
-    pinout: [GND, VCC, RX, TX] # pincount implicit in pinout
+    pinlabels: [GND, VCC, RX, TX] # pincount implicit in pinout
     type: Molex KK 254
     subtype: female
   X2:

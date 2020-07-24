@@ -1,0 +1,24 @@
+# Example 7: Crossover Cable
+connectors:
+  X1:
+    type: Stewart Connector SS-37000-002
+    subtype: male
+    pinlabels: [DA+,DA-,DB+,DC+,DC-,DB-,DD+,DD-] # pincount is implicit in pinout
+  X2:
+    type: Stewart Connector SS-37000-002
+    subtype: male
+    pinlabels: [DB+,DB-,DA+,DD+,DD-,DA-,DC+,DC-]
+
+cables:
+  W1:
+    color_code: T568A # auto-color wires based on a standard
+    wirecount: 8 # need to specify number of wires explicitly when using a color code
+    gauge: 24 AWG # also accepts AWG as unit
+    length: 1 # length in m
+    shield: false
+    type: CAT5e
+
+connections:
+  - - X1: [1-8]
+    - W1: [1-8]
+    - X2: [3,6,1,7,8,2,4,5] # crossover

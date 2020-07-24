@@ -4,52 +4,21 @@ graph {
 	graph [bgcolor=white fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor=white fontname=arial shape=record style=filled]
 	edge [fontname=arial style=bold]
-	X1 [label="X1|{Molex 8981|female|4-pin}|{{<p1l>1|<p2l>2|<p3l>3|<p4l>4}|{+12V|GND|GND|+5V}}"]
-	F_10_1 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Ferrule, crimp, 1.0 mm² YE </TD>
-                <TD BGCOLOR="#FFFF00" BORDER="1" SIDES="LR" WIDTH="4"></TD>
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F1 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Ferrule, crimp, 0.5 mm² OG </TD>
-                <TD BGCOLOR="#FF8000" BORDER="1" SIDES="LR" WIDTH="4"></TD>
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F2 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Ferrule, crimp, 0.5 mm² OG </TD>
-                <TD BGCOLOR="#FF8000" BORDER="1" SIDES="LR" WIDTH="4"></TD>
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
+	X1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">X1</td></tr></table></td></tr><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Molex 8981</td><td balign="left">female</td><td balign="left">4-pin</td></tr></table></td></tr><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td port="p1l">1</td><td>+12V</td></tr><tr><td port="p2l">2</td><td>GND</td></tr><tr><td port="p3l">3</td><td>GND</td></tr><tr><td port="p4l">4</td><td>+5V</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	F_10 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td><td balign="left">1.0 mm²</td><td balign="left">YE</td><td balign="left" bgcolor="#FFFF00" width="4"></td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_F_05_1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td><td balign="left">0.5 mm²</td><td balign="left">OG</td><td balign="left" bgcolor="#FF8000" width="4"></td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_F_05_2 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td><td balign="left">0.5 mm²</td><td balign="left">OG</td><td balign="left" bgcolor="#FF8000" width="4"></td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
 	edge [color="#000000:#ffff00:#000000"]
-	_F1:e -- W1:w1:w
-	edge [color="#000000:#ff0000:#000000"]
-	_F2:e -- W1:w4:w
-	edge [color="#000000:#ffff00:#000000"]
+	_F_05_1:e -- W1:w1:w
 	W1:w1:e -- X1:p1l:w
 	edge [color="#000000:#000000:#000000"]
+	F_10:e -- W1:w2:w
 	W1:w2:e -- X1:p2l:w
 	edge [color="#000000:#000000:#000000"]
+	F_10:e -- W1:w3:w
 	W1:w3:e -- X1:p3l:w
 	edge [color="#000000:#ff0000:#000000"]
+	_F_05_2:e -- W1:w4:w
 	W1:w4:e -- X1:p4l:w
-	edge [color="#000000:#000000:#000000"]
-	F_10_1:e -- W1:w2:w
-	edge [color="#000000:#000000:#000000"]
-	F_10_1:e -- W1:w3:w
-	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="3">W1</td></tr><tr><td>4x</td><td>0.5 mm²</td><td>0.3 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>YE</td><td>X1:1</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ffff00" border="2" sides="tb" port="w1"></td></tr><tr><td></td><td>BK</td><td>X1:2</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#000000" border="2" sides="tb" port="w2"></td></tr><tr><td></td><td>BK</td><td>X1:3</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#000000" border="2" sides="tb" port="w3"></td></tr><tr><td></td><td>RD</td><td>X1:4</td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff0000" border="2" sides="tb" port="w4"></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
+	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="3">W1</td></tr><tr><td balign="left">4x</td><td balign="left">0.5 mm²</td><td balign="left">0.3 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>YE</td><td>X1:1</td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w1" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffff00" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>BK</td><td>X1:2</td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w2" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>BK</td><td>X1:3</td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w3" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>RD</td><td>X1:4</td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w4" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ff0000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
 }

@@ -9,16 +9,12 @@ cables:
 
 connectors:
   ferrule_crimp:
-    category: ferrule
+    style: simple
     autogenerate: true
     type: Crimp ferrule
-    show_name: false
-    show_pincount: false
 
 connections:
   -
     - ferrule_crimp
     - W1: [1-6]
-  -
-    - W1: [6-1]
     - ferrule_crimp

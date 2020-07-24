@@ -4,149 +4,35 @@ graph {
 	graph [bgcolor=white fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor=white fontname=arial shape=record style=filled]
 	edge [fontname=arial style=bold]
-	_F1 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Crimp ferrule  </TD>
-                
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F2 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Crimp ferrule  </TD>
-                
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F3 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Crimp ferrule  </TD>
-                
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F4 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Crimp ferrule  </TD>
-                
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F5 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Crimp ferrule  </TD>
-                
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F6 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l"> Crimp ferrule  </TD>
-                
-                <TD PORT="p1r">  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=180 shape=none style=filled]
-	_F7 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l">  </TD>
-                
-                <TD PORT="p1r"> Crimp ferrule  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=0 shape=none style=filled]
-	_F8 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l">  </TD>
-                
-                <TD PORT="p1r"> Crimp ferrule  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=0 shape=none style=filled]
-	_F9 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l">  </TD>
-                
-                <TD PORT="p1r"> Crimp ferrule  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=0 shape=none style=filled]
-	_F10 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l">  </TD>
-                
-                <TD PORT="p1r"> Crimp ferrule  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=0 shape=none style=filled]
-	_F11 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l">  </TD>
-                
-                <TD PORT="p1r"> Crimp ferrule  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=0 shape=none style=filled]
-	_F12 [label=<
-
-                <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2"><TR>
-                <TD PORT="p1l">  </TD>
-                
-                <TD PORT="p1r"> Crimp ferrule  </TD>
-                </TR></TABLE>
-
-
-                > margin=0 orientation=0 shape=none style=filled]
-	edge [color="#000000:#666600:#000000"]
-	_F1:e -- W1:w1:w
+	_ferrule_crimp_1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_2 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_3 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_4 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_5 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_6 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_7 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_8 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_9 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_10 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_11 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	_ferrule_crimp_12 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td balign="left">Crimp ferrule</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=none style=filled]
+	edge [color="#000000:#895956:#000000"]
+	_ferrule_crimp_1:e -- W1:w1:w
+	W1:w1:e -- _ferrule_crimp_7:w
 	edge [color="#000000:#ff0000:#000000"]
-	_F2:e -- W1:w2:w
+	_ferrule_crimp_2:e -- W1:w2:w
+	W1:w2:e -- _ferrule_crimp_8:w
 	edge [color="#000000:#ff8000:#000000"]
-	_F3:e -- W1:w3:w
+	_ferrule_crimp_3:e -- W1:w3:w
+	W1:w3:e -- _ferrule_crimp_9:w
 	edge [color="#000000:#ffff00:#000000"]
-	_F4:e -- W1:w4:w
+	_ferrule_crimp_4:e -- W1:w4:w
+	W1:w4:e -- _ferrule_crimp_10:w
 	edge [color="#000000:#00ff00:#000000"]
-	_F5:e -- W1:w5:w
+	_ferrule_crimp_5:e -- W1:w5:w
+	W1:w5:e -- _ferrule_crimp_11:w
 	edge [color="#000000:#0066ff:#000000"]
-	_F6:e -- W1:w6:w
-	edge [color="#000000:#0066ff:#000000"]
-	W1:w6:e -- _F7:w
-	edge [color="#000000:#00ff00:#000000"]
-	W1:w5:e -- _F8:w
-	edge [color="#000000:#ffff00:#000000"]
-	W1:w4:e -- _F9:w
-	edge [color="#000000:#ff8000:#000000"]
-	W1:w3:e -- _F10:w
-	edge [color="#000000:#ff0000:#000000"]
-	W1:w2:e -- _F11:w
-	edge [color="#000000:#666600:#000000"]
-	W1:w1:e -- _F12:w
-	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="3">W1</td></tr><tr><td>6x</td><td>0.25 mm² (24 AWG)</td><td>0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>BN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#666600" border="2" sides="tb" port="w1"></td></tr><tr><td></td><td>RD</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff0000" border="2" sides="tb" port="w2"></td></tr><tr><td></td><td>OG</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ff8000" border="2" sides="tb" port="w3"></td></tr><tr><td></td><td>YE</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#ffff00" border="2" sides="tb" port="w4"></td></tr><tr><td></td><td>GN</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#00ff00" border="2" sides="tb" port="w5"></td></tr><tr><td></td><td>BU</td><td></td></tr><tr><td colspan="3" cellpadding="0" height="6" bgcolor="#0066ff" border="2" sides="tb" port="w6"></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
+	_ferrule_crimp_6:e -- W1:w6:w
+	W1:w6:e -- _ferrule_crimp_12:w
+	W1 [label=<<table border="0" cellspacing="0" cellpadding="0"><tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td colspan="3">W1</td></tr><tr><td balign="left">6x</td><td balign="left">0.25 mm² (24 AWG)</td><td balign="left">0.2 m</td></tr></table></td></tr><tr><td>&nbsp;</td></tr><tr><td><table border="0" cellspacing="0" cellborder="0"><tr><td></td><td>BN</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w1" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#895956" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>RD</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w2" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ff0000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>OG</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w3" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ff8000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>YE</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w4" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffff00" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>GN</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w5" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#00ff00" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td></td><td>BU</td><td></td></tr><tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w6" height="6"><table cellspacing="0" cellborder="0" border = "0"><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#0066ff" border="0"></td></tr><tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr></table></td></tr><tr><td>&nbsp;</td></tr></table></td></tr></table>> fillcolor=white margin=0 shape=box style="filled,dashed"]
 }
