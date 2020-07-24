@@ -113,8 +113,7 @@ def remove_line_breaks(inp):
     return inp.replace('\n', ' ').rstrip() if isinstance(inp, str) else inp
 
 def open_file_read(filename):
-    # TODO: Intelligently determine encoding
     return open(filename, 'r', encoding='UTF-8')
 
-def open_file_write(filename):
-    return open(filename, 'w', encoding='UTF-8')
+def open_file_write(filename, newline='\n'):
+    return open(filename, 'w', encoding='UTF-8', newline=newline)

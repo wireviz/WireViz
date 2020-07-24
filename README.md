@@ -100,10 +100,11 @@ $ wireviz ~/path/to/file/mywire.yml
 This will output the following files
 
 ```
-mywire.gv         GraphViz output
+mywire.gv         Raw GraphViz DOT file output of wiring diagram
 mywire.svg        Wiring diagram as vector image
 mywire.png        Wiring diagram as raster image
 mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
+mywire.bom.csv    BOM (bill of materials) as comma-separated, excel-format text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 

@@ -98,12 +98,13 @@ _color_ger = {
 }
 
 
-color_default = '#ffffff'
+COLOR_DEFAULT = '#ffffff'
+COLOR_BACKGROUND = '#ffffff'
 
 
 def get_color_hex(input, pad=False):
     if input is None or input == '':
-        return [color_default]
+        return [COLOR_DEFAULT]
     if len(input) == 4:  # give wires with EXACTLY 2 colors that striped/banded look
         input = input + input[:2]
     # hacky style fix: give single color wires a triple-up so that wires are the same size
@@ -113,7 +114,7 @@ def get_color_hex(input, pad=False):
         output = [_color_hex[input[i:i + 2]] for i in range(0, len(input), 2)]
     except KeyError:
         print("Unknown color specified")
-        output = [color_default]
+        output = [COLOR_DEFAULT]
     return output
 
 
