@@ -1,4 +1,5 @@
 .
+click
 graphviz
 pyyaml
 setuptools

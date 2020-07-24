@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 from typing import Any, Tuple
 
+import click
 import yaml
 
 if __name__ == '__main__':
@@ -58,7 +59,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                 yaml_data[sec] = []
 
     # add connections
-
     def check_designators(what, where): # helper function
         for i, x in enumerate(what):
             if x not in yaml_data[where[i]]:
@@ -207,45 +207,43 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
     parse(yaml_input, file_out=file_out)
 
 
-def parse_cmdline():
-    parser = argparse.ArgumentParser(
-        description='Generate cable and wiring harness documentation from YAML descriptions',
-    )
-    parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
-    parser.add_argument('-o', '--output_file', action='store', type=str, metavar='OUTPUT')
-    parser.add_argument('--generate-bom', action='store_true', default=True)
-    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
-    return parser.parse_args()
-
-
-def main():
-
-    args = parse_cmdline()
-
-    if not os.path.exists(args.input_file):
-        print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
+@click.command()
+@click.argument('input_file', required=True)
+@click.option('--prepend', '-p', default=None, help='a YAML file containing a library of templates and parts that may be referenced in the `input_file`')
+@click.option('--out_types', '-o', multiple=True, default=['png'], help='the output formats to be generated')
+def main(input_file, prepend, out_types):
+    if not os.path.exists(input_file):
+        print(f'Error: input file {input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
-    with open_file_read(args.input_file) as fh:
+    with open_file_read(input_file) as fh:
         yaml_input = fh.read()
 
-    if args.prepend_file:
-        if not os.path.exists(args.prepend_file):
-            print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
+    if prepend:
+        if not os.path.exists(prepend):
+            print(f'Error: prepend input file {prepend} inaccessible or does not exist, check path')
             sys.exit(1)
-        with open_file_read(args.prepend_file) as fh:
+        with open_file_read(prepend) as fh:
             prepend = fh.read()
             yaml_input = prepend + yaml_input
 
-    if not args.output_file:
-        file_out = args.input_file
-        pre, _ = os.path.splitext(file_out)
-        file_out = pre  # extension will be added by graphviz output function
-    else:
-        file_out = args.output_file
-    file_out = os.path.abspath(file_out)
+    input_file = Path(input_file)
+    base_file_name = input_file.name.replace(input_file.suffix, '')
 
-    parse(yaml_input, file_out=file_out)
+    # the parse function may return a single instance or a tuple, thus, the
+    # if/then determines if there is only one thing that must be saved or multiple
+    filedatas = parse(yaml_input, return_types=out_types)
+    if isinstance(filedatas, tuple):
+        for ext, data in zip(out_types, filedatas):
+            fname = f'{base_file_name}.{ext}'
+            with open(fname, 'wb') as f:
+                f.write(data)
+    else:
+        ext = out_types[0]
+        data = filedatas
+        fname = f'{base_file_name}.{ext}'
+        with open(fname, 'wb') as f:
+            f.write(data)
 
 
 if __name__ == '__main__':
