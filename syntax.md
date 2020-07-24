@@ -42,9 +42,9 @@ additional_bom_items:  # custom items to add to BOM
   notes: <string>
 
   # product information (all optional)
-  manufacturer: <string>
-  manufacturer_part_number: <string>
-  internal_part_number: <string>
+  pn: <string>            # [internal] part number
+  mpn: <string>           # manufacturer part number
+  manufacturer: <string>  # manufacturer name
 
   # pinout information
   # at least one of the following must be specified
@@ -110,9 +110,9 @@ Since the auto-incremented and auto-assigned designator is not known to the user
   notes: <string>
 
   # product information (all optional)
-  manufacturer: <string>
-  manufacturer_part_number: <string>
-  internal_part_number: <string>
+  pn: <string>            # [internal] part number
+  mpn: <string>           # manufacturer part number
+  manufacturer: <string>  # manufacturer name
 
   # conductor information
   # the following combinations are permitted:
@@ -242,9 +242,9 @@ Additional BOM entries can be generated in the sections marked `<bom-item>` abov
   # all the following are optional:
   unit: <string>
   designators: <List>
-  manufacturer: <string>
-  manufacturer_part_number: <string>
-  internal_part_number: <string>
+  pn: <string>            # [internal] part number
+  mpn: <string>           # manufacturer part number
+  manufacturer: <string>  # manufacturer name  
 ```
 
 ## Colors
