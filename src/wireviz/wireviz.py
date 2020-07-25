@@ -203,7 +203,7 @@ def parse(yaml_input: str, return_types: (None, str, Tuple[str]) = None) -> Any:
 @click.argument('input_file', required=True)
 @click.option('--prepend', '-p', default=None, help='a YAML file containing a library of templates and parts that may be referenced in the `input_file`')
 @click.option('--out', '-o', multiple=True, default=['png'], help='specify one or more output types to be generated; currently supports "png" "svg", "html", "csv", "csv_excel", "csv_unix", "tsv", "tsv_excel"')
-def main(input_file, prepend, out):
+def cli(input_file, prepend, out):
     """
     Take a YAML file containing a harness specification and, utilizing GraphViz,
     translate that specification into various output formats.
@@ -212,8 +212,12 @@ def main(input_file, prepend, out):
 
         $>wireviz my_input_file.yml -o png -o svg
     """
+    main(input_file, prepend, out)
+
+
+def main(input_file, prepend, out):
     if not os.path.exists(input_file):
-        print(f'Error: input file {input_file} inaccessible or does not exist, check path')
+        print(f'Error: input file "{input_file}" inaccessible or does not exist, check path')
         sys.exit(1)
 
     with open_file_read(input_file) as fh:
@@ -250,4 +254,4 @@ def main(input_file, prepend, out):
 
 
 if __name__ == '__main__':
-    main()
+    cli()
