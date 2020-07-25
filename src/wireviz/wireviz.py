@@ -214,7 +214,7 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
 @click.command()
 @click.argument('input_file', required=True)
 @click.option('--prepend', '-p', default=None, help='a YAML file containing a library of templates and parts that may be referenced in the `input_file`')
-@click.option('--out', '-o', multiple=True, default=['png'], help='specify one or more output types to be generated; currently supports "png" "svg", "html"')
+@click.option('--out', '-o', multiple=True, default=['png'], help='specify one or more output types to be generated; currently supports "png" "svg", "html", "csv", "csv_excel", "csv_unix", "tsv", "tsv_excel"')
 def main(input_file, prepend, out):
     """
     Take a YAML file containing a harness specification and, utilizing GraphViz,
