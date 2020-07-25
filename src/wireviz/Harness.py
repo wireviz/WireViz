@@ -290,8 +290,6 @@ class Harness:
 
     @property
     def html(self):
-        self.create_graph()
-
         bom_list = self.bom_list()
         string = ''
 
