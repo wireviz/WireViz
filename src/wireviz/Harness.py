@@ -271,6 +271,11 @@ class Harness:
         return dot
 
     @property
+    def gv(self):
+        # self.create_graph().save()
+        raise NotImplementedError
+
+    @property
     def png(self):
         from io import BytesIO
         graph = self.create_graph()

@@ -189,6 +189,8 @@ def parse(yaml_input: str, return_types: (None, str, Tuple[str]) = None) -> Any:
                 returns.append(harness.tsv)
             elif rt == 'tsv_excel':
                 returns.append(harness.tsv_excel)
+            elif rt == 'gv':
+                returns.append(harness.gv)
             elif rt == 'harness':
                 returns.append(harness)
             else:
