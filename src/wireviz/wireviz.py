@@ -179,12 +179,24 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         for rt in return_types:
             if rt == 'png':
                 returns.append(harness.png)
-            if rt == 'svg':
+            elif rt == 'svg':
                 returns.append(harness.svg)
-            if rt == 'html':
+            elif rt == 'html':
                 returns.append(harness.html)
-            if rt == 'harness':
+            elif rt == 'csv':
+                returns.append(harness.csv)
+            elif rt == 'csv_excel':
+                returns.append(harness.csv_excel)
+            elif rt == 'csv_unix':
+                returns.append(harness.csv_unix)
+            elif rt == 'tsv':
+                returns.append(harness.tsv)
+            elif rt == 'tsv_excel':
+                returns.append(harness.tsv_excel)
+            elif rt == 'harness':
                 returns.append(harness)
+            else:
+                raise ValueError(f'return type "{rt}" not supported')
 
         return tuple(returns) if len(returns) != 1 else returns[0]
 
@@ -208,7 +220,9 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
 def main(input_file, prepend, out):
     """
     Take a YAML file containing a harness specification and, utilizing GraphViz,
-    translate that specification into various output formats.  Example:
+    translate that specification into various output formats.
+
+    Example:
 
         $>wireviz my_input_file.yml -o png -o svg
     """

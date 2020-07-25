@@ -328,6 +328,26 @@ class Harness:
 
         return bytes(string, encoding='utf-8')
 
+    @property
+    def csv(self):
+        raise NotImplementedError
+
+    @property
+    def csv_excel(self):
+        raise NotImplementedError
+
+    @property
+    def csv_unix(self):
+        raise NotImplementedError
+
+    @property
+    def tsv(self):
+        raise NotImplementedError
+
+    @property
+    def tsv_excel(self):
+        raise NotImplementedError
+
     def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('pdf', )) -> None:
         # graphical output
         graph = self.create_graph()
