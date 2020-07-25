@@ -290,7 +290,7 @@ class Harness:
 
     @property
     def html(self):
-        bom_list = self.bom_list()
+        bom_list = self._bom_list()
         string = ''
 
         string += '<!DOCTYPE html>\n'
@@ -329,82 +329,39 @@ class Harness:
     @property
     def csv(self):
         return bom_helper.generate_bom_outputs(
-            self.bom_list(),
+            self._bom_list(),
             'csv'
         )
 
     @property
     def csv_excel(self):
         return bom_helper.generate_bom_outputs(
-            self.bom_list(),
+            self._bom_list(),
             'csv_excel'
         )
 
     @property
     def csv_unix(self):
         return bom_helper.generate_bom_outputs(
-            self.bom_list(),
+            self._bom_list(),
             'csv_unix'
         )
 
     @property
     def tsv(self):
         return bom_helper.generate_bom_outputs(
-            self.bom_list(),
+            self._bom_list(),
             'tsv'
         )
 
     @property
     def tsv_excel(self):
         return bom_helper.generate_bom_outputs(
-            self.bom_list(),
+            self._bom_list(),
             'tsv_excel'
         )
 
-    def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('pdf', )) -> None:
-        # graphical output
-        graph = self.create_graph()
-        for f in fmt:
-            graph.format = f
-            graph.render(filename=filename, view=view, cleanup=cleanup)
-        graph.save(filename=f'{filename}.gv')
-        # bom output
-        bom_list = self.bom_list()
-        # todo: support user choices of BOM format (probably also graphviz outputs, html outputs)
-        bom_helper.generate_bom_outputs(filename, bom_list, [bom_helper.WIREVIZ_TSV, bom_helper.EXCEL_CSV])
-        # HTML output
-        with open_file_write(f'{filename}.html') as file:
-            file.write('<!DOCTYPE html>\n')
-            file.write(f'<html><head><meta charset="UTF-8"></head><body style="font-family:Arial;background-color:{wv_colors.COLOR_BACKGROUND}">')
-
-            file.write('<h1>Diagram</h1>')
-            with open_file_read(f'{filename}.svg') as svg:
-                file.write(re.sub(
-                    '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
-                    '<!-- XML and DOCTYPE declarations from SVG file removed -->',
-                    svg.read(1024), 1))
-                for svgdata in svg:
-                    file.write(svgdata)
-
-            file.write('<h1>Bill of Materials</h1>')
-            listy = flatten2d(bom_list)
-            file.write('<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">')
-            file.write('<tr>')
-            for item in listy[0]:
-                file.write(f'<th align="left" style="border:1px solid #000000; padding: 8px">{item}</th>')
-            file.write('</tr>')
-            for row in listy[1:]:
-                file.write('<tr>')
-                for i, item in enumerate(row):
-                    item_str = item.replace('\u00b2', '&sup2;')
-                    align = 'align="right"' if listy[0][i] == 'Qty' else ''
-                    file.write(f'<td {align} style="border:1px solid #000000; padding: 4px">{item_str}</td>')
-                file.write('</tr>')
-            file.write('</table>')
-
-            file.write('</body></html>')
-
-    def bom(self):
+    def _bom(self):
         bom = []
         bom_connectors = []
         bom_cables = []
@@ -484,8 +441,8 @@ class Harness:
         bom.extend(bom_extra)
         return bom
 
-    def bom_list(self):
-        bom = self.bom()
+    def _bom_list(self):
+        bom = self._bom()
         keys = ['item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
         for fieldname in ['manufacturer', 'manufacturer part number', 'internal part number']: # these optional BOM columns will only be included if at least one BOM item actually uses them
             if any(fieldname in x and x.get(fieldname, None) for x in bom):
