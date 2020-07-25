@@ -199,18 +199,6 @@ def parse(yaml_input: str, return_types: (None, str, Tuple[str]) = None) -> Any:
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
-    with open_file_read(yaml_file) as file:
-        yaml_input = file.read()
-
-    if not file_out:
-        fn, fext = os.path.splitext(yaml_file)
-        file_out = fn
-    file_out = os.path.abspath(file_out)
-
-    parse(yaml_input, file_out=file_out)
-
-
 @click.command()
 @click.argument('input_file', required=True)
 @click.option('--prepend', '-p', default=None, help='a YAML file containing a library of templates and parts that may be referenced in the `input_file`')
@@ -245,21 +233,18 @@ def main(input_file, prepend, out):
     # the parse function may return a single instance or a tuple, thus, the
     # if/then determines if there is only one thing that must be saved or multiple
     filedatas = parse(yaml_input, return_types=out)
-    if isinstance(filedatas, tuple):
-        for ext, data in zip(out, filedatas):
-            if 'csv' in ext:
-                extension = 'bom.csv'
-            elif 'tsv' in ext:
-                extension = 'bom.tsv'
-            else:
-                extension = ext
-            fname = f'{base_file_name}.{extension}'
-            with open(fname, 'wb') as f:
-                f.write(data)
-    else:
-        ext = out[0]
-        data = filedatas
-        fname = f'{base_file_name}.{ext}'
+    if not isinstance(filedatas, tuple):
+        filedatas = (filedatas, )
+
+    for ext, data in zip(out, filedatas):
+        if 'csv' in ext:
+            extension = 'bom.csv'
+        elif 'tsv' in ext:
+            extension = 'bom.tsv'
+        else:
+            extension = ext
+
+        fname = f'{base_file_name}.{extension}'
         with open(fname, 'wb') as f:
             f.write(data)
 
