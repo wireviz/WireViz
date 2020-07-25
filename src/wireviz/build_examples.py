@@ -125,6 +125,8 @@ def parse_args():
     parser.add_argument('action', nargs='?', action='store',
                         choices=['build','clean','compare','restore'], default='build',
                         help='what to do with the generated files (default: build)')
+    parser.add_argument('-c', '--compare-graphviz-output', action='store_true',
+                        help='the Graphviz output is also compared (default: False)')
     parser.add_argument('-g', '--groups', nargs='+',
                         choices=groups.keys(), default=groups.keys(),
                         help='the groups of generated files (default: all)')
@@ -138,7 +140,7 @@ def main():
     elif args.action == 'clean':
         clean_generated(args.groups)
     elif args.action == 'compare':
-        compare_generated(args.groups)
+        compare_generated(args.groups, args.compare_graphviz_output)
     elif args.action == 'restore':
         restore_generated(args.groups)
 
