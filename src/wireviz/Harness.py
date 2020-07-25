@@ -288,6 +288,46 @@ class Harness:
         data.seek(0)
         return data.read()
 
+    @property
+    def html(self):
+        self.create_graph()
+
+        bom_list = self.bom_list()
+        string = ''
+
+        string += '<!DOCTYPE html>\n'
+        string += f'<html><head><meta charset="UTF-8"></head><body style="font-family:Arial;background-color:{wv_colors.COLOR_BACKGROUND}">'
+
+        string += '<h1>Diagram</h1>'
+
+        svg = self.svg.decode('utf-8')
+        svg = re.sub(
+            '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
+            '<!-- XML and DOCTYPE declarations from SVG file removed -->',
+            svg)
+        for svgdata in svg:
+            string += svgdata
+
+        string += '<h1>Bill of Materials</h1>'
+        listy = flatten2d(bom_list)
+        string += '<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">'
+        string += '<tr>'
+        for item in listy[0]:
+            string += f'<th align="left" style="border:1px solid #000000; padding: 8px">{item}</th>'
+        string += '</tr>'
+        for row in listy[1:]:
+            string += '<tr>'
+            for i, item in enumerate(row):
+                item_str = item.replace('\u00b2', '&sup2;')
+                align = 'align="right"' if listy[0][i] == 'Qty' else ''
+                string += f'<td {align} style="border:1px solid #000000; padding: 4px">{item_str}</td>'
+            string += '</tr>'
+        string += '</table>'
+
+        string += '</body></html>'
+
+        return bytes(string, encoding='utf-8')
+
     def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('pdf', )) -> None:
         # graphical output
         graph = self.create_graph()

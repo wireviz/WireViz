@@ -181,6 +181,8 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                 returns.append(harness.png)
             if rt == 'svg':
                 returns.append(harness.svg)
+            if rt == 'html':
+                returns.append(harness.html)
             if rt == 'harness':
                 returns.append(harness)
 

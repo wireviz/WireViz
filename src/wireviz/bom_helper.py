@@ -26,6 +26,7 @@ _tsv_formats = { EXCEL_TSV, WIREVIZ_TSV }
 _csv_ext = '.bom.csv'
 _tsv_ext = '.bom.tsv'
 
+
 def generate_bom_outputs(base_filename, bomdata, formats=None):
     if formats is None:
         formats = [EXCEL_CSV, WIREVIZ_TSV]
