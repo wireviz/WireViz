@@ -230,7 +230,14 @@ class Harness:
                 for bla in p:
                     html = html + f'<td>{bla}</td>'
                 html = f'{html}</tr>'
-                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" border="2" sides="b" port="ws"></td></tr>'
+                if isinstance(cable.shield, str):
+                    # shield is shown with specified color and black borders
+                    shield_color_hex = wv_colors.get_color_hex(cable.shield)[0]
+                    attributes = f'height="6" bgcolor="{shield_color_hex}" border="2" sides="tb"'
+                else:
+                    # shield is shown as a thin black wire
+                    attributes = f'height="2" bgcolor="#000000" border="0"'
+                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" {attributes} port="ws"></td></tr>'
 
             html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
@@ -248,8 +255,8 @@ class Harness:
                 if isinstance(connection_color.via_port, int):  # check if it's an actual wire and not a shield
                     dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1], pad=pad) + ['#000000']))
                 else:  # it's a shield connection
-                    # shield is shown as a thin tinned wire
-                    dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN', pad=False)[0], '#000000']))
+                    # shield is shown with specified color and black borders, or as a thin black wire otherwise
+                    dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000')
                 if connection_color.from_port is not None:  # connect to left
                     from_port = f':p{connection_color.from_port}r' if self.connectors[connection_color.from_name].style != 'simple' else ''
                     code_left_1 = f'{connection_color.from_name}{from_port}:e'
