@@ -328,23 +328,38 @@ class Harness:
 
     @property
     def csv(self):
-        raise NotImplementedError
+        return bom_helper.generate_bom_outputs(
+            self.bom_list(),
+            'csv'
+        )
 
     @property
     def csv_excel(self):
-        raise NotImplementedError
+        return bom_helper.generate_bom_outputs(
+            self.bom_list(),
+            'csv_excel'
+        )
 
     @property
     def csv_unix(self):
-        raise NotImplementedError
+        return bom_helper.generate_bom_outputs(
+            self.bom_list(),
+            'csv_unix'
+        )
 
     @property
     def tsv(self):
-        raise NotImplementedError
+        return bom_helper.generate_bom_outputs(
+            self.bom_list(),
+            'tsv'
+        )
 
     @property
     def tsv_excel(self):
-        raise NotImplementedError
+        return bom_helper.generate_bom_outputs(
+            self.bom_list(),
+            'tsv_excel'
+        )
 
     def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('pdf', )) -> None:
         # graphical output
@@ -356,7 +371,7 @@ class Harness:
         # bom output
         bom_list = self.bom_list()
         # todo: support user choices of BOM format (probably also graphviz outputs, html outputs)
-        bom_helper.generate_bom_outputs(filename,bom_list, [bom_helper.WIREVIZ_TSV, bom_helper.EXCEL_CSV])
+        bom_helper.generate_bom_outputs(filename, bom_list, [bom_helper.WIREVIZ_TSV, bom_helper.EXCEL_CSV])
         # HTML output
         with open_file_write(f'{filename}.html') as file:
             file.write('<!DOCTYPE html>\n')

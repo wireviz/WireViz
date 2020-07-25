@@ -249,7 +249,13 @@ def main(input_file, prepend, out):
     filedatas = parse(yaml_input, return_types=out)
     if isinstance(filedatas, tuple):
         for ext, data in zip(out, filedatas):
-            fname = f'{base_file_name}.{ext}'
+            if 'csv' in ext:
+                extension = 'bom.csv'
+            elif 'tsv' in ext:
+                extension = 'bom.tsv'
+            else:
+                extension = ext
+            fname = f'{base_file_name}.{extension}'
             with open(fname, 'wb') as f:
                 f.write(data)
     else:
