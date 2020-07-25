@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import os
+from pathlib import Path
 import sys
 from fnmatch import fnmatch
 
@@ -12,8 +13,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import wireviz
 
-examples_path = os.path.join('..','..','examples')
-tutorials_path = os.path.join('..','..','tutorial')
+examples_path = Path('../../examples').absolute()
+tutorials_path = Path('../../tutorial').absolute()
 demos_path = examples_path
 
 readme = 'readme.md'
@@ -22,24 +23,25 @@ readme = 'readme.md'
 def build_demos():
     for fn in sorted(os.listdir(demos_path)):
         if fnmatch(fn, "demo*.yml"):
-            abspath = os.path.join(demos_path, fn)
+            path = Path(os.path.join(demos_path, fn))
 
-            print(abspath)
-            wireviz.main(abspath, prepend=None, out=['png', 'svg', 'html', 'csv'])
+            print(path)
+            wireviz.main(path.absolute(), prepend=None, out=['png', 'svg', 'html', 'csv'])
 
 
 def build_examples():
-    with open_file_write(os.path.join(examples_path, readme)) as file:
+    with open_file_write(examples_path / readme) as file:
         file.write('# Example gallery\n')
         for fn in sorted(os.listdir(examples_path)):
             if fnmatch(fn, "ex*.yml"):
                 i = ''.join(filter(str.isdigit, fn))
 
-                abspath = os.path.join(examples_path, fn)
-                outfile_name = abspath.split(".yml")[0]
+                path = examples_path / f'{fn}'
+                os.chdir(path.parent.absolute())
+                outfile_name = path.name.replace('.yml', '')
 
-                print(abspath)
-                wireviz.main(abspath, prepend=None, out=['png', 'svg', 'html', 'csv'])
+                print(path)
+                wireviz.main(path, prepend=None, out=['png', 'svg', 'html', 'csv'])
 
                 file.write(f'## Example {i}\n')
                 file.write(f'![]({outfile_name}.png)\n\n')
@@ -52,19 +54,21 @@ def build_tutorials():
         for fn in sorted(os.listdir(tutorials_path)):
             if fnmatch(fn, "tutorial*.yml"):
                 i = ''.join(filter(str.isdigit, fn))
-                abspath = os.path.join(tutorials_path, fn)
-                print(abspath)
 
-                wireviz.main(abspath, prepend=None, out=['png', 'svg', 'html', 'csv'])
+                path = tutorials_path / f'{fn}'
+                os.chdir(path.parent.absolute())
+                outfile_name = path.name.replace('.yml', '')
 
-                outfile_name = abspath.split(".yml")[0]
+                print(path)
+
+                wireviz.main(path, prepend=None, out=['png', 'svg', 'html', 'csv'])
 
                 with open_file_read(outfile_name + '.md') as info:
                     for line in info:
                         file.write(line.replace('## ', '## {} - '.format(i)))
                 file.write(f'\n[Source]({fn}):\n\n')
 
-                with open_file_read(abspath) as src:
+                with open_file_read(path) as src:
                     file.write('```yaml\n')
                     for line in src:
                         file.write(line)
@@ -108,11 +112,14 @@ def main():
             'demos': build_demos,
             'tutorials': build_tutorials
         }
+
         for gentype in args.generate:
             if gentype in generate_types:
-                generate_types.get(gentype) ()
+                generate_types.get(gentype)()
+
     elif args.action == 'clean':
         clean_examples()
+
 
 if __name__ == '__main__':
     main()
