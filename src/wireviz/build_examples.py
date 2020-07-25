@@ -25,7 +25,8 @@ def build_demos():
             abspath = os.path.join(demos_path, fn)
 
             print(abspath)
-            wireviz.parse_file(abspath)
+            wireviz.main(abspath, prepend=None, out=['png', 'svg', 'html', 'csv'])
+
 
 def build_examples():
     with open_file_write(os.path.join(examples_path, readme)) as file:
@@ -37,13 +38,13 @@ def build_examples():
                 abspath = os.path.join(examples_path, fn)
                 outfile_name = abspath.split(".yml")[0]
 
-
                 print(abspath)
-                wireviz.parse_file(abspath)
+                wireviz.main(abspath, prepend=None, out=['png', 'svg', 'html', 'csv'])
 
                 file.write(f'## Example {i}\n')
                 file.write(f'![]({outfile_name}.png)\n\n')
                 file.write(f'[Source]({fn}) - [Bill of Materials]({outfile_name}.bom.tsv)\n\n\n')
+
 
 def build_tutorials():
     with open_file_write(os.path.join(tutorials_path, readme)) as file:
@@ -54,7 +55,7 @@ def build_tutorials():
                 abspath = os.path.join(tutorials_path, fn)
                 print(abspath)
 
-                wireviz.parse_file(abspath)
+                wireviz.main(abspath, prepend=None, out=['png', 'svg', 'html', 'csv'])
 
                 outfile_name = abspath.split(".yml")[0]
 
@@ -77,6 +78,7 @@ def build_tutorials():
                 file.write(f'[Bill of Materials - TSV](tutorial{outfile_name}.bom.tsv)\n\n')
                 file.write(f'[Bill of Materials - CSV](tutorial{outfile_name}.bom.csv)\n\n\n')
 
+
 def clean_examples():
     generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv', '.bom.csv']
 
@@ -96,6 +98,8 @@ def parse_args():
     parser.add_argument('action', nargs='?', action='store', default='build')
     parser.add_argument('-generate', nargs='*', choices=['examples', 'demos', 'tutorials'], default=['examples', 'demos', 'tutorials'])
     return parser.parse_args()
+
+
 def main():
     args = parse_args()
     if args.action == 'build':
