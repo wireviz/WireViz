@@ -17,12 +17,11 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read
 
 
-def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
+def parse(yaml_input: str, return_types: (None, str, Tuple[str]) = None) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
     :param yaml_input: a string containing the yaml input data
-    :param file_out:
     :param return_types: if None, then returns None; if the value is a string, then a
         corresponding data format will be returned; if the value is a tuple of strings,
         then for every valid format in the `return_types` tuple, another return type
@@ -165,9 +164,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
     if "additional_bom_items" in yaml_data:
         for line in yaml_data["additional_bom_items"]:
             harness.add_bom_item(line)
-
-    if file_out is not None:
-        harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
 
     if return_types is not None:
         returns = []
