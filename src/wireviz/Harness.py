@@ -211,7 +211,7 @@ class Harness:
 
         return dot
 
-    def output(self, filename, directory='_output', view=False, cleanup=True, fmt='pdf', gen_bom=False):
+    def output(self, filename, directory='_output', view=False, cleanup=True, fmt=('pdf',), gen_bom=False):
         # graphical output
         graph = self.create_graph()
         for f in fmt:
