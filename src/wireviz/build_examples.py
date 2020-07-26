@@ -34,8 +34,9 @@ groups = {
 }
 
 input_extensions = ['.yml']
-generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv']
-extensions_not_from_graphviz = [ext for ext in generated_extensions if ext[-1] == 'v']
+extensions_not_containing_graphviz_output = ['.gv', '.bom.tsv']
+extensions_containing_graphviz_output = ['.png', '.svg', '.html']
+generated_extensions = extensions_not_containing_graphviz_output + extensions_containing_graphviz_output
 
 
 def collect_filenames(description, groupkey, ext_list):
@@ -43,7 +44,7 @@ def collect_filenames(description, groupkey, ext_list):
     patterns = [f"{groups[groupkey]['prefix']}*{ext}" for ext in ext_list]
     if ext_list != input_extensions and readme in groups[groupkey]:
         patterns.append(readme)
-    print(f"{description} {groupkey} in {path}")
+    print(f'{description} {groupkey} in "{path}"')
     return sorted([filename for pattern in patterns for filename in path.glob(pattern)])
 
 
@@ -59,7 +60,7 @@ def build_generated(groupkeys):
                 out.write(f'# {groups[key]["title"]}\n\n')
         # collect and iterate input YAML files
         for yaml_file in collect_filenames('Building', key, input_extensions):
-            print(f'  {yaml_file}')
+            print(f'  "{yaml_file}"')
             wireviz.parse_file(yaml_file)
 
             if build_readme:
@@ -91,16 +92,16 @@ def clean_generated(groupkeys):
         # collect and remove files
         for filename in collect_filenames('Cleaning', key, generated_extensions):
             if filename.is_file():
-                print(f'  rm {filename}')
+                print(f'  rm "{filename}"')
                 os.remove(filename)
 
 
-def compare_generated(groupkeys, include_from_graphviz = False):
-    compare_extensions = generated_extensions if include_from_graphviz else extensions_not_from_graphviz
+def compare_generated(groupkeys, include_graphviz_output = False):
+    compare_extensions = generated_extensions if include_graphviz_output else extensions_not_containing_graphviz_output
     for key in groupkeys:
         # collect and compare files
         for filename in collect_filenames('Comparing', key, compare_extensions):
-            cmd = f'git --no-pager diff {filename}'
+            cmd = f'git --no-pager diff "{filename}"'
             print(f'  {cmd}')
             os.system(cmd)
 
@@ -115,7 +116,7 @@ def restore_generated(groupkeys):
             filename_list.append(groups[key]['path'] / readme)
         # restore files
         for filename in filename_list:
-            cmd = f'git checkout -- {filename}'
+            cmd = f'git checkout -- "{filename}"'
             print(f'  {cmd}')
             os.system(cmd)
 
