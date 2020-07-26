@@ -414,7 +414,7 @@ class Harness:
     def bom_list(self):
         bom = self.bom()
         keys = ['item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
-        for fieldname in ['manufacturer', 'manufacturer part number', 'part number']: # these optional BOM columns will only be included if at least one BOM item actually uses them
+        for fieldname in ['part number', 'manufacturer', 'manufacturer part number']: # these optional BOM columns will only be included if at least one BOM item actually uses them
             if any(fieldname in x and x.get(fieldname, None) for x in bom):
                 keys.append(fieldname)
         bom_list = []
