@@ -121,8 +121,7 @@ def open_file_write(filename):
 
 
 def manufacturer_info_field(manufacturer, mpn):
-    if manufacturer:
-        part_number_component = f': {mpn}' if mpn else ''
-        return(f'{manufacturer}{part_number_component}')
+    if manufacturer or mpn:
+        return f'{manufacturer if manufacturer else "MPN"}{": " + str(mpn) if mpn else ""}'
     else:
-        return(f'MPN: {mpn}' if mpn else None)
+        return None
