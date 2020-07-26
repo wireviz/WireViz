@@ -96,9 +96,9 @@ Since the auto-incremented and auto-assigned designator is not known to the user
                              # renders with a dashed outline
   type: <string>
   gauge: <int/float/string>  # allowed formats:
-                             # <int/float>      is assumed to be mm2
                              # <int/float> mm2  is understood
                              # <int> AWG        is understood
+                             # <int/float>      is assumed to be mm2
                              # <string>         custom units and formats are allowed
                              #                  but unavailable for auto-conversion
   show_equiv: <bool>         # defaults to false; can auto-convert between mm2 and AWG
@@ -194,7 +194,7 @@ For connectors with `autogenerate: true`, a new instance, with auto-generated de
 
   - `<int/string>` to refer to a specific pin, using its number (from its `pins` attribute) or its label (from its `pinlabels` attribute, provided the label is unique for this connector)
 
-  - `<int>-<int>` auto-expands to a range. E.g. `1-4` auto-expands to `1,2,3,4`; `9-7` will auto-expand to `9,8,7`.
+  - `<int>-<int>` auto-expands to a range, e.g. `1-4` auto-expands to `1,2,3,4`; `9-7` will auto-expand to `9,8,7`.
 
   - Mixing types is allowed, e.g. `[<pin>, <pinlabel>, <pin>-<pin>, <pin>]`
 
