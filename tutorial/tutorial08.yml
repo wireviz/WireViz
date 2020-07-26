@@ -3,11 +3,11 @@ connectors:
     type: Molex KK 254
     pincount: 4
     subtype: female
-    manufacturer: Molex
-    manufacturer_part_number: 22013047
+    manufacturer: Molex # set manufacter name
+    mpn: 22013047 # set manufacturer part number
   X2:
     <<: *template1 # reuse template
-    internal_part_number: CON4
+    pn: CON4 # set an internal part number
   X3:
     <<: *template1 # reuse template
 
@@ -18,16 +18,16 @@ cables:
     gauge: 0.25 mm2
     color_code: IEC
     manufacturer: CablesCo
-    manufacturer_part_number: ABC123
-    internal_part_number: CAB1
+    mpn: ABC123
+    pn: CAB1
   W2:
     category: bundle
     length: 1
     gauge: 0.25 mm2
     colors: [YE, BK, BK, RD]
-    manufacturer: [WiresCo,WiresCo,WiresCo,WiresCo]
-    manufacturer_part_number: [W1-YE,W1-BK,W1-BK,W1-RD]
-    internal_part_number: [WIRE1,WIRE2,WIRE2,WIRE3]
+    manufacturer: [WiresCo,WiresCo,WiresCo,WiresCo] # set a manufacter per wire
+    mpn: [W1-YE,W1-BK,W1-BK,W1-RD]
+    pn: [WIRE1,WIRE2,WIRE2,WIRE3]
 
 
 connections:
@@ -39,3 +39,14 @@ connections:
     - X1: [1-4]
     - W2: [1-4]
     - X3: [1-4]
+
+additional_bom_items:
+  - # define an additional item to add to the bill of materials
+    description: Label, pinout information
+    qty: 2
+    designators:
+      - X2
+      - X3
+    manufacturer: generic company
+    mpn: Label1
+    pn: Label-ID-1

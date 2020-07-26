@@ -11,8 +11,8 @@ from wireviz import wv_colors
 class Connector:
     name: str
     manufacturer: Optional[str] = None
-    manufacturer_part_number: Optional[str] = None
-    internal_part_number: Optional[str] = None
+    mpn: Optional[str] = None
+    pn: Optional[str] = None
     style: Optional[str] = None
     category: Optional[str] = None
     type: Optional[str] = None
@@ -80,8 +80,8 @@ class Connector:
 class Cable:
     name: str
     manufacturer: Optional[Union[str, List[str]]] = None
-    manufacturer_part_number: Optional[Union[str, List[str]]] = None
-    internal_part_number: Optional[Union[str, List[str]]] = None
+    mpn: Optional[Union[str, List[str]]] = None
+    pn: Optional[Union[str, List[str]]] = None
     category: Optional[str] = None
     type: Optional[str] = None
     gauge: Optional[float] = None
@@ -140,7 +140,7 @@ class Cable:
             self.wirecount = len(self.colors)
 
         # if lists of part numbers are provided check this is a bundle and that it matches the wirecount.
-        for idfield in [self.manufacturer, self.manufacturer_part_number, self.internal_part_number]:
+        for idfield in [self.manufacturer, self.mpn, self.pn]:
             if isinstance(idfield, list):
                 if self.category == "bundle":
                     # check the length
