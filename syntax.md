@@ -64,11 +64,6 @@ additional_bom_items:  # custom items to add to BOM
   # loops and shorts (#48)
   loops: <List>  # TODO
 
-  # BOM options (all optional)
-  ignore_in_bom: <bool>  # defaults to false TODO
-  bom_items:             # list of additional BOM entries for this cable/bundle TODO
-    - <bom-item>         # BOM item (see below)
-    ...
 
   # auto-generation
   autogenerate: <bool>  # optional; defaults to false; see below
@@ -125,12 +120,6 @@ Since the auto-incremented and auto-assigned designator is not known to the user
   wirecount: <int>
   colors: <List>     # list of colors (see below)
   color_code: <str>  # one of the supported cable color codes (see below)
-
-  # BOM options (all optional)
-  ignore_in_bom: <bool>  # defaults to false TODO
-  bom_items:             # list of additional BOM entries for this cable/bundle TODO
-    - <bom-item>         # BOM item (see below)
-    ...
 
   # rendering information (all optional)
   show_name: <bool>       # defaults to true
