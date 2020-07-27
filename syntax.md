@@ -104,8 +104,9 @@ Since the auto-incremented and auto-assigned designator is not known to the user
   show_equiv: <bool>      # defaults to false; can auto-convert between mm2 and AWG
                           # and display the result when set to true
   length: <int/float>     # is assumed to be in meters
-  shield: <bool/str>      # defaults to false
-                          # the shield can be accessed in connections
+  shield: <bool/color>    # defaults to false
+                          # setting to true will display the shield as a thin black line
+                          # using a color (see below) will render the shield in that color
                           # using 's' as the wire number
   notes: <str>   
 
