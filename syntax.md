@@ -61,9 +61,9 @@ additional_bom_items:  # custom items to add to BOM
                          # false for simple connectors
   hide_disconnected_pins: <bool>  # defaults to false
 
-  # loops and shorts (#48)
-  loops: <List>  # TODO
-
+  # loops
+  loops: <List>  # every list item is itself a list of exactly two pins
+                 # on the connector that are to be shorted
 
   # auto-generation
   autogenerate: <bool>  # optional; defaults to false; see below
