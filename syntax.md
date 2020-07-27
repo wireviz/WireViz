@@ -4,16 +4,16 @@
 
 ```yaml
 connectors:  # dictionary of all used connectors
-  <string>:    # unique connector designator/name
+  <str>   :    # unique connector designator/name
     ...          # connector attributes (see below)
-  <string>:
+  <str>   :
     ...
   ...
 
 cables:      # dictionary of all used cables and wires
-  <string>:    # unique cable designator/name
+  <str>   :    # unique cable designator/name
     ...          # cable attributes (see below)
-  <string>:
+  <str>   :
     ...
   ...
 
@@ -34,17 +34,17 @@ additional_bom_items:  # custom items to add to BOM
 ## Connector attributes
 
 ```yaml
-<string>:  # unique connector designator/name
+<str>   :  # unique connector designator/name
   # general information about a connector (all optional)
-  type: <string>
-  subtype: <string>
+  type: <str>   
+  subtype: <str>   
   color: <color>  # see below
-  notes: <string>
+  notes: <str>   
 
   # product information (all optional)
-  pn: <string>            # [internal] part number
-  mpn: <string>           # manufacturer part number
-  manufacturer: <string>  # manufacturer name
+  pn: <str>            # [internal] part number
+  mpn: <str>           # manufacturer part number
+  manufacturer: <str>  # manufacturer name
 
   # pinout information
   # at least one of the following must be specified
@@ -88,31 +88,31 @@ Since the auto-incremented and auto-assigned designator is not known to the user
 ## Cable attributes
 
 ```yaml
-<string>:  # unique cable designator/name
+<str>   :  # unique cable designator/name
   # general information about a connector (all optional)
-  category: <category>       # may be set to bundle;
-                             # generates one BOM item for every wire in the bundle
-                             # instead of a single item for the entire cable;
-                             # renders with a dashed outline
-  type: <string>
-  gauge: <int/float/string>  # allowed formats:
-                             # <int/float> mm2  is understood
-                             # <int> AWG        is understood
-                             # <int/float>      is assumed to be mm2
-                             # <string>         custom units and formats are allowed
-                             #                  but unavailable for auto-conversion
-  show_equiv: <bool>         # defaults to false; can auto-convert between mm2 and AWG
-                             # and display the result when set to true
-  length: <int/float>        # is assumed to be in meters
-  shield: <bool>             # defaults to false
-                             # the shield can be accessed in connections
-                             # using 's' as the wire number
-  notes: <string>
+  category: <category>  # may be set to bundle;
+                        # generates one BOM item for every wire in the bundle
+                        # instead of a single item for the entire cable;
+                        # renders with a dashed outline
+  type: <str>   
+  gauge: <int/float/str>  # allowed formats:
+                          # <int/float> mm2  is understood
+                          # <int> AWG        is understood
+                          # <int/float>      is assumed to be mm2
+                          # <str>            custom units and formats are allowed
+                          #                  but unavailable for auto-conversion
+  show_equiv: <bool>      # defaults to false; can auto-convert between mm2 and AWG
+                          # and display the result when set to true
+  length: <int/float>     # is assumed to be in meters
+  shield: <bool/str>      # defaults to false
+                          # the shield can be accessed in connections
+                          # using 's' as the wire number
+  notes: <str>   
 
   # product information (all optional)
-  pn: <string>            # [internal] part number
-  mpn: <string>           # manufacturer part number
-  manufacturer: <string>  # manufacturer name
+  pn: <str>            # [internal] part number
+  mpn: <str>           # manufacturer part number
+  manufacturer: <str>  # manufacturer name
 
   # conductor information
   # the following combinations are permitted:
@@ -175,7 +175,7 @@ connections:
 
 #### Connectors
 
-- `- <designator>: <int/string>` attaches a pin of the connector, referring to a pin number (from the connector's `pins` attribute) or a pin label (from its `pinlabels` attribute), provided the label is unique.
+- `- <designator>: <int/str>` attaches a pin of the connector, referring to a pin number (from the connector's `pins` attribute) or a pin label (from its `pinlabels` attribute), provided the label is unique.
 
 - `- <designator>` is allowed for simple connectors, since they have only one pin to connect.
 For connectors with `autogenerate: true`, a new instance, with auto-generated designator, is created.
@@ -192,7 +192,7 @@ For connectors with `autogenerate: true`, a new instance, with auto-generated de
 
   Each `<pin>` may be:
 
-  - `<int/string>` to refer to a specific pin, using its number (from its `pins` attribute) or its label (from its `pinlabels` attribute, provided the label is unique for this connector)
+  - `<int/str>` to refer to a specific pin, using its number (from its `pins` attribute) or its label (from its `pinlabels` attribute, provided the label is unique for this connector)
 
   - `<int>-<int>` auto-expands to a range, e.g. `1-4` auto-expands to `1,2,3,4`; `9-7` will auto-expand to `9,8,7`.
 
@@ -231,20 +231,20 @@ Additional BOM entries can be generated in the sections marked `<bom-item>` abov
 
 ```yaml
 -
-  description: <string>              
-  qty: <int/string>  # when used in the additional_bom_items section:
-                     # <int>            manually specify qty.
-                     # when used within a component:
-                     # <int>            manually specify qty.
-                     # pincount         match number of pins of connector
-                     # wirecount        match number of wires of cable/bundle
-                     # connectioncount  match number of connected pins
+  description: <str>              
+  qty: <int/str>  # when used in the additional_bom_items section:
+                  # <int>            manually specify qty.
+                  # when used within a component:
+                  # <int>            manually specify qty.
+                  # pincount         match number of pins of connector
+                  # wirecount        match number of wires of cable/bundle
+                  # connectioncount  match number of connected pins
   # all the following are optional:
-  unit: <string>
+  unit: <str>   
   designators: <List>
-  pn: <string>            # [internal] part number
-  mpn: <string>           # manufacturer part number
-  manufacturer: <string>  # manufacturer name  
+  pn: <str>            # [internal] part number
+  mpn: <str>           # manufacturer part number
+  manufacturer: <str>  # manufacturer name  
 ```
 
 ## Colors
