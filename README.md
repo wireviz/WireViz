@@ -1,8 +1,10 @@
 # WireViz
 
+
 ## Summary
 
 WireViz is a tool for easily documenting cables, wiring harnesses and connector pinouts. It takes plain text, YAML-formatted files as input and produces beautiful graphical output (SVG, PNG, ...) thanks to [GraphViz](https://www.graphviz.org/). It handles automatic BOM (Bill of Materials) creation and has a lot of extra features.
+
 
 ## Features
 
@@ -26,17 +28,6 @@ WireViz is a tool for easily documenting cables, wiring harnesses and connector 
 
 _Note_: WireViz is not designed to represent the complete wiring of a system. Its main aim is to document the construction of individual wires and harnesses.
 
-## Installation
-
-WireWiz requires GraphViz to be installed in order to work. See the [GraphViz download page](https://graphviz.org/download/) for OS-specific instructions.
-
-Installation of the WireWiz package and its Python dependencies can be done using pip after cloning the repository:
-
-```
-git clone <repo url>
-cd <working copy>
-pip3 install -e .
-```
 
 ## Examples
 
@@ -90,7 +81,38 @@ Output file:
 See the [tutorial page](tutorial/readme.md) for sample code,
 as well as the [example gallery](examples/readme.md) to see more of what WireViz can do.
 
+
 ## Usage
+
+### Installation
+
+#### Requirements
+
+WireViz requires Python 3.7 or later.
+
+WireWiz requires GraphViz to be installed in order to work. See the [GraphViz download page](https://graphviz.org/download/) for OS-specific instructions.
+
+_Note_: Ubuntu 18.04 LTS users in particular may need to separately install Python 3.7 or above, as that comes with Python 3.6 as the included system Python install.
+
+#### Installing the latest release
+
+The latest WireViz release can be downloaded from [PyPI](https://pypi.org/project/wireviz/) with the following command:
+```
+pip3 install wireviz
+```
+
+#### Installing the development version
+
+Access to the current state of the development branch can be gained by cloning the repo and installing manually:
+
+```
+git clone <repo url>
+cd <working copy>
+git checkout dev
+pip3 install -e .
+```
+
+### How to run
 
 ```
 $ wireviz ~/path/to/file/mywire.yml
@@ -106,28 +128,28 @@ mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 
+### Syntax description
+
+A description of the WireViz YAML input syntax can be found [here](syntax.md).
+
+
 ### (Re-)Building the example projects
 
-If you would like to rebuild all of the included demos, examples and tutorials, use the ```build_examples.py``` script:
+If you would like to rebuild all of the included demos, examples and tutorials, use the `build_examples.py` script:
 
 ```cd src/wireviz
 ./build_examples.py
-
 ```
 
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md)
 
+
 ## Status
 
-This is very much a [work in progress](https://github.com/formatc1702/WireViz/projects/1). Source code, API, syntax and functionality may change wildly at any time.
+This is very much a work in progress. Source code, API, syntax and functionality may change wildly at any time.
 
-## Requirements
-
-Developed and tested using Python 3.7; might not work with older Python versions.
-
-Ubuntu 18.04 LTS users in particular may need to separately install Python 3.7 or above, as that comes with Python 3.6 as the included system Python install.
 
 ## License
 
