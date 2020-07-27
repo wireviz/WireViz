@@ -202,11 +202,18 @@ class Harness:
                     html = f'{html}<td>{bla}</td>'
                 html = f'{html}</tr>'
 
-                bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
-                html = f'{html}<tr><td colspan="{len(p)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
-                for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
-                    html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
-                html = html + '</table></td></tr>'
+                colors = get_color_hex(connection_color)
+                html = f'{html}<tr><td colspan="{len(p)}" border="2" sides="tb" cellspacing="0" cellpadding="0" port="w{i}" height="6"><table cellspacing="0" cellborder="0" cellpadding="0" border="0">'
+                html = f'{html}<tr>'
+                numColors = len(colors)
+                for i in range(12) if numColors > 1 else range(1): #12 works well up to 4 colors
+                    html = f'{html}<td border="0" bgcolor="{colors[i%numColors]}"></td>'
+
+                html = html + '</tr></table></td></tr>'
+
+                #for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
+                #    html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
+                #html = html + '</table></td></tr>'
                 if(cable.category == 'bundle'):  # for bundles individual wires can have part information
                     # create a list of wire parameters
                     wireidentification = []
@@ -246,24 +253,69 @@ class Harness:
             # connections
             for connection_color in cable.connections:
                 if isinstance(connection_color.via_port, int):  # check if it's an actual wire and not a shield
-                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1], pad=pad) + ['#000000']))
+                    colors = wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1])
+                    isShield=False
+                    #dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1], pad=pad) + ['#000000']))
                 else:  # it's a shield connection
                     # shield is shown as a thin tinned wire
-                    dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN', pad=False)[0], '#000000']))
-                if connection_color.from_port is not None:  # connect to left
+                    colors = wv_colors.get_color_hex('SN', pad=False)
+                    isShield=True
+                    #dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN', pad=False)[0], '#000000']))
+                
+                
+                leftConn = connection_color.from_port is not None
+                rightConn = connection_color.to_port is not None
+
+
+                if leftConn:  # connect to left
                     from_port = f':p{connection_color.from_port}r' if self.connectors[connection_color.from_name].style != 'simple' else ''
                     code_left_1 = f'{connection_color.from_name}{from_port}:e'
                     code_left_2 = f'{cable.name}:w{connection_color.via_port}:w'
-                    dot.edge(code_left_1, code_left_2)
                     from_string = f'{connection_color.from_name}:{connection_color.from_port}' if self.connectors[connection_color.from_name].show_name else ''
                     html = html.replace(f'<!-- {connection_color.via_port}_in -->', from_string)
-                if connection_color.to_port is not None:  # connect to right
+                
+                if rightConn:  # connect to right
                     code_right_1 = f'{cable.name}:w{connection_color.via_port}:e'
                     to_port = f':p{connection_color.to_port}l' if self.connectors[connection_color.to_name].style != 'simple' else ''
                     code_right_2 = f'{connection_color.to_name}{to_port}:w'
-                    dot.edge(code_right_1, code_right_2)
                     to_string = f'{connection_color.to_name}:{connection_color.to_port}' if self.connectors[connection_color.to_name].show_name else ''
                     html = html.replace(f'<!-- {connection_color.via_port}_out -->', to_string)
+
+                #black cable borders
+                if not isShield:
+                    dot.attr('edge', style="solid", penwidth="6.0", color='#000000')
+                    if leftConn:
+                        dot.edge(code_left_1, code_left_2)
+                    if rightConn:
+                        dot.edge(code_right_1, code_right_2)
+
+                    #invis cable to break graphviz edge ordering
+                    dot.attr('edge', style='invis')
+                    if leftConn:
+                        dot.edge (connection_color.from_name, cable.name)
+                    if rightConn:
+                        dot.edge (cable.name, connection_color.to_name)
+
+                #cable color
+                dot.attr('edge', style="solid", penwidth="4.0" if isShield else "2.0", color=colors[0])
+                if leftConn:
+                    dot.edge(code_left_1, code_left_2)
+                if rightConn:
+                    dot.edge(code_right_1, code_right_2)
+
+                if len(colors) > 1:
+                    #invis cable to break graphviz edge ordering
+                    dot.attr('edge', style='invis')
+                    if leftConn:
+                        dot.edge (connection_color.from_name, cable.name)
+                    if rightConn:
+                        dot.edge (cable.name, connection_color.to_name)
+
+                    dot.attr('edge', style="dashed", penwidth="2.0", color=colors[1])
+                    if leftConn:
+                        dot.edge(code_left_1, code_left_2)
+                    if rightConn:
+                        dot.edge(code_right_1, code_right_2)
 
             dot.node(cable.name, label=f'<{html}>', shape='box',
                      style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
