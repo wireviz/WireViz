@@ -139,6 +139,10 @@ class Harness:
                     dot.edge(f'{connector.name}:p{loop[0]}{loop_side}:{loop_dir}',
                              f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
+        # determine if there are double- or triple-colored wires in the harness;
+        # if so, pad single-color wires to make all wires of equal thickness
+        pad = any(len(colorstr) > 2 for cable in self.cables.values() for colorstr in cable.colors)
+
         for _, cable in self.cables.items():
 
             awg_fmt = ''
@@ -186,11 +190,6 @@ class Harness:
             html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer between attributes and wires
 
             html = f'{html}<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
-
-            # determine if there are double- or triple-colored wires;
-            # if so, pad single-color wires to make all wires of equal thickness
-            colorlengths = list(map(len, cable.colors))
-            pad = 4 in colorlengths or 6 in colorlengths
 
             for i, connection_color in enumerate(cable.colors, 1):
                 p = []
