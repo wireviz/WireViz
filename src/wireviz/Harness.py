@@ -7,7 +7,8 @@ from wireviz import wv_colors, wv_helper, bom_helper
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
-    graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write
+    graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
+    manufacturer_info_field
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -88,9 +89,8 @@ class Harness:
         for key, connector in self.connectors.items():
 
             rows = [[connector.name if connector.show_name else None],
-                    [connector.manufacturer,
-                     f'MPN: {connector.manufacturer_part_number}' if connector.manufacturer_part_number else None,
-                     f'IPN: {connector.internal_part_number}' if connector.internal_part_number else None],
+                    [f'P/N: {connector.pn}' if connector.pn else None,
+                     manufacturer_info_field(connector.manufacturer, connector.mpn)],
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
@@ -139,6 +139,10 @@ class Harness:
                     dot.edge(f'{connector.name}:p{loop[0]}{loop_side}:{loop_dir}',
                              f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
 
+        # determine if there are double- or triple-colored wires in the harness;
+        # if so, pad single-color wires to make all wires of equal thickness
+        pad = any(len(colorstr) > 2 for cable in self.cables.values() for colorstr in cable.colors)
+
         for _, cable in self.cables.items():
 
             awg_fmt = ''
@@ -151,9 +155,9 @@ class Harness:
                 elif cable.gauge_unit.upper() == 'AWG':
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
-            identification = [cable.manufacturer if not isinstance(cable.manufacturer, list) else '',
-                              f'MPN: {cable.manufacturer_part_number}' if (cable.manufacturer_part_number and not isinstance(cable.manufacturer_part_number, list)) else '',
-                              f'IPN: {cable.internal_part_number}' if (cable.internal_part_number and not isinstance(cable.internal_part_number, list)) else '']
+            identification = [f'P/N: {cable.pn}' if (cable.pn and not isinstance(cable.pn, list)) else '',
+                              manufacturer_info_field(cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
+                                                      cable.mpn if not isinstance(cable.mpn, list) else None)]
             identification = list(filter(None, identification))
 
             attributes = [html_line_breaks(cable.type) if cable.type else '',
@@ -187,11 +191,6 @@ class Harness:
 
             html = f'{html}<tr><td><table border="0" cellspacing="0" cellborder="0">'  # conductor table
 
-            # determine if there are double- or triple-colored wires;
-            # if so, pad single-color wires to make all wires of equal thickness
-            colorlengths = list(map(len, cable.colors))
-            pad = 4 in colorlengths or 6 in colorlengths
-
             for i, connection_color in enumerate(cable.colors, 1):
                 p = []
                 p.append(f'<!-- {i}_in -->')
@@ -210,12 +209,12 @@ class Harness:
                 if(cable.category == 'bundle'):  # for bundles individual wires can have part information
                     # create a list of wire parameters
                     wireidentification = []
-                    if isinstance(cable.manufacturer, list):
-                        wireidentification.append(cable.manufacturer[i - 1])
-                    if isinstance(cable.manufacturer_part_number, list):
-                        wireidentification.append(f'MPN: {cable.manufacturer_part_number[i - 1]}')
-                    if isinstance(cable.internal_part_number, list):
-                        wireidentification.append(f'IPN: {cable.internal_part_number[i - 1]}')
+                    if isinstance(cable.pn, list):
+                        wireidentification.append(f'P/N: {cable.pn[i - 1]}')
+                    manufacturer_info = manufacturer_info_field(cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
+                                                                      cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
+                    if manufacturer_info:
+                        wireidentification.append(manufacturer_info)
                     # print parameters into a table row under the wire
                     if(len(wireidentification) > 0):
                         html = f'{html}<tr><td colspan="{len(p)}"><table border="0" cellspacing="0" cellborder="0"><tr>'
@@ -230,7 +229,14 @@ class Harness:
                 for bla in p:
                     html = html + f'<td>{bla}</td>'
                 html = f'{html}</tr>'
-                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" height="6" border="2" sides="b" port="ws"></td></tr>'
+                if isinstance(cable.shield, str):
+                    # shield is shown with specified color and black borders
+                    shield_color_hex = wv_colors.get_color_hex(cable.shield)[0]
+                    attributes = f'height="6" bgcolor="{shield_color_hex}" border="2" sides="tb"'
+                else:
+                    # shield is shown as a thin black wire
+                    attributes = f'height="2" bgcolor="#000000" border="0"'
+                html = f'{html}<tr><td colspan="{len(p)}" cellpadding="0" {attributes} port="ws"></td></tr>'
 
             html = f'{html}<tr><td>&nbsp;</td></tr>'  # spacer at the end
 
@@ -248,8 +254,8 @@ class Harness:
                 if isinstance(connection_color.via_port, int):  # check if it's an actual wire and not a shield
                     dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1], pad=pad) + ['#000000']))
                 else:  # it's a shield connection
-                    # shield is shown as a thin tinned wire
-                    dot.attr('edge', color=':'.join(['#000000', wv_colors.get_color_hex('SN', pad=False)[0], '#000000']))
+                    # shield is shown with specified color and black borders, or as a thin black wire otherwise
+                    dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000')
                 if connection_color.from_port is not None:  # connect to left
                     from_port = f':p{connection_color.from_port}r' if self.connectors[connection_color.from_name].style != 'simple' else ''
                     code_left_1 = f'{connection_color.from_name}{from_port}:e'
@@ -372,7 +378,7 @@ class Harness:
         bom_cables = []
         bom_extra = []
         # connectors
-        connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
+        connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.mpn, c.pn)
         for group in Counter([connector_group(v) for v in self.connectors.values()]):
             items = {k: v for k, v in self.connectors.items() if connector_group(v) == group}
             shared = next(iter(items.values()))
@@ -384,14 +390,14 @@ class Harness:
             conn_color = f', {shared.color}' if shared.color else ''
             name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
             item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.show_name else '',
-                    'manufacturer': shared.manufacturer, 'manufacturer part number': shared.manufacturer_part_number, 'internal part number': shared.internal_part_number}
+                    'manufacturer': shared.manufacturer, 'mpn': shared.mpn, 'pn': shared.pn}
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
         # The category needs to be included in cable_group to keep the bundles excluded.
-        cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.manufacturer_part_number, c.internal_part_number)
+        cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.mpn, c.pn)
         for group in Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle']):
             items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
             shared = next(iter(items.values()))
@@ -403,7 +409,7 @@ class Harness:
             shield_name = ' shielded' if shared.shield else ''
             name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
-                    'manufacturer': shared.manufacturer, 'manufacturer part number': shared.manufacturer_part_number, 'internal part number': shared.internal_part_number}
+                    'manufacturer': shared.manufacturer, 'mpn': shared.mpn, 'pn': shared.pn}
             bom_cables.append(item)
         # bundles (ignores wirecount)
         wirelist = []
@@ -414,10 +420,10 @@ class Harness:
                 for index, color in enumerate(bundle.colors, 0):
                     wirelist.append({'type': bundle.type, 'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
                                      'manufacturer': index_if_list(bundle.manufacturer, index),
-                                     'manufacturer part number': index_if_list(bundle.manufacturer_part_number, index),
-                                     'internal part number': index_if_list(bundle.internal_part_number, index)})
+                                     'mpn': index_if_list(bundle.mpn, index),
+                                     'pn': index_if_list(bundle.pn, index)})
         # join similar wires from all the bundles to a single BOM item
-        wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['manufacturer part number'], w['internal part number'])
+        wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['mpn'], w['pn'])
         for group in Counter([wire_group(v) for v in wirelist]):
             items = [v for v in wirelist if wire_group(v) == group]
             shared = items[0]
@@ -430,7 +436,7 @@ class Harness:
             gauge_color = f', {shared["color"]}' if 'color' in shared != '' else ''
             name = f'Wire{wire_type}{gauge_name}{gauge_color}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
-                    'manufacturer': shared['manufacturer'], 'manufacturer part number': shared['manufacturer part number'], 'internal part number': shared['internal part number']}
+                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
             bom_cables.append(item)
             bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
         bom.extend(bom_cables)
@@ -440,7 +446,7 @@ class Harness:
             if isinstance(item.get('designators', None), List):
                 item['designators'].sort()  # sort designators if a list is provided
             item = {'item': name, 'qty': item.get('qty', None), 'unit': item.get('unit', None), 'designators': item.get('designators', None),
-                    'manufacturer': item.get('manufacturer', None), 'manufacturer part number': item.get('manufacturer_part_number', None), 'internal part number': item.get('internal_part_number', None)}
+                    'manufacturer': item.get('manufacturer', None), 'mpn': item.get('mpn', None), 'pn': item.get('pn', None)}
             bom_extra.append(item)
         bom_extra = sorted(bom_extra, key=lambda k: k['item'])
         bom.extend(bom_extra)
@@ -449,11 +455,16 @@ class Harness:
     def _bom_list(self):
         bom = self._bom()
         keys = ['item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
-        for fieldname in ['manufacturer', 'manufacturer part number', 'internal part number']: # these optional BOM columns will only be included if at least one BOM item actually uses them
+        for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
             if any(fieldname in x and x.get(fieldname, None) for x in bom):
                 keys.append(fieldname)
         bom_list = []
-        bom_list.append([k.capitalize() for k in keys])  # create header row with keys
+        # list of staic bom header names,  headers not specified here are generated by capitilising the internal name
+        bom_headings = {
+            "pn": "P/N",
+            "mpn": "MPN"
+        }
+        bom_list.append([(bom_headings[k] if k in bom_headings else k.capitalize()) for k in keys])  # create header row with keys
         for item in bom:
             item_list = [item.get(key, '') for key in keys]  # fill missing values with blanks
             item_list = [', '.join(subitem) if isinstance(subitem, List) else subitem for subitem in item_list]  # convert any lists into comma separated strings

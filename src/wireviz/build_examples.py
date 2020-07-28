@@ -1,124 +1,149 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
 import argparse
+import sys
 import os
 from pathlib import Path
-import sys
-from fnmatch import fnmatch
 
-# noinspection PyUnresolvedReferences
-from wv_helper import open_file_write, open_file_read
+script_path = Path(__file__).absolute()
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
+sys.path.insert(0, str(script_path.parent.parent))  # to find wireviz module
 from wireviz import wireviz
+from wireviz.wv_helper import open_file_write, open_file_read, open_file_append
 
-examples_path = Path('../../examples').absolute()
-tutorials_path = Path('../../tutorial').absolute()
-demos_path = examples_path
 
 readme = 'readme.md'
+groups = {
+    'examples': {
+        'path': Path(script_path).parent.parent.parent / 'examples',
+        'prefix': 'ex',
+        readme: [], # Include no files
+        'title': 'Example Gallery',
+    },
+    'tutorial' : {
+        'path': Path(script_path).parent.parent.parent / 'tutorial',
+        'prefix': 'tutorial',
+        readme: ['md', 'yml'], # Include .md and .yml files
+        'title': 'WireViz Tutorial',
+    },
+    'demos' : {
+        'path': Path(script_path).parent.parent.parent / 'examples',
+        'prefix': 'demo',
+    },
+}
+
+input_extensions = ['.yml']
+extensions_not_containing_graphviz_output = ['.gv', '.bom.tsv']
+extensions_containing_graphviz_output = ['.png', '.svg', '.html']
+generated_extensions = extensions_not_containing_graphviz_output + extensions_containing_graphviz_output
 
 
-def build_demos():
-    for fn in sorted(os.listdir(demos_path)):
-        if fnmatch(fn, "demo*.yml"):
-            path = Path(os.path.join(demos_path, fn))
-
-            print(path)
-            wireviz.main(path.absolute(), prepend=None, out=['png', 'svg', 'html', 'csv'])
-
-
-def build_examples():
-    with open_file_write(examples_path / readme) as file:
-        file.write('# Example gallery\n')
-        for fn in sorted(os.listdir(examples_path)):
-            if fnmatch(fn, "ex*.yml"):
-                i = ''.join(filter(str.isdigit, fn))
-
-                path = examples_path / f'{fn}'
-                os.chdir(path.parent.absolute())
-                outfile_name = path.name.replace('.yml', '')
-
-                print(path)
-                wireviz.main(path, prepend=None, out=['png', 'svg', 'html', 'csv'])
-
-                file.write(f'## Example {i}\n')
-                file.write(f'![]({outfile_name}.png)\n\n')
-                file.write(f'[Source]({fn}) - [Bill of Materials]({outfile_name}.bom.tsv)\n\n\n')
+def collect_filenames(description, groupkey, ext_list):
+    path = groups[groupkey]['path']
+    patterns = [f"{groups[groupkey]['prefix']}*{ext}" for ext in ext_list]
+    if ext_list != input_extensions and readme in groups[groupkey]:
+        patterns.append(readme)
+    print(f'{description} {groupkey} in "{path}"')
+    return sorted([filename for pattern in patterns for filename in path.glob(pattern)])
 
 
-def build_tutorials():
-    with open_file_write(os.path.join(tutorials_path, readme)) as file:
-        file.write('# WireViz Tutorial\n')
-        for fn in sorted(os.listdir(tutorials_path)):
-            if fnmatch(fn, "tutorial*.yml"):
-                i = ''.join(filter(str.isdigit, fn))
+def build_generated(groupkeys):
+    for key in groupkeys:
+        # preparation
+        path = groups[key]['path']
+        build_readme = readme in groups[key]
+        if build_readme:
+            include_readme = 'md' in groups[key][readme]
+            include_source = 'yml' in groups[key][readme]
+            with open_file_write(path / readme) as out:
+                out.write(f'# {groups[key]["title"]}\n\n')
+        # collect and iterate input YAML files
+        for yaml_file in collect_filenames('Building', key, input_extensions):
+            print(f'  "{yaml_file}"')
+            wireviz.main(yaml_file, prepend=None, out=['png', 'svg', 'html', 'csv'])
 
-                path = tutorials_path / f'{fn}'
-                os.chdir(path.parent.absolute())
-                outfile_name = path.name.replace('.yml', '')
+            if build_readme:
+                i = ''.join(filter(str.isdigit, yaml_file.stem))
 
-                print(path)
+                with open_file_append(path / readme) as out:
+                    if include_readme:
+                        with open_file_read(yaml_file.with_suffix('.md')) as info:
+                            for line in info:
+                                out.write(line.replace('## ', f'## {i} - '))
+                            out.write('\n\n')
+                    else:
+                        out.write(f'## Example {i}\n')
 
-                wireviz.main(path, prepend=None, out=['png', 'svg', 'html', 'csv'])
+                    if include_source:
+                        with open_file_read(yaml_file) as src:
+                            out.write('```yaml\n')
+                            for line in src:
+                                out.write(line)
+                            out.write('```\n')
+                        out.write('\n')
 
-                with open_file_read(outfile_name + '.md') as info:
-                    for line in info:
-                        file.write(line.replace('## ', '## {} - '.format(i)))
-                file.write(f'\n[Source]({fn}):\n\n')
-
-                with open_file_read(path) as src:
-                    file.write('```yaml\n')
-                    for line in src:
-                        file.write(line)
-                    file.write('```\n')
-                file.write('\n')
-
-                file.write('\nOutput:\n\n'.format(i))
-
-                file.write(f'![](tutorial{outfile_name}.png)\n\n')
-
-                file.write(f'[Bill of Materials - TSV](tutorial{outfile_name}.bom.tsv)\n\n')
-                file.write(f'[Bill of Materials - CSV](tutorial{outfile_name}.bom.csv)\n\n\n')
+                    out.write(f'![]({yaml_file.stem}.png)\n\n')
+                    out.write(f'[Source]({yaml_file.name}) - [Bill of Materials]({yaml_file.stem}.bom.tsv)\n\n\n')
 
 
-def clean_examples():
-    generated_extensions = ['.gv', '.png', '.svg', '.html', '.bom.tsv', '.bom.csv']
+def clean_generated(groupkeys):
+    for key in groupkeys:
+        # collect and remove files
+        for filename in collect_filenames('Cleaning', key, generated_extensions):
+            if filename.is_file():
+                print(f'  rm "{filename}"')
+                os.remove(filename)
 
-    for filepath in [examples_path, demos_path, tutorials_path]:
-        print(filepath)
-        for file in sorted(os.listdir(filepath)):
-            if os.path.exists(os.path.join(filepath, file)):
-                if list(filter(file.endswith, generated_extensions)) or file == 'readme.md':
-                    print('rm ' + os.path.join(filepath, file))
-                    os.remove(os.path.join(filepath, file))
+
+def compare_generated(groupkeys, include_graphviz_output = False):
+    compare_extensions = generated_extensions if include_graphviz_output else extensions_not_containing_graphviz_output
+    for key in groupkeys:
+        # collect and compare files
+        for filename in collect_filenames('Comparing', key, compare_extensions):
+            cmd = f'git --no-pager diff "{filename}"'
+            print(f'  {cmd}')
+            os.system(cmd)
+
+
+def restore_generated(groupkeys):
+    for key in groupkeys:
+        # collect input YAML files
+        filename_list = collect_filenames('Restoring', key, input_extensions)
+        # collect files to restore
+        filename_list = [fn.with_suffix(ext) for fn in filename_list for ext in generated_extensions]
+        if readme in groups[key]:
+            filename_list.append(groups[key]['path'] / readme)
+        # restore files
+        for filename in filename_list:
+            cmd = f'git checkout -- "{filename}"'
+            print(f'  {cmd}')
+            os.system(cmd)
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Wireviz Example Manager',
-    )
-    parser.add_argument('action', nargs='?', action='store', default='build')
-    parser.add_argument('-generate', nargs='*', choices=['examples', 'demos', 'tutorials'], default=['examples', 'demos', 'tutorials'])
+    parser = argparse.ArgumentParser(description='Wireviz Example Manager',)
+    parser.add_argument('action', nargs='?', action='store',
+                        choices=['build','clean','compare','restore'], default='build',
+                        help='what to do with the generated files (default: build)')
+    parser.add_argument('-c', '--compare-graphviz-output', action='store_true',
+                        help='the Graphviz output is also compared (default: False)')
+    parser.add_argument('-g', '--groups', nargs='+',
+                        choices=groups.keys(), default=groups.keys(),
+                        help='the groups of generated files (default: all)')
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
     if args.action == 'build':
-        generate_types = {
-            'examples': build_examples,
-            'demos': build_demos,
-            'tutorials': build_tutorials
-        }
-
-        for gentype in args.generate:
-            if gentype in generate_types:
-                generate_types.get(gentype)()
-
+        build_generated(args.groups)
     elif args.action == 'clean':
-        clean_examples()
+        clean_generated(args.groups)
+    elif args.action == 'compare':
+        compare_generated(args.groups, args.compare_graphviz_output)
+    elif args.action == 'restore':
+        restore_generated(args.groups)
 
 
 if __name__ == '__main__':

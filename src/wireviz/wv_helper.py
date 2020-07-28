@@ -113,7 +113,17 @@ def remove_line_breaks(inp):
     return inp.replace('\n', ' ').rstrip() if isinstance(inp, str) else inp
 
 def open_file_read(filename):
+    # TODO: Intelligently determine encoding
     return open(filename, 'r', encoding='UTF-8')
 
-def open_file_write(filename, newline='\n'):
-    return open(filename, 'w', encoding='UTF-8', newline=newline)
+def open_file_write(filename):
+    return open(filename, 'w', encoding='UTF-8')
+
+def open_file_append(filename):
+    return open(filename, 'a', encoding='UTF-8')
+
+def manufacturer_info_field(manufacturer, mpn):
+    if manufacturer or mpn:
+        return f'{manufacturer if manufacturer else "MPN"}{": " + str(mpn) if mpn else ""}'
+    else:
+        return None
