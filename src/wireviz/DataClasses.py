@@ -149,8 +149,6 @@ class Cable:
                 else:
                     raise Exception('lists of part data are only supported for bundles')
 
-        # for BOM generation
-        self.wirecount_and_shield = (self.wirecount, self.shield)
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
         from_pin = int2tuple(from_pin)
