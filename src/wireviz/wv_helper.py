@@ -59,21 +59,26 @@ def expand(yaml_data):
         yaml_data = [yaml_data]
     for e in yaml_data:
         e = str(e)
-        if '-' in e:  # list of pins
-            a, b = tuple(map(int, e.split('-')))
-            if a < b:
-                for x in range(a, b + 1):
-                    output.append(x)
-            elif a > b:
-                for x in range(a, b - 1, -1):
-                    output.append(x)
-            elif a == b:
-                output.append(a)
+        if '-' in e:
+            a, b = e.split('-', 1)
+            try:
+                a = int(a)
+                b = int(b)
+                if a < b:
+                    for x in range(a, b + 1):
+                        output.append(x)  # ascending range
+                elif a > b:
+                    for x in range(a, b - 1, -1):
+                        output.append(x)  # descending range
+                else:  # a == b
+                    output.append(a)  # range of length 1
+            except:
+                output.append(e)  # '-' was not a delimiter between two ints, pass e through unchanged
         else:
             try:
-                x = int(e)
+                x = int(e)  # single int
             except Exception:
-                x = e
+                x = e  # string
             output.append(x)
     return output
 
