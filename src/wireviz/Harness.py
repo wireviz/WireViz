@@ -177,19 +177,18 @@ class Harness:
             wirehtml = f'{wirehtml}<tr><td>&nbsp;</td></tr>'
 
             for i, connection_color in enumerate(cable.colors, 1):
-                p = []
-                p.append(f'<!-- {i}_in -->')
-                p.append(wv_colors.translate_color(connection_color, self.color_mode))
-                p.append(f'<!-- {i}_out -->')
+                wirerow = [f'<!-- {i}_in -->',
+                           wv_colors.translate_color(connection_color, self.color_mode),
+                           f'<!-- {i}_out -->']
                 wirehtml = f'{wirehtml}<tr>'
-                for bla in p:
-                    wirehtml = f'{wirehtml}<td>{bla}</td>'
+                for cell in wirerow:
+                    wirehtml = f'{wirehtml}<td>{cell}</td>'
                 wirehtml = f'{wirehtml}</tr>'
 
                 bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
-                wirehtml = f'{wirehtml}<tr><td colspan="{len(p)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
+                wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
                 for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
-                    wirehtml = f'{wirehtml}<tr><td colspan="{len(p)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
+                    wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
                 wirehtml = wirehtml + '</table></td></tr>'
                 if(cable.category == 'bundle'):  # for bundles individual wires can have part information
                     # create a list of wire parameters
@@ -202,17 +201,17 @@ class Harness:
                         wireidentification.append(manufacturer_info)
                     # print parameters into a table row under the wire
                     if(len(wireidentification) > 0):
-                        wirehtml = f'{wirehtml}<tr><td colspan="{len(p)}"><table border="0" cellspacing="0" cellborder="0"><tr>'
+                        wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}"><table border="0" cellspacing="0" cellborder="0"><tr>'
                         for attrib in wireidentification:
                             wirehtml = f'{wirehtml}<td>{attrib}</td>'
                         wirehtml = f'{wirehtml}</tr></table></td></tr>'
 
             if cable.shield:
-                p = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
+                wirerow = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
                 wirehtml = f'{wirehtml}<tr><td>&nbsp;</td></tr>'  # spacer
                 wirehtml = f'{wirehtml}<tr>'
-                for bla in p:
-                    wirehtml = wirehtml + f'<td>{bla}</td>'
+                for cell in wirerow:
+                    wirehtml = wirehtml + f'<td>{cell}</td>'
                 wirehtml = f'{wirehtml}</tr>'
                 if isinstance(cable.shield, str):
                     # shield is shown with specified color and black borders
@@ -221,7 +220,7 @@ class Harness:
                 else:
                     # shield is shown as a thin black wire
                     attributes = f'height="2" bgcolor="#000000" border="0"'
-                wirehtml = f'{wirehtml}<tr><td colspan="{len(p)}" cellpadding="0" {attributes} port="ws"></td></tr>'
+                wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}" cellpadding="0" {attributes} port="ws"></td></tr>'
 
             wirehtml = f'{wirehtml}<tr><td>&nbsp;</td></tr>'
             wirehtml = f'{wirehtml}</table>'
