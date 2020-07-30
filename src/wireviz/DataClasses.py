@@ -88,6 +88,7 @@ class Cable:
     gauge_unit: Optional[str] = None
     show_equiv: bool = False
     length: float = 0
+    color: Optional[str] = None
     wirecount: Optional[int] = None
     shield: bool = False
     notes: Optional[str] = None

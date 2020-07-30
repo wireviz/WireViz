@@ -163,11 +163,16 @@ class Harness:
                      f'{len(cable.colors)}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
-                     f'{cable.length} m' if cable.length > 0 else None],
+                     f'{cable.length} m' if cable.length > 0 else None,
+                     cable.color, '<!-- colorbar -->' if cable.color else None],
                     '<!-- wire table -->',
                     [html_line_breaks(cable.notes)]]
             html = nested_html_table(rows)
 
+            if cable.color: # add color bar next to color info, if present
+                colorbar = f' bgcolor="{wv_colors.translate_color(cable.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
+                html = html.replace('><!-- colorbar --></td>', colorbar)
+            
             wirehtml = '<table border="0" cellspacing="0" cellborder="0">'  # conductor table
             wirehtml = f'{wirehtml}<tr><td>&nbsp;</td></tr>'
 
