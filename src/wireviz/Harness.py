@@ -197,8 +197,9 @@ class Harness:
                     wireidentification = []
                     if isinstance(cable.pn, list):
                         wireidentification.append(f'P/N: {cable.pn[i - 1]}')
-                    manufacturer_info = manufacturer_info_field(cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
-                                                                      cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
+                    manufacturer_info = manufacturer_info_field(
+                        cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
+                        cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
                     if manufacturer_info:
                         wireidentification.append(html_line_breaks(manufacturer_info))
                     # print parameters into a table row under the wire
@@ -335,7 +336,7 @@ class Harness:
             conn_color = f', {shared.color}' if shared.color else ''
             name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
             item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.show_name else '',
-                    'manufacturer': shared.manufacturer, 'mpn': shared.mpn, 'pn': shared.pn}
+                    'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
             bom_connectors.append(item)
             bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
         bom.extend(bom_connectors)
@@ -354,7 +355,7 @@ class Harness:
             shield_name = ' shielded' if shared.shield else ''
             name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
-                    'manufacturer': shared.manufacturer, 'mpn': shared.mpn, 'pn': shared.pn}
+                    'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
             bom_cables.append(item)
         # bundles (ignores wirecount)
         wirelist = []
@@ -364,8 +365,8 @@ class Harness:
                 # add each wire from each bundle to the wirelist
                 for index, color in enumerate(bundle.colors, 0):
                     wirelist.append({'type': bundle.type, 'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
-                                     'manufacturer': index_if_list(bundle.manufacturer, index),
-                                     'mpn': index_if_list(bundle.mpn, index),
+                                     'manufacturer': remove_line_breaks(index_if_list(bundle.manufacturer, index)),
+                                     'mpn': remove_line_breaks(index_if_list(bundle.mpn, index)),
                                      'pn': index_if_list(bundle.pn, index)})
         # join similar wires from all the bundles to a single BOM item
         wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['mpn'], w['pn'])

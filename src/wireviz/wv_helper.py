@@ -110,7 +110,7 @@ def graphviz_line_breaks(inp):
     return inp.replace('\n', '\\n') if isinstance(inp, str) else inp # \n generates centered new lines. http://www.graphviz.org/doc/info/attrs.html#k:escString
 
 def remove_line_breaks(inp):
-    return inp.replace('\n', ' ').rstrip() if isinstance(inp, str) else inp
+    return inp.replace('\n', ' ').strip() if isinstance(inp, str) else inp
 
 def open_file_read(filename):
     # TODO: Intelligently determine encoding
