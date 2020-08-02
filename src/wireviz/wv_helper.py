@@ -34,18 +34,23 @@ def nested_html_table(rows):
     # input: list, each item may be scalar or list
     # output: a parent table with one child table per parent item that is list, and one cell per parent item that is scalar
     # purpose: create the appearance of one table, where cell widths are independent between rows
-    html = '<table border="0" cellspacing="0" cellpadding="0">'
+    html = []
+    html.append('<table border="0" cellspacing="0" cellpadding="0">')
     for row in rows:
         if isinstance(row, List):
             if len(row) > 0 and any(row):
-                html = f'{html}<tr><td><table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
+                html.append('<tr><td>')
+                html.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>')
                 for cell in row:
                     if cell is not None:
-                        html = f'{html}<td balign="left">{cell}</td>'
-                html = f'{html}</tr></table></td></tr>'
+                        html.append(f'<td balign="left">{cell}</td>')
+                html.append('</tr></table>')
+                html.append('</td></tr>')
         elif row is not None:
-            html = f'{html}<tr><td>{row}</td></tr>'
-    html = f'{html}</table>'
+            html.append('<tr><td>')
+            html.append(row)
+            html.append('</td></tr>')
+    html.append('</table>')
     return html
 
 

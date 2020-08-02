@@ -88,6 +88,8 @@ class Harness:
 
         for connector in self.connectors.values():
 
+            html = []
+
             rows = [[connector.name if connector.show_name else None],
                     [f'P/N: {connector.pn}' if connector.pn else None,
                      html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))],
@@ -97,33 +99,34 @@ class Harness:
                      connector.color, '<!-- colorbar -->' if connector.color else None],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_line_breaks(connector.notes)]]
-            html = nested_html_table(rows)
+            html.extend(nested_html_table(rows))
 
             if connector.color: # add color bar next to color info, if present
                 colorbar = f' bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
-                html = html.replace('><!-- colorbar --></td>', colorbar)
+                html = [row.replace('><!-- colorbar --></td>', colorbar) for row in html]
 
             if connector.style != 'simple':
-                pinlist = []
+                pinhtml = []
+                pinhtml.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
+
                 for pin, pinlabel in zip(connector.pins, connector.pinlabels):
                     if connector.hide_disconnected_pins and not connector.visible_pins.get(pin, False):
                         continue
-                    pinlist.append([f'<td port="p{pin}l">{pin}</td>' if connector.ports_left else None,
-                                    f'<td>{pinlabel}</td>' if pinlabel else '',
-                                    f'<td port="p{pin}r">{pin}</td>' if connector.ports_right else None])
+                    pinhtml.append('<tr>')
+                    if connector.ports_left:
+                        pinhtml.append(f'<td port="p{pin}l">{pin}</td>')
+                    if pinlabel:
+                        pinhtml.append(f'<td>{pinlabel}</td>')
+                    if connector.ports_right:
+                        pinhtml.append(f'<td port="p{pin}r">{pin}</td>')
+                    pinhtml.append('</tr>')
 
-                pinhtml = '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
-                for i, pin in enumerate(pinlist):
-                    pinhtml = f'{pinhtml}<tr>'
-                    for column in pin:
-                        if column is not None:
-                            pinhtml = f'{pinhtml}{column}'
-                    pinhtml = f'{pinhtml}</tr>'
-                pinhtml = f'{pinhtml}</table>'
-                html = html.replace('<!-- connector table -->', pinhtml)
+                pinhtml.append('</table>')
 
+                html = [row.replace('<!-- connector table -->', '\n'.join(pinhtml)) for row in html]
 
-            dot.node(connector.name, label=f'<{html}>', shape='none', margin='0', style='filled', fillcolor='white')
+            html = '\n'.join(html)
+            dot.node(connector.name, label=f'<\n{html}\n>', shape='none', margin='0', style='filled', fillcolor='white')
 
             if len(connector.loops) > 0:
                 dot.attr('edge', color='#000000:#ffffff:#000000')
@@ -145,6 +148,8 @@ class Harness:
         pad = any(len(colorstr) > 2 for cable in self.cables.values() for colorstr in cable.colors)
 
         for cable in self.cables.values():
+
+            html = []
 
             awg_fmt = ''
             if cable.show_equiv:
@@ -169,29 +174,30 @@ class Harness:
                      cable.color, '<!-- colorbar -->' if cable.color else None],
                     '<!-- wire table -->',
                     [html_line_breaks(cable.notes)]]
-            html = nested_html_table(rows)
+            html.extend(nested_html_table(rows))
 
             if cable.color: # add color bar next to color info, if present
                 colorbar = f' bgcolor="{wv_colors.translate_color(cable.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
-                html = html.replace('><!-- colorbar --></td>', colorbar)
+                html = [row.replace('><!-- colorbar --></td>', colorbar) for row in html]
 
-            wirehtml = '<table border="0" cellspacing="0" cellborder="0">'  # conductor table
-            wirehtml = f'{wirehtml}<tr><td>&nbsp;</td></tr>'
+            wirehtml = []
+            wirehtml.append('<table border="0" cellspacing="0" cellborder="0">')  # conductor table
+            wirehtml.append('<tr><td>&nbsp;</td></tr>')
 
             for i, connection_color in enumerate(cable.colors, 1):
-                wirerow = [f'<!-- {i}_in -->',
-                           wv_colors.translate_color(connection_color, self.color_mode),
-                           f'<!-- {i}_out -->']
-                wirehtml = f'{wirehtml}<tr>'
-                for cell in wirerow:
-                    wirehtml = f'{wirehtml}<td>{cell}</td>'
-                wirehtml = f'{wirehtml}</tr>'
+                wirehtml.append('<tr>')
+                wirehtml.append(f'<td><!-- {i}_in --></td>')
+                wirehtml.append(f'<td>{wv_colors.translate_color(connection_color, self.color_mode)}</td>')
+                wirehtml.append(f'<td><!-- {i}_out --></td>')
+                wirehtml.append('</tr>')
 
                 bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
-                wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}"><table cellspacing="0" cellborder="0" border = "0">'
+                wirehtml.append(f'<tr><td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}">')
+                wirehtml.append('<table cellspacing="0" cellborder="0" border="0">')
                 for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
-                    wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
-                wirehtml = wirehtml + '</table></td></tr>'
+                    wirehtml.append(f'<tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>')
+                wirehtml.append('</table>')
+                wirehtml.append('</td></tr>')
                 if(cable.category == 'bundle'):  # for bundles individual wires can have part information
                     # create a list of wire parameters
                     wireidentification = []
@@ -204,18 +210,20 @@ class Harness:
                         wireidentification.append(html_line_breaks(manufacturer_info))
                     # print parameters into a table row under the wire
                     if(len(wireidentification) > 0):
-                        wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}"><table border="0" cellspacing="0" cellborder="0"><tr>'
+                        wirehtml.append('<tr><td colspan="3">')
+                        wirehtml.append('<table border="0" cellspacing="0" cellborder="0"><tr>')
                         for attrib in wireidentification:
-                            wirehtml = f'{wirehtml}<td>{attrib}</td>'
-                        wirehtml = f'{wirehtml}</tr></table></td></tr>'
+                            wirehtml.append(f'<td>{attrib}</td>')
+                        wirehtml.append('</tr></table>')
+                        wirehtml.append('</td></tr>')
 
             if cable.shield:
-                wirerow = ['<!-- s_in -->', 'Shield', '<!-- s_out -->']
-                wirehtml = f'{wirehtml}<tr><td>&nbsp;</td></tr>'  # spacer
-                wirehtml = f'{wirehtml}<tr>'
-                for cell in wirerow:
-                    wirehtml = wirehtml + f'<td>{cell}</td>'
-                wirehtml = f'{wirehtml}</tr>'
+                wirehtml.append('<tr><td>&nbsp;</td></tr>')  # spacer
+                wirehtml.append('<tr>')
+                wirehtml.append('<td><!-- s_in --></td>')
+                wirehtml.append('<td>Shield</td>')
+                wirehtml.append('<td><!-- s_out --></td>')
+                wirehtml.append('</tr>')
                 if isinstance(cable.shield, str):
                     # shield is shown with specified color and black borders
                     shield_color_hex = wv_colors.get_color_hex(cable.shield)[0]
@@ -223,12 +231,12 @@ class Harness:
                 else:
                     # shield is shown as a thin black wire
                     attributes = f'height="2" bgcolor="#000000" border="0"'
-                wirehtml = f'{wirehtml}<tr><td colspan="{len(wirerow)}" cellpadding="0" {attributes} port="ws"></td></tr>'
+                wirehtml.append(f'<tr><td colspan="3" cellpadding="0" {attributes} port="ws"></td></tr>')
 
-            wirehtml = f'{wirehtml}<tr><td>&nbsp;</td></tr>'
-            wirehtml = f'{wirehtml}</table>'
+            wirehtml.append('<tr><td>&nbsp;</td></tr>')
+            wirehtml.append('</table>')
 
-            html = html.replace('<!-- wire table -->', wirehtml)
+            html = [row.replace('<!-- wire table -->', '\n'.join(wirehtml)) for row in html]
 
             # connections
             for connection_color in cable.connections:
@@ -243,16 +251,17 @@ class Harness:
                     code_left_2 = f'{cable.name}:w{connection_color.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
                     from_string = f'{connection_color.from_name}:{connection_color.from_port}' if self.connectors[connection_color.from_name].show_name else ''
-                    html = html.replace(f'<!-- {connection_color.via_port}_in -->', from_string)
+                    html = [row.replace(f'<!-- {connection_color.via_port}_in -->', from_string) for row in html]
                 if connection_color.to_port is not None:  # connect to right
                     code_right_1 = f'{cable.name}:w{connection_color.via_port}:e'
                     to_port = f':p{connection_color.to_port}l' if self.connectors[connection_color.to_name].style != 'simple' else ''
                     code_right_2 = f'{connection_color.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
                     to_string = f'{connection_color.to_name}:{connection_color.to_port}' if self.connectors[connection_color.to_name].show_name else ''
-                    html = html.replace(f'<!-- {connection_color.via_port}_out -->', to_string)
+                    html = [row.replace(f'<!-- {connection_color.via_port}_out -->', to_string) for row in html]
 
-            dot.node(cable.name, label=f'<{html}>', shape='box',
+            html = '\n'.join(html)
+            dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
                      style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
 
         return dot
