@@ -34,6 +34,7 @@ def nested_html_table(rows):
     # input: list, each item may be scalar or list
     # output: a parent table with one child table per parent item that is list, and one cell per parent item that is scalar
     # purpose: create the appearance of one table, where cell widths are independent between rows
+    # attributes in any leading <tdX> inside a list are injected into to the preceeding <td> tag
     html = []
     html.append('<table border="0" cellspacing="0" cellpadding="0">')
     for row in rows:
@@ -43,7 +44,8 @@ def nested_html_table(rows):
                 html.append('  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>')
                 for cell in row:
                     if cell is not None:
-                        html.append(f'   <td balign="left">{cell}</td>')
+                        # Inject attributes to the preceeding <td> tag where needed
+                        html.append(f'   <td balign="left">{cell}</td>'.replace('><tdX', ''))
                 html.append('  </tr></table>')
                 html.append(' </td></tr>')
         elif row is not None:
@@ -52,6 +54,12 @@ def nested_html_table(rows):
             html.append(' </td></tr>')
     html.append('</table>')
     return html
+
+def html_image(node):
+    return f'''<tdX{' sides="TLR"' if node.caption else ''}><img src="{node.image}"/>''' if node.image else None
+
+def html_caption(node):
+    return f'''<tdX{' sides="LRB"' if node.image else ''}>{html_line_breaks(node.caption)}''' if node.caption else None
 
 
 def expand(yaml_data):
