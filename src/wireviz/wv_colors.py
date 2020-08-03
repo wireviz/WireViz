@@ -11,14 +11,21 @@ COLOR_CODES = {
             'GYBNBK', 'WHPKBK', 'PKBNBK', 'WHBUBK', 'BNBUBK', 'WHRDBK', 'BNRDBK'],
     'IEC': ['BN', 'RD', 'OG', 'YE', 'GN', 'BU', 'VT', 'GY', 'WH', 'BK'],
     'BW': ['BK', 'WH'],
-    'TEL': ['BUWH', 'WHBU', 'OGWH', 'WHOG', 'GNWH', 'WHGN', 'BNWH', 'WHBN', 'SLWH', 'WHSL', 'BURD', 'RDBU', 'OGRD',
-            'RDOG', 'GNRD', 'RDGN', 'BNRD', 'RDBN', 'SLRD', 'RDSL', 'BUBK', 'BKBU', 'OGBK', 'BKOG', 'GNBK', 'BKGN',
-            'BNBK', 'BKBN', 'SLBK', 'BKSL', 'BUYE', 'YEBU', 'OGYE', 'YEOG', 'GNYE', 'YEGN', 'BNYE', 'YEBN', 'SLYE',
-            'YESL', 'BUVT', 'VTBU', 'OGVT', 'VTOG', 'GNVT', 'VTGN', 'BNVT', 'VTBN', 'SLVT', 'VTSL'],
-    'TELALT': ['WHBU', 'BU', 'WHOG', 'OG', 'WHGN', 'GN', 'WHBN', 'BN', 'WHSL', 'SL', 'RDBU', 'BURD', 'RDOG', 'OGRD',
-               'RDGN', 'GNRD', 'RDBN', 'BNRD', 'RDSL', 'SLRD', 'BKBU', 'BUBK', 'BKOG', 'OGBK', 'BKGN', 'GNBK', 'BKBN',
-               'BNBK', 'BKSL', 'SLBK', 'YEBU', 'BUYE', 'YEOG', 'OGYE', 'YEGN', 'GNYE', 'YEBN', 'BNYE', 'YESL', 'SLYE',
-               'VTBU', 'BUVT', 'VTOG', 'OGVT', 'VTGN', 'GNVT', 'VTBN', 'BNVT', 'VTSL', 'SLVT'],
+    # 25-pair color code - see also https://en.wikipedia.org/wiki/25-pair_color_code
+    # 5 major colors (WH,RD,BK,YE,VT) combined with 5 minor colors (BU,OG,GN,BN,SL).
+    # Each POTS pair tip (+) had major/minor color, and ring (-) had minor/major color.
+    'TEL': [ # 25x2: Ring and then tip of each pair
+        'BUWH', 'WHBU', 'OGWH', 'WHOG', 'GNWH', 'WHGN', 'BNWH', 'WHBN', 'SLWH', 'WHSL',
+        'BURD', 'RDBU', 'OGRD', 'RDOG', 'GNRD', 'RDGN', 'BNRD', 'RDBN', 'SLRD', 'RDSL',
+        'BUBK', 'BKBU', 'OGBK', 'BKOG', 'GNBK', 'BKGN', 'BNBK', 'BKBN', 'SLBK', 'BKSL',
+        'BUYE', 'YEBU', 'OGYE', 'YEOG', 'GNYE', 'YEGN', 'BNYE', 'YEBN', 'SLYE', 'YESL',
+        'BUVT', 'VTBU', 'OGVT', 'VTOG', 'GNVT', 'VTGN', 'BNVT', 'VTBN', 'SLVT', 'VTSL'],
+    'TELALT': [ # 25x2: Tip and then ring of each pair
+        'WHBU', 'BU',   'WHOG', 'OG',   'WHGN', 'GN',   'WHBN', 'BN',   'WHSL', 'SL',
+        'RDBU', 'BURD', 'RDOG', 'OGRD', 'RDGN', 'GNRD', 'RDBN', 'BNRD', 'RDSL', 'SLRD',
+        'BKBU', 'BUBK', 'BKOG', 'OGBK', 'BKGN', 'GNBK', 'BKBN', 'BNBK', 'BKSL', 'SLBK',
+        'YEBU', 'BUYE', 'YEOG', 'OGYE', 'YEGN', 'GNYE', 'YEBN', 'BNYE', 'YESL', 'SLYE',
+        'VTBU', 'BUVT', 'VTOG', 'OGVT', 'VTGN', 'GNVT', 'VTBN', 'BNVT', 'VTSL', 'SLVT'],
     'T568A': ['WHGN', 'GN', 'WHOG', 'BU', 'WHBU', 'OG', 'WHBN', 'BN'],
     'T568B': ['WHOG', 'OG', 'WHGN', 'BU', 'WHBU', 'GN', 'WHBN', 'BN'],
 }
