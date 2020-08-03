@@ -19,6 +19,7 @@ class Connector:
     subtype: Optional[str] = None
     pincount: Optional[int] = None
     image: Optional[str] = None
+    caption: Optional[str] = None
     notes: Optional[str] = None
     pinlabels: List[Any] = field(default_factory=list)
     pins: List[Any] = field(default_factory=list)
@@ -93,6 +94,7 @@ class Cable:
     wirecount: Optional[int] = None
     shield: bool = False
     image: Optional[str] = None
+    caption: Optional[str] = None
     notes: Optional[str] = None
     colors: List[Any] = field(default_factory=list)
     color_code: Optional[str] = None
