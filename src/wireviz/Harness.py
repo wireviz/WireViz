@@ -99,6 +99,7 @@ class Harness:
                      connector.color, '<!-- colorbar -->' if connector.color else None],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [f'<img src="{connector.image}"/>' if connector.image else None],
+                    [html_line_breaks(connector.caption)],
                     [html_line_breaks(connector.notes)]]
             html.extend(nested_html_table(rows))
 
@@ -175,6 +176,7 @@ class Harness:
                      cable.color, '<!-- colorbar -->' if cable.color else None],
                     '<!-- wire table -->',
                     [f'<img src="{cable.image}"/>' if cable.image else None],
+                    [html_line_breaks(cable.caption)],
                     [html_line_breaks(cable.notes)]]
             html.extend(nested_html_table(rows))
 
