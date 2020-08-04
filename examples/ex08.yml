@@ -7,14 +7,19 @@ connectors:
     pins: [T, R, S]
     pinlabels: [Dot, Dash, Ground]
     show_pincount: false
+    image: ../resources/stereo-phone-plug-TRS.png
+    caption: Tip, Ring, and Sleeve
 
 cables:
   W1:
     gauge: 24 AWG
     length: 0.2
+    color: BK
     color_code: DIN
     wirecount: 3
-    shield: true
+    shield: SN
+    image: ../resources/cable-WH+BN+GN+shield.png
+    caption: Cross-section
 
 connections:
   -
