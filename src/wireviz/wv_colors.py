@@ -112,7 +112,7 @@ def get_color_hex(input, pad=False):
     try:
         output = [_color_hex[input[i:i + 2]] for i in range(0, len(input), 2)]
     except KeyError:
-        print("Unknown color specified")
+        print(f"Unknown color specified: {input}")
         output = [color_default]
     return output
 
