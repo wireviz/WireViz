@@ -58,10 +58,21 @@ def nested_html_table(rows):
 def html_image(node):
     if not node.image:
         return None
-    return f'''<tdX{' sides="TLR"' if node.caption else ''}><img scale="{node.image_scale}" src="{node.image}"/>'''
+    return f'''<tdX{' sides="TLR"' if node.caption else ''}{html_size_attr(node.image_size)}>''' \
+           f'''<img scale="{node.image_scale}" src="{node.image}"/>'''
 
 def html_caption(node):
     return f'''<tdX{' sides="LRB"' if node.image else ''}>{html_line_breaks(node.caption)}''' if node.caption else None
+
+def html_size_attr(size):
+    # Return Graphviz HTML attributes to specify minimum size of a TABLE or TD object
+    # size: List of values where only these are used:
+    # - First value is minimum width of object in points, an int value in the range 1-65535. (Default 0 = none)
+    # - Second value is minimum height of the object in points, an int value in the range 1-65535. (Default 0 = none)
+    if not size or not isinstance(size, list):
+        return ''
+    return ((f' width="{size[0]}"' if len(size) > 0 and size[0] else '')
+        + (f' height="{size[1]}"' if len(size) > 1 and size[1] else ''))
 
 
 def expand(yaml_data):
