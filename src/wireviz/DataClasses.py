@@ -20,6 +20,7 @@ class Connector:
     pincount: Optional[int] = None
     image: Optional[str] = None
     image_scale: Optional[str] = "FALSE"
+    image_size: List[Any] = field(default_factory=list)
     caption: Optional[str] = None
     notes: Optional[str] = None
     pinlabels: List[Any] = field(default_factory=list)
@@ -96,6 +97,7 @@ class Cable:
     shield: bool = False
     image: Optional[str] = None
     image_scale: Optional[str] = "FALSE"
+    image_size: List[Any] = field(default_factory=list)
     caption: Optional[str] = None
     notes: Optional[str] = None
     colors: List[Any] = field(default_factory=list)
