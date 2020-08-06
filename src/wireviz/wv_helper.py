@@ -56,7 +56,9 @@ def nested_html_table(rows):
     return html
 
 def html_image(node):
-    return f'''<tdX{' sides="TLR"' if node.caption else ''}><img src="{node.image}"/>''' if node.image else None
+    if not node.image:
+        return None
+    return f'''<tdX{' sides="TLR"' if node.caption else ''}><img scale="{node.image_scale}" src="{node.image}"/>'''
 
 def html_caption(node):
     return f'''<tdX{' sides="LRB"' if node.image else ''}>{html_line_breaks(node.caption)}''' if node.caption else None
