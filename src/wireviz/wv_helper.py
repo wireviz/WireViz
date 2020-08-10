@@ -47,9 +47,9 @@ def nested_html_table(rows):
                 html.append('</tr></table>')
                 html.append('</td></tr>')
         elif row is not None:
-            html.append(f'<tr><td>')
-            html.append(f'{row}')
-            html.append(f'</td></tr>')
+            html.append('<tr><td>')
+            html.append(row)
+            html.append('</td></tr>')
     html.append('</table>')
     return html
 
