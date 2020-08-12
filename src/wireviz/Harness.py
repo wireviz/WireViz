@@ -8,7 +8,7 @@ from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
-    html_image, html_caption, manufacturer_info_field
+    html_colorbar, html_image, html_caption, manufacturer_info_field
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -96,16 +96,12 @@ class Harness:
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
-                     connector.color, '<!-- colorbar -->' if connector.color else None],
+                     connector.color, html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)],
                     [html_line_breaks(connector.notes)]]
             html.extend(nested_html_table(rows))
-
-            if connector.color: # add color bar next to color info, if present
-                colorbar = f' bgcolor="{wv_colors.translate_color(connector.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
-                html = [row.replace('><!-- colorbar --></td>', colorbar) for row in html]
 
             if connector.style != 'simple':
                 pinhtml = []
@@ -173,16 +169,12 @@ class Harness:
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
                      f'{cable.length} m' if cable.length > 0 else None,
-                     cable.color, '<!-- colorbar -->' if cable.color else None],
+                     cable.color, html_colorbar(cable.color)],
                     '<!-- wire table -->',
                     [html_image(cable.image)],
                     [html_caption(cable.image)],
                     [html_line_breaks(cable.notes)]]
             html.extend(nested_html_table(rows))
-
-            if cable.color: # add color bar next to color info, if present
-                colorbar = f' bgcolor="{wv_colors.translate_color(cable.color, "HEX")}" width="4"></td>' # leave out '<td' from string to preserve any existing attributes of the <td> tag
-                html = [row.replace('><!-- colorbar --></td>', colorbar) for row in html]
 
             wirehtml = []
             wirehtml.append('<table border="0" cellspacing="0" cellborder="0">')  # conductor table

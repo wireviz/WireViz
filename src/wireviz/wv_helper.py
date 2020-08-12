@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from wireviz import wv_colors
 from typing import List
 
 awg_equiv_table = {
@@ -54,6 +55,9 @@ def nested_html_table(rows):
             html.append(' </td></tr>')
     html.append('</table>')
     return html
+
+def html_colorbar(color):
+    return f'<tdX bgcolor="{wv_colors.translate_color(color, "HEX")}" width="4">' if color else None
 
 def html_image(image):
     if not image:
