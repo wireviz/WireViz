@@ -120,7 +120,7 @@ def get_color_hex(input, pad=False):
         padded = input
 
     try:
-        output = [_color_hex[padded[i:i + 2]] for i in range(0, len(input), 2)]
+        output = [_color_hex[padded[i:i + 2]] for i in range(0, len(padded), 2)]
     except KeyError:
         print(f'Unknown color specified: {input}')
         output = [color_default]
