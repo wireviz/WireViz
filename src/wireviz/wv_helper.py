@@ -39,17 +39,17 @@ def nested_html_table(rows):
     for row in rows:
         if isinstance(row, List):
             if len(row) > 0 and any(row):
-                html.append('<tr><td>')
-                html.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>')
+                html.append(' <tr><td>')
+                html.append('  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>')
                 for cell in row:
                     if cell is not None:
-                        html.append(f'<td balign="left">{cell}</td>')
-                html.append('</tr></table>')
-                html.append('</td></tr>')
+                        html.append(f'   <td balign="left">{cell}</td>')
+                html.append('  </tr></table>')
+                html.append(' </td></tr>')
         elif row is not None:
-            html.append('<tr><td>')
-            html.append(row)
-            html.append('</td></tr>')
+            html.append(' <tr><td>')
+            html.append(f'  {row}')
+            html.append(' </td></tr>')
     html.append('</table>')
     return html
 
