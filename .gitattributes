@@ -1,0 +1,11 @@
+docs/* linguist-documentation
+
+examples/* -linguist-detectable
+tutorial/* -linguist-detectable
+
+**/*.bom.tsv linguist-generated
+**/*.bom.csv linguist-generated
+**/*.gv linguist-generated
+**/*.html linguist-generated
+**/*.png linguist-generated
+**/*.svg linguist-generated
