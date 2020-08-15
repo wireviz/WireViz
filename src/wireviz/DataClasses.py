@@ -8,6 +8,16 @@ from wireviz import wv_colors
 
 
 @dataclass
+class Image:
+    src: str
+    scale: str = "false"
+    width: Optional[int] = None
+    height: Optional[int] = None
+    fixedsize: bool = False
+    caption: Optional[str] = None
+
+
+@dataclass
 class Connector:
     name: str
     manufacturer: Optional[str] = None
@@ -18,10 +28,7 @@ class Connector:
     type: Optional[str] = None
     subtype: Optional[str] = None
     pincount: Optional[int] = None
-    image: Optional[str] = None
-    image_scale: Optional[str] = "FALSE"
-    image_size: List[Any] = field(default_factory=list)
-    caption: Optional[str] = None
+    image: Optional[Image] = None
     notes: Optional[str] = None
     pinlabels: List[Any] = field(default_factory=list)
     pins: List[Any] = field(default_factory=list)
@@ -33,6 +40,10 @@ class Connector:
     loops: List[Any] = field(default_factory=list)
 
     def __post_init__(self):
+
+        if isinstance(self.image, dict):
+            self.image = Image(**self.image)
+
         self.ports_left = False
         self.ports_right = False
         self.visible_pins = {}
@@ -95,10 +106,7 @@ class Cable:
     color: Optional[str] = None
     wirecount: Optional[int] = None
     shield: bool = False
-    image: Optional[str] = None
-    image_scale: Optional[str] = "FALSE"
-    image_size: List[Any] = field(default_factory=list)
-    caption: Optional[str] = None
+    image: Optional[Image] = None
     notes: Optional[str] = None
     colors: List[Any] = field(default_factory=list)
     color_code: Optional[str] = None
@@ -106,6 +114,9 @@ class Cable:
     show_wirecount: bool = True
 
     def __post_init__(self):
+
+        if isinstance(self.image, dict):
+            self.image = Image(**self.image)
 
         if isinstance(self.gauge, str):  # gauge and unit specified
             try:

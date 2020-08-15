@@ -98,8 +98,8 @@ class Harness:
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
                      connector.color, '<!-- colorbar -->' if connector.color else None],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
-                    [html_image(connector)],
-                    [html_caption(connector)],
+                    [html_image(connector.image)],
+                    [html_caption(connector.image)],
                     [html_line_breaks(connector.notes)]]
             html.extend(nested_html_table(rows))
 
@@ -175,8 +175,8 @@ class Harness:
                      f'{cable.length} m' if cable.length > 0 else None,
                      cable.color, '<!-- colorbar -->' if cable.color else None],
                     '<!-- wire table -->',
-                    [html_image(cable)],
-                    [html_caption(cable)],
+                    [html_image(cable.image)],
+                    [html_caption(cable.image)],
                     [html_line_breaks(cable.notes)]]
             html.extend(nested_html_table(rows))
 
