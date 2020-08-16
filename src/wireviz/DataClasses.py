@@ -11,14 +11,29 @@ from wireviz import wv_colors
 class Image:
     # Attributes of the image object <img>:
     src: str
-    scale: Optional[str] = "false"  # false | true | width | height | both
+    scale: Optional[str] = None  # false | true | width | height | both
     # Attributes of the image cell <td> containing the image:
     width: Optional[int] = None
     height: Optional[int] = None
-    fixedsize: Optional[bool] = False
+    fixedsize: Optional[bool] = None
     # Contents of the cell <td> just below the image cell:
     caption: Optional[str] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
+
+    def __post_init__(self):
+
+        if self.scale is None:
+            self.scale = "false" if self.width is None     and self.height is None \
+                else     "both"  if self.width is not None and self.height is not None \
+                else     "true" # When only one dimension is specified.
+
+        if self.fixedsize is None:
+            self.fixedsize = self.width is not None or self.height is not None
+
+        if self.width is None and self.height is not None:
+            self.width = self.height # Assuming 1:1 aspect ratio for now.
+        elif self.height is None and self.width is not None:
+            self.height = self.width # Assuming 1:1 aspect ratio for now.
 
 
 @dataclass

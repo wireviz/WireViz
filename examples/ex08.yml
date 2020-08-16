@@ -9,8 +9,6 @@ connectors:
     show_pincount: false
     image:
       src: resources/stereo-phone-plug-TRS.png
-      scale: true
-      height: 100
       caption: Tip, Ring, and Sleeve
 
 cables:
@@ -23,6 +21,7 @@ cables:
     shield: SN
     image:
       src: resources/cable-WH+BN+GN+shield.png
+      height: 75
       caption: Cross-section
 
 connections:
