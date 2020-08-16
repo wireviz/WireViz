@@ -9,12 +9,16 @@ from wireviz import wv_colors
 
 @dataclass
 class Image:
+    # Attributes of the image object <img>:
     src: str
-    scale: str = "false"
+    scale: Optional[str] = "false"  # false | true | width | height | both
+    # Attributes of the image cell <td> containing the image:
     width: Optional[int] = None
     height: Optional[int] = None
-    fixedsize: bool = False
+    fixedsize: Optional[bool] = False
+    # Contents of the cell <td> just below the image cell:
     caption: Optional[str] = None
+    # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
 
 @dataclass
