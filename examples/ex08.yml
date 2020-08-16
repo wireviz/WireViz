@@ -9,6 +9,8 @@ connectors:
     show_pincount: false
     image:
       src: resources/stereo-phone-plug-TRS.png
+      scale: true
+      height: 100
       caption: Tip, Ring, and Sleeve
 
 cables:
