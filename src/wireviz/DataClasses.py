@@ -16,24 +16,26 @@ class Image:
     width: Optional[int] = None
     height: Optional[int] = None
     fixedsize: Optional[bool] = None
-    # Contents of the cell <td> just below the image cell:
+    # Contents of the text cell <td> just below the image cell:
     caption: Optional[str] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
     def __post_init__(self):
 
         if self.scale is None:
-            self.scale = "false" if self.width is None     and self.height is None \
-                else     "both"  if self.width is not None and self.height is not None \
+            self.scale = "false" if not self.width and not self.height \
+                else     "both"  if     self.width and     self.height \
                 else     "true" # When only one dimension is specified.
 
         if self.fixedsize is None:
-            self.fixedsize = self.width is not None or self.height is not None
+            self.fixedsize = self.width or self.height
 
-        if self.width is None and self.height is not None:
-            self.width = self.height # Assuming 1:1 aspect ratio for now.
-        elif self.height is None and self.width is not None:
-            self.height = self.width # Assuming 1:1 aspect ratio for now.
+        if self.height:
+            if not self.width:
+                self.width = self.height # Assuming 1:1 aspect ratio for now.
+        else:
+            if self.width:
+                self.height = self.width # Assuming 1:1 aspect ratio for now.
 
 
 @dataclass

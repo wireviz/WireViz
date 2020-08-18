@@ -75,8 +75,8 @@ def html_caption(image):
 
 def html_size_attr(image):
     # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
-    return ((f' width="{image.width}"'   if image.width is not None else '')
-        +   (f' height="{image.height}"' if image.height is not None else '')
+    return ((f' width="{image.width}"'   if image.width else '')
+        +   (f' height="{image.height}"' if image.height else '')
         +   ( ' fixedsize="true"'        if image.fixedsize else '')) if image else ''
 
 
