@@ -158,6 +158,21 @@ def open_file_write(filename):
 def open_file_append(filename):
     return open(filename, 'a', encoding='UTF-8')
 
+
+def aspect_ratio(image_src):
+    try:
+        from PIL import Image
+        image = Image.open(image_src)
+        if image.width > 0 and image.height > 0:
+            return image.width / image.height
+        print(f'aspect_ratio(): image size is {image.width} x {image.height}')
+    except ModuleNotFoundError as error:
+        print(f'aspect_ratio(): {error}')
+    except FileNotFoundError as error:
+        print(f'aspect_ratio(): {error}')
+    return 1 # Assume 1:1 when unable to read actual image size
+
+
 def manufacturer_info_field(manufacturer, mpn):
     if manufacturer or mpn:
         return f'{manufacturer if manufacturer else "MPN"}{": " + str(mpn) if mpn else ""}'

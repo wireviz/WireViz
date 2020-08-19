@@ -3,12 +3,14 @@
 
 from typing import Optional, List, Any, Union
 from dataclasses import dataclass, field
-from wireviz.wv_helper import int2tuple
+from pathlib import Path
+from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
 
 
 @dataclass
 class Image:
+    gv_dir: Path # Directory of .gv file injected as context during parsing
     # Attributes of the image object <img>:
     src: str
     scale: Optional[str] = None  # false | true | width | height | both
@@ -35,10 +37,10 @@ class Image:
             # If only one dimension is specified, compute the other because both are required.
             if self.height:
                 if not self.width:
-                    self.width = self.height # Assuming 1:1 aspect ratio for now.
+                    self.width = self.height * aspect_ratio(self.gv_dir.joinpath(self.src))
             else:
                 if self.width:
-                    self.height = self.width # Assuming 1:1 aspect ratio for now.
+                    self.height = self.width / aspect_ratio(self.gv_dir.joinpath(self.src))
 
 
 @dataclass
