@@ -28,14 +28,17 @@ class Image:
                 else     "true" # When only one dimension is specified.
 
         if self.fixedsize is None:
-            self.fixedsize = self.width or self.height
+            # Normally equal to (self.width or self.height), but the user might override self.scale.
+            self.fixedsize = str(self.scale).lower() in ["true", "both"]
 
-        if self.height:
-            if not self.width:
-                self.width = self.height # Assuming 1:1 aspect ratio for now.
-        else:
-            if self.width:
-                self.height = self.width # Assuming 1:1 aspect ratio for now.
+        if self.fixedsize:
+            # If only one dimension is specified, compute the other because both are required.
+            if self.height:
+                if not self.width:
+                    self.width = self.height # Assuming 1:1 aspect ratio for now.
+            else:
+                if self.width:
+                    self.height = self.width # Assuming 1:1 aspect ratio for now.
 
 
 @dataclass
