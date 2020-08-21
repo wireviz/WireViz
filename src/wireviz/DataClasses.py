@@ -30,11 +30,12 @@ class Image:
                 else     "true" # When only one dimension is specified.
 
         if self.fixedsize is None:
-            # Normally equal to (self.width or self.height), but the user might override self.scale.
-            self.fixedsize = str(self.scale).lower() in ["true", "both"]
+            # Avoid default True if the user overrides self.scale to a different value.
+            self.fixedsize = (self.width or self.height) and str(self.scale).lower() in ["true", "both"]
 
         if self.fixedsize:
-            # If only one dimension is specified, compute the other because both are required.
+            # If only one dimension is specified, compute the other
+            # because Graphviz requires both when fixedsize=True.
             if self.height:
                 if not self.width:
                     self.width = self.height * aspect_ratio(self.gv_dir.joinpath(self.src))
