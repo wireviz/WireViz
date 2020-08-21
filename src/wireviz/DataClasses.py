@@ -24,14 +24,14 @@ class Image:
 
     def __post_init__(self):
 
+        if self.fixedsize is None:
+            # Default True if any dimension specified unless self.scale also is specified.
+            self.fixedsize = (self.width or self.height) and self.scale is None
+
         if self.scale is None:
             self.scale = "false" if not self.width and not self.height \
                 else     "both"  if     self.width and     self.height \
                 else     "true" # When only one dimension is specified.
-
-        if self.fixedsize is None:
-            # Avoid default True if the user overrides self.scale to a different value.
-            self.fixedsize = (self.width or self.height) and str(self.scale).lower() in ["true", "both"]
 
         if self.fixedsize:
             # If only one dimension is specified, compute the other
