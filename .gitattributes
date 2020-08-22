@@ -1,7 +1,6 @@
 docs/* linguist-documentation
-
-examples/* -linguist-detectable
-tutorial/* -linguist-detectable
+examples/* linguist-documentation
+tutorial/* linguist-documentation
 
 **/*.bom.tsv linguist-generated
 **/*.bom.csv linguist-generated
