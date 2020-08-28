@@ -170,7 +170,7 @@ class Harness:
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
-                     f'{cable.length} m' if cable.length > 0 else None,
+                     f'{cable.length} {cable.lengthunit}' if cable.length > 0 else None,
                      cable.color, '<!-- colorbar -->' if cable.color else None],
                     '<!-- wire table -->',
                     [html_line_breaks(cable.notes)]]
@@ -365,7 +365,7 @@ class Harness:
             gauge_name = f' x {shared.gauge} {shared.gauge_unit}' if shared.gauge else ' wires'
             shield_name = ' shielded' if shared.shield else ''
             name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
-            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
+            item = {'item': name, 'qty': round(total_length, 3), 'unit': shared.lengthunit, 'designators': designators,
                     'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
             bom_cables.append(item)
         # bundles (ignores wirecount)
