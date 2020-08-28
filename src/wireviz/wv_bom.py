@@ -67,7 +67,7 @@ def generate_bom(harness):
                                + (f' x {cable.gauge} {cable.gauge_unit}' if cable.gauge else ' wires')
                                + (' shielded' if cable.shield else ''))
                 bom_entries.append({
-                    'item': description, 'qty': cable.length, 'unit': 'm', 'designators': cable.name if cable.show_name else None,
+                    'item': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
                     'manufacturer': cable.manufacturer, 'mpn': cable.mpn, 'pn': cable.pn
                 })
             else:
@@ -78,7 +78,7 @@ def generate_bom(harness):
                                    + (f', {cable.gauge} {cable.gauge_unit}' if cable.gauge else '')
                                    + (f', {color}' if color else ''))
                     bom_entries.append({
-                        'item': description, 'qty': cable.length, 'unit': 'm', 'designators': cable.name if cable.show_name else None,
+                        'item': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
                         'manufacturer': index_if_list(cable.manufacturer, index),
                         'mpn': index_if_list(cable.mpn, index), 'pn': index_if_list(cable.pn, index)
                     })

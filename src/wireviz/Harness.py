@@ -203,7 +203,7 @@ class Harness:
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
-                     f'{cable.length} m' if cable.length > 0 else None,
+                     f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
                      cable.color, html_colorbar(cable.color)],
                     '<!-- wire table -->',
                     [html_image(cable.image)],
