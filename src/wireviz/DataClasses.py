@@ -88,6 +88,7 @@ class Cable:
     gauge_unit: Optional[str] = None
     show_equiv: bool = False
     length: float = 0
+    lengthunit: Optional[str] = None      
     color: Optional[str] = None
     wirecount: Optional[int] = None
     shield: bool = False
@@ -119,6 +120,9 @@ class Cable:
 
         self.connections = []
 
+        if self.lengthunit is None: #Default wire length units to meters if left undeclared
+            self.lengthunit = 'm'
+        
         if self.wirecount:  # number of wires explicitly defined
             if self.colors:  # use custom color palette (partly or looped if needed)
                 pass
