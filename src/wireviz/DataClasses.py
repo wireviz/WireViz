@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from typing import Optional, List, Any, Union
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
@@ -10,7 +10,7 @@ from wireviz import wv_colors
 
 @dataclass
 class Image:
-    gv_dir: Path # Directory of .gv file injected as context during parsing
+    gv_dir: InitVar[Path] # Directory of .gv file injected as context during parsing
     # Attributes of the image object <img>:
     src: str
     scale: Optional[str] = None  # false | true | width | height | both
@@ -22,7 +22,7 @@ class Image:
     caption: Optional[str] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
-    def __post_init__(self):
+    def __post_init__(self, gv_dir):
 
         if self.fixedsize is None:
             # Default True if any dimension specified unless self.scale also is specified.
@@ -38,10 +38,10 @@ class Image:
             # because Graphviz requires both when fixedsize=True.
             if self.height:
                 if not self.width:
-                    self.width = self.height * aspect_ratio(self.gv_dir.joinpath(self.src))
+                    self.width = self.height * aspect_ratio(gv_dir.joinpath(self.src))
             else:
                 if self.width:
-                    self.height = self.width / aspect_ratio(self.gv_dir.joinpath(self.src))
+                    self.height = self.width / aspect_ratio(gv_dir.joinpath(self.src))
 
 
 @dataclass
