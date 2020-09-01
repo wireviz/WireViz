@@ -79,8 +79,8 @@ class Connector:
     pinlabels: List[Any] = field(default_factory=list)
     pins: List[Any] = field(default_factory=list)
     color: Optional[str] = None
-    show_name: bool = None
-    show_pincount: bool = None
+    show_name: Optional[bool] = None
+    show_pincount: Optional[bool] = None
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
     loops: List[Any] = field(default_factory=list)
@@ -167,7 +167,7 @@ class Cable:
     length: float = 0
     color: Optional[str] = None
     wirecount: Optional[int] = None
-    shield: bool = False
+    shield: Union[bool, str] = False # False | True | color
     image: Optional[Image] = None
     notes: Optional[str] = None
     colors: List[Any] = field(default_factory=list)
