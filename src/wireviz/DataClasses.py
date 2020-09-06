@@ -1,15 +1,32 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import Optional, List, Any, Union
+from typing import Optional, List, Tuple, Union
 from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
 
+
+# Each type alias have their legal values described in comments - validation might be implemented in the future
+PlainText = str # Text not containing HTML tags nor newlines
+Hypertext = str # Text possibly including HTML hyperlinks that are removed in all outputs except HTML output
+MultilineHypertext = str # Hypertext possibly also including newlines to break lines in diagram output
+Designator = PlainText # Case insensitive unique name of connector or cable
+
 # Literal type aliases below are commented to avoid requiring python 3.8
-ConnectorMultiplier = str  # = Literal['pincount', 'populated']
-CableMultiplier = str  # = Literal['wirecount', 'terminations', 'length', 'total_length']
+ConnectorMultiplier = PlainText # = Literal['pincount', 'populated']
+CableMultiplier = PlainText # = Literal['wirecount', 'terminations', 'length', 'total_length']
+ImageScale = PlainText # = Literal['false', 'true', 'width', 'height', 'both']
+Color = PlainText # Two-letter color name = Literal[wv_colors._color_hex.keys()]
+ColorScheme = PlainText # Color scheme name = Literal[wv_colors.COLOR_CODES.keys()]
+
+# Type combinations
+Colors = PlainText # One or more two-letter color names (Color) concatenated into one string
+Pin = Union[int, PlainText] # Pin identifier
+Wire = Union[int, PlainText] # Wire number or Literal['s'] for shield
+NoneOrMorePins = Union[Pin, Tuple[Pin, ...], None] # None, one, or a tuple of pins
+OneOrMoreWires = Union[Wire, Tuple[Wire, ...]] # One or a tuple of wires
 
 
 @dataclass
@@ -17,13 +34,13 @@ class Image:
     gv_dir: InitVar[Path] # Directory of .gv file injected as context during parsing
     # Attributes of the image object <img>:
     src: str
-    scale: Optional[str] = None  # false | true | width | height | both
+    scale: Optional[ImageScale] = None
     # Attributes of the image cell <td> containing the image:
     width: Optional[int] = None
     height: Optional[int] = None
     fixedsize: Optional[bool] = None
     # Contents of the text cell <td> just below the image cell:
-    caption: Optional[str] = None
+    caption: Optional[MultilineHypertext] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
     def __post_init__(self, gv_dir):
@@ -47,13 +64,14 @@ class Image:
                 if self.width:
                     self.height = self.width / aspect_ratio(gv_dir.joinpath(self.src))
 
+
 @dataclass
 class AdditionalComponent:
-    type: str
-    subtype: Optional[str] = None
-    manufacturer: Optional[str] = None
-    mpn: Optional[str] = None
-    pn: Optional[str] = None
+    type: MultilineHypertext
+    subtype: Optional[MultilineHypertext] = None
+    manufacturer: Optional[MultilineHypertext] = None
+    mpn: Optional[MultilineHypertext] = None
+    pn: Optional[Hypertext] = None
     qty: float = 1
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
@@ -65,29 +83,29 @@ class AdditionalComponent:
 
 @dataclass
 class Connector:
-    name: str
-    manufacturer: Optional[str] = None
-    mpn: Optional[str] = None
-    pn: Optional[str] = None
+    name: Designator
+    manufacturer: Optional[MultilineHypertext] = None
+    mpn: Optional[MultilineHypertext] = None
+    pn: Optional[Hypertext] = None
     style: Optional[str] = None
     category: Optional[str] = None
-    type: Optional[str] = None
-    subtype: Optional[str] = None
+    type: Optional[MultilineHypertext] = None
+    subtype: Optional[MultilineHypertext] = None
     pincount: Optional[int] = None
     image: Optional[Image] = None
-    notes: Optional[str] = None
-    pinlabels: List[Any] = field(default_factory=list)
-    pins: List[Any] = field(default_factory=list)
-    color: Optional[str] = None
+    notes: Optional[MultilineHypertext] = None
+    pinlabels: List[Pin] = field(default_factory=list)
+    pins: List[Pin] = field(default_factory=list)
+    color: Optional[Color] = None
     show_name: Optional[bool] = None
     show_pincount: Optional[bool] = None
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
-    loops: List[Any] = field(default_factory=list)
+    loops: List[List[Pin]] = field(default_factory=list)
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
 
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
@@ -139,7 +157,7 @@ class Connector:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
-    def activate_pin(self, pin):
+    def activate_pin(self, pin: Pin) -> None:
         self.visible_pins[pin] = True
 
     def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
@@ -155,29 +173,29 @@ class Connector:
 
 @dataclass
 class Cable:
-    name: str
-    manufacturer: Optional[Union[str, List[str]]] = None
-    mpn: Optional[Union[str, List[str]]] = None
-    pn: Optional[Union[str, List[str]]] = None
+    name: Designator
+    manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+    mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+    pn: Union[Hypertext, List[Hypertext], None] = None
     category: Optional[str] = None
-    type: Optional[str] = None
+    type: Optional[MultilineHypertext] = None
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
     show_equiv: bool = False
     length: float = 0
-    color: Optional[str] = None
+    color: Optional[Color] = None
     wirecount: Optional[int] = None
-    shield: Union[bool, str] = False # False | True | color
+    shield: Union[bool, Color] = False
     image: Optional[Image] = None
-    notes: Optional[str] = None
-    colors: List[Any] = field(default_factory=list)
-    color_code: Optional[str] = None
+    notes: Optional[MultilineHypertext] = None
+    colors: List[Colors] = field(default_factory=list)
+    color_code: Optional[ColorScheme] = None
     show_name: bool = True
     show_wirecount: bool = True
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
 
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
@@ -237,7 +255,9 @@ class Cable:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
-    def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
+    # The *_pin arguments accept a tuple, but it seems not in use with the current code.
+    def connect(self, from_name: Optional[Designator], from_pin: NoneOrMorePins, via_pin: OneOrMoreWires,
+                to_name: Optional[Designator], to_pin: NoneOrMorePins) -> None:
         from_pin = int2tuple(from_pin)
         via_pin = int2tuple(via_pin)
         to_pin = int2tuple(to_pin)
@@ -264,8 +284,8 @@ class Cable:
 
 @dataclass
 class Connection:
-    from_name: Any
-    from_port: Any
-    via_port: Any
-    to_name: Any
-    to_port: Any
+    from_name: Optional[Designator]
+    from_port: Optional[Pin]
+    via_port: Wire
+    to_name: Optional[Designator]
+    to_port: Optional[Pin]
