@@ -3,8 +3,8 @@ connectors:
     type: Molex KK 254
     pincount: 4
     subtype: female
-    manufacturer: Molex # set manufacter name
-    mpn: 22013047 # set manufacturer part number
+    manufacturer: '<a href="https://www.molex.com/">Molex</a>' # set manufacter name
+    mpn: '<a href="https://www.molex.com/molex/products/part-detail/crimp_housings/0022013047">22013047</a>' # set manufacturer part number
     # add a list of additional components to a part (shown in graph)
     additional_components:
       -
@@ -63,6 +63,6 @@ additional_bom_items:
     designators:
       - X2
       - X3
-    manufacturer: generic company
-    mpn: Label1
+    manufacturer: '<a href="https://www.bradyid.com">Brady</a>'
+    mpn: '<a href="https://www.bradyid.com/wire-cable-labels/bmp71-bmp61-m611-tls-2200-nylon-cloth-wire-general-id-labels-cps-2958789">B-499</a>'
     pn: Label-ID-1

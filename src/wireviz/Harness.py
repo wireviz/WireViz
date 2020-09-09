@@ -8,7 +8,7 @@ from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     clean_whitespace, open_file_read, open_file_write, html_colorbar, \
-    html_image, html_caption, manufacturer_info_field, component_table_entry
+    html_image, html_caption, manufacturer_info_field, component_table_entry, remove_links
 from collections import Counter
 from typing import List, Union
 from pathlib import Path
@@ -92,8 +92,8 @@ class Harness:
 
             html = []
 
-            rows = [[connector.name if connector.show_name else None],
-                    [f'P/N: {connector.pn}' if connector.pn else None,
+            rows = [[remove_links(connector.name) if connector.show_name else None],
+                    [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
                      html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))],
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
@@ -162,8 +162,8 @@ class Harness:
                 elif cable.gauge_unit.upper() == 'AWG':
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
-            rows = [[cable.name if cable.show_name else None],
-                    [f'P/N: {cable.pn}' if (cable.pn and not isinstance(cable.pn, list)) else None,
+            rows = [[remove_links(cable.name) if cable.show_name else None],
+                    [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
                      html_line_breaks(manufacturer_info_field(
                         cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
                         cable.mpn if not isinstance(cable.mpn, list) else None))],
@@ -205,7 +205,7 @@ class Harness:
                     # create a list of wire parameters
                     wireidentification = []
                     if isinstance(cable.pn, list):
-                        wireidentification.append(f'P/N: {cable.pn[i - 1]}')
+                        wireidentification.append(f'P/N: {remove_links(cable.pn[i - 1])}')
                     manufacturer_info = manufacturer_info_field(
                         cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
                         cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
