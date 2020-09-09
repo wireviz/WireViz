@@ -3,6 +3,7 @@
 
 from wireviz import wv_colors
 from typing import List
+import re
 
 awg_equiv_table = {
     '0.09': '28',
@@ -136,15 +137,18 @@ def tuplelist2tsv(inp, header=None):
         inp.insert(0, header)
     inp = flatten2d(inp)
     for row in inp:
-        output = output + '\t'.join(str(item) for item in row) + '\n'
+        output = output + '\t'.join(str(remove_links(item)) for item in row) + '\n'
     return output
 
 # Return the value indexed if it is a list, or simply the value otherwise.
 def index_if_list(value, index):
     return value[index] if isinstance(value, list) else value
 
+def remove_links(inp):
+    return re.sub(r'<[aA] [^>]*>([^<]*)</[aA]>', r'\1', inp) if isinstance(inp, str) else inp
+
 def html_line_breaks(inp):
-    return inp.replace('\n', '<br />') if isinstance(inp, str) else inp
+    return remove_links(inp).replace('\n', '<br />') if isinstance(inp, str) else inp
 
 def clean_whitespace(inp):
     return ' '.join(inp.split()).replace(' ,', ',') if isinstance(inp, str) else inp
