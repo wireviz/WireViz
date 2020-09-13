@@ -13,22 +13,23 @@ from wireviz import wireviz
 from wv_helper import open_file_write, open_file_read, open_file_append
 
 
+dir = script_path.parent.parent.parent
 readme = 'readme.md'
 groups = {
     'examples': {
-        'path': Path(script_path).parent.parent.parent / 'examples',
+        'path': dir / 'examples',
         'prefix': 'ex',
         readme: [], # Include no files
         'title': 'Example Gallery',
     },
     'tutorial' : {
-        'path': Path(script_path).parent.parent.parent / 'tutorial',
+        'path': dir / 'tutorial',
         'prefix': 'tutorial',
         readme: ['md', 'yml'], # Include .md and .yml files
         'title': 'WireViz Tutorial',
     },
     'demos' : {
-        'path': Path(script_path).parent.parent.parent / 'examples',
+        'path': dir / 'examples',
         'prefix': 'demo',
     },
 }
@@ -96,17 +97,21 @@ def clean_generated(groupkeys):
                 os.remove(filename)
 
 
-def compare_generated(groupkeys, include_graphviz_output = False):
+def compare_generated(groupkeys, branch = '', include_graphviz_output = False):
+    if branch:
+        branch = f' {branch.strip()}'
     compare_extensions = generated_extensions if include_graphviz_output else extensions_not_containing_graphviz_output
     for key in groupkeys:
         # collect and compare files
         for filename in collect_filenames('Comparing', key, compare_extensions):
-            cmd = f'git --no-pager diff "{filename}"'
+            cmd = f'git --no-pager diff{branch} -- "{filename}"'
             print(f'  {cmd}')
             os.system(cmd)
 
 
-def restore_generated(groupkeys):
+def restore_generated(groupkeys, branch = ''):
+    if branch:
+        branch = f' {branch.strip()}'
     for key in groupkeys:
         # collect input YAML files
         filename_list = collect_filenames('Restoring', key, input_extensions)
@@ -116,7 +121,7 @@ def restore_generated(groupkeys):
             filename_list.append(groups[key]['path'] / readme)
         # restore files
         for filename in filename_list:
-            cmd = f'git checkout -- "{filename}"'
+            cmd = f'git checkout{branch} -- "{filename}"'
             print(f'  {cmd}')
             os.system(cmd)
 
@@ -128,6 +133,8 @@ def parse_args():
                         help='what to do with the generated files (default: build)')
     parser.add_argument('-c', '--compare-graphviz-output', action='store_true',
                         help='the Graphviz output is also compared (default: False)')
+    parser.add_argument('-b', '--branch', action='store', default='',
+                        help='branch or commit to compare with or restore from')
     parser.add_argument('-g', '--groups', nargs='+',
                         choices=groups.keys(), default=groups.keys(),
                         help='the groups of generated files (default: all)')
@@ -141,9 +148,9 @@ def main():
     elif args.action == 'clean':
         clean_generated(args.groups)
     elif args.action == 'compare':
-        compare_generated(args.groups, args.compare_graphviz_output)
+        compare_generated(args.groups, args.branch, args.compare_graphviz_output)
     elif args.action == 'restore':
-        restore_generated(args.groups)
+        restore_generated(args.groups, args.branch)
 
 
 if __name__ == '__main__':
