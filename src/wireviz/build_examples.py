@@ -129,7 +129,7 @@ def restore_generated(groupkeys, branch = ''):
 def parse_args():
     parser = argparse.ArgumentParser(description='Wireviz Example Manager',)
     parser.add_argument('action', nargs='?', action='store',
-                        choices=['build','clean','compare','restore'], default='build',
+                        choices=['build','clean','compare','diff','restore'], default='build',
                         help='what to do with the generated files (default: build)')
     parser.add_argument('-c', '--compare-graphviz-output', action='store_true',
                         help='the Graphviz output is also compared (default: False)')
@@ -147,7 +147,7 @@ def main():
         build_generated(args.groups)
     elif args.action == 'clean':
         clean_generated(args.groups)
-    elif args.action == 'compare':
+    elif args.action == 'compare' or args.action == 'diff':
         compare_generated(args.groups, args.branch, args.compare_graphviz_output)
     elif args.action == 'restore':
         restore_generated(args.groups, args.branch)
