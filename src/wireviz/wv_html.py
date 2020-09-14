@@ -36,6 +36,8 @@ def generate_html_output(filename: (str, Path), bom_list):
             file.write('<tr>')
             for i, item in enumerate(row):
                 item_str = item.replace('\u00b2', '&sup2;')
+                if listy[0][i] == 'URL':
+                    item_str = f'<a href="{item}">{item_str}</a>'
                 align = 'text-align:right; ' if listy[0][i] == 'Qty' else ''
                 file.write(f'<td style="{align}border:1px solid #000000; padding: 4px">{item_str}</td>')
             file.write('</tr>')

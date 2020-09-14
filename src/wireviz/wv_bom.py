@@ -15,7 +15,7 @@ def get_additional_component_table(harness, component: Union[Connector, Cable]) 
         for extra in component.additional_components:
             qty = extra.qty * component.get_qty_multiplier(extra.qty_multiplier)
             if harness.mini_bom_mode:
-                id = get_bom_index(harness, extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                id = get_bom_index(harness, extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn, extra.href)
                 rows.append(component_table_entry(f'#{id} ({extra.type.rstrip()})', qty, extra.unit))
             else:
                 rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
@@ -32,7 +32,8 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dic
             'manufacturer': part.manufacturer,
             'mpn': part.mpn,
             'pn': part.pn,
-            'designators': component.name if component.show_name else None
+            'designators': component.name if component.show_name else None,
+            'href': part.href,
         })
     return(bom_entries)
 
@@ -49,7 +50,7 @@ def generate_bom(harness):
                            + (f', {connector.color}' if connector.color else ''))
             bom_entries.append({
                 'item': description, 'qty': 1, 'unit': None, 'designators': connector.name if connector.show_name else None,
-                'manufacturer': connector.manufacturer, 'mpn': connector.mpn, 'pn': connector.pn
+                'manufacturer': connector.manufacturer, 'mpn': connector.mpn, 'pn': connector.pn, 'href': connector.href,
             })
 
         # add connectors aditional components to bom
@@ -68,7 +69,8 @@ def generate_bom(harness):
                                + (' shielded' if cable.shield else ''))
                 bom_entries.append({
                     'item': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
-                    'manufacturer': cable.manufacturer, 'mpn': cable.mpn, 'pn': cable.pn
+                    'manufacturer': cable.manufacturer, 'mpn': cable.mpn, 'pn': cable.pn,
+                    'href': cable.href if isinstance(cable.href, str) else None,
                 })
             else:
                 # add each wire from the bundle to the bom
@@ -80,7 +82,8 @@ def generate_bom(harness):
                     bom_entries.append({
                         'item': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
                         'manufacturer': index_if_list(cable.manufacturer, index),
-                        'mpn': index_if_list(cable.mpn, index), 'pn': index_if_list(cable.pn, index)
+                        'mpn': index_if_list(cable.mpn, index), 'pn': index_if_list(cable.pn, index),
+                        'href': index_if_list(cable.href, index),
                     })
 
         # add cable/bundles aditional components to bom
@@ -89,7 +92,7 @@ def generate_bom(harness):
     for item in harness.additional_bom_items:
         bom_entries.append({
             'item': item.get('description', ''), 'qty': item.get('qty', 1), 'unit': item.get('unit'), 'designators': item.get('designators'),
-            'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn')
+            'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn'), 'href': item.get('href'),
         })
 
     # remove line breaks if present and cleanup any resulting whitespace issues
@@ -97,7 +100,7 @@ def generate_bom(harness):
 
     # deduplicate bom
     bom = []
-    bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
+    bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'], bt['href'])
     for group in Counter([bom_types_group(v) for v in bom_entries]):
         group_entries = [v for v in bom_entries if bom_types_group(v) == group]
         designators = []
@@ -118,24 +121,25 @@ def generate_bom(harness):
     bom = [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
     return bom
 
-def get_bom_index(harness, item, unit, manufacturer, mpn, pn):
+def get_bom_index(harness, item, unit, manufacturer, mpn, pn, href):
     # Remove linebreaks and clean whitespace of values in search
-    target = tuple(clean_whitespace(v) for v in (item, unit, manufacturer, mpn, pn))
+    target = tuple(clean_whitespace(v) for v in (item, unit, manufacturer, mpn, pn, href))
     for entry in harness.bom():
-        if (entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == target:
+        if (entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn'], entry['href']) == target:
             return entry['id']
     return None
 
 def bom_list(bom):
     keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
-    for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
+    for fieldname in ['pn', 'manufacturer', 'mpn', 'href']: # these optional BOM columns will only be included if at least one BOM item actually uses them
         if any(entry.get(fieldname) for entry in bom):
             keys.append(fieldname)
     bom_list = []
     # list of staic bom header names,  headers not specified here are generated by capitilising the internal name
     bom_headings = {
         "pn": "P/N",
-        "mpn": "MPN"
+        "mpn": "MPN",
+        "href": "URL",
     }
     bom_list.append([(bom_headings[k] if k in bom_headings else k.capitalize()) for k in keys])  # create header row with keys
     for item in bom:

@@ -14,7 +14,7 @@ from wireviz.wv_colors import get_color_hex
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
     html_caption, remove_links, html_line_breaks
 from wireviz.wv_bom import manufacturer_info_field, component_table_entry, \
-    get_additional_component_table, bom_list, generate_bom
+    get_additional_component_table, bom_list, generate_bom, index_if_list
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
     open_file_read, open_file_write
@@ -159,7 +159,8 @@ class Harness:
                 html = [row.replace('<!-- connector table -->', '\n'.join(pinhtml)) for row in html]
 
             html = '\n'.join(html)
-            dot.node(connector.name, label=f'<\n{html}\n>', shape='none', margin='0', style='filled', fillcolor='white')
+            dot.node(connector.name, label=f'<\n{html}\n>', shape='none', href=connector.href,
+                     margin='0', style='filled', fillcolor='white')
 
             if len(connector.loops) > 0:
                 dot.attr('edge', color='#000000:#ffffff:#000000')
@@ -288,10 +289,12 @@ class Harness:
             # connections
             for connection in cable.connections:
                 if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
-                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection.via_port - 1], pad=pad) + ['#000000']))
+                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection.via_port - 1], pad=pad) + ['#000000']),
+                             href=index_if_list(cable.href, connection.via_port - 1))
                 else:  # it's a shield connection
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
-                    dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000')
+                    dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000',
+                             href=cable.href if isinstance(cable.href, str) else None)
                 if connection.from_port is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
                     from_port = f':p{connection.from_port}r' if from_connector.style != 'simple' else ''
@@ -327,6 +330,7 @@ class Harness:
 
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
+                     href=cable.href if isinstance(cable.href, str) else None,
                      style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
 
         return dot
