@@ -112,10 +112,10 @@ class Harness:
                             elif extra['qty'] == 'connectioncount':
                                 qty = sum(1 for value in connector.visible_pins.values() if value is True)
                             else:
-                                raise ValueError('invalid aty parameter')
+                                raise ValueError('invalid qty parameter {}'.format(extra["qty"]))
                     else:
                         qty = 1
-                    rows.append([extra["type"], qty])
+                    rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
                     rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
                                  html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
             rows.append([html_line_breaks(connector.notes)])
@@ -208,10 +208,10 @@ class Harness:
                             elif extra['qty'] == 'total_length':
                                 qty = cable.length * cable.wirecount
                             else:
-                                raise ValueError('invalid aty parameter {}'.format(extra["qty"]))
+                                raise ValueError('invalid qty parameter {}'.format(extra["qty"]))
                     else:
                         qty = 1
-                    rows.append([extra["type"], qty])
+                    rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
                     rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
                                  html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
             rows.append([html_line_breaks(cable.notes)])
