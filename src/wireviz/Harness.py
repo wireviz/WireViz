@@ -103,18 +103,14 @@ class Harness:
             if connector.additional_components is not None:
                 rows.append(["Additional components"])
                 for extra in connector.additional_components:
-                    if 'qty' in extra:
-                        if isinstance(extra['qty'], int) or isinstance(extra['qty'], float):
-                            qty = extra['qty']
-                        else:  # check for special quantities
-                            if extra['qty'] == 'pincount':
-                                qty = connector.pincount
-                            elif extra['qty'] == 'connectioncount':
-                                qty = sum(1 for value in connector.visible_pins.values() if value is True)
-                            else:
-                                raise ValueError('invalid qty parameter {}'.format(extra["qty"]))
-                    else:
-                        qty = 1
+                    qty = extra.get('qty', 1)
+                    if 'qty_multiplier' in extra:
+                        if extra['qty_multiplier'] == 'pincount':
+                            qty = connector.pincount
+                        elif extra['qty_multiplier'] == 'populated':
+                            qty = sum(1 for value in connector.visible_pins.values() if value is True)
+                        else:
+                            raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier'"]))
                     rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
                     rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
                                  html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
@@ -195,22 +191,18 @@ class Harness:
             if cable.additional_components is not None:
                 rows.append(["Additional components"])
                 for extra in cable.additional_components:
-                    if 'qty' in extra:
-                        if isinstance(extra['qty'], int) or isinstance(extra['qty'], float):
-                            qty = extra['qty']
-                        else:  # check for special quantities
-                            if extra['qty'] == 'wirecount':
-                                qty = cable.wirecount
-                            elif extra['qty'] == 'terminations':
-                                qty = len(cable.connections)
-                            elif extra['qty'] == 'length':
-                                qty = cable.length
-                            elif extra['qty'] == 'total_length':
-                                qty = cable.length * cable.wirecount
-                            else:
-                                raise ValueError('invalid qty parameter {}'.format(extra["qty"]))
-                    else:
-                        qty = 1
+                    qty = extra.get('qty', 1)
+                    if 'qty_multiplier' in extra:
+                        if extra['qty_multiplier'] == 'wirecount':
+                            qty *= cable.wirecount
+                        elif extra['qty_multiplier'] == 'terminations':
+                            qty *= len(cable.connections)
+                        elif extra['qty_multiplier'] == 'length':
+                            qty *= cable.length
+                        elif extra['qty_multiplier'] == 'total_length':
+                            qty *= cable.length * cable.wirecount
+                        else:
+                            raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
                     rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
                     rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
                                  html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
@@ -399,18 +391,14 @@ class Harness:
         for connector in self.connectors.values():
             if connector.additional_components:
                 for part in connector.additional_components:
-                    if 'qty' in part:
-                        if isinstance(part['qty'], int) or isinstance(part['qty'], float):
-                            qty = part['qty']
-                        else:  # check for special quantities
-                            if part['qty'] == 'pincount':
-                                qty = connector.pincount
-                            elif part['qty'] == 'connectioncount':
-                                qty = sum(1 for value in connector.visible_pins.values() if value is True)
-                            else:
-                                raise ValueError('invalid aty parameter')
-                    else:
-                        qty = 1
+                    qty = part.get('qty', 1)
+                    if 'qty_multiplier' in part:
+                        if part['qty_multiplier'] == 'pincount':
+                            qty = connector.pincount
+                        elif part['qty_multiplier'] == 'populated':
+                            qty = sum(1 for value in connector.visible_pins.values() if value is True)
+                        else:
+                            raise ValueError('invalid qty parameter {}'.format(part["qty_multiplier'"]))
                     connectors_extra.append(
                         {
                             'type': part.get('type', None),
@@ -488,22 +476,18 @@ class Harness:
         for cable in self.cables.values():
             if cable.additional_components:
                 for part in cable.additional_components:
-                    if 'qty' in part:
-                        if isinstance(part['qty'], int) or isinstance(part['qty'], float):
-                            qty = part['qty']
-                        else:  # check for special quantities
-                            if part['qty'] == 'wirecount':
-                                qty = cable.wirecount
-                            elif part['qty'] == 'terminations':
-                                qty = len(cable.connections)
-                            elif part['qty'] == 'length':
-                                qty = cable.length
-                            elif part['qty'] == 'total_length':
-                                qty = cable.length * cable.wirecount
-                            else:
-                                raise ValueError('invalid aty parameter')
-                    else:
-                        qty = 1
+                    qty = part.get('qty', 1)
+                    if 'qty_multiplier' in part:
+                        if part['qty_multiplier'] == 'wirecount':
+                            qty *= cable.wirecount
+                        elif part['qty_multiplier'] == 'terminations':
+                            qty *= len(cable.connections)
+                        elif part['qty_multiplier'] == 'length':
+                            qty *= cable.length
+                        elif part['qty_multiplier'] == 'total_length':
+                            qty *= cable.length * cable.wirecount
+                        else:
+                            raise ValueError('invalid qty parameter {}'.format(part["qty_multiplier"]))
                     cables_extra.append(
                         {
                             'type': part.get('type', None),
