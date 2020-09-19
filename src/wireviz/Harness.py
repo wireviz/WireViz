@@ -496,7 +496,7 @@ class Harness:
                             'manufacturer': part.get('manufacturer', None),
                             'mpn': part.get('mpn', None),
                             'pn': part.get('pn', None),
-                            'designator': connector.name
+                            'designator': cable.name
                         }
                     )
         cables_extra_group = lambda ce: (ce['type'], ce['qty'], ce['unit'], ce['manufacturer'], ce['mpn'], ce['pn'])
