@@ -112,7 +112,7 @@ class Harness:
                         else:
                             raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier'"]))
                     rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
-                    rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
+                    rows.append([f'P/N: {extra["pn"]}' if "pn" in extra else None,
                                  html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
@@ -204,7 +204,7 @@ class Harness:
                         else:
                             raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
                     rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
-                    rows.append([f'P/N: {extra["pn"]}' if extra["pn"] else None,
+                    rows.append([f'P/N: {extra["pn"]}' if "pn" in extra else None,
                                  html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
