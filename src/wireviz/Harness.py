@@ -8,7 +8,7 @@ from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
-    html_colorbar, html_image, html_caption, manufacturer_info_field
+    html_colorbar, html_image, html_caption, manufacturer_info_field, component_table_entry
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -110,10 +110,8 @@ class Harness:
                         elif extra['qty_multiplier'] == 'populated':
                             qty *= sum(1 for value in connector.visible_pins.values() if value is True)
                         else:
-                            raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier'"]))
-                    rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
-                    rows.append([f'P/N: {extra["pn"]}' if "pn" in extra else None,
-                                 html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
+                            raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
+                    rows.append(html_line_breaks(component_table_entry(extra.get["type"], qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -203,9 +201,7 @@ class Harness:
                             qty *= cable.length * cable.wirecount
                         else:
                             raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
-                    rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
-                    rows.append([f'P/N: {extra["pn"]}' if "pn" in extra else None,
-                                 html_line_breaks(manufacturer_info_field(extra.get("manufacturer", None), extra.get("mpn", None)))])
+                    rows.append(html_line_breaks(component_table_entry(extra["type"], qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 

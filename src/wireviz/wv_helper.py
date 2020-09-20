@@ -181,3 +181,22 @@ def manufacturer_info_field(manufacturer, mpn):
         return f'{manufacturer if manufacturer else "MPN"}{": " + str(mpn) if mpn else ""}'
     else:
         return None
+
+def component_table_entry(type, qty, unit=None, pn=None, manufacturer=None, mpn=None):
+    output = f'{qty}'
+    if unit:
+        output += f' {unit}'
+    output += f' x {type}'
+    # print an extra line with part and manufacturer information if provided
+    manufacturer_str = manufacturer_info_field(manufacturer, mpn)
+    if pn or manufacturer_str:
+        output += '<br/>'
+        if pn:
+            output += f'P/N: {pn}'
+            if manufacturer_str:
+                output += ', '
+        if manufacturer_str:
+            output += manufacturer_str
+    # format the above output as left aligned text in a single visable cell
+    output = f'<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td align="left" balign="left">{output}</td></tr></table>'
+    return output
