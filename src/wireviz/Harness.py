@@ -111,7 +111,7 @@ class Harness:
                             qty *= sum(1 for value in connector.visible_pins.values() if value is True)
                         else:
                             raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
-                    rows.append(html_line_breaks(component_table_entry(extra.get["type"], qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
+                    rows.append(html_line_breaks(component_table_entry(extra["type"], qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
