@@ -116,6 +116,10 @@ class Connector:
             if len(loop) != 2:
                 raise Exception('Loops must be between exactly two pins!')
 
+        for additional_component in self.additional_components:
+            if 'type' not in additional_component:
+                raise Exception('Additional components must have a type specified')
+
     def activate_pin(self, pin):
         self.visible_pins[pin] = True
 
@@ -199,6 +203,10 @@ class Cable:
                         raise Exception('lists of part data must match wirecount')
                 else:
                     raise Exception('lists of part data are only supported for bundles')
+
+        for additional_component in self.additional_components:
+            if 'type' not in additional_component:
+                raise Exception('Additional components must have a type specified')
 
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
