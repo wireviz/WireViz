@@ -106,9 +106,9 @@ class Harness:
                     qty = extra.get('qty', 1)
                     if 'qty_multiplier' in extra:
                         if extra['qty_multiplier'] == 'pincount':
-                            qty = connector.pincount
+                            qty *= connector.pincount
                         elif extra['qty_multiplier'] == 'populated':
-                            qty = sum(1 for value in connector.visible_pins.values() if value is True)
+                            qty *= sum(1 for value in connector.visible_pins.values() if value is True)
                         else:
                             raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier'"]))
                     rows.append([extra["type"], f'{qty} {extra.get("unit", "")}'.strip()])
