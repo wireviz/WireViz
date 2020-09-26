@@ -8,7 +8,8 @@ from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
-    html_colorbar, html_image, html_caption, manufacturer_info_field, component_table_entry
+    html_colorbar, html_image, html_caption, manufacturer_info_field, \
+    component_table_entry, extra_component_long_name
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -19,8 +20,10 @@ class Harness:
 
     def __init__(self):
         self.color_mode = 'SHORT'
+        self.mini_bom_mode = True
         self.connectors = {}
         self.cables = {}
+        self._bom = []  # Internal Cache for generated bom
         self.additional_bom_items = []
 
     def add_connector(self, name: str, *args, **kwargs) -> None:
@@ -111,7 +114,11 @@ class Harness:
                             qty *= sum(1 for value in connector.visible_pins.values() if value is True)
                         else:
                             raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
-                    rows.append(html_line_breaks(component_table_entry(extra["type"], qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
+                    if(self.mini_bom_mode):
+                        id = self.get_bom_index(extra_component_long_name(extra["type"], extra.get("subtype", None)), extra.get("unit", None), extra.get("manufacturer", None), extra.get("mpn", None), extra.get("pn", None))
+                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra["type"].capitalize()})', qty, extra.get("unit", None), None, None, None)))
+                    else:
+                        rows.append(html_line_breaks(extra_component_long_name(extra["type"], extra.get("subtype", None)), qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None)))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -201,7 +208,11 @@ class Harness:
                             qty *= cable.length * cable.wirecount
                         else:
                             raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
-                    rows.append(html_line_breaks(component_table_entry(extra["type"], qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
+                    if(self.mini_bom_mode):
+                        id = self.get_bom_index(extra_component_long_name(extra["type"], extra.get("subtype", None)), extra.get("unit", None), extra.get("manufacturer", None), extra.get("mpn", None), extra.get("pn", None))
+                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra["type"].capitalize()})', qty, extra.get("unit", None), None, None, None)))
+                    else:
+                        rows.append(html_line_breaks(component_table_entry(extra_component_long_name(extra["type"], extra.get("subtype", None)), qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
@@ -359,12 +370,11 @@ class Harness:
             file.write('</body></html>')
 
     def bom(self):
-        bom = []
-        bom_connectors = []
-        bom_connectors_extra = []
-        bom_cables = []
-        bom_cables_extra = []
-        bom_extra = []
+        # if the bom has previously been generated then return the generated bom
+        if len(self._bom) > 0:
+            return self._bom
+        bom_items = []
+
         # connectors
         connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.mpn, c.pn)
         for group in Counter([connector_group(v) for v in self.connectors.values() if v.ignore_in_bom is not True]):
@@ -377,13 +387,10 @@ class Harness:
             conn_pincount = f', {shared.pincount} pins' if shared.style != 'simple' else ''
             conn_color = f', {shared.color}' if shared.color else ''
             name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
-            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.show_name else '',
+            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.show_name else None,
                     'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
-            bom_connectors.append(item)
-            bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
-        bom.extend(bom_connectors)
+            bom_items.append(item)
 
-        connectors_extra = []
         for connector in self.connectors.values():
             if connector.additional_components:
                 for part in connector.additional_components:
@@ -395,31 +402,17 @@ class Harness:
                             qty = sum(1 for value in connector.visible_pins.values() if value is True)
                         else:
                             raise ValueError('invalid qty parameter {}'.format(part["qty_multiplier'"]))
-                    connectors_extra.append(
+                    bom_items.append(
                         {
-                            'type': part.get('type', None),
+                            'item': extra_component_long_name(part["type"], part.get("subtype", None)),
                             'qty': qty,
                             'unit': part.get('unit', None),
                             'manufacturer': part.get('manufacturer', None),
                             'mpn': part.get('mpn', None),
                             'pn': part.get('pn', None),
-                            'designator': connector.name if connector.show_name else ''
+                            'designators': connector.name if connector.show_name else None
                         }
                     )
-        connector_extra_group = lambda ce: (ce['type'], ce['qty'], ce['unit'], ce['manufacturer'], ce['mpn'], ce['pn'])
-        for group in Counter([connector_extra_group(v) for v in connectors_extra]):
-            items = [v for v in connectors_extra if connector_extra_group(v) == group]
-            shared = items[0]
-            designators = [i['designator'] for i in items]
-            designators = list(dict.fromkeys(designators))  # remove duplicates
-            designators.sort()
-            total_qty = sum(i['qty'] for i in items)
-
-            item = {'item': shared['type'], 'qty': round(total_qty, 3), 'unit': shared['unit'], 'designators': designators,
-                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
-            bom_connectors_extra.append(item)
-            bom_connectors_extra = sorted(bom_connectors_extra, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
-        bom.extend(bom_connectors_extra)
 
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
@@ -437,7 +430,7 @@ class Harness:
             name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
                     'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
-            bom_cables.append(item)
+            bom_items.append(item)
         # bundles (ignores wirecount)
         wirelist = []
         # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
@@ -464,11 +457,8 @@ class Harness:
             name = f'Wire{wire_type}{gauge_name}{gauge_color}'
             item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
                     'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
-            bom_cables.append(item)
-            bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
-        bom.extend(bom_cables)
+            bom_items.append(item)
 
-        cables_extra = []
         for cable in self.cables.values():
             if cable.additional_components:
                 for part in cable.additional_components:
@@ -484,46 +474,60 @@ class Harness:
                             qty *= cable.length * cable.wirecount
                         else:
                             raise ValueError('invalid qty parameter {}'.format(part["qty_multiplier"]))
-                    cables_extra.append(
+                    bom_items.append(
                         {
-                            'type': part.get('type', None),
+                            'item': extra_component_long_name(part["type"], part.get("subtype", None)),
                             'qty': qty,
                             'unit': part.get('unit', None),
                             'manufacturer': part.get('manufacturer', None),
                             'mpn': part.get('mpn', None),
                             'pn': part.get('pn', None),
-                            'designator': cable.name
+                            'designators': cable.name
                         }
                     )
-        cables_extra_group = lambda ce: (ce['type'], ce['qty'], ce['unit'], ce['manufacturer'], ce['mpn'], ce['pn'])
-        for group in Counter([connector_extra_group(v) for v in cables_extra]):
-            items = [v for v in cables_extra if connector_extra_group(v) == group]
-            shared = items[0]
-            designators = [i['designator'] for i in items]
-            designators = list(dict.fromkeys(designators))  # remove duplicates
-            designators.sort()
-            total_qty = sum(i['qty'] for i in items)
-
-            item = {'item': shared['type'], 'qty': round(total_qty, 3), 'unit': shared['unit'], 'designators': designators,
-                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
-            bom_cables_extra.append(item)
-            bom_cables_extra = sorted(bom_cables_extra, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
-        bom.extend(bom_cables_extra)
 
         for item in self.additional_bom_items:
             name = item['description'] if item.get('description', None) else ''
-            if isinstance(item.get('designators', None), List):
-                item['designators'].sort()  # sort designators if a list is provided
             item = {'item': name, 'qty': item.get('qty', None), 'unit': item.get('unit', None), 'designators': item.get('designators', None),
                     'manufacturer': item.get('manufacturer', None), 'mpn': item.get('mpn', None), 'pn': item.get('pn', None)}
-            bom_extra.append(item)
-        bom_extra = sorted(bom_extra, key=lambda k: k['item'])
-        bom.extend(bom_extra)
-        return bom
+            bom_items.append(item)
+
+        # deduplicate bom
+        bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
+        for group in Counter([bom_types_group(v) for v in bom_items]):
+            items = [v for v in bom_items if bom_types_group(v) == group]
+            shared = items[0]
+            designators = []
+            for item in items:
+                if "designators" in item and item['designators']:
+                    if isinstance(item['designators'], List):
+                        designators.extend(item['designators'])
+                    else:
+                        designators.append(item['designators'])
+            designators = list(dict.fromkeys(designators))  # remove duplicates
+            designators.sort()
+            total_qty = sum(i['qty'] for i in items)
+            item = {'item': shared['item'], 'qty': round(total_qty, 3), 'unit': shared['unit'], 'designators': designators,
+                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
+            self._bom.append(item)
+
+        self._bom = sorted(self._bom, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
+        # add index
+        index = 1
+        for item in self._bom:
+            item["id"] = index
+            index += 1
+        return self._bom
+
+    def get_bom_index(self, item, unit, manufacturer, mpn, pn):
+        for bom_item in self.bom():
+            if((bom_item['item'], bom_item['unit'], bom_item['manufacturer'], bom_item['mpn'], bom_item['pn']) == (item, unit, manufacturer, mpn, pn)):
+                return bom_item['id']
+        return None
 
     def bom_list(self):
         bom = self.bom()
-        keys = ['item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
+        keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
         for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
             if any(fieldname in x and x.get(fieldname, None) for x in bom):
                 keys.append(fieldname)

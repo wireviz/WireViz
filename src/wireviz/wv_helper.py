@@ -200,3 +200,9 @@ def component_table_entry(type, qty, unit=None, pn=None, manufacturer=None, mpn=
     # format the above output as left aligned text in a single visable cell
     output = f'<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td align="left" balign="left">{output}</td></tr></table>'
     return output
+
+
+def extra_component_long_name(type, subtype):
+    name_subtype = f', {remove_line_breaks(subtype)}' if subtype else ''
+    name = f'{type.capitalize()}{name_subtype}'
+    return name
