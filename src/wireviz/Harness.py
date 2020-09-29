@@ -9,7 +9,8 @@ from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
     html_colorbar, html_image, html_caption, manufacturer_info_field, \
-    component_table_entry
+    component_table_entry, \
+    calculate_qty_multiplier_connector, calculate_qty_multiplier_cable
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -107,13 +108,7 @@ class Harness:
                 rows.append(["Additional components"])
                 for extra in connector.additional_components:
                     qty = extra.qty
-                    if extra.qty_multiplier:
-                        if extra.qty_multiplier == 'pincount':
-                            qty *= connector.pincount
-                        elif extra.qty_multiplier == 'populated':
-                            qty *= sum(connector.visible_pins.values())
-                        else:
-                            raise ValueError(f'invalid qty multiplier parameter {extra["qty_multiplier"]}')
+                    qty *= calculate_qty_multiplier_connector(extra.qty_multiplier, connector)
                     if(self.mini_bom_mode):
                         id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                         rows.append(html_line_breaks(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit)))
@@ -197,17 +192,7 @@ class Harness:
                 rows.append(["Additional components"])
                 for extra in cable.additional_components:
                     qty = extra.qty
-                    if extra.qty_multiplier:
-                        if extra.qty_multiplier == 'wirecount':
-                            qty *= cable.wirecount
-                        elif extra.qty_multiplier == 'terminations':
-                            qty *= len(cable.connections)
-                        elif extra.qty_multiplier == 'length':
-                            qty *= cable.length
-                        elif extra.qty_multiplier == 'total_length':
-                            qty *= cable.length * cable.wirecount
-                        else:
-                            raise ValueError(f'invalid qty multiplier parameter {extra["qty_multiplier"]}')
+                    qty *= calculate_qty_multiplier_cable(extra.qty_multiplier, cable)
                     if(self.mini_bom_mode):
                         id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                         rows.append(html_line_breaks(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit)))
@@ -389,13 +374,7 @@ class Harness:
 
             for part in connector.additional_components:
                 qty = part.qty
-                if part.qty_multiplier:
-                    if part.qty_multiplier == 'pincount':
-                        qty = connector.pincount
-                    elif part.qty_multiplier == 'populated':
-                        qty = sum(connector.visible_pins.values())
-                    else:
-                        raise ValueError(f'invalid qty multiplier parameter {part.qty_multiplier}')
+                qty *= calculate_qty_multiplier_connector(part.qty_multiplier, connector)
                 bom_items.append(
                     {
                         'item': part.long_name(),
@@ -434,17 +413,7 @@ class Harness:
 
             for part in cable.additional_components:
                 qty = part.qty
-                if part.qty_multiplier:
-                    if part.qty_multiplier == 'wirecount':
-                        qty *= cable.wirecount
-                    elif part.qty_multiplier == 'terminations':
-                        qty *= len(cable.connections)
-                    elif part.qty_multiplier == 'length':
-                        qty *= cable.length
-                    elif part.qty_multiplier == 'total_length':
-                        qty *= cable.length * cable.wirecount
-                    else:
-                        raise ValueError(f'invalid qty multiplier parameter {part.qty_multiplier}')
+                qty *= calculate_qty_multiplier_cable(part.qty_multiplier, cable)
                 bom_items.append(
                     {
                         'item': part.long_name(),
