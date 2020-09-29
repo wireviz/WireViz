@@ -9,7 +9,7 @@ from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
     html_colorbar, html_image, html_caption, manufacturer_info_field, \
-    component_table_entry, extra_component_long_name
+    component_table_entry
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -106,19 +106,19 @@ class Harness:
             if connector.additional_components is not None:
                 rows.append(["Additional components"])
                 for extra in connector.additional_components:
-                    qty = extra.get('qty', 1)
-                    if 'qty_multiplier' in extra:
-                        if extra['qty_multiplier'] == 'pincount':
+                    qty = extra.qty
+                    if extra.qty_multiplier:
+                        if extra.qty_multiplier == 'pincount':
                             qty *= connector.pincount
-                        elif extra['qty_multiplier'] == 'populated':
-                            qty *= sum(1 for value in connector.visible_pins.values() if value is True)
+                        elif extra.qty_multiplier == 'populated':
+                            qty *= sum(connector.visible_pins.values())
                         else:
-                            raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
+                            raise ValueError(f'invalid qty multiplier parameter {extra["qty_multiplier"]}')
                     if(self.mini_bom_mode):
-                        id = self.get_bom_index(extra_component_long_name(extra["type"], extra.get("subtype", None)), extra.get("unit", None), extra.get("manufacturer", None), extra.get("mpn", None), extra.get("pn", None))
-                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra["type"].capitalize()})', qty, extra.get("unit", None), None, None, None)))
+                        id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit)))
                     else:
-                        rows.append(html_line_breaks(extra_component_long_name(extra["type"], extra.get("subtype", None)), qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None)))
+                        rows.append(html_line_breaks(extra.long_name(), qty, extra.get.unit, extra.pn, extra.manufacturer, extra.mpn))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -193,26 +193,26 @@ class Harness:
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]
 
-            if cable.additional_components is not None:
+            if len(cable.additional_components) > 0:
                 rows.append(["Additional components"])
                 for extra in cable.additional_components:
-                    qty = extra.get('qty', 1)
-                    if 'qty_multiplier' in extra:
-                        if extra['qty_multiplier'] == 'wirecount':
+                    qty = extra.qty
+                    if extra.qty_multiplier:
+                        if extra.qty_multiplier == 'wirecount':
                             qty *= cable.wirecount
-                        elif extra['qty_multiplier'] == 'terminations':
+                        elif extra.qty_multiplier == 'terminations':
                             qty *= len(cable.connections)
-                        elif extra['qty_multiplier'] == 'length':
+                        elif extra.qty_multiplier == 'length':
                             qty *= cable.length
-                        elif extra['qty_multiplier'] == 'total_length':
+                        elif extra.qty_multiplier == 'total_length':
                             qty *= cable.length * cable.wirecount
                         else:
-                            raise ValueError('invalid qty parameter {}'.format(extra["qty_multiplier"]))
+                            raise ValueError(f'invalid qty multiplier parameter {extra["qty_multiplier"]}')
                     if(self.mini_bom_mode):
-                        id = self.get_bom_index(extra_component_long_name(extra["type"], extra.get("subtype", None)), extra.get("unit", None), extra.get("manufacturer", None), extra.get("mpn", None), extra.get("pn", None))
-                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra["type"].capitalize()})', qty, extra.get("unit", None), None, None, None)))
+                        id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit)))
                     else:
-                        rows.append(html_line_breaks(component_table_entry(extra_component_long_name(extra["type"], extra.get("subtype", None)), qty, extra.get("unit", None), extra.get("pn", None), extra.get("manufacturer", None), extra.get("mpn", None))))
+                        rows.append(html_line_breaks(component_table_entry(extra.long_name(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn)))
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
@@ -376,120 +376,91 @@ class Harness:
         bom_items = []
 
         # connectors
-        connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.mpn, c.pn)
-        for group in Counter([connector_group(v) for v in self.connectors.values() if v.ignore_in_bom is not True]):
-            items = {k: v for k, v in self.connectors.items() if connector_group(v) == group}
-            shared = next(iter(items.values()))
-            designators = list(items.keys())
-            designators.sort()
-            conn_type = f', {remove_line_breaks(shared.type)}' if shared.type else ''
-            conn_subtype = f', {remove_line_breaks(shared.subtype)}' if shared.subtype else ''
-            conn_pincount = f', {shared.pincount} pins' if shared.style != 'simple' else ''
-            conn_color = f', {shared.color}' if shared.color else ''
-            name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
-            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.show_name else None,
-                    'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
-            bom_items.append(item)
-
         for connector in self.connectors.values():
-            if connector.additional_components:
-                for part in connector.additional_components:
-                    qty = part.get('qty', 1)
-                    if 'qty_multiplier' in part:
-                        if part['qty_multiplier'] == 'pincount':
-                            qty = connector.pincount
-                        elif part['qty_multiplier'] == 'populated':
-                            qty = sum(1 for value in connector.visible_pins.values() if value is True)
-                        else:
-                            raise ValueError('invalid qty parameter {}'.format(part["qty_multiplier'"]))
-                    bom_items.append(
-                        {
-                            'item': extra_component_long_name(part["type"], part.get("subtype", None)),
-                            'qty': qty,
-                            'unit': part.get('unit', None),
-                            'manufacturer': part.get('manufacturer', None),
-                            'mpn': part.get('mpn', None),
-                            'pn': part.get('pn', None),
-                            'designators': connector.name if connector.show_name else None
-                        }
-                    )
+            if not connector.ignore_in_bom:
+                conn_type = f', {remove_line_breaks(connector.type)}' if connector.type else ''
+                conn_subtype = f', {remove_line_breaks(connector.subtype)}' if connector.subtype else ''
+                conn_pincount = f', {connector.pincount} pins' if connector.style != 'simple' else ''
+                conn_color = f', {connector.color}' if connector.color else ''
+                name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
+                item = {'item': name, 'qty': 1, 'unit': '', 'designators': connector.name if connector.show_name else None,
+                        'manufacturer': remove_line_breaks(connector.manufacturer), 'mpn': remove_line_breaks(connector.mpn), 'pn': connector.pn}
+                bom_items.append(item)
+
+            for part in connector.additional_components:
+                qty = part.qty
+                if part.qty_multiplier:
+                    if part.qty_multiplier == 'pincount':
+                        qty = connector.pincount
+                    elif part.qty_multiplier == 'populated':
+                        qty = sum(connector.visible_pins.values())
+                    else:
+                        raise ValueError(f'invalid qty multiplier parameter {part.qty_multiplier}')
+                bom_items.append(
+                    {
+                        'item': part.long_name(),
+                        'qty': qty,
+                        'unit': part.unit,
+                        'manufacturer': part.manufacturer,
+                        'mpn': part.mpn,
+                        'pn': part.pn,
+                        'designators': connector.name if connector.show_name else None
+                    }
+                )
 
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
-        # The category needs to be included in cable_group to keep the bundles excluded.
-        cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.mpn, c.pn)
-        for group in Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle' and v.ignore_in_bom is not True]):
-            items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
-            shared = next(iter(items.values()))
-            designators = list(items.keys())
-            designators.sort()
-            total_length = sum(i.length for i in items.values())
-            cable_type = f', {remove_line_breaks(shared.type)}' if shared.type else ''
-            gauge_name = f' x {shared.gauge} {shared.gauge_unit}' if shared.gauge else ' wires'
-            shield_name = ' shielded' if shared.shield else ''
-            name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
-            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
-                    'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
-            bom_items.append(item)
-        # bundles (ignores wirecount)
-        wirelist = []
-        # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        for bundle in self.cables.values():
-            if bundle.category == 'bundle':
-                # add each wire from each bundle to the wirelist
-                for index, color in enumerate(bundle.colors, 0):
-                    wirelist.append({'type': bundle.type, 'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
-                                     'manufacturer': remove_line_breaks(index_if_list(bundle.manufacturer, index)),
-                                     'mpn': remove_line_breaks(index_if_list(bundle.mpn, index)),
-                                     'pn': index_if_list(bundle.pn, index)})
-        # join similar wires from all the bundles to a single BOM item
-        wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['mpn'], w['pn'])
-        for group in Counter([wire_group(v) for v in wirelist]):
-            items = [v for v in wirelist if wire_group(v) == group]
-            shared = items[0]
-            designators = [i['designator'] for i in items]
-            designators = list(dict.fromkeys(designators))  # remove duplicates
-            designators.sort()
-            total_length = sum(i['length'] for i in items)
-            wire_type = f', {remove_line_breaks(shared["type"])}' if shared.get('type', None) else ''
-            gauge_name = f', {shared["gauge"]} {shared["gauge_unit"]}' if shared.get('gauge', None) else ''
-            gauge_color = f', {shared["color"]}' if 'color' in shared != '' else ''
-            name = f'Wire{wire_type}{gauge_name}{gauge_color}'
-            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
-                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
-            bom_items.append(item)
-
         for cable in self.cables.values():
-            if cable.additional_components:
-                for part in cable.additional_components:
-                    qty = part.get('qty', 1)
-                    if 'qty_multiplier' in part:
-                        if part['qty_multiplier'] == 'wirecount':
-                            qty *= cable.wirecount
-                        elif part['qty_multiplier'] == 'terminations':
-                            qty *= len(cable.connections)
-                        elif part['qty_multiplier'] == 'length':
-                            qty *= cable.length
-                        elif part['qty_multiplier'] == 'total_length':
-                            qty *= cable.length * cable.wirecount
-                        else:
-                            raise ValueError('invalid qty parameter {}'.format(part["qty_multiplier"]))
-                    bom_items.append(
-                        {
-                            'item': extra_component_long_name(part["type"], part.get("subtype", None)),
-                            'qty': qty,
-                            'unit': part.get('unit', None),
-                            'manufacturer': part.get('manufacturer', None),
-                            'mpn': part.get('mpn', None),
-                            'pn': part.get('pn', None),
-                            'designators': cable.name
-                        }
-                    )
+            if not cable.ignore_in_bom:
+                # create name beilds used by both cables and bundles
+                cable_type = f', {remove_line_breaks(cable.type)}' if cable.type else ''
+                gauge_name = f' x {cable.gauge} {cable.gauge_unit}' if cable.gauge else ' wires'
+                if cable.category != 'bundle':
+                    # process cable as a single entity
+                    shield_name = ' shielded' if cable.shield else ''
+                    name = f'Cable{cable_type}, {cable.wirecount}{gauge_name}{shield_name}'
+                    item = {'item': name, 'qty': cable.length, 'unit': 'm', 'designators': cable.name,
+                            'manufacturer': remove_line_breaks(cable.manufacturer), 'mpn': remove_line_breaks(cable.mpn), 'pn': cable.pn}
+                    bom_items.append(item)
+                else:
+                    # add each wire from the bundle to the bom
+                    for index, color in enumerate(cable.colors, 0):
+                        gauge_color = f', {color}' if color else ''
+                        name = f'Wire{cable_type}{gauge_name}{gauge_color}'
+                        item = {'item': name, 'qty': cable.length, 'unit': 'm', 'designators': cable.name,
+                                'manufacturer': remove_line_breaks(index_if_list(cable.manufacturer, index)),
+                                'mpn': remove_line_breaks(index_if_list(cable.mpn, index)), 'pn': index_if_list(cable.pn, index)}
+                        bom_items.append(item)
+
+            for part in cable.additional_components:
+                qty = part.qty
+                if part.qty_multiplier:
+                    if part.qty_multiplier == 'wirecount':
+                        qty *= cable.wirecount
+                    elif part.qty_multiplier == 'terminations':
+                        qty *= len(cable.connections)
+                    elif part.qty_multiplier == 'length':
+                        qty *= cable.length
+                    elif part.qty_multiplier == 'total_length':
+                        qty *= cable.length * cable.wirecount
+                    else:
+                        raise ValueError(f'invalid qty multiplier parameter {part.qty_multiplier}')
+                bom_items.append(
+                    {
+                        'item': part.long_name(),
+                        'qty': qty,
+                        'unit': part.unit,
+                        'manufacturer': part.manufacturer,
+                        'mpn': part.mpn,
+                        'pn': part.pn,
+                        'designators': cable.name
+                    }
+                )
 
         for item in self.additional_bom_items:
             name = item['description'] if item.get('description', None) else ''
-            item = {'item': name, 'qty': item.get('qty', None), 'unit': item.get('unit', None), 'designators': item.get('designators', None),
-                    'manufacturer': item.get('manufacturer', None), 'mpn': item.get('mpn', None), 'pn': item.get('pn', None)}
+            item = {'item': name, 'qty': item.get('qty'), 'unit': item.get('unit'), 'designators': item.get('designators'),
+                    'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn')}
             bom_items.append(item)
 
         # deduplicate bom
@@ -499,7 +470,7 @@ class Harness:
             shared = items[0]
             designators = []
             for item in items:
-                if "designators" in item and item['designators']:
+                if item.get('designators'):
                     if isinstance(item['designators'], List):
                         designators.extend(item['designators'])
                     else:
@@ -529,7 +500,7 @@ class Harness:
         bom = self.bom()
         keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
         for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
-            if any(fieldname in x and x.get(fieldname, None) for x in bom):
+            if any(entry.get(fieldname) for entry in bom):
                 keys.append(fieldname)
         bom_list = []
         # list of staic bom header names,  headers not specified here are generated by capitilising the internal name

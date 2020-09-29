@@ -43,6 +43,21 @@ class Image:
                 if self.width:
                     self.height = self.width / aspect_ratio(gv_dir.joinpath(self.src))
 
+@dataclass
+class AdditionalComponent:
+    type: str
+    subtype: Optional[str] = None
+    manufacturer: Optional[str] = None
+    mpn: Optional[str] = None
+    pn: Optional[str] = None
+    qty: float = 1
+    unit: Optional[str] = None
+    qty_multiplier: Optional[str] = None
+
+    def long_name(self) -> str:
+        name_subtype = f', {self.subtype}' if self.subtype else ''
+        return f'{self.type.capitalize()}{name_subtype}'
+
 
 @dataclass
 class Connector:
@@ -66,7 +81,7 @@ class Connector:
     autogenerate: bool = False
     loops: List[Any] = field(default_factory=list)
     ignore_in_bom: bool = False
-    additional_components: List[Any] = None
+    additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self):
 
@@ -116,10 +131,9 @@ class Connector:
             if len(loop) != 2:
                 raise Exception('Loops must be between exactly two pins!')
 
-        if self.additional_components:
-            for additional_component in self.additional_components:
-                if 'type' not in additional_component:
-                    raise Exception('Additional components must have a type specified')
+        for i, item in enumerate(self.additional_components):
+            if isinstance(item, dict):
+                self.additional_components[i] = AdditionalComponent(**item)
 
     def activate_pin(self, pin):
         self.visible_pins[pin] = True
@@ -147,7 +161,7 @@ class Cable:
     show_name: bool = True
     show_wirecount: bool = True
     ignore_in_bom: bool = False
-    additional_components: List[Any] = None
+    additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self):
 
@@ -205,11 +219,9 @@ class Cable:
                 else:
                     raise Exception('lists of part data are only supported for bundles')
 
-        if self.additional_components:
-            for additional_component in self.additional_components:
-                if 'type' not in additional_component:
-                    raise Exception('Additional components must have a type specified')
-
+        for i, item in enumerate(self.additional_components):
+            if isinstance(item, dict):
+                self.additional_components[i] = AdditionalComponent(**item)
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
         from_pin = int2tuple(from_pin)
