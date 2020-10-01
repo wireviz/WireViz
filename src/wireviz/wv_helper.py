@@ -200,31 +200,3 @@ def component_table_entry(type, qty, unit=None, pn=None, manufacturer=None, mpn=
     output = html_line_breaks(output)
     # format the above output as left aligned text in a single visable cell
     return f'<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td align="left" balign="left">{output}</td></tr></table>'
-
-
-def calculate_qty_multiplier_connector(qty_multiplier, connector):
-    if not qty_multiplier:
-        return 1
-
-    if qty_multiplier == 'pincount':
-        return connector.pincount
-    elif qty_multiplier == 'populated':
-        return sum(connector.visible_pins.values())
-    else:
-        raise ValueError(f'invalid qty multiplier parameter for connector {qty_multiplier}')
-
-
-def calculate_qty_multiplier_cable(qty_multiplier, cable):
-    if not qty_multiplier:
-        return 1
-
-    if qty_multiplier == 'wirecount':
-        return cable.wirecount
-    elif qty_multiplier == 'terminations':
-        return len(cable.connections)
-    elif qty_multiplier == 'length':
-        return cable.length
-    elif qty_multiplier == 'total_length':
-        return cable.length * cable.wirecount
-    else:
-        raise ValueError(f'invalid qty multiplier parameter for cable {qty_multiplier}')

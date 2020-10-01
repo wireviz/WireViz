@@ -9,8 +9,7 @@ from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
     html_colorbar, html_image, html_caption, manufacturer_info_field, \
-    component_table_entry, \
-    calculate_qty_multiplier_connector, calculate_qty_multiplier_cable
+    component_table_entry
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -107,12 +106,12 @@ class Harness:
             if connector.additional_components:
                 rows.append(["Additional components"])
                 for extra in connector.additional_components:
-                    qty = extra.qty * calculate_qty_multiplier_connector(extra.qty_multiplier, connector)
+                    qty = extra.qty * connector.get_qty_multiplier(extra.qty_multiplier)
                     if(self.mini_bom_mode):
-                        id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                        id = self.get_bom_index(extra.description(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                         rows.append(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit))
                     else:
-                        rows.append(component_table_entry(extra.long_name(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
+                        rows.append(component_table_entry(extra.description(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -190,12 +189,12 @@ class Harness:
             if cable.additional_components:
                 rows.append(["Additional components"])
                 for extra in cable.additional_components:
-                    qty = extra.qty * calculate_qty_multiplier_cable(extra.qty_multiplier, cable)
+                    qty = extra.qty * cable.get_qty_multiplier(extra.qty_multiplier)
                     if(self.mini_bom_mode):
-                        id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                        id = self.get_bom_index(extra.description(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                         rows.append(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit))
                     else:
-                        rows.append(component_table_entry(extra.long_name(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
+                        rows.append(component_table_entry(extra.description(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
@@ -371,10 +370,10 @@ class Harness:
                 bom_items.append(item)
 
             for part in connector.additional_components:
-                qty = part.qty * calculate_qty_multiplier_connector(part.qty_multiplier, connector)
+                qty = part.qty * connector.get_qty_multiplier(part.qty_multiplier)
                 bom_items.append(
                     {
-                        'item': part.long_name(),
+                        'item': part.description(),
                         'qty': qty,
                         'unit': part.unit,
                         'manufacturer': part.manufacturer,
@@ -409,10 +408,10 @@ class Harness:
                         bom_items.append(item)
 
             for part in cable.additional_components:
-                qty = part.qty * calculate_qty_multiplier_cable(part.qty_multiplier, cable)
+                qty = part.qty * cable.get_qty_multiplier(part.qty_multiplier)
                 bom_items.append(
                     {
-                        'item': part.long_name(),
+                        'item': part.description(),
                         'qty': qty,
                         'unit': part.unit,
                         'manufacturer': part.manufacturer,

@@ -10,6 +10,7 @@ from wireviz import wv_colors
 ConnectorMultiplier = str  # = Literal['pincount', 'populated']
 CableMultiplier = str  # = Literal['wirecount', 'terminations', 'length', 'total_length']
 
+
 @dataclass
 class Image:
     gv_dir: InitVar[Path] # Directory of .gv file injected as context during parsing
@@ -56,7 +57,7 @@ class AdditionalComponent:
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
 
-    def long_name(self) -> str:
+    def description(self) -> str:
         name_subtype = f', {self.subtype}' if self.subtype else ''
         return f'{self.type.capitalize()}{name_subtype}'
 
@@ -139,6 +140,16 @@ class Connector:
 
     def activate_pin(self, pin):
         self.visible_pins[pin] = True
+
+    def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
+        if not qty_multiplier:
+            return 1
+        elif qty_multiplier == 'pincount':
+            return self.pincount
+        elif qty_multiplier == 'populated':
+            return sum(self.visible_pins.values())
+        else:
+            raise ValueError(f'invalid qty multiplier parameter for connector {qty_multiplier}')
 
 
 @dataclass
@@ -234,6 +245,20 @@ class Cable:
         for i, _ in enumerate(from_pin):
             # self.connections.append((from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
             self.connections.append(Connection(from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
+
+    def get_qty_multiplier(self, qty_multiplier: Optional[CableMultiplier]) -> float:
+        if not qty_multiplier:
+            return 1
+        elif qty_multiplier == 'wirecount':
+            return self.wirecount
+        elif qty_multiplier == 'terminations':
+            return len(self.connections)
+        elif qty_multiplier == 'length':
+            return self.length
+        elif qty_multiplier == 'total_length':
+            return self.length * self.wirecount
+        else:
+            raise ValueError(f'invalid qty multiplier parameter for cable {qty_multiplier}')
 
 
 @dataclass
