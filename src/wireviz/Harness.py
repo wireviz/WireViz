@@ -108,10 +108,10 @@ class Harness:
                 for extra in connector.additional_components:
                     qty = extra.qty * connector.get_qty_multiplier(extra.qty_multiplier)
                     if(self.mini_bom_mode):
-                        id = self.get_bom_index(extra.description(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                        id = self.get_bom_index(extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                         rows.append(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit))
                     else:
-                        rows.append(component_table_entry(extra.description(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
+                        rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -191,10 +191,10 @@ class Harness:
                 for extra in cable.additional_components:
                     qty = extra.qty * cable.get_qty_multiplier(extra.qty_multiplier)
                     if(self.mini_bom_mode):
-                        id = self.get_bom_index(extra.description(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                        id = self.get_bom_index(extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                         rows.append(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit))
                     else:
-                        rows.append(component_table_entry(extra.description(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
+                        rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
@@ -373,7 +373,7 @@ class Harness:
                 qty = part.qty * connector.get_qty_multiplier(part.qty_multiplier)
                 bom_items.append(
                     {
-                        'item': part.description(),
+                        'item': part.description,
                         'qty': qty,
                         'unit': part.unit,
                         'manufacturer': part.manufacturer,
@@ -411,7 +411,7 @@ class Harness:
                 qty = part.qty * cable.get_qty_multiplier(part.qty_multiplier)
                 bom_items.append(
                     {
-                        'item': part.description(),
+                        'item': part.description,
                         'qty': qty,
                         'unit': part.unit,
                         'manufacturer': part.manufacturer,

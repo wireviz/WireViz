@@ -57,6 +57,7 @@ class AdditionalComponent:
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
 
+    @property
     def description(self) -> str:
         name_subtype = f', {self.subtype}' if self.subtype else ''
         return f'{self.type.capitalize()}{name_subtype}'
