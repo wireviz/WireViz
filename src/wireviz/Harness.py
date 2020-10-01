@@ -104,16 +104,15 @@ class Harness:
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
-            if connector.additional_components is not None:
+            if connector.additional_components:
                 rows.append(["Additional components"])
                 for extra in connector.additional_components:
-                    qty = extra.qty
-                    qty *= calculate_qty_multiplier_connector(extra.qty_multiplier, connector)
+                    qty = extra.qty * calculate_qty_multiplier_connector(extra.qty_multiplier, connector)
                     if(self.mini_bom_mode):
                         id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
-                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit)))
+                        rows.append(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit))
                     else:
-                        rows.append(html_line_breaks(extra.long_name(), qty, extra.get.unit, extra.pn, extra.manufacturer, extra.mpn))
+                        rows.append(component_table_entry(extra.long_name(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -188,16 +187,15 @@ class Harness:
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]
 
-            if len(cable.additional_components) > 0:
+            if cable.additional_components:
                 rows.append(["Additional components"])
                 for extra in cable.additional_components:
-                    qty = extra.qty
-                    qty *= calculate_qty_multiplier_cable(extra.qty_multiplier, cable)
+                    qty = extra.qty * calculate_qty_multiplier_cable(extra.qty_multiplier, cable)
                     if(self.mini_bom_mode):
                         id = self.get_bom_index(extra.long_name(), extra.unit, extra.manufacturer, extra.mpn, extra.pn)
-                        rows.append(html_line_breaks(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit)))
+                        rows.append(component_table_entry(f'{id} ({extra.type.capitalize()})', qty, extra.unit))
                     else:
-                        rows.append(html_line_breaks(component_table_entry(extra.long_name(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn)))
+                        rows.append(component_table_entry(extra.long_name(), qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
@@ -356,7 +354,7 @@ class Harness:
 
     def bom(self):
         # if the bom has previously been generated then return the generated bom
-        if len(self._bom) > 0:
+        if self._bom:
             return self._bom
         bom_items = []
 
@@ -373,8 +371,7 @@ class Harness:
                 bom_items.append(item)
 
             for part in connector.additional_components:
-                qty = part.qty
-                qty *= calculate_qty_multiplier_connector(part.qty_multiplier, connector)
+                qty = part.qty * calculate_qty_multiplier_connector(part.qty_multiplier, connector)
                 bom_items.append(
                     {
                         'item': part.long_name(),
@@ -404,16 +401,15 @@ class Harness:
                 else:
                     # add each wire from the bundle to the bom
                     for index, color in enumerate(cable.colors, 0):
-                        gauge_color = f', {color}' if color else ''
-                        name = f'Wire{cable_type}{gauge_name}{gauge_color}'
+                        wire_color = f', {color}' if color else ''
+                        name = f'Wire{cable_type}{gauge_name}{wire_color}'
                         item = {'item': name, 'qty': cable.length, 'unit': 'm', 'designators': cable.name,
                                 'manufacturer': remove_line_breaks(index_if_list(cable.manufacturer, index)),
                                 'mpn': remove_line_breaks(index_if_list(cable.mpn, index)), 'pn': index_if_list(cable.pn, index)}
                         bom_items.append(item)
 
             for part in cable.additional_components:
-                qty = part.qty
-                qty *= calculate_qty_multiplier_cable(part.qty_multiplier, cable)
+                qty = part.qty * calculate_qty_multiplier_cable(part.qty_multiplier, cable)
                 bom_items.append(
                     {
                         'item': part.long_name(),
@@ -427,8 +423,7 @@ class Harness:
                 )
 
         for item in self.additional_bom_items:
-            name = item['description'] if item.get('description', None) else ''
-            item = {'item': name, 'qty': item.get('qty'), 'unit': item.get('unit'), 'designators': item.get('designators'),
+            item = {'item': item.get('description', ''), 'qty': item.get('qty'), 'unit': item.get('unit'), 'designators': item.get('designators'),
                     'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn')}
             bom_items.append(item)
 

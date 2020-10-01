@@ -7,6 +7,8 @@ from pathlib import Path
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
 
+ConnectorMultiplier = str  # = Literal['pincount', 'populated']
+CableMultiplier = str  # = Literal['wirecount', 'terminations', 'length', 'total_length']
 
 @dataclass
 class Image:
@@ -52,7 +54,7 @@ class AdditionalComponent:
     pn: Optional[str] = None
     qty: float = 1
     unit: Optional[str] = None
-    qty_multiplier: Optional[str] = None
+    qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
 
     def long_name(self) -> str:
         name_subtype = f', {self.subtype}' if self.subtype else ''

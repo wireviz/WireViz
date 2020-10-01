@@ -197,6 +197,7 @@ def component_table_entry(type, qty, unit=None, pn=None, manufacturer=None, mpn=
                 output += ', '
         if manufacturer_str:
             output += manufacturer_str
+    output = html_line_breaks(output)
     # format the above output as left aligned text in a single visable cell
     return f'<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td align="left" balign="left">{output}</td></tr></table>'
 
