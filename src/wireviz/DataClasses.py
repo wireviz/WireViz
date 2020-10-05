@@ -59,8 +59,7 @@ class AdditionalComponent:
 
     @property
     def description(self) -> str:
-        name_subtype = f', {self.subtype}' if self.subtype else ''
-        return f'{self.type.capitalize()}{name_subtype}'
+        return self.type.capitalize() + (f', {self.subtype}' if self.subtype else '')
 
 
 @dataclass
