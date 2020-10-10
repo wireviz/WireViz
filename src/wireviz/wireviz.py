@@ -12,7 +12,7 @@ import yaml
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-
+from wireviz import __version__
 from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read
 
@@ -211,6 +211,7 @@ def parse_cmdline():
     parser = argparse.ArgumentParser(
         description='Generate cable and wiring harness documentation from YAML descriptions',
     )
+    parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
     parser.add_argument('-o', '--output_file', action='store', type=str, metavar='OUTPUT')
     # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
