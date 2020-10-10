@@ -4,6 +4,8 @@
 import os
 from setuptools import setup, find_packages
 
+from src.wireviz import __version__
+
 project_name = 'wireviz'
 
 # Utility function to read the README file.
@@ -15,7 +17,7 @@ def read(fname):
 
 setup(
     name=project_name,
-    version='0.1',
+    version=__version__,
     author='Daniel Rojas',
     #author_email='',
     description='Easily document cables and wiring harnesses',
