@@ -1,4 +1,5 @@
 # contributed by @cocide
+# and later extended to include images
 
 connectors:
   Key:
@@ -15,13 +16,13 @@ cables:
   W1:
     gauge: 24 AWG
     length: 0.2
-    color: BK
+    color: BK  # Cable jacket color
     color_code: DIN
     wirecount: 3
-    shield: SN
+    shield: SN  # Matching the shield color in the image
     image:
       src: resources/cable-WH+BN+GN+shield.png
-      height: 75
+      height: 70  # Scale the image size slightly down
       caption: Cross-section
 
 connections:
