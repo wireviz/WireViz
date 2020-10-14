@@ -8,7 +8,7 @@ from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
     graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
-    manufacturer_info_field
+    html_image, html_caption, manufacturer_info_field
 from collections import Counter
 from typing import List
 from pathlib import Path
@@ -98,6 +98,8 @@ class Harness:
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
                      connector.color, '<!-- colorbar -->' if connector.color else None],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
+                    [html_image(connector.image)],
+                    [html_caption(connector.image)],
                     [html_line_breaks(connector.notes)]]
             html.extend(nested_html_table(rows))
 
@@ -173,6 +175,8 @@ class Harness:
                      f'{cable.length} m' if cable.length > 0 else None,
                      cable.color, '<!-- colorbar -->' if cable.color else None],
                     '<!-- wire table -->',
+                    [html_image(cable.image)],
+                    [html_caption(cable.image)],
                     [html_line_breaks(cable.notes)]]
             html.extend(nested_html_table(rows))
 

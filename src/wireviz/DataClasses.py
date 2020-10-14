@@ -2,9 +2,46 @@
 # -*- coding: utf-8 -*-
 
 from typing import Optional, List, Any, Union
-from dataclasses import dataclass, field
-from wireviz.wv_helper import int2tuple
+from dataclasses import dataclass, field, InitVar
+from pathlib import Path
+from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
+
+
+@dataclass
+class Image:
+    gv_dir: InitVar[Path] # Directory of .gv file injected as context during parsing
+    # Attributes of the image object <img>:
+    src: str
+    scale: Optional[str] = None  # false | true | width | height | both
+    # Attributes of the image cell <td> containing the image:
+    width: Optional[int] = None
+    height: Optional[int] = None
+    fixedsize: Optional[bool] = None
+    # Contents of the text cell <td> just below the image cell:
+    caption: Optional[str] = None
+    # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
+
+    def __post_init__(self, gv_dir):
+
+        if self.fixedsize is None:
+            # Default True if any dimension specified unless self.scale also is specified.
+            self.fixedsize = (self.width or self.height) and self.scale is None
+
+        if self.scale is None:
+            self.scale = "false" if not self.width and not self.height \
+                else     "both"  if     self.width and     self.height \
+                else     "true" # When only one dimension is specified.
+
+        if self.fixedsize:
+            # If only one dimension is specified, compute the other
+            # because Graphviz requires both when fixedsize=True.
+            if self.height:
+                if not self.width:
+                    self.width = self.height * aspect_ratio(gv_dir.joinpath(self.src))
+            else:
+                if self.width:
+                    self.height = self.width / aspect_ratio(gv_dir.joinpath(self.src))
 
 
 @dataclass
@@ -18,6 +55,7 @@ class Connector:
     type: Optional[str] = None
     subtype: Optional[str] = None
     pincount: Optional[int] = None
+    image: Optional[Image] = None
     notes: Optional[str] = None
     pinlabels: List[Any] = field(default_factory=list)
     pins: List[Any] = field(default_factory=list)
@@ -29,6 +67,10 @@ class Connector:
     loops: List[Any] = field(default_factory=list)
 
     def __post_init__(self):
+
+        if isinstance(self.image, dict):
+            self.image = Image(**self.image)
+
         self.ports_left = False
         self.ports_right = False
         self.visible_pins = {}
@@ -91,6 +133,7 @@ class Cable:
     color: Optional[str] = None
     wirecount: Optional[int] = None
     shield: bool = False
+    image: Optional[Image] = None
     notes: Optional[str] = None
     colors: List[Any] = field(default_factory=list)
     color_code: Optional[str] = None
@@ -98,6 +141,9 @@ class Cable:
     show_wirecount: bool = True
 
     def __post_init__(self):
+
+        if isinstance(self.image, dict):
+            self.image = Image(**self.image)
 
         if isinstance(self.gauge, str):  # gauge and unit specified
             try:

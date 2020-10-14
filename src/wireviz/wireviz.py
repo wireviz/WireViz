@@ -44,6 +44,11 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             if len(yaml_data[sec]) > 0:
                 if ty == dict:
                     for key, attribs in yaml_data[sec].items():
+                        # The Image dataclass might need to open an image file with a relative path.
+                        image = attribs.get('image')
+                        if isinstance(image, dict):
+                            image['gv_dir'] = Path(file_out if file_out else '').parent # Inject context
+
                         if sec == 'connectors':
                             if not attribs.get('autogenerate', False):
                                 harness.add_connector(name=key, **attribs)

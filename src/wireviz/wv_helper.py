@@ -34,6 +34,7 @@ def nested_html_table(rows):
     # input: list, each item may be scalar or list
     # output: a parent table with one child table per parent item that is list, and one cell per parent item that is scalar
     # purpose: create the appearance of one table, where cell widths are independent between rows
+    # attributes in any leading <tdX> inside a list are injected into to the preceeding <td> tag
     html = []
     html.append('<table border="0" cellspacing="0" cellpadding="0">')
     for row in rows:
@@ -43,7 +44,8 @@ def nested_html_table(rows):
                 html.append('  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>')
                 for cell in row:
                     if cell is not None:
-                        html.append(f'   <td balign="left">{cell}</td>')
+                        # Inject attributes to the preceeding <td> tag where needed
+                        html.append(f'   <td balign="left">{cell}</td>'.replace('><tdX', ''))
                 html.append('  </tr></table>')
                 html.append(' </td></tr>')
         elif row is not None:
@@ -52,6 +54,30 @@ def nested_html_table(rows):
             html.append(' </td></tr>')
     html.append('</table>')
     return html
+
+def html_image(image):
+    if not image:
+        return None
+    # The leading attributes belong to the preceeding tag. See where used below.
+    html = f'{html_size_attr(image)}><img scale="{image.scale}" src="{image.src}"/>'
+    if image.fixedsize:
+        # Close the preceeding tag and enclose the image cell in a table without
+        # borders to avoid narrow borders when the fixed width < the node width.
+        html = f'''>
+    <table border="0" cellspacing="0" cellborder="0"><tr>
+     <td{html}</td>
+    </tr></table>
+   '''
+    return f'''<tdX{' sides="TLR"' if image.caption else ''}{html}'''
+
+def html_caption(image):
+    return f'<tdX sides="BLR">{html_line_breaks(image.caption)}' if image and image.caption else None
+
+def html_size_attr(image):
+    # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
+    return ((f' width="{image.width}"'   if image.width else '')
+        +   (f' height="{image.height}"' if image.height else '')
+        +   ( ' fixedsize="true"'        if image.fixedsize else '')) if image else ''
 
 
 def expand(yaml_data):
@@ -131,6 +157,20 @@ def open_file_write(filename):
 
 def open_file_append(filename):
     return open(filename, 'a', encoding='UTF-8')
+
+
+def aspect_ratio(image_src):
+    try:
+        from PIL import Image
+        image = Image.open(image_src)
+        if image.width > 0 and image.height > 0:
+            return image.width / image.height
+        print(f'aspect_ratio(): Invalid image size {image.width} x {image.height}')
+    # ModuleNotFoundError and FileNotFoundError are the most expected, but all are handled equally.
+    except Exception as error:
+        print(f'aspect_ratio(): {type(error).__name__}: {error}')
+    return 1 # Assume 1:1 when unable to read actual image size
+
 
 def manufacturer_info_field(manufacturer, mpn):
     if manufacturer or mpn:
