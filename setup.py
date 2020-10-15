@@ -4,9 +4,7 @@
 import os
 from setuptools import setup, find_packages
 
-from src.wireviz import __version__
-
-project_name = 'wireviz'
+from src.wireviz import __version__, CMD_NAME, APP_URL
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -16,7 +14,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
-    name=project_name,
+    name=CMD_NAME,
     version=__version__,
     author='Daniel Rojas',
     #author_email='',
@@ -30,7 +28,7 @@ setup(
         ],
     license='GPLv3',
     keywords='cable connector hardware harness wiring wiring-diagram wiring-harness',
-    url='https://github.com/formatc1702/WireViz',
+    url=APP_URL,
     package_dir={'': 'src'},
     packages=find_packages('src'),
     entry_points={

@@ -9,7 +9,7 @@ from pathlib import Path
 script_path = Path(__file__).absolute()
 
 sys.path.insert(0, str(script_path.parent.parent))  # to find wireviz module
-from wireviz import wireviz, __version__
+from wireviz import wireviz, __version__, APP_NAME
 from wv_helper import open_file_write, open_file_read, open_file_append
 
 
@@ -26,7 +26,7 @@ groups = {
         'path': dir / 'tutorial',
         'prefix': 'tutorial',
         readme: ['md', 'yml'], # Include .md and .yml files
-        'title': 'WireViz Tutorial',
+        'title': f'{APP_NAME} Tutorial',
     },
     'demos' : {
         'path': dir / 'examples',
@@ -127,8 +127,8 @@ def restore_generated(groupkeys, branch = ''):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Wireviz Example Manager',)
-    parser.add_argument('-V', '--version', action='version', version='%(prog)s - wireviz ' + __version__)
+    parser = argparse.ArgumentParser(description=f'{APP_NAME} Example Manager',)
+    parser.add_argument('-V', '--version', action='version', version=f'%(prog)s - {APP_NAME} {__version__}')
     parser.add_argument('action', nargs='?', action='store',
                         choices=['build','clean','compare','diff','restore'], default='build',
                         help='what to do with the generated files (default: build)')
