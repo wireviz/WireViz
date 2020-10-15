@@ -316,14 +316,14 @@ class Harness:
             file.write('<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">')
             file.write('<tr>')
             for item in listy[0]:
-                file.write(f'<th align="left" style="border:1px solid #000000; padding: 8px">{item}</th>')
+                file.write(f'<th style="text-align:left; border:1px solid #000000; padding: 8px">{item}</th>')
             file.write('</tr>')
             for row in listy[1:]:
                 file.write('<tr>')
                 for i, item in enumerate(row):
                     item_str = item.replace('\u00b2', '&sup2;')
-                    align = 'align="right"' if listy[0][i] == 'Qty' else ''
-                    file.write(f'<td {align} style="border:1px solid #000000; padding: 4px">{item_str}</td>')
+                    align = 'text-align:right; ' if listy[0][i] == 'Qty' else ''
+                    file.write(f'<td style="{align}border:1px solid #000000; padding: 4px">{item_str}</td>')
                 file.write('</tr>')
             file.write('</table>')
 
