@@ -1,12 +1,12 @@
 connectors:
   X1:
-    pinout: [+12V, GND, GND, +5V]
+    pinlabels: [+12V, GND, GND, +5V]
     type: Molex 8981
     subtype: female
-
-ferrules: # ferrules
   F1:
-    type: Ferrule, crimp
+    style: simple
+    autogenerate: true
+    type: Crimp ferrule
     subtype: 0.5 mm²
     color: OG # optional color
 
@@ -18,9 +18,7 @@ cables:
     colors: [YE, BK, BK, RD] # custom colors, wirecount is implicit
 
 connections:
-  - # attach ferrules
-    - F1 # no need for list of connections; one ferrule per wire is auto-generated and attached
-    - W1: [1-4] # a new ferrule is auto-generated for each wire
-  - # attach connectors (separately from ferrules)
+  -
+    - F1 # a new ferrule is auto-generated for each of the four wires
     - W1: [1-4]
     - X1: [1-4]

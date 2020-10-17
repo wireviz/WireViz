@@ -2,11 +2,11 @@ connectors:
   X1:
     type: Molex KK 254 # more information
     subtype: female
-    pinout: [GND, VCC, RX, TX] # pincount is implicit in pinout
+    pinlabels: [GND, VCC, RX, TX] # pincount is implicit in pinout
   X2:
     type: Molex KK 254
     subtype: female
-    pinout: [GND, VCC, RX, TX]
+    pinlabels: [GND, VCC, RX, TX]
 
 cables:
   W1:
@@ -16,6 +16,7 @@ cables:
     show_equiv: true # auto-calculate AWG equivalent from metric gauge
     length: 0.2 # length in m
     shield: true
+    type: Serial
 
 connections:
   -

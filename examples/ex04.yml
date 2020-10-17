@@ -1,13 +1,3 @@
-# connectors:
-#   X1:
-#     type: D-Sub
-#     subtype: female
-#     pincount: 4
-#   X2:
-#     type: Molex KK 254
-#     subtype: female
-#     pincount: 3
-
 cables:
   W1:
     gauge: 0.25 mm2
@@ -17,16 +7,14 @@ cables:
     wirecount: 6
     category: bundle
 
-ferrules:
+connectors:
   ferrule_crimp:
+    style: simple
+    autogenerate: true
     type: Crimp ferrule
-    show_name: false
-    show_pincount: false
 
 connections:
   -
     - ferrule_crimp
     - W1: [1-6]
-  -
-    - W1: [6-1]
     - ferrule_crimp

@@ -1,6 +1,6 @@
 connectors:
   X1: &template_con
-    pinout: [GND, VCC, SCL, SDA]
+    pinlabels: [GND, VCC, SCL, SDA]
     type: Molex KK 254
     subtype: male
     notes: to microcontroller # add notes
