@@ -202,7 +202,7 @@ class Harness:
                 wirehtml.append('     </table>')
                 wirehtml.append('    </td>')
                 wirehtml.append('   </tr>')
-                if(cable.category == 'bundle'):  # for bundles individual wires can have part information
+                if cable.category == 'bundle':  # for bundles individual wires can have part information
                     # create a list of wire parameters
                     wireidentification = []
                     if isinstance(cable.pn, list):
@@ -213,7 +213,7 @@ class Harness:
                     if manufacturer_info:
                         wireidentification.append(html_line_breaks(manufacturer_info))
                     # print parameters into a table row under the wire
-                    if(len(wireidentification) > 0):
+                    if len(wireidentification) > 0 :
                         wirehtml.append('   <tr><td colspan="3">')
                         wirehtml.append('    <table border="0" cellspacing="0" cellborder="0"><tr>')
                         for attrib in wireidentification:
@@ -341,7 +341,7 @@ class Harness:
             rows.append(["Additional components"])
             for extra in component.additional_components:
                 qty = extra.qty * component.get_qty_multiplier(extra.qty_multiplier)
-                if(self.mini_bom_mode):
+                if self.mini_bom_mode:
                     id = self.get_bom_index(extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                     rows.append(component_table_entry(f'#{id} ({extra.type.capitalize()})', qty, extra.unit))
                 else:
@@ -352,17 +352,15 @@ class Harness:
         bom_entries = []
         for part in component.additional_components:
             qty = part.qty * component.get_qty_multiplier(part.qty_multiplier)
-            bom_entries.append(
-                {
-                    'item': part.description,
-                    'qty': qty,
-                    'unit': part.unit,
-                    'manufacturer': part.manufacturer,
-                    'mpn': part.mpn,
-                    'pn': part.pn,
-                    'designators': component.name if component.show_name else None
-                }
-            )
+            bom_entries.append({
+                'item': part.description,
+                'qty': qty,
+                'unit': part.unit,
+                'manufacturer': part.manufacturer,
+                'mpn': part.mpn,
+                'pn': part.pn,
+                'designators': component.name if component.show_name else None
+            })
         return(bom_entries)
 
     def bom(self):
@@ -428,7 +426,6 @@ class Harness:
         bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
         for group in Counter([bom_types_group(v) for v in bom_entries]):
             group_entries = [v for v in bom_entries if bom_types_group(v) == group]
-            shared = group_entries[0]
             designators = []
             for group_entry in group_entries:
                 if group_entry.get('designators'):
@@ -438,24 +435,19 @@ class Harness:
                         designators.append(group_entry['designators'])
             designators = list(dict.fromkeys(designators))  # remove duplicates
             designators.sort()
-            total_qty = sum(i['qty'] for i in group_entries)
-            self._bom.append({
-                'item': shared['item'], 'qty': round(total_qty, 3), 'unit': shared['unit'], 'designators': designators,
-                'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']
-            })
+            total_qty = sum(entry['qty'] for entry in group_entries)
+            self._bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': designators})
 
         self._bom = sorted(self._bom, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
-        # add index
-        index = 1
-        for item in self._bom:
-            item["id"] = index
-            index += 1
+
+        # add an incrementing id to each bom item
+        self._bom = [{**entry, 'id': index} for index, entry in enumerate(self._bom, 1)]
         return self._bom
 
     def get_bom_index(self, item, unit, manufacturer, mpn, pn):
-        for bom_item in self.bom():
-            if((bom_item['item'], bom_item['unit'], bom_item['manufacturer'], bom_item['mpn'], bom_item['pn']) == (item, unit, manufacturer, mpn, pn)):
-                return bom_item['id']
+        for entry in self.bom():
+            if(entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == (item, unit, manufacturer, mpn, pn):
+                return entry['id']
         return None
 
     def bom_list(self):
