@@ -378,7 +378,7 @@ class Harness:
                                + (f', {connector.pincount} pins' if connector.show_pincount else '')
                                + (f', {connector.color}' if connector.color else ''))
                 bom_entries.append({
-                    'item': description, 'qty': 1, 'unit': '', 'designators': connector.name if connector.show_name else None,
+                    'item': description, 'qty': 1, 'unit': None, 'designators': connector.name if connector.show_name else None,
                     'manufacturer': connector.manufacturer, 'mpn': connector.mpn, 'pn': connector.pn
                 })
 
