@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.2](https://github.com/formatc1702/WireViz/tree/v0.2) (2020-XX-XX)
+## [0.2](https://github.com/formatc1702/WireViz/tree/v0.2) (2020-10-17)
 
 ### Backward incompatible changes
 
