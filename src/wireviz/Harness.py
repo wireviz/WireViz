@@ -418,7 +418,7 @@ class Harness:
 
         for item in self.additional_bom_items:
             bom_entries.append({
-                'item': item.get('description', ''), 'qty': item.get('qty'), 'unit': item.get('unit'), 'designators': item.get('designators'),
+                'item': item.get('description', ''), 'qty': item.get('qty', 1), 'unit': item.get('unit'), 'designators': item.get('designators'),
                 'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn')
             })
 
