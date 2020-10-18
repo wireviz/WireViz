@@ -152,6 +152,9 @@ def graphviz_line_breaks(inp):
 def remove_line_breaks(inp):
     return inp.replace('\n', ' ').strip() if isinstance(inp, str) else inp
 
+def clean_whitespace(inp):
+    return ' '.join(inp.split()).replace(' ,', ',') if isinstance(inp, str) else inp
+
 def open_file_read(filename):
     # TODO: Intelligently determine encoding
     return open(filename, 'r', encoding='UTF-8')

@@ -7,9 +7,9 @@ from wireviz import wv_colors, wv_helper, __version__, APP_NAME, APP_URL
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
-    graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
-    html_colorbar, html_image, html_caption, manufacturer_info_field, \
-    component_table_entry
+    graphviz_line_breaks, remove_line_breaks, clean_whitespace, open_file_read, \
+    open_file_write, html_colorbar, html_image, html_caption, \
+    manufacturer_info_field, component_table_entry
 from collections import Counter
 from typing import List, Union
 from pathlib import Path
@@ -343,7 +343,7 @@ class Harness:
                 qty = extra.qty * component.get_qty_multiplier(extra.qty_multiplier)
                 if self.mini_bom_mode:
                     id = self.get_bom_index(extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
-                    rows.append(component_table_entry(f'#{id} ({extra.type.capitalize()})', qty, extra.unit))
+                    rows.append(component_table_entry(f'#{id} ({extra.type.capitalize().strip()})', qty, extra.unit))
                 else:
                     rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
         return(rows)
@@ -422,6 +422,9 @@ class Harness:
                 'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn')
             })
 
+        # remove line breaks if present and cleanup any resulting whitespace issues
+        bom_entries = [{k: clean_whitespace(v) for k, v in entry.items()} for entry in bom_entries]
+
         # deduplicate bom
         bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
         for group in Counter([bom_types_group(v) for v in bom_entries]):
@@ -445,8 +448,10 @@ class Harness:
         return self._bom
 
     def get_bom_index(self, item, unit, manufacturer, mpn, pn):
+        # Remove linebreaks and clean whitespace of values in search
+        target = tuple(clean_whitespace(v) for v in (item, unit, manufacturer, mpn, pn))
         for entry in self.bom():
-            if(entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == (item, unit, manufacturer, mpn, pn):
+            if(entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == target:
                 return entry['id']
         return None
 
@@ -467,6 +472,5 @@ class Harness:
             item_list = [item.get(key, '') for key in keys]  # fill missing values with blanks
             item_list = [', '.join(subitem) if isinstance(subitem, List) else subitem for subitem in item_list]  # convert any lists into comma separated strings
             item_list = ['' if subitem is None else subitem for subitem in item_list]  # if a field is missing for some (but not all) BOM items
-            item_list = [remove_line_breaks(subitem) for subitem in item_list]  # remove line breaks if present
             bom_list.append(item_list)
         return bom_list
