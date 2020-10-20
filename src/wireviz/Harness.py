@@ -7,9 +7,8 @@ from wireviz import wv_colors, wv_helper, __version__, APP_NAME, APP_URL
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
-    graphviz_line_breaks, remove_line_breaks, clean_whitespace, open_file_read, \
-    open_file_write, html_colorbar, html_image, html_caption, \
-    manufacturer_info_field, component_table_entry
+    clean_whitespace, open_file_read, open_file_write, html_colorbar, \
+    html_image, html_caption, manufacturer_info_field, component_table_entry
 from collections import Counter
 from typing import List, Union
 from pathlib import Path
@@ -451,7 +450,7 @@ class Harness:
         # Remove linebreaks and clean whitespace of values in search
         target = tuple(clean_whitespace(v) for v in (item, unit, manufacturer, mpn, pn))
         for entry in self.bom():
-            if(entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == target:
+            if (entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == target:
                 return entry['id']
         return None
 

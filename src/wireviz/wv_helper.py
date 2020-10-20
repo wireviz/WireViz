@@ -146,12 +146,6 @@ def index_if_list(value, index):
 def html_line_breaks(inp):
     return inp.replace('\n', '<br />') if isinstance(inp, str) else inp
 
-def graphviz_line_breaks(inp):
-    return inp.replace('\n', '\\n') if isinstance(inp, str) else inp # \n generates centered new lines. http://www.graphviz.org/doc/info/attrs.html#k:escString
-
-def remove_line_breaks(inp):
-    return inp.replace('\n', ' ').strip() if isinstance(inp, str) else inp
-
 def clean_whitespace(inp):
     return ' '.join(inp.split()).replace(' ,', ',') if isinstance(inp, str) else inp
 
@@ -202,4 +196,7 @@ def component_table_entry(type, qty, unit=None, pn=None, manufacturer=None, mpn=
             output += manufacturer_str
     output = html_line_breaks(output)
     # format the above output as left aligned text in a single visible cell
-    return f'<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr><td align="left" balign="left">{output}</td></tr></table>'
+    # indent is set to two to match the indent in the generated html table
+    return f'''<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
+   <td align="left" balign="left">{output}</td>
+  </tr></table>'''
