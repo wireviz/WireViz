@@ -7,6 +7,7 @@ from pathlib import Path
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
 
+# Literal type aliases below are commented to avoid requiring python 3.8
 ConnectorMultiplier = str  # = Literal['pincount', 'populated']
 CableMultiplier = str  # = Literal['wirecount', 'terminations', 'length', 'total_length']
 
@@ -59,7 +60,7 @@ class AdditionalComponent:
 
     @property
     def description(self) -> str:
-        return self.type.capitalize().strip() + (f', {self.subtype.strip()}' if self.subtype else '')
+        return self.type.rstrip() + (f', {self.subtype.rstrip()}' if self.subtype else '')
 
 
 @dataclass

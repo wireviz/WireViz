@@ -342,7 +342,7 @@ class Harness:
                 qty = extra.qty * component.get_qty_multiplier(extra.qty_multiplier)
                 if self.mini_bom_mode:
                     id = self.get_bom_index(extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
-                    rows.append(component_table_entry(f'#{id} ({extra.type.capitalize().strip()})', qty, extra.unit))
+                    rows.append(component_table_entry(f'#{id} ({extra.type.rstrip()})', qty, extra.unit))
                 else:
                     rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
         return(rows)
