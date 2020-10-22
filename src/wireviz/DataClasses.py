@@ -7,6 +7,10 @@ from pathlib import Path
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
 
+# Literal type aliases below are commented to avoid requiring python 3.8
+ConnectorMultiplier = str  # = Literal['pincount', 'populated']
+CableMultiplier = str  # = Literal['wirecount', 'terminations', 'length', 'total_length']
+
 
 @dataclass
 class Image:
@@ -43,6 +47,21 @@ class Image:
                 if self.width:
                     self.height = self.width / aspect_ratio(gv_dir.joinpath(self.src))
 
+@dataclass
+class AdditionalComponent:
+    type: str
+    subtype: Optional[str] = None
+    manufacturer: Optional[str] = None
+    mpn: Optional[str] = None
+    pn: Optional[str] = None
+    qty: float = 1
+    unit: Optional[str] = None
+    qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
+
+    @property
+    def description(self) -> str:
+        return self.type.rstrip() + (f', {self.subtype.rstrip()}' if self.subtype else '')
+
 
 @dataclass
 class Connector:
@@ -65,6 +84,8 @@ class Connector:
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
     loops: List[Any] = field(default_factory=list)
+    ignore_in_bom: bool = False
+    additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self):
 
@@ -114,8 +135,22 @@ class Connector:
             if len(loop) != 2:
                 raise Exception('Loops must be between exactly two pins!')
 
+        for i, item in enumerate(self.additional_components):
+            if isinstance(item, dict):
+                self.additional_components[i] = AdditionalComponent(**item)
+
     def activate_pin(self, pin):
         self.visible_pins[pin] = True
+
+    def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
+        if not qty_multiplier:
+            return 1
+        elif qty_multiplier == 'pincount':
+            return self.pincount
+        elif qty_multiplier == 'populated':
+            return sum(self.visible_pins.values())
+        else:
+            raise ValueError(f'invalid qty multiplier parameter for connector {qty_multiplier}')
 
 
 @dataclass
@@ -139,6 +174,8 @@ class Cable:
     color_code: Optional[str] = None
     show_name: bool = True
     show_wirecount: bool = True
+    ignore_in_bom: bool = False
+    additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self):
 
@@ -196,6 +233,9 @@ class Cable:
                 else:
                     raise Exception('lists of part data are only supported for bundles')
 
+        for i, item in enumerate(self.additional_components):
+            if isinstance(item, dict):
+                self.additional_components[i] = AdditionalComponent(**item)
 
     def connect(self, from_name, from_pin, via_pin, to_name, to_pin):
         from_pin = int2tuple(from_pin)
@@ -206,6 +246,20 @@ class Cable:
         for i, _ in enumerate(from_pin):
             # self.connections.append((from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
             self.connections.append(Connection(from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
+
+    def get_qty_multiplier(self, qty_multiplier: Optional[CableMultiplier]) -> float:
+        if not qty_multiplier:
+            return 1
+        elif qty_multiplier == 'wirecount':
+            return self.wirecount
+        elif qty_multiplier == 'terminations':
+            return len(self.connections)
+        elif qty_multiplier == 'length':
+            return self.length
+        elif qty_multiplier == 'total_length':
+            return self.length * self.wirecount
+        else:
+            raise ValueError(f'invalid qty multiplier parameter for cable {qty_multiplier}')
 
 
 @dataclass

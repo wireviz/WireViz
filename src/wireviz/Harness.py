@@ -7,10 +7,10 @@ from wireviz import wv_colors, wv_helper, __version__, APP_NAME, APP_URL
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
     nested_html_table, flatten2d, index_if_list, html_line_breaks, \
-    graphviz_line_breaks, remove_line_breaks, open_file_read, open_file_write, \
-    html_colorbar, html_image, html_caption, manufacturer_info_field
+    clean_whitespace, open_file_read, open_file_write, html_colorbar, \
+    html_image, html_caption, manufacturer_info_field, component_table_entry
 from collections import Counter
-from typing import List
+from typing import List, Union
 from pathlib import Path
 import re
 
@@ -19,8 +19,10 @@ class Harness:
 
     def __init__(self):
         self.color_mode = 'SHORT'
+        self.mini_bom_mode = True
         self.connectors = {}
         self.cables = {}
+        self._bom = []  # Internal Cache for generated bom
         self.additional_bom_items = []
 
     def add_connector(self, name: str, *args, **kwargs) -> None:
@@ -99,8 +101,9 @@ class Harness:
                      connector.color, html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
-                    [html_caption(connector.image)],
-                    [html_line_breaks(connector.notes)]]
+                    [html_caption(connector.image)]]
+            rows.extend(self.get_additional_component_table(connector))
+            rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
             if connector.style != 'simple':
@@ -172,8 +175,10 @@ class Harness:
                      cable.color, html_colorbar(cable.color)],
                     '<!-- wire table -->',
                     [html_image(cable.image)],
-                    [html_caption(cable.image)],
-                    [html_line_breaks(cable.notes)]]
+                    [html_caption(cable.image)]]
+
+            rows.extend(self.get_additional_component_table(cable))
+            rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
             wirehtml = []
@@ -196,7 +201,7 @@ class Harness:
                 wirehtml.append('     </table>')
                 wirehtml.append('    </td>')
                 wirehtml.append('   </tr>')
-                if(cable.category == 'bundle'):  # for bundles individual wires can have part information
+                if cable.category == 'bundle':  # for bundles individual wires can have part information
                     # create a list of wire parameters
                     wireidentification = []
                     if isinstance(cable.pn, list):
@@ -207,7 +212,7 @@ class Harness:
                     if manufacturer_info:
                         wireidentification.append(html_line_breaks(manufacturer_info))
                     # print parameters into a table row under the wire
-                    if(len(wireidentification) > 0):
+                    if len(wireidentification) > 0 :
                         wirehtml.append('   <tr><td colspan="3">')
                         wirehtml.append('    <table border="0" cellspacing="0" cellborder="0"><tr>')
                         for attrib in wireidentification:
@@ -329,91 +334,131 @@ class Harness:
 
             file.write('</body></html>')
 
+    def get_additional_component_table(self, component: Union[Connector, Cable]) -> List[str]:
+        rows = []
+        if component.additional_components:
+            rows.append(["Additional components"])
+            for extra in component.additional_components:
+                qty = extra.qty * component.get_qty_multiplier(extra.qty_multiplier)
+                if self.mini_bom_mode:
+                    id = self.get_bom_index(extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                    rows.append(component_table_entry(f'#{id} ({extra.type.rstrip()})', qty, extra.unit))
+                else:
+                    rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
+        return(rows)
+
+    def get_additional_component_bom(self, component: Union[Connector, Cable]) -> List[dict]:
+        bom_entries = []
+        for part in component.additional_components:
+            qty = part.qty * component.get_qty_multiplier(part.qty_multiplier)
+            bom_entries.append({
+                'item': part.description,
+                'qty': qty,
+                'unit': part.unit,
+                'manufacturer': part.manufacturer,
+                'mpn': part.mpn,
+                'pn': part.pn,
+                'designators': component.name if component.show_name else None
+            })
+        return(bom_entries)
+
     def bom(self):
-        bom = []
-        bom_connectors = []
-        bom_cables = []
-        bom_extra = []
+        # if the bom has previously been generated then return the generated bom
+        if self._bom:
+            return self._bom
+        bom_entries = []
+
         # connectors
-        connector_group = lambda c: (c.type, c.subtype, c.pincount, c.manufacturer, c.mpn, c.pn)
-        for group in Counter([connector_group(v) for v in self.connectors.values()]):
-            items = {k: v for k, v in self.connectors.items() if connector_group(v) == group}
-            shared = next(iter(items.values()))
-            designators = list(items.keys())
-            designators.sort()
-            conn_type = f', {remove_line_breaks(shared.type)}' if shared.type else ''
-            conn_subtype = f', {remove_line_breaks(shared.subtype)}' if shared.subtype else ''
-            conn_pincount = f', {shared.pincount} pins' if shared.style != 'simple' else ''
-            conn_color = f', {shared.color}' if shared.color else ''
-            name = f'Connector{conn_type}{conn_subtype}{conn_pincount}{conn_color}'
-            item = {'item': name, 'qty': len(designators), 'unit': '', 'designators': designators if shared.show_name else '',
-                    'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
-            bom_connectors.append(item)
-            bom_connectors = sorted(bom_connectors, key=lambda k: k['item'])  # https://stackoverflow.com/a/73050
-        bom.extend(bom_connectors)
+        for connector in self.connectors.values():
+            if not connector.ignore_in_bom:
+                description = ('Connector'
+                               + (f', {connector.type}' if connector.type else '')
+                               + (f', {connector.subtype}' if connector.subtype else '')
+                               + (f', {connector.pincount} pins' if connector.show_pincount else '')
+                               + (f', {connector.color}' if connector.color else ''))
+                bom_entries.append({
+                    'item': description, 'qty': 1, 'unit': None, 'designators': connector.name if connector.show_name else None,
+                    'manufacturer': connector.manufacturer, 'mpn': connector.mpn, 'pn': connector.pn
+                })
+
+            # add connectors aditional components to bom
+            bom_entries.extend(self.get_additional_component_bom(connector))
+
         # cables
         # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
-        # The category needs to be included in cable_group to keep the bundles excluded.
-        cable_group = lambda c: (c.category, c.type, c.gauge, c.gauge_unit, c.wirecount, c.shield, c.manufacturer, c.mpn, c.pn)
-        for group in Counter([cable_group(v) for v in self.cables.values() if v.category != 'bundle']):
-            items = {k: v for k, v in self.cables.items() if cable_group(v) == group}
-            shared = next(iter(items.values()))
-            designators = list(items.keys())
-            designators.sort()
-            total_length = sum(i.length for i in items.values())
-            cable_type = f', {remove_line_breaks(shared.type)}' if shared.type else ''
-            gauge_name = f' x {shared.gauge} {shared.gauge_unit}' if shared.gauge else ' wires'
-            shield_name = ' shielded' if shared.shield else ''
-            name = f'Cable{cable_type}, {shared.wirecount}{gauge_name}{shield_name}'
-            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
-                    'manufacturer': remove_line_breaks(shared.manufacturer), 'mpn': remove_line_breaks(shared.mpn), 'pn': shared.pn}
-            bom_cables.append(item)
-        # bundles (ignores wirecount)
-        wirelist = []
-        # list all cables again, since bundles are represented as wires internally, with the category='bundle' set
-        for bundle in self.cables.values():
-            if bundle.category == 'bundle':
-                # add each wire from each bundle to the wirelist
-                for index, color in enumerate(bundle.colors, 0):
-                    wirelist.append({'type': bundle.type, 'gauge': bundle.gauge, 'gauge_unit': bundle.gauge_unit, 'length': bundle.length, 'color': color, 'designator': bundle.name,
-                                     'manufacturer': remove_line_breaks(index_if_list(bundle.manufacturer, index)),
-                                     'mpn': remove_line_breaks(index_if_list(bundle.mpn, index)),
-                                     'pn': index_if_list(bundle.pn, index)})
-        # join similar wires from all the bundles to a single BOM item
-        wire_group = lambda w: (w.get('type', None), w['gauge'], w['gauge_unit'], w['color'], w['manufacturer'], w['mpn'], w['pn'])
-        for group in Counter([wire_group(v) for v in wirelist]):
-            items = [v for v in wirelist if wire_group(v) == group]
-            shared = items[0]
-            designators = [i['designator'] for i in items]
-            designators = list(dict.fromkeys(designators))  # remove duplicates
-            designators.sort()
-            total_length = sum(i['length'] for i in items)
-            wire_type = f', {remove_line_breaks(shared["type"])}' if shared.get('type', None) else ''
-            gauge_name = f', {shared["gauge"]} {shared["gauge_unit"]}' if shared.get('gauge', None) else ''
-            gauge_color = f', {shared["color"]}' if 'color' in shared != '' else ''
-            name = f'Wire{wire_type}{gauge_name}{gauge_color}'
-            item = {'item': name, 'qty': round(total_length, 3), 'unit': 'm', 'designators': designators,
-                    'manufacturer': shared['manufacturer'], 'mpn': shared['mpn'], 'pn': shared['pn']}
-            bom_cables.append(item)
-            bom_cables = sorted(bom_cables, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
-        bom.extend(bom_cables)
+        for cable in self.cables.values():
+            if not cable.ignore_in_bom:
+                if cable.category != 'bundle':
+                    # process cable as a single entity
+                    description = ('Cable'
+                                   + (f', {cable.type}' if cable.type else '')
+                                   + (f', {cable.wirecount}')
+                                   + (f' x {cable.gauge} {cable.gauge_unit}' if cable.gauge else ' wires')
+                                   + (' shielded' if cable.shield else ''))
+                    bom_entries.append({
+                        'item': description, 'qty': cable.length, 'unit': 'm', 'designators': cable.name if cable.show_name else None,
+                        'manufacturer': cable.manufacturer, 'mpn': cable.mpn, 'pn': cable.pn
+                    })
+                else:
+                    # add each wire from the bundle to the bom
+                    for index, color in enumerate(cable.colors):
+                        description = ('Wire'
+                                       + (f', {cable.type}' if cable.type else '')
+                                       + (f', {cable.gauge} {cable.gauge_unit}' if cable.gauge else '')
+                                       + (f', {color}' if color else ''))
+                        bom_entries.append({
+                            'item': description, 'qty': cable.length, 'unit': 'm', 'designators': cable.name if cable.show_name else None,
+                            'manufacturer': index_if_list(cable.manufacturer, index),
+                            'mpn': index_if_list(cable.mpn, index), 'pn': index_if_list(cable.pn, index)
+                        })
+
+            # add cable/bundles aditional components to bom
+            bom_entries.extend(self.get_additional_component_bom(cable))
 
         for item in self.additional_bom_items:
-            name = item['description'] if item.get('description', None) else ''
-            if isinstance(item.get('designators', None), List):
-                item['designators'].sort()  # sort designators if a list is provided
-            item = {'item': name, 'qty': item.get('qty', None), 'unit': item.get('unit', None), 'designators': item.get('designators', None),
-                    'manufacturer': item.get('manufacturer', None), 'mpn': item.get('mpn', None), 'pn': item.get('pn', None)}
-            bom_extra.append(item)
-        bom_extra = sorted(bom_extra, key=lambda k: k['item'])
-        bom.extend(bom_extra)
-        return bom
+            bom_entries.append({
+                'item': item.get('description', ''), 'qty': item.get('qty', 1), 'unit': item.get('unit'), 'designators': item.get('designators'),
+                'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn')
+            })
+
+        # remove line breaks if present and cleanup any resulting whitespace issues
+        bom_entries = [{k: clean_whitespace(v) for k, v in entry.items()} for entry in bom_entries]
+
+        # deduplicate bom
+        bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
+        for group in Counter([bom_types_group(v) for v in bom_entries]):
+            group_entries = [v for v in bom_entries if bom_types_group(v) == group]
+            designators = []
+            for group_entry in group_entries:
+                if group_entry.get('designators'):
+                    if isinstance(group_entry['designators'], List):
+                        designators.extend(group_entry['designators'])
+                    else:
+                        designators.append(group_entry['designators'])
+            designators = list(dict.fromkeys(designators))  # remove duplicates
+            designators.sort()
+            total_qty = sum(entry['qty'] for entry in group_entries)
+            self._bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': designators})
+
+        self._bom = sorted(self._bom, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
+
+        # add an incrementing id to each bom item
+        self._bom = [{**entry, 'id': index} for index, entry in enumerate(self._bom, 1)]
+        return self._bom
+
+    def get_bom_index(self, item, unit, manufacturer, mpn, pn):
+        # Remove linebreaks and clean whitespace of values in search
+        target = tuple(clean_whitespace(v) for v in (item, unit, manufacturer, mpn, pn))
+        for entry in self.bom():
+            if (entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == target:
+                return entry['id']
+        return None
 
     def bom_list(self):
         bom = self.bom()
-        keys = ['item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
+        keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
         for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
-            if any(fieldname in x and x.get(fieldname, None) for x in bom):
+            if any(entry.get(fieldname) for entry in bom):
                 keys.append(fieldname)
         bom_list = []
         # list of staic bom header names,  headers not specified here are generated by capitilising the internal name

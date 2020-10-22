@@ -5,9 +5,17 @@ connectors:
     subtype: female
     manufacturer: Molex # set manufacter name
     mpn: 22013047 # set manufacturer part number
+    # add a list of additional components to a part (shown in graph)
+    additional_components:
+      -
+        type: Crimp # short identifier used in graph
+        subtype: Molex KK 254, 22-30 AWG # extra information added to type in bom
+        qty_multiplier: populated # multipier for quantity (number of populated pins)
+        manufacturer: Molex # set manufacter name
+        mpn: 08500030 # set manufacturer part number
   X2:
     <<: *template1 # reuse template
-    pn: CON4 # set an internal part number
+    pn: CON4 # set an internal part number for just this connector
   X3:
     <<: *template1 # reuse template
 
@@ -28,6 +36,14 @@ cables:
     manufacturer: [WiresCo,WiresCo,WiresCo,WiresCo] # set a manufacter per wire
     mpn: [W1-YE,W1-BK,W1-BK,W1-RD]
     pn: [WIRE1,WIRE2,WIRE2,WIRE3]
+    # add a list of additional components to a part (shown in graph)
+    additional_components:
+      -
+        type: Sleve # short identifier used in graph
+        subtype: Braided nylon, black, 3mm # extra information added to type in bom
+        qty_multiplier: length # multipier for quantity (length of cable)
+        unit: m
+        pn: SLV-1
 
 
 connections:
@@ -41,7 +57,7 @@ connections:
     - X3: [1-4]
 
 additional_bom_items:
-  - # define an additional item to add to the bill of materials
+  - # define an additional item to add to the bill of materials (does not appear in graph)
     description: Label, pinout information
     qty: 2
     designators:
