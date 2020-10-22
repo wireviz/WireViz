@@ -3,6 +3,7 @@
 ## [0.3](https://github.com/formatc1702/WireViz/tree/v0.3) (202X-XX-XX)
 
 - Allow additional BOM items within components ([#50](https://github.com/formatc1702/WireViz/issues/50), [#115](https://github.com/formatc1702/WireViz/pull/115))
+- Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
 
 
 ## [0.2](https://github.com/formatc1702/WireViz/tree/v0.2) (2020-10-17)
