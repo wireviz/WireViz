@@ -43,9 +43,12 @@ additional_bom_items:  # custom items to add to BOM
   notes: <str>   
 
   # product information (all optional)
-  pn: <str>            # [internal] part number
-  mpn: <str>           # manufacturer part number
-  manufacturer: <str>  # manufacturer name
+  ignore_in_bom: <bool>  # if set to true the connector is not added to the BOM
+  pn: <str>              # [internal] part number
+  mpn: <str>             # manufacturer part number
+  manufacturer: <str>    # manufacturer name
+  additional_components: # additional components
+    - <additional-component> # additional component (see below)
 
   # pinout information
   # at least one of the following must be specified
@@ -108,9 +111,12 @@ Since the auto-incremented and auto-assigned designator is not known to the user
   notes: <str>   
 
   # product information (all optional)
-  pn: <str>            # [internal] part number
-  mpn: <str>           # manufacturer part number
-  manufacturer: <str>  # manufacturer name
+  ignore_in_bom: <bool>  # if set to true the cable or wires are not added to the BOM
+  pn: <str>              # [internal] part number
+  mpn: <str>             # manufacturer part number
+  manufacturer: <str>    # manufacturer name
+  additional_components: # additional components
+    - <additional-component> # additional component (see below)
 
   # conductor information
   # the following combinations are permitted:
@@ -212,27 +218,42 @@ For connectors with `autogenerate: true`, a new instance, with auto-generated de
   - `<int>-<int>` auto-expands to a range.
 
 
-## BOM items
+## BOM items and additional components
 
-Connectors (both regular, and auto-generated), cables, and wires of a bundle are automatically added to the BOM.
+Connectors (both regular, and auto-generated), cables, and wires of a bundle are automatically added to the BOM,
+unless the `ignore_in_bom` attribute is set to `true`.
+Additional items can be added to the BOM as either part of a connector or cable or on their own.
 
-<!-- unless the `ignore_in_bom` attribute is set to `true` (#115) -->
+Parts can be added to a connector or cable in the section `<additional-component>` which will also list them in the graph.
 
-Additional BOM entries can be generated in the sections marked `<bom-item>` above.
+```yaml
+-
+  type: <str>  # type of additional component
+  # all the following are optional:
+  subtype: <str>  # additional description (only shown in bom)
+  qty: <int/float>  # qty to add to the bom (defaults to 1)
+  qty_multiplier: <str>  # multiplies qty by a feature of the parent component
+                  # when used in a connector:
+                  # pincount         number of pins of connector
+                  # populated        number of populated positions in a connector
+                  # when used in a cable:
+                  # wirecount        number of wires of cable/bundle
+                  # terminations     number of terminations on a cable/bundle
+                  # length           length of cable/bundle
+                  # total_length     sum of lengths of each wire in the bundle
+  unit: <str>
+  pn: <str>            # [internal] part number
+  mpn: <str>           # manufacturer part number
+  manufacturer: <str>  # manufacturer name  
+```
 
-<!-- BOM items inside connectors/cables are not implemented yet, but should be soon (#50) -->
+Alternatively items can be added to just the BOM by putting them in the section `<bom-item>` above.
 
 ```yaml
 -
   description: <str>              
-  qty: <int/str>  # when used in the additional_bom_items section:
-                  # <int>            manually specify qty.
-                  # when used within a component:
-                  # <int>            manually specify qty.
-                  # pincount         match number of pins of connector
-                  # wirecount        match number of wires of cable/bundle
-                  # connectioncount  match number of connected pins
   # all the following are optional:
+  qty: <int/float>  # qty to add to the bom (defaults to 1)
   unit: <str>   
   designators: <List>
   pn: <str>            # [internal] part number
