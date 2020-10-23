@@ -76,26 +76,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
     print('Conector templates:', template_connector_names)
     print('Cable templates:   ', template_cable_names)
 
-
-    def get_item_list(entry):  # returns a list of components
-        if isinstance(entry, list):
-            return entry  # return list as-is
-        elif isinstance(entry, dict):
-            return [list(entry.keys())[0]]  # return key
-        elif isinstance(entry, str):
-            return [entry]  # return str inside a list
-
-    def get_first_item_in_entry(entry):
-        if isinstance(entry, list):
-            return entry[0]
-        elif isinstance(entry, dict):
-            return list(entry.keys())[0]
-        elif isinstance(entry, str):
-            return entry
-
-    def get_template_name(inp):
-        return [x.split('.')[0] for x in inp]
-
     def resolve_designator(inp):
         if '.' in inp:  # generate a new instance of an item
             template, designator = inp.split('.')  # TODO: handle more than one `.`
@@ -193,18 +173,13 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     print('   ', designator, 'is an existing connector instance')
                 elif template in template_connector_names:
                     print('   ', designator, 'is a new connector instance of type', template)
-                    # print(template_connectors[template])
                     harness.add_connector(name = designator, **template_connectors[template])
-                    # harness.connectors[designator] = templates.connectors[template]
-                    # harness.connectors[designator].name = designator
 
                 elif designator in harness.cables:
                     print('   ', designator, 'is an existing cable instance')
                 elif template in template_cable_names:
                     print('   ', designator, 'is a new cable instance of type', template)
                     harness.add_cable(name = designator, **template_cables[template])
-                    # harness.cables[designator] = templates.cables[template]
-                    # harness.cables[designator].name = designator
 
                 else:
                     print(f'   Template {template} not found, neither in connectors nor in cables')
@@ -309,33 +284,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             raise Exception('First item not found anywhere.')
         expected_index = 1 - expected_index  # flip once since it is flipped back at the *beginning* of every loop
 
-        # check that all iterable items (lists and dicts) are the same length
-        # and that they are alternating between connectors and cables/bundles, starting with either
-        itemcount = None
-        for item in connection:
-            expected_index = 1 - expected_index  # make sure items alternate between connectors and cables
-            expected_section = alternating_sections[expected_index]
-            if isinstance(item, list):
-                itemcount_new = len(item)
-                for subitem in item:
-                    if not subitem in alternating_section_keys[expected_index]:
-                        raise Exception(f'{subitem} is not in {expected_section}')
-            elif isinstance(item, dict):
-                if len(item.keys()) != 1:
-                    raise Exception('Dicts may contain only one key here!')
-                itemcount_new = len(expand(list(item.values())[0]))
-                subitem = list(item.keys())[0]
-                if not subitem in alternating_section_keys[expected_index]:
-                    raise Exception(f'{subitem} is not in {expected_section}')
-            elif isinstance(item, str):
-                if not item in alternating_section_keys[expected_index]:
-                    raise Exception(f'{item} is not in {expected_section}')
-                continue
-            if itemcount is not None and itemcount_new != itemcount:
-                raise Exception('All lists and dict lists must be the same length!')
-            itemcount = itemcount_new
-        if itemcount is None:
-            raise Exception('No item revealed the number of connections to make!')
 
         # populate connection list
         connection_list = []
