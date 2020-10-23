@@ -3,6 +3,7 @@ connectors:
     type: JST SM
     subtype: male
     pincount: 4
+    pinlabels: [A, B, C, D]
   JSTFEMALE:
     <<: *JST_SM  # easily create JSTMALE's matching connector
     subtype: female
@@ -10,10 +11,12 @@ connectors:
     type: Screw terminal connector
     pincount: 4
     color: GN
+    pinlabels: [W, X, Y, Z]
   S:
     # autogenerate: true should no longer be required with the new syntax
     style: simple
     type: Splice
+    color: CU
   F:
     style: simple
     type: Ferrule
@@ -37,11 +40,13 @@ connections:
     - [S., S., S.S1, S.]  # splice W1 and W2 together; only wire #3 needs a user-defined designator
     - CABLE.W2: [1-4]
     - JSTFEMALE.X2: [1-4]
-    - <=>                 # mate X2 and X3
+  #   - <=>                 # mate X2 and X3
+  -
     - JSTMALE.X3: [1-4]
     - CABLE.W3: [1-4]
     - [F., F., F., F.]
-    - ->                  # insert ferrules into screw terminal connector
+  #   - -->                 # insert ferrules into screw terminal connector
+  -
     - X4: [2,1,4,3]       # X4 does not require auto-generation, thus no `.` syntax here
   -
     - S1: [1]             # reuse previously generated splice
