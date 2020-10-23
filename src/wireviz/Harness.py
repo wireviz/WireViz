@@ -110,7 +110,9 @@ class Harness:
                 pinhtml = []
                 pinhtml.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
 
-                for pin, pinlabel in zip(connector.pins, connector.pinlabels):
+                for pin, pinlabel, pincolor in zip(connector.pins,
+                                                   connector.pinlabels,
+                                                   connector.pincolors if connector.pincolors else [None] * len(connector.pins)):
                     if connector.hide_disconnected_pins and not connector.visible_pins.get(pin, False):
                         continue
                     pinhtml.append('   <tr>')
@@ -118,6 +120,14 @@ class Harness:
                         pinhtml.append(f'    <td port="p{pin}l">{pin}</td>')
                     if pinlabel:
                         pinhtml.append(f'    <td>{pinlabel}</td>')
+                    if connector.pincolors:
+                        if pincolor in wv_colors._color_hex.keys():
+                            pinhtml.append(f'<td sides="tbl">{pincolor}</td>')
+                            pinhtml.append(f'<td sides="tbr"><table border="0" cellborder="1"><tr><td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td></tr></table></td>')
+                        else:
+                            pinhtml.append(f'<td sides="tbl"></td>')
+                            pinhtml.append(f'<td sides="tbr"></td>')
+
                     if connector.ports_right:
                         pinhtml.append(f'    <td port="p{pin}r">{pin}</td>')
                     pinhtml.append('   </tr>')

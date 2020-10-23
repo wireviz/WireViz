@@ -96,6 +96,7 @@ class Connector:
     notes: Optional[MultilineHypertext] = None
     pinlabels: List[Pin] = field(default_factory=list)
     pins: List[Pin] = field(default_factory=list)
+    pincolors: List[Color] = field(default_factory=list)
     color: Optional[Color] = None
     show_name: Optional[bool] = None
     show_pincount: Optional[bool] = None
@@ -139,6 +140,9 @@ class Connector:
 
         if len(self.pins) != len(set(self.pins)):
             raise Exception('Pins are not unique')
+
+        if self.pincolors:
+            self.pincolors.extend([None] * (len(self.pins) - len(self.pincolors)))  # autofill missing pincolors as 'no color'
 
         if self.show_name is None:
             self.show_name = not self.autogenerate # hide auto-generated designators by default
