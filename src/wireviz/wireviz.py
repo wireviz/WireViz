@@ -49,8 +49,8 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
     sections = ['connectors', 'cables', 'connections']
     types = [dict, dict, list]
     for sec, ty in zip(sections, types):
-        if sec in yaml_data and type(yaml_data[sec]) == ty:
-            if len(yaml_data[sec]) > 0:
+        if sec in yaml_data and type(yaml_data[sec]) == ty:  # section exists
+            if len(yaml_data[sec]) > 0:  # section has contents
                 if ty == dict:
                     for key, attribs in yaml_data[sec].items():
                         # The Image dataclass might need to open an image file with a relative path.
@@ -63,8 +63,8 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                             template_connectors[key] = attribs
                         elif sec == 'cables':
                             template_cables[key] = attribs
-            else:
-                pass  # section exists but is empty
+            else:  # section exists but is empty
+                pass
         else:  # section does not exist, create empty section
             if ty == dict:
                 yaml_data[sec] = {}
