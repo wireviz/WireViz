@@ -121,10 +121,11 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         if len(set(filter(None, connectioncount))) > 1:
             raise Exception('All items in connection set must reference the same number of connections')
 
-        connectioncount = connectioncount[0]
+        connectioncount = list(filter(None, connectioncount))[0]
 
         # expand string entries to list entries of correct length
         for index, entry in enumerate(connection_set):
+            print(index, entry, connectioncount)
             if isinstance(entry, str):
                 connection_set[index] = [entry] * connectioncount
 
