@@ -35,17 +35,19 @@ cables:
 
 connections:
   -
-    - JSTMALE.X1: [1-4]   # use `.` syntax to generate a new instance of JSTMALE, named X1
+    - JSTMALE.X1: [4-1]   # use `.` syntax to generate a new instance of JSTMALE, named X1
     - CABLE.W1: [1-4]     # same syntax for cables
     - [S., S., S.S1, S.]  # splice W1 and W2 together; only wire #3 needs a user-defined designator
     - CABLE.W2: [1-4]
+    - S.                  # test shorthand, auto-get required number of ferrules from context
+    - CABLE.W21: [1-4]
     - JSTFEMALE.X2: [1-4]
-  #   - <=>                 # mate X2 and X3
+  # #   - <=>                 # mate X2 and X3
   -
     - JSTMALE.X3: [1-4]
     - CABLE.W3: [1-4]
     - [F., F., F., F.]
-  #   - -->                 # insert ferrules into screw terminal connector
+  # #   - -->                 # insert ferrules into screw terminal connector
   -
     - X4: [2,1,4,3]       # X4 does not require auto-generation, thus no `.` syntax here
   -
