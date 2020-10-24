@@ -362,7 +362,8 @@ class Harness:
             if isinstance(mate, MatePin):
                 color = '#000000'
             elif isinstance(mate, MateComponent):
-                color = '#000000:#ffffff:#000000'
+                # color = '#000000:#ffffff:#000000'  # GraphViz bug? 'back' and 'both' do not work with multicolor edges
+                color = '#000000'
             else:
                 raise Exception(f'{mate} is an unknown mate')
 
