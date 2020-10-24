@@ -24,7 +24,6 @@ connectors:
     pinlabels: [GND, +12V, MISO, MOSI, SCK]
   F:
     style: simple
-    show_name: false
     type: Crimp ferrule
     subtype: 0.25 mm²
     color: YE

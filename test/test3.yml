@@ -12,7 +12,6 @@ connectors:
     subtype: female
   F:
     style: simple
-    show_name: false
     type: Ferrule
     color: GY
 

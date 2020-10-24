@@ -13,7 +13,6 @@ connectors:
     color: GN
     pinlabels: [W, X, Y, Z]
   S:
-    # autogenerate: true should no longer be required with the new syntax
     style: simple
     type: Splice
     color: CU

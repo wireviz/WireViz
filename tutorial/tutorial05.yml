@@ -5,7 +5,6 @@ connectors:
     subtype: female
   F1:
     style: simple
-    show_name: false
     type: Crimp ferrule
     subtype: 0.5 mm²
     color: OG # optional color
