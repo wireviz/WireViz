@@ -186,6 +186,9 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     print('   ', designator, 'is a new cable instance of type', template)
                     harness.add_cable(name = designator, **template_cables[template])
 
+                elif designator in arrows:
+                    print(f'   {template} is an arrow')
+
                 else:
                     print(f'   Template {template} not found, neither in connectors nor in cables')
 
@@ -195,9 +198,9 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         print(connection_set)
 
         # actually connect components using connection list
-        for index_connection, connection in enumerate(connection_set):
-            print(f'  connection ic {index_connection}', connection)
-            for index_item, item in enumerate(connection):
+        for index_entry, entry in enumerate(connection_set):
+            print(f'  entry ie {index_entry}', entry)
+            for index_item, item in enumerate(entry):
                 print(f'    item ii {index_item}', item)
                 designator = list(item.keys())[0]
                 if designator in harness.cables:
@@ -206,35 +209,37 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                         from_name = None
                         from_pin  = None
                     else:
-                        from_name = list(connection_set[index_connection][index_item-1].keys())[0]
-                        from_pin  = connection_set[index_connection][index_item-1][from_name]
+                        from_name = list(connection_set[index_entry][index_item-1].keys())[0]
+                        from_pin  = connection_set[index_entry][index_item-1][from_name]
                     via_name  = designator
                     via_pin   = item[designator]
-                    if index_item == len(connection) - 1:  # list ends with a cable, no connector to join on right side
+                    if index_item == len(entry) - 1:  # list ends with a cable, no connector to join on right side
                         to_name   = None
                         to_pin    = None
                     else:
-                        to_name   = list(connection_set[index_connection][index_item+1].keys())[0]
-                        to_pin    = connection_set[index_connection][index_item+1][to_name]
+                        to_name   = list(connection_set[index_entry][index_item+1].keys())[0]
+                        to_pin    = connection_set[index_entry][index_item+1][to_name]
                     print('    > connect ', from_name, from_pin, via_name, via_pin, to_name, to_pin)
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
                 elif designator in arrows:
                     print(f'    - {designator} is an arrow')
                     if index_item == 0:  # list startess with an arrow
                         raise Exception('An arrow cannot be at the start of a connection set')
-                    elif index_item == len(connection) - 1:  # list ends with an arrow
+                    elif index_item == len(entry) - 1:  # list ends with an arrow
                         raise Exception('An arrow cannot be at the end of a connection set')
 
-                    if '-' in designator:  # join pin by pin
-                        from_name = list(connection_set[index_connection][index_item-1].keys())[0]
-                        from_pin  = connection_set[index_connection][index_item-1][from_name]
-                        via_name  = designator
-                        via_pin   = None
-                        to_name   = list(connection_set[index_connection][index_item+1].keys())[0]
-                        to_pin    = connection_set[index_connection][index_item+1][to_name]
+                    from_name = list(connection_set[index_entry][index_item-1].keys())[0]
+                    from_pin  = connection_set[index_entry][index_item-1][from_name]
+                    via_name  = designator
+                    via_pin   = None
+                    to_name   = list(connection_set[index_entry][index_item+1].keys())[0]
+                    to_pin    = connection_set[index_entry][index_item+1][to_name]
+                    if '-' in designator:  # mate pin by pin
                         print(f'      Mate {from_name}:{from_pin} {designator} {to_name}:{to_pin}')
-                        # harness.connect(from_name, from_pin, designator, None, to_name, to_pin)
                         harness.add_mate_pin(from_name, from_pin, to_name, to_pin, designator)
+                    elif '=' in designator and index_entry == 0:  # mate two connectors as a whole
+                        print(f'      Mate {from_name} {designator} {to_name} ({index_entry})')
+                        harness.add_mate_component(from_name, to_name, designator)
                     elif '=' in designator:  # mate connectors as a whole
                         pass
 

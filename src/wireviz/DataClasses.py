@@ -102,7 +102,6 @@ class Connector:
     show_name: Optional[bool] = None
     show_pincount: Optional[bool] = None
     hide_disconnected_pins: bool = False
-    autogenerate: bool = False
     loops: List[List[Pin]] = field(default_factory=list)
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
@@ -134,7 +133,7 @@ class Connector:
             raise Exception('Pins are not unique')
 
         if self.show_name is None:
-            self.show_name = not self.autogenerate # hide auto-generated designators by default
+            self.show_name = self.style != 'simple' # hide designators for simple connectors by default
 
         if self.show_pincount is None:
             self.show_pincount = self.style != 'simple' # hide pincount for simple (1 pin) connectors by default
