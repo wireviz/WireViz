@@ -108,14 +108,16 @@ def open_file_append(filename):
 
 def isarrow(inp):
     """
-    Matches strings of one or multiple `-` or `=` (TODO: but not mixed)
+    Matches strings of one or multiple `-` or `=` (but not mixed)
     optionally starting with `<` and/or ending with `>`.
 
     Examples:
       <-, --, ->, <->
       <==, ==, ==>, <=>
+
+    regex by @shiraneyo
     """
-    return bool(re.match(r"^<?[=-]+>?$", inp))
+    return bool(re.match(r"^\s*(?P<leftHead><?)(?P<body>-+|=+)(?P<rightHead>>?)\s*$", inp))
 
 def aspect_ratio(image_src):
     try:
