@@ -244,7 +244,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                         print(f'      Mate {from_name} {designator} {to_name} ({index_entry})')
                         harness.add_mate_component(from_name, to_name, designator)
 
-    # harness population comleted ==============================================
+    # harness population completed ==============================================
 
     if "additional_bom_items" in yaml_data:
         for line in yaml_data["additional_bom_items"]:
