@@ -40,12 +40,7 @@ class Harness:
         self.cables[name] = Cable(name, *args, **kwargs)
 
     def add_mate_pin(self, *args, **kwargs) -> None:
-        mate = MatePin(*args, **kwargs)
-        self.mates_pin.append(mate)
-        self.connectors[mate.from_name].activate_pin(mate.from_port)
-        self.connectors[mate.from_name].ports_right = True
-        self.connectors[mate.to_name].activate_pin(mate.to_port)
-        self.connectors[mate.to_name].ports_left = True
+        self.mates_pin.append(MatePin(*args, **kwargs))
 
     def add_mate_component(self, *args, **kwargs) -> None:
         self.mates_component.append(MateComponent(*args, **kwargs))
