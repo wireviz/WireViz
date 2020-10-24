@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import sys
 from typing import Any, Tuple
+import re
 
 import yaml
 
@@ -14,7 +15,7 @@ if __name__ == '__main__':
 
 from wireviz import __version__
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, open_file_read
+from wireviz.wv_helper import expand, open_file_read, isarrow
 
 
 def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
@@ -96,8 +97,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             else:
                 designators_and_templates[designator] = template
         return (template, designator)
-
-    arrows = ['<--','<->','-->','<==','<=>','==>']
 
     connection_sets = yaml_data['connections']
     for connection_set in connection_sets:
@@ -186,7 +185,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     print('   ', designator, 'is a new cable instance of type', template)
                     harness.add_cable(name = designator, **template_cables[template])
 
-                elif designator in arrows:
+                elif isarrow(designator):
                     print(f'   {template} is an arrow')
 
                 else:
@@ -221,7 +220,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                         to_pin    = connection_set[index_entry][index_item+1][to_name]
                     print('    > connect ', from_name, from_pin, via_name, via_pin, to_name, to_pin)
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
-                elif designator in arrows:
+                elif isarrow(designator):
                     print(f'    - {designator} is an arrow')
                     if index_item == 0:  # list startess with an arrow
                         raise Exception('An arrow cannot be at the start of a connection set')
@@ -240,8 +239,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     elif '=' in designator and index_entry == 0:  # mate two connectors as a whole
                         print(f'      Mate {from_name} {designator} {to_name} ({index_entry})')
                         harness.add_mate_component(from_name, to_name, designator)
-                    elif '=' in designator:  # mate connectors as a whole
-                        pass
 
 
     if "additional_bom_items" in yaml_data:

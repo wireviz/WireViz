@@ -357,7 +357,7 @@ class Harness:
             elif mate.shape[-1] == '>':
                 dir = 'forward'
             else:
-                dir = 'none'  # should not happen?
+                dir = 'none'  # should not happen
 
             if isinstance(mate, MatePin):
                 color = '#000000'

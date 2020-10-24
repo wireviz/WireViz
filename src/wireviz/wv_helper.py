@@ -106,6 +106,17 @@ def open_file_write(filename):
 def open_file_append(filename):
     return open(filename, 'a', encoding='UTF-8')
 
+def isarrow(inp):
+    """
+    Matches strings of one or multiple `-` or `=` (TODO: but not mixed)
+    optionally starting with `<` and/or ending with `>`.
+
+    Examples:
+      <-, --, ->, <->
+      <==, ==, ==>, <=>
+    """
+    return bool(re.match(r"^<?[=-]+>?$", inp))
+
 def aspect_ratio(image_src):
     try:
         from PIL import Image
