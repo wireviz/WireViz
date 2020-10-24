@@ -5,7 +5,7 @@ connectors:
     subtype: female
   F1:
     style: simple
-    autogenerate: true
+    show_name: false
     type: Crimp ferrule
     subtype: 0.5 mm²
     color: OG # optional color
@@ -19,6 +19,6 @@ cables:
 
 connections:
   -
-    - F1 # a new ferrule is auto-generated for each of the four wires
+    - F1. # a new ferrule is auto-generated for each of the four wires
     - W1: [1-4]
     - X1: [1-4]

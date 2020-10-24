@@ -10,7 +10,7 @@ cables:
 connectors:
   ferrule_crimp:
     style: simple
-    autogenerate: true
+    # autogenerate: true
     type: Crimp ferrule
 
 connections:
