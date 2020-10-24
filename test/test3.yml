@@ -1,4 +1,4 @@
-# based on @stmaxed's example in #134
+# expanding upon @stmaxed's example in #134
 
 connectors:
   X1: &X
@@ -7,6 +7,9 @@ connectors:
     color: GN
     pincount: 4
     pinlabels: [A, B, C, D]
+  X2:
+    <<: *X
+    subtype: female
   F:
     style: simple
     show_name: false
@@ -24,3 +27,8 @@ connections:
     - F.
     - -->
     - X1: [1-4]
+    - ==>
+    - X2: [1-4]
+    - <--
+    - F.
+    - W.W2: [1-4]
