@@ -17,7 +17,7 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read
 
 
-def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
+def parse(yaml_input: str, file_in: (str, Path) = None, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
@@ -44,10 +44,11 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             if len(yaml_data[sec]) > 0:
                 if ty == dict:
                     for key, attribs in yaml_data[sec].items():
-                        # The Image dataclass might need to open an image file with a relative path.
-                        image = attribs.get('image')
-                        if isinstance(image, dict):
-                            image['gv_dir'] = Path(file_out if file_out else '').parent # Inject context
+                        if attribs.get('image'):
+                            image_path = attribs['image']['src']
+                            if not Path(image_path).is_absolute():  # resolve relative image path
+                                image_path = (Path(file_in).parent / image_path).resolve()
+                                attribs['image']['src'] = image_path
 
                         if sec == 'connectors':
                             if not attribs.get('autogenerate', False):
@@ -209,7 +210,7 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
         file_out = fn
     file_out = os.path.abspath(file_out)
 
-    parse(yaml_input, file_out=file_out)
+    parse(yaml_input, file_in=Path(yaml_file).resolve(), file_out=file_out)
 
 
 def parse_cmdline():
@@ -251,7 +252,7 @@ def main():
         file_out = args.output_file
     file_out = os.path.abspath(file_out)
 
-    parse(yaml_input, file_out=file_out)
+    parse(yaml_input, file_in=Path(args.input_file).resolve(), file_out=file_out)
 
 
 if __name__ == '__main__':
