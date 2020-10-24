@@ -120,8 +120,11 @@ class Harness:
             for connection_color in cable.connections:
                 if connection_color.from_port is not None:  # connect to left
                     self.connectors[connection_color.from_name].ports_right = True
+                    self.connectors[connection_color.from_name].activate_pin(connection_color.from_port)
                 if connection_color.to_port is not None:  # connect to right
                     self.connectors[connection_color.to_name].ports_left = True
+                    self.connectors[connection_color.to_name].activate_pin(connection_color.to_port)
+
         for mate in self.mates:
             if isinstance(mate, MatePin):
                 self.connectors[mate.from_name].ports_right = True
