@@ -19,6 +19,7 @@ from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
     open_file_read, open_file_write
 
+arrows = ['<--','<->','-->','<==','<=>','==>']
 
 class Harness:
 
@@ -27,6 +28,8 @@ class Harness:
         self.mini_bom_mode = True
         self.connectors = {}
         self.cables = {}
+        self.mates_pin = []
+        self.mates_component = []
         self._bom = []  # Internal Cache for generated bom
         self.additional_bom_items = []
 
@@ -35,6 +38,17 @@ class Harness:
 
     def add_cable(self, name: str, *args, **kwargs) -> None:
         self.cables[name] = Cable(name, *args, **kwargs)
+
+    def add_mate_pin(self, *args, **kwargs) -> None:
+        mate = MatePin(*args, **kwargs)
+        self.mates_pin.append(mate)
+        self.connectors[mate.from_name].activate_pin(mate.from_port)
+        self.connectors[mate.from_name].ports_right = True
+        self.connectors[mate.to_name].activate_pin(mate.to_port)
+        self.connectors[mate.to_name].ports_left = True
+
+    def add_mate_component(self, *args, **kwargs) -> None:
+        self.mates_component.append(MateComponent(*args, **kwargs))
 
     def add_bom_item(self, item: dict) -> None:
         self.additional_bom_items.append(item)
@@ -62,7 +76,13 @@ class Harness:
                     raise Exception(f'{name}:{pin} not found.')
 
         # check via cable
-        if via_name in self.cables:
+        if via_name in arrows:
+            if '-' in via_name:
+                self.mates[(from_name, from_pin, to_name, to_pin)] = via_name
+            elif '=' in via_name:
+                self.mates[(from_name, to_name)] = via_name
+            print(self.mates)
+        elif via_name in self.cables:
             cable = self.cables[via_name]
             # check if provided name is ambiguous
             if via_wire in cable.colors and via_wire in cable.wirelabels:
@@ -108,6 +128,11 @@ class Harness:
                     self.connectors[connection_color.from_name].ports_right = True
                 if connection_color.to_port is not None:  # connect to right
                     self.connectors[connection_color.to_name].ports_left = True
+        for mate in self.mates_pin:
+            self.connectors[mate.from_name].ports_right = True
+            self.connectors[mate.from_name].activate_pin(mate.from_port)
+            self.connectors[mate.to_name].ports_left = True
+            self.connectors[mate.to_name].activate_pin(mate.to_port)
 
         for connector in self.connectors.values():
 
@@ -328,6 +353,21 @@ class Harness:
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
                      style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
+
+        for mate in self.mates_pin:
+            if mate.shape == '<--':
+                dir = 'back'
+            elif mate.shape == '-->':
+                dir = 'forward'
+            elif mate.shape == '<->':
+                dir = 'both'
+            dot.attr('edge', color='#000000', style='dashed', dir=dir)
+            from_port = f':p{mate.from_port}r' if self.connectors[mate.from_name].style != 'simple' else ''
+            code_from = f'{mate.from_name}{from_port}:e'
+            to_port = f':p{mate.to_port}l' if self.connectors[mate.to_name].style != 'simple' else ''
+            code_to = f'{mate.to_name}{to_port}:w'
+            print(mate, '---', code_from, '---', code_to)
+            dot.edge(code_from, code_to)
 
         return dot
 

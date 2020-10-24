@@ -291,3 +291,17 @@ class Connection:
     via_port: Wire
     to_name: Optional[Designator]
     to_port: Optional[Pin]
+
+@dataclass
+class MatePin:
+    from_name: Designator
+    from_port: Pin
+    to_name: Designator
+    to_port: Pin
+    shape: str
+
+@dataclass
+class MateComponent:
+    from_name: Designator
+    to_name: Designator
+    shape: str

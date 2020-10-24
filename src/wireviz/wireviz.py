@@ -97,6 +97,8 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                 designators_and_templates[designator] = template
         return (template, designator)
 
+    arrows = ['<--','<->','-->','<==','<=>','==>']
+
     connection_sets = yaml_data['connections']
     for connection_set in connection_sets:
         print('')
@@ -160,6 +162,8 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                 designator = list(entry.keys())[0]
                 pinlist = expand(entry[designator])
                 connection_set[index] = [{designator: pin} for pin in pinlist]
+            else:
+                pass  # string entries have been expanded in previous step
 
         print('connection set @3:', connection_set)
 
@@ -214,6 +218,25 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                         to_pin    = connection_set[index_connection][index_item+1][to_name]
                     print('    > connect ', from_name, from_pin, via_name, via_pin, to_name, to_pin)
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
+                elif designator in arrows:
+                    print(f'    - {designator} is an arrow')
+                    if index_item == 0:  # list startess with an arrow
+                        raise Exception('An arrow cannot be at the start of a connection set')
+                    elif index_item == len(connection) - 1:  # list ends with an arrow
+                        raise Exception('An arrow cannot be at the end of a connection set')
+
+                    if '-' in designator:  # join pin by pin
+                        from_name = list(connection_set[index_connection][index_item-1].keys())[0]
+                        from_pin  = connection_set[index_connection][index_item-1][from_name]
+                        via_name  = designator
+                        via_pin   = None
+                        to_name   = list(connection_set[index_connection][index_item+1].keys())[0]
+                        to_pin    = connection_set[index_connection][index_item+1][to_name]
+                        print(f'      Mate {from_name}:{from_pin} {designator} {to_name}:{to_pin}')
+                        # harness.connect(from_name, from_pin, designator, None, to_name, to_pin)
+                        harness.add_mate_pin(from_name, from_pin, to_name, to_pin, designator)
+                    elif '=' in designator:  # mate connectors as a whole
+                        pass
 
 
     if "additional_bom_items" in yaml_data:
