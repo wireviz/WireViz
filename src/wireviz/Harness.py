@@ -374,7 +374,6 @@ class Harness:
             code_from = f'{mate.from_name}{from_port}:e'
             to_port = f':p{mate.to_port}l' if isinstance(mate, MatePin) and self.connectors[mate.to_name].style != 'simple' else ''
             code_to = f'{mate.to_name}{to_port}:w'
-            print(mate, '---', code_from, '---', code_to)
             dot.edge(code_from, code_to)
 
         return dot

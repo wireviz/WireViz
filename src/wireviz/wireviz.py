@@ -73,9 +73,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
     connection_sets = yaml_data['connections']
 
-    print('Conector templates:', list(template_connectors.keys()))
-    print('Cable templates:   ', list(template_cables.keys()))
-
     # go through connection sets, generate and connect components ==============
 
     def resolve_designator(inp):
@@ -100,8 +97,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         return (template, designator)
 
     for connection_set in connection_sets:
-        print('')
-        print('connection set @0:', connection_set)
 
         # figure out number of parallel connections within this set
         connectioncount = []
@@ -114,7 +109,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                 connectioncount.append(None)  # strings do not reveal connectioncount
         if not any(connectioncount):
             raise Exception('No item in connection set revealed number of connections')
-        print(f'Connection count: {connectioncount}')
 
         # check that all entries are the same length
         if len(set(filter(None, connectioncount))) > 1:
@@ -124,32 +118,22 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
         # expand string entries to list entries of correct length
         for index, entry in enumerate(connection_set):
-            print(index, entry, connectioncount)
             if isinstance(entry, str):
                 connection_set[index] = [entry] * connectioncount
 
-        print('connection set @1:', connection_set)
-        print('des_temp @1:', designators_and_templates)
-
         # resolve all designators
         for index, entry in enumerate(connection_set):
-            # print(index, ':')
             if isinstance(entry, list):
                 for subindex, item in enumerate(entry):
                     template, designator = resolve_designator(item)
-                    # print('list', index, subindex, item, template, designator)
                     connection_set[index][subindex] = designator
             elif isinstance(entry, dict):
                 key = list(entry.keys())[0]
                 template, designator = resolve_designator(key)
                 value = entry[key]
-                # print('dict', key, template, designator, value)
                 connection_set[index] = {designator: value}
             else:
                 pass  # string entries have been expanded in previous step
-
-        print('connection set @2:', connection_set)
-        print('des_temp @2:', designators_and_templates)
 
         # expand all pin lists
         for index, entry in enumerate(connection_set):
@@ -162,8 +146,6 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             else:
                 pass  # string entries have been expanded in previous step
 
-        print('connection set @3:', connection_set)
-
         # TODO: check alternating cable/connector
         alternating_sections = ['connectors','cables']
 
@@ -174,39 +156,32 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             for item in entry:
                 designator = list(item.keys())[0]
                 template = designators_and_templates[designator]
-                if designator in harness.connectors:
-                    print('   ', designator, 'is an existing connector instance')
-                elif template in template_connectors.keys():
-                    print('   ', designator, 'is a new connector instance of type', template)
+                if designator in harness.connectors:  # existing connector instance
+                    pass
+                elif template in template_connectors.keys():  # generate new connector instance from template
                     harness.add_connector(name = designator, **template_connectors[template])
 
-                elif designator in harness.cables:
-                    print('   ', designator, 'is an existing cable instance')
-                elif template in template_cables.keys():
-                    print('   ', designator, 'is a new cable instance of type', template)
+                elif designator in harness.cables:  # existing cable instance
+                    pass
+                elif template in template_cables.keys():  # generate new cable instance from template
                     harness.add_cable(name = designator, **template_cables[template])
 
                 elif isarrow(designator):
-                    print(f'   {template} is an arrow')
-
+                    pass  # arrows do not need to be generated here
                 else:
-                    print(f'   Template {template} not found, neither in connectors nor in cables')
+                    raise Exception(f'{template} is an unknown template/designator/arrow.')
 
         # transpose connection set list
         # before: one row per component, one column per connection in set
         # after:  one row per connection in set, one column per component
-        print('TRANSPOSE!!')
         connection_set = list(map(list, zip(*connection_set)))  # transpose list
-        print(connection_set)
 
         # connect components
         for index_entry, entry in enumerate(connection_set):
-            print(f'  entry ie {index_entry}', entry)
             for index_item, item in enumerate(entry):
-                print(f'    item ii {index_item}', item)
                 designator = list(item.keys())[0]
+
                 if designator in harness.cables:
-                    print(f'    - {designator} is a known cable')
                     if index_item == 0:  # list started with a cable, no connector to join on left side
                         from_name = None
                         from_pin  = None
@@ -221,10 +196,9 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     else:
                         to_name   = list(connection_set[index_entry][index_item+1].keys())[0]
                         to_pin    = connection_set[index_entry][index_item+1][to_name]
-                    print('    > connect ', from_name, from_pin, via_name, via_pin, to_name, to_pin)
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
+
                 elif isarrow(designator):
-                    print(f'    - {designator} is an arrow')
                     if index_item == 0:  # list startess with an arrow
                         raise Exception('An arrow cannot be at the start of a connection set')
                     elif index_item == len(entry) - 1:  # list ends with an arrow
@@ -237,10 +211,8 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     to_name   = list(connection_set[index_entry][index_item+1].keys())[0]
                     to_pin    = connection_set[index_entry][index_item+1][to_name]
                     if '-' in designator:  # mate pin by pin
-                        print(f'      Mate {from_name}:{from_pin} {designator} {to_name}:{to_pin}')
                         harness.add_mate_pin(from_name, from_pin, to_name, to_pin, designator)
                     elif '=' in designator and index_entry == 0:  # mate two connectors as a whole
-                        print(f'      Mate {from_name} {designator} {to_name} ({index_entry})')
                         harness.add_mate_component(from_name, to_name, designator)
 
     # harness population completed ==============================================
