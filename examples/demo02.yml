@@ -22,7 +22,7 @@ connectors:
   X4:
     <<: *molex_f
     pinlabels: [GND, +12V, MISO, MOSI, SCK]
-  ferrule_crimp:
+  F:
     style: simple
     show_name: false
     type: Crimp ferrule
@@ -64,6 +64,6 @@ connections:
     - W3: [1-4]
     - X4: [1,3-5]
   -
-    - ferrule_crimp.
+    - F.
     - W4: [1,2]
     - X4: [1,2]
