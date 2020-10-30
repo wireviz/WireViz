@@ -114,9 +114,8 @@ def isarrow(inp):
     Examples:
       <-, --, ->, <->
       <==, ==, ==>, <=>
-
-    regex by @shiraneyo
     """
+    # regex by @shiraneyo
     return bool(re.match(r"^\s*(?P<leftHead><?)(?P<body>-+|=+)(?P<rightHead>>?)\s*$", inp))
 
 def aspect_ratio(image_src):
