@@ -4,6 +4,7 @@
 from typing import Optional, List, Tuple, Union
 from dataclasses import dataclass, field, InitVar
 from pathlib import Path
+
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz import wv_colors
 
