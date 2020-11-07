@@ -2,14 +2,14 @@ templates: # defining templates to be used later on
   - &molex_f
     type: Molex KK 254
     subtype: female
-    href: "https://www.molex.com/molex/products/family/kk_254_rpc_connector_system"
+    url: "https://www.molex.com/molex/products/family/kk_254_rpc_connector_system"
   - &con_i2c
     pinlabels: [GND, +5V, SCL, SDA]
   - &wire_i2c
     category: bundle
     gauge: 0.14 mm2
     colors: [BK, RD, YE, GN]
-    href: [a, b, c, d]
+    url: [bk.html, rd.html, ye.html, gn.html]
 
 connectors:
   X1:
@@ -80,4 +80,4 @@ additional_bom_items:
     manufacturer: generic company
     mpn: Label1
     pn: Label-ID-1
-    href: "https://www.bradyid.com/wire-cable-labels/bmp71-bmp61-m611-tls-2200-nylon-cloth-wire-general-id-labels-cps-2958789"
+    url: "https://www.bradyid.com/wire-cable-labels/bmp71-bmp61-m611-tls-2200-nylon-cloth-wire-general-id-labels-cps-2958789"

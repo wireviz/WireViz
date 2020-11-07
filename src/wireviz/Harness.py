@@ -159,7 +159,7 @@ class Harness:
                 html = [row.replace('<!-- connector table -->', '\n'.join(pinhtml)) for row in html]
 
             html = '\n'.join(html)
-            dot.node(connector.name, label=f'<\n{html}\n>', shape='none', href=connector.href,
+            dot.node(connector.name, label=f'<\n{html}\n>', shape='none', href=connector.url,
                      margin='0', style='filled', fillcolor='white')
 
             if len(connector.loops) > 0:
@@ -290,11 +290,11 @@ class Harness:
             for connection in cable.connections:
                 if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
                     dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection.via_port - 1], pad=pad) + ['#000000']),
-                             href=index_if_list(cable.href, connection.via_port - 1))
+                             href=index_if_list(cable.url, connection.via_port - 1))
                 else:  # it's a shield connection
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
                     dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000',
-                             href=cable.href if isinstance(cable.href, str) else None)
+                             href=cable.url if isinstance(cable.url, str) else None)
                 if connection.from_port is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
                     from_port = f':p{connection.from_port}r' if from_connector.style != 'simple' else ''
@@ -330,7 +330,7 @@ class Harness:
 
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
-                     href=cable.href if isinstance(cable.href, str) else None,
+                     href=cable.url if isinstance(cable.url, str) else None,
                      style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
 
         return dot
