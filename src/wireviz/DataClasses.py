@@ -120,29 +120,17 @@ class Connector:
                 raise Exception('Connectors with style set to simple may only have one pin')
             self.pincount = 1
 
-        if self.pincount is None:
-            if self.pinlabels:
-                self.pincount = len(self.pinlabels)
-            elif self.pins:
-                self.pincount = len(self.pins)
-            else:
+        if not self.pincount:
+            if not self.pins and not self.pinlabels:
                 raise Exception('You need to specify at least one, pincount, pins or pinlabels')
-
-        if self.pinlabels and self.pins:
-            if len(self.pinlabels) != len(self.pins):
-                raise Exception('Given pins and pinlabels size mismatch')
+            self.pincount = max(len(self.pins), len(self.pinlabels), len(self.pincolors))
 
         # create default lists for pins (sequential) and pinlabels (blank) if not specified
         if not self.pins:
             self.pins = list(range(1, self.pincount + 1))
-        if not self.pinlabels:
-            self.pinlabels = [''] * self.pincount
 
         if len(self.pins) != len(set(self.pins)):
             raise Exception('Pins are not unique')
-
-        if self.pincolors:
-            self.pincolors.extend([None] * (len(self.pins) - len(self.pincolors)))  # autofill missing pincolors as 'no color'
 
         if self.show_name is None:
             self.show_name = not self.autogenerate # hide auto-generated designators by default
