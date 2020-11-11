@@ -181,9 +181,11 @@ class Cable:
     image: Optional[Image] = None
     notes: Optional[MultilineHypertext] = None
     colors: List[Colors] = field(default_factory=list)
+    wirelabels: List[Wire] = field(default_factory=list)
     color_code: Optional[ColorScheme] = None
     show_name: bool = True
     show_wirecount: bool = True
+    show_wirenumbers: Optional[bool] = None
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
@@ -233,6 +235,10 @@ class Cable:
                 raise Exception('Unknown number of wires. Must specify wirecount or colors (implicit length)')
             self.wirecount = len(self.colors)
 
+        if self.wirelabels:
+            if self.shield and 's' in self.wirelabels:
+                raise Exception('"s" may not be used as a wire label for a shielded cable.')
+
         # if lists of part numbers are provided check this is a bundle and that it matches the wirecount.
         for idfield in [self.manufacturer, self.mpn, self.pn]:
             if isinstance(idfield, list):
@@ -243,21 +249,24 @@ class Cable:
                 else:
                     raise Exception('lists of part data are only supported for bundles')
 
+        # by default, show wire numbers for cables, hide for bundles
+        if not self.show_wirenumbers:
+            self.show_wirenumbers = self.category != 'bundle'
+
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
     # The *_pin arguments accept a tuple, but it seems not in use with the current code.
-    def connect(self, from_name: Optional[Designator], from_pin: NoneOrMorePins, via_pin: OneOrMoreWires,
+    def connect(self, from_name: Optional[Designator], from_pin: NoneOrMorePins, via_wire: OneOrMoreWires,
                 to_name: Optional[Designator], to_pin: NoneOrMorePins) -> None:
         from_pin = int2tuple(from_pin)
-        via_pin = int2tuple(via_pin)
+        via_wire = int2tuple(via_wire)
         to_pin = int2tuple(to_pin)
         if len(from_pin) != len(to_pin):
             raise Exception('from_pin must have the same number of elements as to_pin')
         for i, _ in enumerate(from_pin):
-            # self.connections.append((from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
-            self.connections.append(Connection(from_name, from_pin[i], via_pin[i], to_name, to_pin[i]))
+            self.connections.append(Connection(from_name, from_pin[i], via_wire[i], to_name, to_pin[i]))
 
     def get_qty_multiplier(self, qty_multiplier: Optional[CableMultiplier]) -> float:
         if not qty_multiplier:
