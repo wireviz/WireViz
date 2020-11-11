@@ -282,26 +282,44 @@ class Harness:
             html = [row.replace('<!-- wire table -->', '\n'.join(wirehtml)) for row in html]
 
             # connections
-            for connection_color in cable.connections:
-                if isinstance(connection_color.via_port, int):  # check if it's an actual wire and not a shield
-                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection_color.via_port - 1], pad=pad) + ['#000000']))
+            for connection in cable.connections:
+                if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
+                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection.via_port - 1], pad=pad) + ['#000000']))
                 else:  # it's a shield connection
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
                     dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000')
-                if connection_color.from_port is not None:  # connect to left
-                    from_port = f':p{connection_color.from_port}r' if self.connectors[connection_color.from_name].style != 'simple' else ''
-                    code_left_1 = f'{connection_color.from_name}{from_port}:e'
-                    code_left_2 = f'{cable.name}:w{connection_color.via_port}:w'
+                if connection.from_port is not None:  # connect to left
+                    from_connector = self.connectors[connection.from_name]
+                    from_port = f':p{connection.from_port}r' if from_connector.style != 'simple' else ''
+                    code_left_1 = f'{connection.from_name}{from_port}:e'
+                    code_left_2 = f'{cable.name}:w{connection.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
-                    from_string = f'{connection_color.from_name}:{connection_color.from_port}' if self.connectors[connection_color.from_name].show_name else ''
-                    html = [row.replace(f'<!-- {connection_color.via_port}_in -->', from_string) for row in html]
-                if connection_color.to_port is not None:  # connect to right
-                    code_right_1 = f'{cable.name}:w{connection_color.via_port}:e'
-                    to_port = f':p{connection_color.to_port}l' if self.connectors[connection_color.to_name].style != 'simple' else ''
-                    code_right_2 = f'{connection_color.to_name}{to_port}:w'
+                    if from_connector.show_name:
+                        from_info = [str(connection.from_name), str(connection.from_port)]
+                        if from_connector.pinlabels:
+                            pinlabel = from_connector.pinlabels[from_connector.pins.index(connection.from_port)]
+                            if pinlabel != '':
+                                from_info.append(pinlabel)
+                        from_string = ':'.join(from_info)
+                    else:
+                        from_string = ''
+                    html = [row.replace(f'<!-- {connection.via_port}_in -->', from_string) for row in html]
+                if connection.to_port is not None:  # connect to right
+                    to_connector = self.connectors[connection.to_name]
+                    code_right_1 = f'{cable.name}:w{connection.via_port}:e'
+                    to_port = f':p{connection.to_port}l' if self.connectors[connection.to_name].style != 'simple' else ''
+                    code_right_2 = f'{connection.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
-                    to_string = f'{connection_color.to_name}:{connection_color.to_port}' if self.connectors[connection_color.to_name].show_name else ''
-                    html = [row.replace(f'<!-- {connection_color.via_port}_out -->', to_string) for row in html]
+                    if to_connector.show_name:
+                        to_info = [str(connection.to_name), str(connection.to_port)]
+                        if to_connector.pinlabels:
+                            pinlabel = to_connector.pinlabels[to_connector.pins.index(connection.to_port)]
+                            if pinlabel != '':
+                                to_info.append(pinlabel)
+                        to_string = ':'.join(to_info)
+                    else:
+                        to_string = ''
+                    html = [row.replace(f'<!-- {connection.via_port}_out -->', to_string) for row in html]
 
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
