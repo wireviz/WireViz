@@ -122,9 +122,13 @@ class Harness:
                     if connector.pincolors:
                         if pincolor in wv_colors._color_hex.keys():
                             pinhtml.append(f'    <td sides="tbl">{pincolor}</td>')
-                            pinhtml.append(f'    <td sides="tbr"><table border="0" cellborder="1"><tr><td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td></tr></table></td>')
+                            pinhtml.append( '    <td sides="tbr">')
+                            pinhtml.append( '     <table border="0" cellborder="1"><tr>')
+                            pinhtml.append(f'      <td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
+                            pinhtml.append( '     </tr></table>')
+                            pinhtml.append( '    </td>')
                         else:
-                            pinhtml.append(f'    <td colspan="2"></td>')
+                            pinhtml.append( '    <td colspan="2"></td>')
 
                     if connector.ports_right:
                         pinhtml.append(f'    <td port="p{pin}r">{pin}</td>')
