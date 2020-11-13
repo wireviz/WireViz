@@ -121,9 +121,9 @@ class Connector:
             self.pincount = 1
 
         if not self.pincount:
-            if not self.pins and not self.pinlabels:
-                raise Exception('You need to specify at least one, pincount, pins or pinlabels')
             self.pincount = max(len(self.pins), len(self.pinlabels), len(self.pincolors))
+            if not self.pincount:
+                raise Exception('You need to specify at least one, pincount, pins, pinlabels, or pincolors')
 
         # create default list for pins (sequential) if not specified
         if not self.pins:
