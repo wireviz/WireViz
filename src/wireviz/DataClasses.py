@@ -96,6 +96,7 @@ class Connector:
     notes: Optional[MultilineHypertext] = None
     pinlabels: List[Pin] = field(default_factory=list)
     pins: List[Pin] = field(default_factory=list)
+    pincolors: List[Color] = field(default_factory=list)
     color: Optional[Color] = None
     show_name: Optional[bool] = None
     show_pincount: Optional[bool] = None
@@ -119,23 +120,14 @@ class Connector:
                 raise Exception('Connectors with style set to simple may only have one pin')
             self.pincount = 1
 
-        if self.pincount is None:
-            if self.pinlabels:
-                self.pincount = len(self.pinlabels)
-            elif self.pins:
-                self.pincount = len(self.pins)
-            else:
-                raise Exception('You need to specify at least one, pincount, pins or pinlabels')
+        if not self.pincount:
+            self.pincount = max(len(self.pins), len(self.pinlabels), len(self.pincolors))
+            if not self.pincount:
+                raise Exception('You need to specify at least one, pincount, pins, pinlabels, or pincolors')
 
-        if self.pinlabels and self.pins:
-            if len(self.pinlabels) != len(self.pins):
-                raise Exception('Given pins and pinlabels size mismatch')
-
-        # create default lists for pins (sequential) and pinlabels (blank) if not specified
+        # create default list for pins (sequential) if not specified
         if not self.pins:
             self.pins = list(range(1, self.pincount + 1))
-        if not self.pinlabels:
-            self.pinlabels = [''] * self.pincount
 
         if len(self.pins) != len(set(self.pins)):
             raise Exception('Pins are not unique')

@@ -12,6 +12,7 @@ from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, \
 from collections import Counter
 from typing import List, Union
 from pathlib import Path
+from itertools import zip_longest
 import re
 
 
@@ -110,7 +111,7 @@ class Harness:
                 pinhtml = []
                 pinhtml.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
 
-                for pin, pinlabel in zip(connector.pins, connector.pinlabels):
+                for pin, pinlabel, pincolor in zip_longest(connector.pins, connector.pinlabels, connector.pincolors):
                     if connector.hide_disconnected_pins and not connector.visible_pins.get(pin, False):
                         continue
                     pinhtml.append('   <tr>')
@@ -118,6 +119,17 @@ class Harness:
                         pinhtml.append(f'    <td port="p{pin}l">{pin}</td>')
                     if pinlabel:
                         pinhtml.append(f'    <td>{pinlabel}</td>')
+                    if connector.pincolors:
+                        if pincolor in wv_colors._color_hex.keys():
+                            pinhtml.append(f'    <td sides="tbl">{pincolor}</td>')
+                            pinhtml.append( '    <td sides="tbr">')
+                            pinhtml.append( '     <table border="0" cellborder="1"><tr>')
+                            pinhtml.append(f'      <td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
+                            pinhtml.append( '     </tr></table>')
+                            pinhtml.append( '    </td>')
+                        else:
+                            pinhtml.append( '    <td colspan="2"></td>')
+
                     if connector.ports_right:
                         pinhtml.append(f'    <td port="p{pin}r">{pin}</td>')
                     pinhtml.append('   </tr>')
