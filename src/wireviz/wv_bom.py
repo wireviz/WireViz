@@ -140,7 +140,7 @@ def bom_list(bom):
         "pn": "P/N",
         "mpn": "MPN"
     }
-    bom_list.append([(bom_headings[k] if k in bom_headings else k.capitalize()) for k in keys])  # create header row with keys
+    bom_list.append([bom_headings.get(k, k.capitalize()) for k in keys])  # create header row with keys
     for item in bom:
         item_list = [item.get(key, '') for key in keys]  # fill missing values with blanks
         item_list = [', '.join(subitem) if isinstance(subitem, List) else subitem for subitem in item_list]  # convert any lists into comma separated strings
