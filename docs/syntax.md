@@ -56,6 +56,11 @@ additional_bom_items:  # custom items to add to BOM
   pins: <List>       # if omitted, is autofilled with [1, 2, ..., pincount]
   pinlabels: <List>  # if omitted, is autofilled with blanks
 
+  # pin color marks (optional)
+  pincolors: <List>  # list of colors to be assigned to the respective pins;
+                     # if list length is lower than connector pinout,
+                     # no color marks will be added to remaining pins
+
   # rendering information (all optional)
   style: <style>         # may be set to simple for single pin connectors
   show_name: <bool>      # defaults to true for regular connectors,
