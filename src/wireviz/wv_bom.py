@@ -106,11 +106,8 @@ def generate_bom(harness):
         group_entries = [v for v in bom_entries if bom_types_group(v) == group]
         designators = []
         for group_entry in group_entries:
-            if group_entry.get('designators'):
-                if isinstance(group_entry['designators'], List):
-                    designators.extend(group_entry['designators'])
-                else:
-                    designators.append(group_entry['designators'])
+            d = group_entry.get('designators')
+            designators.extend(d if isinstance(d, List) else [d] if d else [])
         designators = list(dict.fromkeys(designators))  # remove duplicates
         designators.sort()
         total_qty = sum(entry['qty'] for entry in group_entries)
