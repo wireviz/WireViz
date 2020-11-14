@@ -36,6 +36,8 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dic
         })
     return(bom_entries)
 
+bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
+
 def generate_bom(harness):
     from wireviz.Harness import Harness  # Local import to avoid circular imports
     bom_entries = []
@@ -97,7 +99,6 @@ def generate_bom(harness):
 
     # deduplicate bom
     bom = []
-    bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
     for group in Counter([bom_types_group(v) for v in bom_entries]):
         group_entries = [v for v in bom_entries if bom_types_group(v) == group]
         designators = []
@@ -121,7 +122,7 @@ def get_bom_index(bom: List[dict], extra: AdditionalComponent) -> int:
     # Remove linebreaks and clean whitespace of values in search
     target = tuple(clean_whitespace(v) for v in (extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn))
     for entry in bom:
-        if (entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == target:
+        if bom_types_group(entry) == target:
             return entry['id']
     return None
 
