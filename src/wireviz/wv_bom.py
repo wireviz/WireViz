@@ -108,10 +108,8 @@ def generate_bom(harness):
         for group_entry in group_entries:
             d = group_entry.get('designators')
             designators.extend(d if isinstance(d, List) else [d] if d else [])
-        designators = list(dict.fromkeys(designators))  # remove duplicates
-        designators.sort()
         total_qty = sum(entry['qty'] for entry in group_entries)
-        bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': designators})
+        bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': sorted(set(designators))})
 
     bom = sorted(bom, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
 
