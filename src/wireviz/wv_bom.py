@@ -115,8 +115,7 @@ def generate_bom(harness):
     bom = sorted(bom, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
 
     # add an incrementing id to each bom item
-    bom = [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
-    return bom
+    return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
 
 def get_bom_index(harness, item, unit, manufacturer, mpn, pn):
     # Remove linebreaks and clean whitespace of values in search
