@@ -4,7 +4,7 @@
 from typing import List, Union
 from collections import Counter
 
-from wireviz.DataClasses import Connector, Cable
+from wireviz.DataClasses import AdditionalComponent, Connector, Cable
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import clean_whitespace
 
@@ -15,7 +15,7 @@ def get_additional_component_table(harness, component: Union[Connector, Cable]) 
         for extra in component.additional_components:
             qty = extra.qty * component.get_qty_multiplier(extra.qty_multiplier)
             if harness.mini_bom_mode:
-                id = get_bom_index(harness, extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
+                id = get_bom_index(harness.bom(), extra)
                 rows.append(component_table_entry(f'#{id} ({extra.type.rstrip()})', qty, extra.unit))
             else:
                 rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
@@ -117,10 +117,10 @@ def generate_bom(harness):
     # add an incrementing id to each bom item
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
 
-def get_bom_index(harness, item, unit, manufacturer, mpn, pn):
+def get_bom_index(bom: List[dict], extra: AdditionalComponent) -> int:
     # Remove linebreaks and clean whitespace of values in search
-    target = tuple(clean_whitespace(v) for v in (item, unit, manufacturer, mpn, pn))
-    for entry in harness.bom():
+    target = tuple(clean_whitespace(v) for v in (extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn))
+    for entry in bom:
         if (entry['item'], entry['unit'], entry['manufacturer'], entry['mpn'], entry['pn']) == target:
             return entry['id']
     return None
