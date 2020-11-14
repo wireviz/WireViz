@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import List, Union
 from collections import Counter
+from dataclasses import asdict
+from typing import List, Union
 
 from wireviz.DataClasses import AdditionalComponent, Connector, Cable
 from wireviz.wv_gv_html import html_line_breaks
@@ -120,7 +121,7 @@ def generate_bom(harness):
 
 def get_bom_index(bom: List[dict], extra: AdditionalComponent) -> int:
     # Remove linebreaks and clean whitespace of values in search
-    target = tuple(clean_whitespace(v) for v in (extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn))
+    target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(extra), 'item': extra.description}))
     for entry in bom:
         if bom_types_group(entry) == target:
             return entry['id']
