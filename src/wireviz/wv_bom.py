@@ -3,7 +3,7 @@
 
 from collections import Counter
 from dataclasses import asdict
-from typing import List, Union
+from typing import List, Tuple, Union
 
 from wireviz.DataClasses import AdditionalComponent, Connector, Cable
 from wireviz.wv_gv_html import html_line_breaks
@@ -37,7 +37,9 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dic
         })
     return(bom_entries)
 
-bom_types_group = lambda bt: (bt['item'], bt['unit'], bt['manufacturer'], bt['mpn'], bt['pn'])
+def bom_types_group(entry: dict) -> Tuple[str, ...]:
+    """Return a tuple of values from the dict that must be equal to join BOM entries."""
+    return tuple(entry.get(key) for key in ('item', 'unit', 'manufacturer', 'mpn', 'pn'))
 
 def generate_bom(harness):
     from wireviz.Harness import Harness  # Local import to avoid circular imports
