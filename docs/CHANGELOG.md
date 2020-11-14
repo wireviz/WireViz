@@ -4,6 +4,7 @@
 
 ### New features
 
+- Allow referencing a cable's/bundle's wires by color or by label ([#70](https://github.com/formatc1702/WireViz/issues/70), [#169](https://github.com/formatc1702/WireViz/issues/169), [#193](https://github.com/formatc1702/WireViz/issues/193), [#194](https://github.com/formatc1702/WireViz/pull/194))
 - Allow additional BOM items within components ([#50](https://github.com/formatc1702/WireViz/issues/50), [#115](https://github.com/formatc1702/WireViz/pull/115))
 - Add option to define connector pin colors ([#53](https://github.com/formatc1702/WireViz/issues/53), [#141](https://github.com/formatc1702/WireViz/pull/141))
 - Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
