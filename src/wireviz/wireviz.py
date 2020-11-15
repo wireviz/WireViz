@@ -95,18 +95,18 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                 designators_and_templates[designator] = template
         return (template, designator)
 
-    # utilities to check for alternatinv connectors and cables/arrows ==========
+    # utilities to check for alternating connectors and cables/arrows ==========
 
     alternating_types = ['connector','cable/arrow']
     expected_type = None
 
-    def check_type(designator, template, current_type):
+    def check_type(designator, template, actual_type):
         nonlocal expected_type
         if not expected_type:  # each connection set may start with either section
-            expected_type = current_type
+            expected_type = actual_type
 
-        if current_type != expected_type:  # did not alternate
-            raise Exception(f'Expected {expected_type}; "{designator}" ("{template}") is not of that type.')
+        if actual_type != expected_type:  # did not alternate
+            raise Exception(f'Expected {expected_type}, but "{designator}" ("{template}") is {actual_type}')
 
     def alternate_type():  # flip between connector and cable/arrow
         nonlocal expected_type
@@ -122,7 +122,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             elif isinstance(entry, dict):
                 connectioncount.append(len(expand(list(entry.values())[0])))  # - X1: [1-4,6] yields 5
             else:
-                # strings do not reveal connectioncount
+                pass # strings do not reveal connectioncount
         if not any(connectioncount):
             raise Exception('No item in connection set revealed number of connections')
             # TODO: The following should be a valid connection set,
@@ -173,10 +173,10 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
         expected_type = None  # reset check for alternating types
                               # at the beginning of every connection set
+                              # since each set may begin with either type
 
         # generate components
         for entry in connection_set:
-            first_in_entry = True
             for item in entry:
                 designator = list(item.keys())[0]
                 template = designators_and_templates[designator]
