@@ -9,7 +9,7 @@ def embed_svg_images(fn):
     fn = Path(fn).resolve()
     images_b64 = {}  # cache base-64 encoded images
     num_images = 0   # just for debugging
-    re_xlink=re.compile(r"xlink:href=\"(?P<URL>.*?)\"")
+    re_xlink=re.compile(r"xlink:href=\"(?P<URL>.*?)\"", re.IGNORECASE)
     with open(fn) as file_in, open(f'{fn.with_suffix("")}.b64.svg','w') as file_out:
         for line in file_in:
             for xlink in re_xlink.finditer(line):
