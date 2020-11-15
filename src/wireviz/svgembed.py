@@ -30,7 +30,8 @@ def embed_svg_images(fn):
                     images_b64[imgurl] = data_str
                 else:  # only cache every image once
                     print('  ❌This URL is not new')
-                line = line.replace(imgurl, f'data:image/png;base64, {images_b64[imgurl]}')
+                line = line.replace(imgurl,
+                                    f'data:image/png;base64, {images_b64[imgurl]}')
             file_out.write(line)
 
     print(f'Embedded {num_images} instances of {len(images_b64)} different images.')
