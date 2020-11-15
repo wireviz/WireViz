@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
 from wireviz import __version__
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, open_file_read, isarrow
+from wireviz.wv_helper import expand, open_file_read, isarrow, get_single_key_and_value
 
 
 def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
@@ -190,33 +190,25 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
                 if designator in harness.cables:
                     if index_item == 0:  # list started with a cable, no connector to join on left side
-                        from_name = None
-                        from_pin  = None
+                        from_name, from_pin = (None, None)
                     else:
-                        from_name = list(connection_set[index_entry][index_item-1].keys())[0]
-                        from_pin  = connection_set[index_entry][index_item-1][from_name]
-                    via_name  = designator
-                    via_pin   = item[designator]
+                        from_name, from_pin = get_single_key_and_value(connection_set[index_entry][index_item-1])
+                    via_name, via_pin = (designator, item[designator])
                     if index_item == len(entry) - 1:  # list ends with a cable, no connector to join on right side
-                        to_name   = None
-                        to_pin    = None
+                        to_name, to_pin = (None, None)
                     else:
-                        to_name   = list(connection_set[index_entry][index_item+1].keys())[0]
-                        to_pin    = connection_set[index_entry][index_item+1][to_name]
+                        to_name, to_pin = get_single_key_and_value(connection_set[index_entry][index_item+1])
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
 
                 elif isarrow(designator):
-                    if index_item == 0:  # list startess with an arrow
+                    if index_item == 0:  # list starts with an arrow
                         raise Exception('An arrow cannot be at the start of a connection set')
                     elif index_item == len(entry) - 1:  # list ends with an arrow
                         raise Exception('An arrow cannot be at the end of a connection set')
 
-                    from_name = list(connection_set[index_entry][index_item-1].keys())[0]
-                    from_pin  = connection_set[index_entry][index_item-1][from_name]
-                    via_name  = designator
-                    via_pin   = None
-                    to_name   = list(connection_set[index_entry][index_item+1].keys())[0]
-                    to_pin    = connection_set[index_entry][index_item+1][to_name]
+                    from_name, from_pin = get_single_key_and_value(connection_set[index_entry][index_item-1])
+                    via_name,  via_pin  = (designator, None)
+                    to_name,   to_pin   = get_single_key_and_value(connection_set[index_entry][index_item+1])
                     if '-' in designator:  # mate pin by pin
                         harness.add_mate_pin(from_name, from_pin, to_name, to_pin, designator)
                     elif '=' in designator and index_entry == 0:  # mate two connectors as a whole

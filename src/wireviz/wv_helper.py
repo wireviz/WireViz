@@ -66,6 +66,12 @@ def expand(yaml_data):
     return output
 
 
+def get_single_key_and_value(d: dict):
+    k = list(d.keys())[0]
+    v = d[k]
+    return (k, v)
+
+
 def int2tuple(inp):
     if isinstance(inp, tuple):
         output = inp
