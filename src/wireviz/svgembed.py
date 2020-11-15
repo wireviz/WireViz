@@ -14,7 +14,7 @@ def embed_svg_images(filename_in: Path, overwrite: bool = True):
     images_b64 = {}  # cache base-64 encoded images
     num_images = 0   # just for debugging
     re_xlink=re.compile(r"xlink:href=\"(?P<URL>.*?)\"", re.IGNORECASE)
-    with open(filename_in) as file_in, open(filename_out,'w') as file_out:
+    with open(filename_in,'r') as file_in, open(filename_out,'w') as file_out:
         for line in file_in:
             for xlink in re_xlink.finditer(line):
                 num_images = num_images + 1
@@ -25,7 +25,7 @@ def embed_svg_images(filename_in: Path, overwrite: bool = True):
                     else:
                         imgurl_abs = Path(imgurl)
 
-                    with open(imgurl_abs, 'rb') as img:
+                    with open(imgurl_abs,'rb') as img:
                         data_bin = img.read()
                         data_b64 = base64.b64encode(data_bin)
                         data_str = data_b64.decode('utf-8')
