@@ -96,6 +96,21 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                 designators_and_templates[designator] = template
         return (template, designator)
 
+    alternating_types = ['connector','cable/arrow']
+    expected_type = None
+
+    def check_type(designator, template, current_type):
+        nonlocal expected_type
+        if not expected_type:  # each connection set may start with either section
+            expected_type = current_type
+
+        if current_type != expected_type:  # did not alternate
+            raise Exception(f'Expected {expected_type}; "{designator}" ("{template}") is not of that type.')
+
+    def alternate_type():  # flip between connector and cable/arrow
+        nonlocal expected_type
+        expected_type = alternating_types[1 - alternating_types.index(expected_type)]
+
     for connection_set in connection_sets:
 
         # figure out number of parallel connections within this set
@@ -153,34 +168,41 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             else:
                 pass  # string entries have been expanded in previous step
 
-        # TODO: check alternating cable/connector
-        alternating_sections = ['connectors','cables']
-
         # Populate wiring harness ==============================================
+
+        expected_type = None  # reset check for alternating types
+                              # at the beginning of every connection set
 
         # generate components
         for entry in connection_set:
+            first_in_entry = True
             for item in entry:
                 designator = list(item.keys())[0]
                 template = designators_and_templates[designator]
+
                 if designator in harness.connectors:  # existing connector instance
-                    pass
+                    check_type(designator, template, 'connector')
                 elif template in template_connectors.keys():  # generate new connector instance from template
+                    check_type(designator, template, 'connector')
                     harness.add_connector(name = designator, **template_connectors[template])
 
                 elif designator in harness.cables:  # existing cable instance
-                    pass
+                    check_type(designator, template, 'cable/arrow')
                 elif template in template_cables.keys():  # generate new cable instance from template
+                    check_type(designator, template, 'cable/arrow')
                     harness.add_cable(name = designator, **template_cables[template])
 
                 elif isarrow(designator):
-                    pass  # arrows do not need to be generated here
+                    check_type(designator, template, 'cable/arrow')
+                    # arrows do not need to be generated here
                 else:
                     raise Exception(f'{template} is an unknown template/designator/arrow.')
 
+            alternate_type()  # entries in connection set must alternate between connectors and cables/arrows
+
         # transpose connection set list
-        # before: one row per component, one column per connection in set
-        # after:  one row per connection in set, one column per component
+        # before: one item per component, one subitem per connection in set
+        # after:  one item per connection in set, one subitem per component
         connection_set = list(map(list, zip(*connection_set)))  # transpose list
 
         # connect components
@@ -214,7 +236,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     elif '=' in designator and index_entry == 0:  # mate two connectors as a whole
                         harness.add_mate_component(from_name, to_name, designator)
 
-    # harness population completed ==============================================
+    # harness population completed =============================================
 
     if "additional_bom_items" in yaml_data:
         for line in yaml_data["additional_bom_items"]:
