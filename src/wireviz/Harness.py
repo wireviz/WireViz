@@ -75,7 +75,6 @@ class Harness:
                 self.mates[(from_name, from_pin, to_name, to_pin)] = via_name
             elif '=' in via_name:
                 self.mates[(from_name, to_name)] = via_name
-            print(self.mates)
         elif via_name in self.cables:
             cable = self.cables[via_name]
             # check if provided name is ambiguous
