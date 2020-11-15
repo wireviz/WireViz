@@ -18,7 +18,12 @@ def embed_svg_images(fn):
                 print(' Found URL in SVG:', imgurl)
                 if not imgurl in images_b64:
                     print('  ✅This URL is new')
-                    with open(imgurl, 'rb') as img:
+                    if not Path(imgurl).is_absolute():  # resolve relative image path
+                        imgurl_abs = (Path(fn).parent / imgurl).resolve()
+                        print(imgurl, '-->', imgurl_abs)
+                    else:
+                        imgurl_abs = imgurl
+                    with open(imgurl_abs, 'rb') as img:
                         data_bin = img.read()
                         data_b64 = base64.b64encode(data_bin)
                         data_str = data_b64.decode('utf-8')
