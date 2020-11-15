@@ -88,13 +88,14 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             else:
                 designators_and_templates[designator] = template
         else:
-            template = inp
-            designator = inp
+            template, designator = (inp, inp)
             if designator in designators_and_templates:
                 pass  # referencing an exiting connector, no need to add again
             else:
                 designators_and_templates[designator] = template
         return (template, designator)
+
+    # utilities to check for alternatinv connectors and cables/arrows ==========
 
     alternating_types = ['connector','cable/arrow']
     expected_type = None
@@ -121,7 +122,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             elif isinstance(entry, dict):
                 connectioncount.append(len(expand(list(entry.values())[0])))  # - X1: [1-4,6] yields 5
             else:
-                connectioncount.append(None)  # strings do not reveal connectioncount
+                # strings do not reveal connectioncount
         if not any(connectioncount):
             raise Exception('No item in connection set revealed number of connections')
             # TODO: The following should be a valid connection set,
@@ -133,10 +134,10 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             #   - CONNECTOR
 
         # check that all entries are the same length
-        if len(set(filter(None, connectioncount))) > 1:
+        if len(set(connectioncount)) > 1:
             raise Exception('All items in connection set must reference the same number of connections')
         # all entries are the same length, connection count is set
-        connectioncount = list(filter(None, connectioncount))[0]
+        connectioncount = connectioncount[0]
 
         # expand string entries to list entries of correct length
         for index, entry in enumerate(connection_set):
@@ -203,7 +204,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         # transpose connection set list
         # before: one item per component, one subitem per connection in set
         # after:  one item per connection in set, one subitem per component
-        connection_set = list(map(list, zip(*connection_set)))  # transpose list
+        connection_set = list(map(list, zip(*connection_set)))
 
         # connect components
         for index_entry, entry in enumerate(connection_set):
