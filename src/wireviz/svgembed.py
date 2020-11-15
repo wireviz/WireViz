@@ -36,6 +36,6 @@ def embed_svg_images(filename_in: Path, overwrite: bool = True):
                                     f'data:image/{mime_subtype};base64, {images_b64[imgurl]}')
             file_out.write(line)
 
-        if overwrite:
-            os.remove(filename_in)
-            os.rename(filename_out, filename_in)
+    if overwrite:
+        os.remove(filename_in)
+        os.rename(filename_out, filename_in)
