@@ -112,7 +112,7 @@ def open_file_write(filename):
 def open_file_append(filename):
     return open(filename, 'a', encoding='UTF-8')
 
-def isarrow(inp):
+def is_arrow(inp):
     """
     Matches strings of one or multiple `-` or `=` (but not mixed)
     optionally starting with `<` and/or ending with `>`.

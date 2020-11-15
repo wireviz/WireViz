@@ -17,9 +17,7 @@ from wireviz.wv_bom import manufacturer_info_field, component_table_entry, \
     get_additional_component_table, bom_list, generate_bom
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
-    open_file_read, open_file_write
-
-arrows = ['<--','<->','-->','<==','<=>','==>']
+    open_file_read, open_file_write, is_arrow
 
 class Harness:
 
@@ -70,7 +68,7 @@ class Harness:
                     raise Exception(f'{name}:{pin} not found.')
 
         # check via cable
-        if via_name in arrows:
+        if is_arrow(via_name):
             if '-' in via_name:
                 self.mates[(from_name, from_pin, to_name, to_pin)] = via_name
             elif '=' in via_name:

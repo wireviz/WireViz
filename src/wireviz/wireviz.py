@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
 from wireviz import __version__
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, open_file_read, isarrow, get_single_key_and_value
+from wireviz.wv_helper import expand, open_file_read, is_arrow, get_single_key_and_value
 
 
 def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
@@ -193,7 +193,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     check_type(designator, template, 'cable/arrow')
                     harness.add_cable(name = designator, **template_cables[template])
 
-                elif isarrow(designator):
+                elif is_arrow(designator):
                     check_type(designator, template, 'cable/arrow')
                     # arrows do not need to be generated here
                 else:
@@ -223,7 +223,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                         to_name, to_pin = get_single_key_and_value(connection_set[index_entry][index_item+1])
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
 
-                elif isarrow(designator):
+                elif is_arrow(designator):
                     if index_item == 0:  # list starts with an arrow
                         raise Exception('An arrow cannot be at the start of a connection set')
                     elif index_item == len(entry) - 1:  # list ends with an arrow
