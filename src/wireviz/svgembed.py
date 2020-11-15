@@ -6,6 +6,8 @@ import base64
 from pathlib import Path
 import os
 
+mime_subtype_replacements = {'jpg': 'jpeg', 'tif': 'tiff'}
+
 def embed_svg_images(filename_in: Path, overwrite: bool = True):
     filename_in = Path(filename_in).resolve()
     filename_out = f'{filename_in.with_suffix("")}.b64.svg'
@@ -21,7 +23,7 @@ def embed_svg_images(filename_in: Path, overwrite: bool = True):
                     if not Path(imgurl).is_absolute():  # resolve relative image path
                         imgurl_abs = (Path(filename_in).parent / imgurl).resolve()
                     else:
-                        imgurl_abs = imgurl
+                        imgurl_abs = Path(imgurl)
 
                     with open(imgurl_abs, 'rb') as img:
                         data_bin = img.read()
@@ -29,8 +31,11 @@ def embed_svg_images(filename_in: Path, overwrite: bool = True):
                         data_str = data_b64.decode('utf-8')
                     images_b64[imgurl] = data_str
 
+                mime_subtype = str(imgurl_abs.suffix[1:]).lower()  # remove `.`
+                if mime_subtype in mime_subtype_replacements:
+                    mime_subtype = mime_subtype_replacements[mime_subtype]
                 line = line.replace(imgurl,
-                                    f'data:image/png;base64, {images_b64[imgurl]}')
+                                    f'data:image/{mime_subtype};base64, {images_b64[imgurl]}')
             file_out.write(line)
 
         if overwrite:
