@@ -4,13 +4,12 @@
 import re
 import base64
 from pathlib import Path
-import os
 
 mime_subtype_replacements = {'jpg': 'jpeg', 'tif': 'tiff'}
 
 def embed_svg_images(filename_in: Path, overwrite: bool = True):
     filename_in = Path(filename_in).resolve()
-    filename_out = f'{filename_in.with_suffix("")}.b64.svg'
+    filename_out = Path(f'{filename_in.with_suffix("")}.b64.svg')
     images_b64 = {}  # cache base-64 encoded images
     re_xlink=re.compile(r"xlink:href=\"(?P<URL>.*?)\"", re.IGNORECASE)
     with open(filename_in,'r') as file_in, open(filename_out,'w') as file_out:
@@ -37,5 +36,4 @@ def embed_svg_images(filename_in: Path, overwrite: bool = True):
             file_out.write(line)
 
     if overwrite:
-        os.remove(filename_in)
-        os.rename(filename_out, filename_in)
+        filename_out.replace(filename_in)
