@@ -14,7 +14,7 @@ def embed_svg_images(fn):
         for line in file_in:
             for xlink in re_xlink.finditer(line):
                 num_images = num_images + 1
-                imgurl = xlink.group(1)
+                imgurl = xlink.group('URL')
                 print(' Found URL in SVG:', imgurl)
                 if not imgurl in images_b64:
                     print('  ✅This URL is new')
