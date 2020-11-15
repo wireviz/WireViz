@@ -9,7 +9,7 @@ from itertools import zip_longest
 import re
 
 from wireviz import wv_colors, __version__, APP_NAME, APP_URL
-from wireviz.DataClasses import Connector, Cable
+from wireviz.DataClasses import Connector, Cable, MatePin, MateComponent
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
     html_caption, remove_links, html_line_breaks
