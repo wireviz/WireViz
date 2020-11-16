@@ -200,7 +200,7 @@ class Cable:
             try:
                 g, u = self.gauge.split(' ')
             except Exception:
-                raise Exception('Gauge must be a number, or number and unit separated by a space')
+                raise Exception(f'{self.gauge} - Gauge must be a number, or number and unit separated by a space')
             self.gauge = g
 
             if u.upper() == 'AWG':
@@ -219,7 +219,7 @@ class Cable:
                 l, u = self.length.split(' ')
                 l = float(l)
             except Exception:
-                raise Exception('Length must be a number, or number and unit separated by a space')
+                raise Exception(f'{self.length} - Length must be a number, or number and unit separated by a space')
             self.length = l
             self.length_unit = u
         elif self.length is not None:  # length specified, assume m
