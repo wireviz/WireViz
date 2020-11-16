@@ -214,6 +214,20 @@ class Cable:
         else:
             pass  # gauge not specified
 
+        if isinstance(self.length, str):  # length and unit specified
+            try:
+                l, u = self.length.split(' ')
+                l = float(l)
+            except Exception:
+                raise Exception('Length must be a number, or number and unit separated by a space')
+            self.length = l
+            self.length_unit = u
+        elif self.length is not None:  # length specified, assume m
+            if self.gauge_unit is None:
+                self.length_unit = 'm'
+        else:
+            pass  # length not specified
+
         self.connections = []
 
         if self.length_unit is None: #Default wire length units to meters if left undeclared
