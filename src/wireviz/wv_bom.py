@@ -20,7 +20,7 @@ def get_additional_component_table(harness, component: Union[Connector, Cable]) 
                 rows.append(component_table_entry(f'#{id} ({extra.type.rstrip()})', qty, extra.unit))
             else:
                 rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
-    return(rows)
+    return rows
 
 def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dict]:
     bom_entries = []
@@ -35,7 +35,7 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dic
             'pn': part.pn,
             'designators': component.name if component.show_name else None
         })
-    return(bom_entries)
+    return bom_entries
 
 def bom_types_group(entry: dict) -> Tuple[str, ...]:
     """Return a tuple of values from the dict that must be equal to join BOM entries."""
