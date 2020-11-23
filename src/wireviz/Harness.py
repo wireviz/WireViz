@@ -288,13 +288,14 @@ class Harness:
 
             # connections
             for connection in cable.connections:
+                # Avoid href=None for edges as it seems that Graphviz then uses the href value from a previous edge!
                 if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
                     dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection.via_port - 1], pad=pad) + ['#000000']),
-                             href=index_if_list(cable.url, connection.via_port - 1))
+                             href=index_if_list(cable.url, connection.via_port - 1) or '')
                 else:  # it's a shield connection
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
                     dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000',
-                             href=cable.url if isinstance(cable.url, str) else None)
+                             href=cable.url if isinstance(cable.url, str) else '')
                 if connection.from_port is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
                     from_port = f':p{connection.from_port}r' if from_connector.style != 'simple' else ''
