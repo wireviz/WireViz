@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from collections import Counter
 from dataclasses import asdict
+from itertools import groupby
 from typing import Any, List, Tuple, Union
 
 from wireviz.DataClasses import AdditionalComponent, Connector, Cable
@@ -100,17 +100,20 @@ def generate_bom(harness):
     # remove line breaks if present and cleanup any resulting whitespace issues
     bom_entries = [{k: clean_whitespace(v) for k, v in entry.items()} for entry in bom_entries]
 
+    # Sort entries to prepare grouping on the same key function.
+    bom_entries.sort(key=lambda entry: tuple(attr or '' for attr in bom_types_group(entry)))
+
     # deduplicate bom
     bom = []
-    for group in Counter([bom_types_group(v) for v in bom_entries]):
-        group_entries = [v for v in bom_entries if bom_types_group(v) == group]
+    for _, group in groupby(bom_entries, bom_types_group):
+        last_entry = None
+        total_qty = 0
         designators = []
-        for group_entry in group_entries:
+        for group_entry in group:
             designators.extend(make_list(group_entry.get('designators')))
-        total_qty = sum(entry['qty'] for entry in group_entries)
-        bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': sorted(set(designators))})
-
-    bom = sorted(bom, key=lambda k: k['item'])  # sort list of dicts by their values (https://stackoverflow.com/a/73050)
+            total_qty += group_entry['qty']
+            last_entry = group_entry
+        bom.append({**last_entry, 'qty': round(total_qty, 3), 'designators': sorted(set(designators))})
 
     # add an incrementing id to each bom item
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
