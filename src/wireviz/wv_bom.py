@@ -116,12 +116,10 @@ def generate_bom(harness):
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
 
 def get_bom_index(bom: List[dict], extra: AdditionalComponent) -> int:
+    """Return id of BOM entry or raise StopIteration if not found."""
     # Remove linebreaks and clean whitespace of values in search
     target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(extra), 'item': extra.description}))
-    for entry in bom:
-        if bom_types_group(entry) == target:
-            return entry['id']
-    return None
+    return next(entry['id'] for entry in bom if bom_types_group(entry) == target)
 
 def bom_list(bom):
     keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
