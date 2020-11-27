@@ -38,8 +38,8 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dic
     return bom_entries
 
 def bom_types_group(entry: dict) -> Tuple[str, ...]:
-    """Return a tuple of values from the dict that must be equal to join BOM entries."""
-    return tuple(entry.get(key) for key in ('item', 'unit', 'manufacturer', 'mpn', 'pn'))
+    """Return a tuple of string values from the dict that must be equal to join BOM entries."""
+    return tuple(make_str(entry.get(key)) for key in ('item', 'unit', 'manufacturer', 'mpn', 'pn'))
 
 def generate_bom(harness):
     from wireviz.Harness import Harness  # Local import to avoid circular imports
@@ -100,12 +100,9 @@ def generate_bom(harness):
     # remove line breaks if present and cleanup any resulting whitespace issues
     bom_entries = [{k: clean_whitespace(v) for k, v in entry.items()} for entry in bom_entries]
 
-    # Sort entries to prepare grouping on the same key function.
-    bom_entries.sort(key=lambda entry: tuple(attr or '' for attr in bom_types_group(entry)))
-
     # deduplicate bom
     bom = []
-    for _, group in groupby(bom_entries, bom_types_group):
+    for _, group in groupby(sorted(bom_entries, key=bom_types_group), key=bom_types_group):
         last_entry = None
         total_qty = 0
         designators = []
