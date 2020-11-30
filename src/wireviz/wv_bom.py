@@ -103,14 +103,10 @@ def generate_bom(harness):
     # deduplicate bom
     bom = []
     for _, group in groupby(sorted(bom_entries, key=bom_types_group), key=bom_types_group):
-        last_entry = None
-        total_qty = 0
-        designators = []
-        for group_entry in group:
-            designators.extend(make_list(group_entry.get('designators')))
-            total_qty += group_entry['qty']
-            last_entry = group_entry
-        bom.append({**last_entry, 'qty': round(total_qty, 3), 'designators': sorted(set(designators))})
+        group_entries = list(group)
+        designators = sum((make_list(entry.get('designators')) for entry in group_entries), [])
+        total_qty = sum(entry['qty'] for entry in group_entries)
+        bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': sorted(set(designators))})
 
     # add an incrementing id to each bom item
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
