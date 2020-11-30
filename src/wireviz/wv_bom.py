@@ -3,13 +3,14 @@
 
 from dataclasses import asdict
 from itertools import groupby
-from typing import Any, List, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from wireviz.DataClasses import AdditionalComponent, Connector, Cable
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import clean_whitespace
 
-def get_additional_component_table(harness, component: Union[Connector, Cable]) -> List[str]:
+def get_additional_component_table(harness: "Harness", component: Union[Connector, Cable]) -> List[str]:
+    """Return a list of diagram node table row strings with additional components."""
     rows = []
     if component.additional_components:
         rows.append(["Additional components"])
@@ -23,6 +24,7 @@ def get_additional_component_table(harness, component: Union[Connector, Cable]) 
     return rows
 
 def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dict]:
+    """Return a list of BOM entries with additional components."""
     bom_entries = []
     for part in component.additional_components:
         qty = part.qty * component.get_qty_multiplier(part.qty_multiplier)
@@ -41,7 +43,8 @@ def bom_types_group(entry: dict) -> Tuple[str, ...]:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
     return tuple(make_str(entry.get(key)) for key in ('item', 'unit', 'manufacturer', 'mpn', 'pn'))
 
-def generate_bom(harness):
+def generate_bom(harness: "Harness") -> List[dict]:
+    """Return a list of BOM entries generated from the harness."""
     from wireviz.Harness import Harness  # Local import to avoid circular imports
     bom_entries = []
     # connectors
@@ -117,7 +120,8 @@ def get_bom_index(bom: List[dict], extra: AdditionalComponent) -> int:
     target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(extra), 'item': extra.description}))
     return next(entry['id'] for entry in bom if bom_types_group(entry) == target)
 
-def bom_list(bom):
+def bom_list(bom: List[dict]) -> List[List[str]]:
+    """Return list of BOM rows as lists of column strings with headings in top row."""
     keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
     for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
         if any(entry.get(fieldname) for entry in bom):
@@ -130,7 +134,15 @@ def bom_list(bom):
     return ([[bom_headings.get(k, k.capitalize()) for k in keys]] +  # Create header row with key names
             [[make_str(entry.get(k)) for k in keys] for entry in bom])  # Create string list for each entry row
 
-def component_table_entry(type, qty, unit=None, pn=None, manufacturer=None, mpn=None):
+def component_table_entry(
+        type: str,
+        qty: Union[int, float],
+        unit: Optional[str] = None,
+        pn: Optional[str] = None,
+        manufacturer: Optional[str] = None,
+        mpn: Optional[str] = None,
+    ) -> str:
+    """Return a diagram node table row string with an additional component."""
     output = f'{qty}'
     if unit:
         output += f' {unit}'
@@ -152,14 +164,15 @@ def component_table_entry(type, qty, unit=None, pn=None, manufacturer=None, mpn=
    <td align="left" balign="left">{output}</td>
   </tr></table>'''
 
-def manufacturer_info_field(manufacturer, mpn):
+def manufacturer_info_field(manufacturer: Optional[str], mpn: Optional[str]) -> Optional[str]:
+    """Return the manufacturer and/or the mpn in one single string or None otherwise."""
     if manufacturer or mpn:
         return f'{manufacturer if manufacturer else "MPN"}{": " + str(mpn) if mpn else ""}'
     else:
         return None
 
-# Return the value indexed if it is a list, or simply the value otherwise.
-def index_if_list(value, index):
+def index_if_list(value: Any, index: int) -> Any:
+    """Return the value indexed if it is a list, or simply the value otherwise."""
     return value[index] if isinstance(value, list) else value
 
 def make_list(value: Any) -> list:
