@@ -3,11 +3,13 @@
 
 from dataclasses import asdict
 from itertools import groupby
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from wireviz.DataClasses import AdditionalComponent, Connector, Cable
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import clean_whitespace
+
+BOMEntry = Dict[str, Union[str, int, float, List[str], None]]
 
 def get_additional_component_table(harness: "Harness", component: Union[Connector, Cable]) -> List[str]:
     """Return a list of diagram node table row strings with additional components."""
@@ -23,7 +25,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 rows.append(component_table_entry(extra.description, qty, extra.unit, extra.pn, extra.manufacturer, extra.mpn))
     return rows
 
-def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dict]:
+def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOMEntry]:
     """Return a list of BOM entries with additional components."""
     bom_entries = []
     for part in component.additional_components:
@@ -39,11 +41,11 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[dic
         })
     return bom_entries
 
-def bom_types_group(entry: dict) -> Tuple[str, ...]:
+def bom_types_group(entry: BOMEntry) -> Tuple[str, ...]:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
     return tuple(make_str(entry.get(key)) for key in ('item', 'unit', 'manufacturer', 'mpn', 'pn'))
 
-def generate_bom(harness: "Harness") -> List[dict]:
+def generate_bom(harness: "Harness") -> List[BOMEntry]:
     """Return a list of BOM entries generated from the harness."""
     from wireviz.Harness import Harness  # Local import to avoid circular imports
     bom_entries = []
@@ -114,13 +116,13 @@ def generate_bom(harness: "Harness") -> List[dict]:
     # add an incrementing id to each bom item
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
 
-def get_bom_index(bom: List[dict], extra: AdditionalComponent) -> int:
+def get_bom_index(bom: List[BOMEntry], extra: AdditionalComponent) -> int:
     """Return id of BOM entry or raise StopIteration if not found."""
     # Remove linebreaks and clean whitespace of values in search
     target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(extra), 'item': extra.description}))
     return next(entry['id'] for entry in bom if bom_types_group(entry) == target)
 
-def bom_list(bom: List[dict]) -> List[List[str]]:
+def bom_list(bom: List[BOMEntry]) -> List[List[str]]:
     """Return list of BOM rows as lists of column strings with headings in top row."""
     keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
     for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
