@@ -200,9 +200,11 @@ class Cable:
             try:
                 g, u = self.gauge.split(' ')
             except Exception:
-                raise Exception(f'{self.gauge} - Gauge must be a number, or number and unit separated by a space')
+                raise Exception(f'Cable {self.name} gauge={self.gauge} - Gauge must be a number, or number and unit separated by a space')
             self.gauge = g
 
+            if self.gauge_unit is not None:
+                print(f'Warning: Cable {self.name} gauge_unit={self.gauge_unit} is ignored because its gauge contains {u}')
             if u.upper() == 'AWG':
                 self.gauge_unit = u.upper()
             else:
@@ -216,17 +218,18 @@ class Cable:
 
         if isinstance(self.length, str):  # length and unit specified
             try:
-                l, u = self.length.split(' ')
-                l = float(l)
+                L, u = self.length.split(' ')
+                L = float(L)
             except Exception:
-                raise Exception(f'{self.length} - Length must be a number, or number and unit separated by a space')
-            self.length = l
+                raise Exception(f'Cable {self.name} length={self.length} - Length must be a number, or number and unit separated by a space')
+            self.length = L
+            if self.length_unit is not None:
+                print(f'Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}')
             self.length_unit = u
-        elif self.length is not None:  # length specified, assume m
-            if self.gauge_unit is None:
-                self.length_unit = 'm'
-        else:
-            pass  # length not specified
+        elif not any(isinstance(self.length, t) for t in [int, float]):
+            raise Exception(f'Cable {self.name} length has a non-numeric value')
+        elif self.gauge_unit is None:
+            self.length_unit = 'm'
 
         self.connections = []
 
