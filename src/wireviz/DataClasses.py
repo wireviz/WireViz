@@ -233,9 +233,6 @@ class Cable:
 
         self.connections = []
 
-        if self.length_unit is None: #Default wire length units to meters if left undeclared
-            self.length_unit = 'm'
-
         if self.wirecount:  # number of wires explicitly defined
             if self.colors:  # use custom color palette (partly or looped if needed)
                 pass
