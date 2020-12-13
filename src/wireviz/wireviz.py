@@ -45,11 +45,11 @@ def parse(yaml_input: str, base_path: (str, Path) = None, file_out: (str, Path) 
             if len(yaml_data[sec]) > 0:
                 if ty == dict:
                     for key, attribs in yaml_data[sec].items():
-                        if attribs.get('image'):
-                            image_path = attribs['image']['src']
-                            if not Path(image_path).is_absolute():  # resolve relative image path
-                                image_path = (Path(base_path) / image_path).resolve()
-                                attribs['image']['src'] = image_path
+                        image = attribs.get('image')
+                        if isinstance(image, dict):
+                            image_path = image['src']
+                            if image_path and not Path(image_path).is_absolute():  # resolve relative image path
+                                image['src'] = (Path(base_path) / image_path).resolve()
 
                         if sec == 'connectors':
                             if not attribs.get('autogenerate', False):
