@@ -200,9 +200,11 @@ class Cable:
             try:
                 g, u = self.gauge.split(' ')
             except Exception:
-                raise Exception('Gauge must be a number, or number and unit separated by a space')
+                raise Exception(f'Cable {self.name} gauge={self.gauge} - Gauge must be a number, or number and unit separated by a space')
             self.gauge = g
 
+            if self.gauge_unit is not None:
+                print(f'Warning: Cable {self.name} gauge_unit={self.gauge_unit} is ignored because its gauge contains {u}')
             if u.upper() == 'AWG':
                 self.gauge_unit = u.upper()
             else:
@@ -214,10 +216,22 @@ class Cable:
         else:
             pass  # gauge not specified
 
-        self.connections = []
-
-        if self.length_unit is None: #Default wire length units to meters if left undeclared
+        if isinstance(self.length, str):  # length and unit specified
+            try:
+                L, u = self.length.split(' ')
+                L = float(L)
+            except Exception:
+                raise Exception(f'Cable {self.name} length={self.length} - Length must be a number, or number and unit separated by a space')
+            self.length = L
+            if self.length_unit is not None:
+                print(f'Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}')
+            self.length_unit = u
+        elif not any(isinstance(self.length, t) for t in [int, float]):
+            raise Exception(f'Cable {self.name} length has a non-numeric value')
+        elif self.gauge_unit is None:
             self.length_unit = 'm'
+
+        self.connections = []
 
         if self.wirecount:  # number of wires explicitly defined
             if self.colors:  # use custom color palette (partly or looped if needed)
