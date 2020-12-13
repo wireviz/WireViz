@@ -43,7 +43,7 @@ class Image:
     caption: Optional[MultilineHypertext] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
 
         if self.fixedsize is None:
             # Default True if any dimension specified unless self.scale also is specified.

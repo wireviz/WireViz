@@ -342,7 +342,7 @@ class Harness:
         return data.read()
 
     @property
-    def svg(self):
+    def svg(self) -> str:
         graph = self.create_graph()
         return embed_svg_images(graph.pipe(format='svg').decode('utf-8'), Path.cwd())
 
