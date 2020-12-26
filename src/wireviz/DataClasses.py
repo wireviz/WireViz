@@ -228,7 +228,7 @@ class Cable:
             self.length_unit = u
         elif not any(isinstance(self.length, t) for t in [int, float]):
             raise Exception(f'Cable {self.name} length has a non-numeric value')
-        elif self.gauge_unit is None:
+        elif self.length_unit is None:
             self.length_unit = 'm'
 
         self.connections = []
