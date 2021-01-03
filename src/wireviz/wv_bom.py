@@ -145,25 +145,18 @@ def component_table_entry(
         mpn: Optional[str] = None,
     ) -> str:
     """Return a diagram node table row string with an additional component."""
-    output = f'{qty}'
-    if unit:
-        output += f' {unit}'
-    output += f' x {type}'
-    # print an extra line with part and manufacturer information if provided
     manufacturer_str = manufacturer_info_field(manufacturer, mpn)
-    if pn or manufacturer_str:
-        output += '<br/>'
-        if pn:
-            output += f'P/N: {pn}'
-            if manufacturer_str:
-                output += ', '
-        if manufacturer_str:
-            output += manufacturer_str
-    output = html_line_breaks(output)
+    output = (f'{qty}'
+              + (f' {unit}' if unit else '')
+              + f' x {type}'
+              + ('<br/>' if pn or manufacturer_str else '')
+              + (f'P/N: {pn}' if pn else '')
+              + (', ' if pn and manufacturer_str else '')
+              + (manufacturer_str or ''))
     # format the above output as left aligned text in a single visible cell
     # indent is set to two to match the indent in the generated html table
     return f'''<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td align="left" balign="left">{output}</td>
+   <td align="left" balign="left">{html_line_breaks(output)}</td>
   </tr></table>'''
 
 def manufacturer_info_field(manufacturer: Optional[str], mpn: Optional[str]) -> Optional[str]:
