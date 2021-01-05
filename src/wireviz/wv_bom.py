@@ -29,10 +29,9 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
     """Return a list of BOM entries with additional components."""
     bom_entries = []
     for part in component.additional_components:
-        qty = part.qty * component.get_qty_multiplier(part.qty_multiplier)
         bom_entries.append({
             'item': part.description,
-            'qty': qty,
+            'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
             'unit': part.unit,
             'manufacturer': part.manufacturer,
             'mpn': part.mpn,
