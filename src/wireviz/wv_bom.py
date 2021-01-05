@@ -58,7 +58,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                            + (f', {connector.pincount} pins' if connector.show_pincount else '')
                            + (f', {connector.color}' if connector.color else ''))
             bom_entries.append({
-                'item': description, 'qty': 1, 'unit': None, 'designators': connector.name if connector.show_name else None,
+                'item': description, 'designators': connector.name if connector.show_name else None,
                 'manufacturer': connector.manufacturer, 'mpn': connector.mpn, 'pn': connector.pn
             })
 
@@ -96,11 +96,8 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
         # add cable/bundles aditional components to bom
         bom_entries.extend(get_additional_component_bom(cable))
 
-    for item in harness.additional_bom_items:
-        bom_entries.append({
-            'item': item.get('description', ''), 'qty': item.get('qty', 1), 'unit': item.get('unit'), 'designators': item.get('designators'),
-            'manufacturer': item.get('manufacturer'), 'mpn': item.get('mpn'), 'pn': item.get('pn')
-        })
+    # TODO: Simplify this by renaming the 'item' key to 'description' in all BOMEntry dicts.
+    bom_entries.extend([{k.replace('description', 'item'): v for k, v in entry.items()} for entry in harness.additional_bom_items])
 
     # remove line breaks if present and cleanup any resulting whitespace issues
     bom_entries = [{k: clean_whitespace(v) for k, v in entry.items()} for entry in bom_entries]
@@ -110,7 +107,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
     for _, group in groupby(sorted(bom_entries, key=bom_types_group), key=bom_types_group):
         group_entries = list(group)
         designators = sum((make_list(entry.get('designators')) for entry in group_entries), [])
-        total_qty = sum(entry['qty'] for entry in group_entries)
+        total_qty = sum(entry.get('qty', 1) for entry in group_entries)
         bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': sorted(set(designators))})
 
     # add an incrementing id to each bom item
