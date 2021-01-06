@@ -30,7 +30,7 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
     bom_entries = []
     for part in component.additional_components:
         bom_entries.append({
-            'item': part.description,
+            'description': part.description,
             'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
             'unit': part.unit,
             'manufacturer': part.manufacturer,
@@ -42,7 +42,7 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
 
 def bom_types_group(entry: BOMEntry) -> Tuple[str, ...]:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
-    return tuple(make_str(entry.get(key)) for key in ('item', 'unit', 'manufacturer', 'mpn', 'pn'))
+    return tuple(make_str(entry.get(key)) for key in ('description', 'unit', 'manufacturer', 'mpn', 'pn'))
 
 def generate_bom(harness: "Harness") -> List[BOMEntry]:
     """Return a list of BOM entries generated from the harness."""
@@ -57,7 +57,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                            + (f', {connector.pincount} pins' if connector.show_pincount else '')
                            + (f', {connector.color}' if connector.color else ''))
             bom_entries.append({
-                'item': description, 'designators': connector.name if connector.show_name else None,
+                'description': description, 'designators': connector.name if connector.show_name else None,
                 'manufacturer': connector.manufacturer, 'mpn': connector.mpn, 'pn': connector.pn
             })
 
@@ -65,7 +65,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
         bom_entries.extend(get_additional_component_bom(connector))
 
     # cables
-    # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of item name?
+    # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of description?
     for cable in harness.cables.values():
         if not cable.ignore_in_bom:
             if cable.category != 'bundle':
@@ -76,7 +76,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                                + (f' x {cable.gauge} {cable.gauge_unit}' if cable.gauge else ' wires')
                                + (' shielded' if cable.shield else ''))
                 bom_entries.append({
-                    'item': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
+                    'description': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
                     'manufacturer': cable.manufacturer, 'mpn': cable.mpn, 'pn': cable.pn
                 })
             else:
@@ -87,7 +87,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                                    + (f', {cable.gauge} {cable.gauge_unit}' if cable.gauge else '')
                                    + (f', {color}' if color else ''))
                     bom_entries.append({
-                        'item': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
+                        'description': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
                         'manufacturer': index_if_list(cable.manufacturer, index),
                         'mpn': index_if_list(cable.mpn, index), 'pn': index_if_list(cable.pn, index)
                     })
@@ -95,8 +95,8 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
         # add cable/bundles aditional components to bom
         bom_entries.extend(get_additional_component_bom(cable))
 
-    # TODO: Simplify this by renaming the 'item' key to 'description' in all BOMEntry dicts.
-    bom_entries.extend([{k.replace('description', 'item'): v for k, v in entry.items()} for entry in harness.additional_bom_items])
+    # add harness aditional components to bom directly, as they both are List[BOMEntry]
+    bom_entries.extend(harness.additional_bom_items)
 
     # remove line breaks if present and cleanup any resulting whitespace issues
     bom_entries = [{k: clean_whitespace(v) for k, v in entry.items()} for entry in bom_entries]
@@ -109,23 +109,24 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
         total_qty = sum(entry.get('qty', 1) for entry in group_entries)
         bom.append({**group_entries[0], 'qty': round(total_qty, 3), 'designators': sorted(set(designators))})
 
-    # add an incrementing id to each bom item
+    # add an incrementing id to each bom entry
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
 
 def get_bom_index(bom: List[BOMEntry], part: AdditionalComponent) -> int:
     """Return id of BOM entry or raise StopIteration if not found."""
     # Remove linebreaks and clean whitespace of values in search
-    target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(part), 'item': part.description}))
+    target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(part), 'description': part.description}))
     return next(entry['id'] for entry in bom if bom_types_group(entry) == target)
 
 def bom_list(bom: List[BOMEntry]) -> List[List[str]]:
     """Return list of BOM rows as lists of column strings with headings in top row."""
-    keys = ['id', 'item', 'qty', 'unit', 'designators'] # these BOM columns will always be included
-    for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM item actually uses them
+    keys = ['id', 'description', 'qty', 'unit', 'designators'] # these BOM columns will always be included
+    for fieldname in ['pn', 'manufacturer', 'mpn']: # these optional BOM columns will only be included if at least one BOM entry actually uses them
         if any(entry.get(fieldname) for entry in bom):
             keys.append(fieldname)
     # list of staic bom header names,  headers not specified here are generated by capitilising the internal name
     bom_headings = {
+        "description": "Item",  # TODO: Remove this line to use 'Description' in BOM heading.
         "pn": "P/N",
         "mpn": "MPN"
     }
