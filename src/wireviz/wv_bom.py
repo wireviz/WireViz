@@ -9,7 +9,12 @@ from wireviz.DataClasses import AdditionalComponent, Connector, Cable
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import clean_whitespace
 
-BOMEntry = Dict[str, Union[str, int, float, List[str], None]]
+BOMColumn = str  # = Literal['id', 'description', 'qty', 'unit', 'designators', 'pn', 'manufacturer', 'mpn']
+BOMEntry = Dict[BOMColumn, Union[str, int, float, List[str], None]]
+
+def optional_fields(part: Union[Connector, Cable, AdditionalComponent]) -> BOMEntry:
+    """Return part field values for the optional BOM columns as a dict."""
+    return {'pn': part.pn, 'manufacturer': part.manufacturer, 'mpn': part.mpn}
 
 def get_additional_component_table(harness: "Harness", component: Union[Connector, Cable]) -> List[str]:
     """Return a list of diagram node table row strings with additional components."""
@@ -22,7 +27,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 id = get_bom_index(harness.bom(), part)
                 rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', qty, part.unit))
             else:
-                rows.append(component_table_entry(part.description, qty, part.unit, part.pn, part.manufacturer, part.mpn))
+                rows.append(component_table_entry(part.description, qty, part.unit, **optional_fields(part)))
     return rows
 
 def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOMEntry]:
@@ -33,10 +38,8 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
             'description': part.description,
             'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
             'unit': part.unit,
-            'manufacturer': part.manufacturer,
-            'mpn': part.mpn,
-            'pn': part.pn,
-            'designators': component.name if component.show_name else None
+            'designators': component.name if component.show_name else None,
+            **optional_fields(part),
         })
     return bom_entries
 
@@ -58,7 +61,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                            + (f', {connector.color}' if connector.color else ''))
             bom_entries.append({
                 'description': description, 'designators': connector.name if connector.show_name else None,
-                'manufacturer': connector.manufacturer, 'mpn': connector.mpn, 'pn': connector.pn
+                **optional_fields(connector),
             })
 
         # add connectors aditional components to bom
@@ -77,7 +80,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                                + (' shielded' if cable.shield else ''))
                 bom_entries.append({
                     'description': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
-                    'manufacturer': cable.manufacturer, 'mpn': cable.mpn, 'pn': cable.pn
+                    **optional_fields(cable),
                 })
             else:
                 # add each wire from the bundle to the bom
@@ -88,8 +91,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                                    + (f', {color}' if color else ''))
                     bom_entries.append({
                         'description': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
-                        'manufacturer': index_if_list(cable.manufacturer, index),
-                        'mpn': index_if_list(cable.mpn, index), 'pn': index_if_list(cable.pn, index)
+                        **{k: index_if_list(v, index) for k, v in optional_fields(cable).items()},
                     })
 
         # add cable/bundles aditional components to bom
