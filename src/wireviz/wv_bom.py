@@ -22,12 +22,15 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
     if component.additional_components:
         rows.append(["Additional components"])
         for part in component.additional_components:
-            qty = part.qty * component.get_qty_multiplier(part.qty_multiplier)
+            common_args = {
+                'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
+                'unit': part.unit,
+            }
             if harness.mini_bom_mode:
                 id = get_bom_index(harness.bom(), part)
-                rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', qty, part.unit))
+                rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', **common_args))
             else:
-                rows.append(component_table_entry(part.description, qty, part.unit, **optional_fields(part)))
+                rows.append(component_table_entry(part.description, **common_args, **optional_fields(part)))
     return rows
 
 def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOMEntry]:
