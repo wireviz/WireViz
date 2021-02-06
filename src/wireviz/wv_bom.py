@@ -14,7 +14,7 @@ def get_additional_component_table(harness, component: Union[Connector, Cable]) 
         rows.append(["Additional components"])
         for extra in component.additional_components:
             qty = extra.qty * component.get_qty_multiplier(extra.qty_multiplier)
-            if harness.mini_bom_mode:
+            if harness.options.mini_bom_mode:
                 id = get_bom_index(harness, extra.description, extra.unit, extra.manufacturer, extra.mpn, extra.pn)
                 rows.append(component_table_entry(f'#{id} ({extra.type.rstrip()})', qty, extra.unit))
             else:

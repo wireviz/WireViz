@@ -13,6 +13,7 @@ if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import __version__
+from wireviz.DataClasses import Metadata, Options
 from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read
 
@@ -34,7 +35,11 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
     yaml_data = yaml.safe_load(yaml_input)
 
-    harness = Harness()
+    # Assign default metadata.title here to avoid needing file_out in Metadata.__post_init__().
+    harness = Harness(
+        Metadata(**{'title': Path(file_out).stem, **yaml_data.get('metadata', {})}),
+        Options(**yaml_data.get('options', {})),
+    )
 
     # add items
     sections = ['connectors', 'cables', 'connections']
