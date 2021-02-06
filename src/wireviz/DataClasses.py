@@ -20,6 +20,7 @@ ConnectorMultiplier = PlainText # = Literal['pincount', 'populated']
 CableMultiplier = PlainText # = Literal['wirecount', 'terminations', 'length', 'total_length']
 ImageScale = PlainText # = Literal['false', 'true', 'width', 'height', 'both']
 Color = PlainText # Two-letter color name = Literal[wv_colors._color_hex.keys()]
+ColorMode = PlainText # = Literal['full', 'FULL', 'hex', 'HEX', 'short', 'SHORT', 'ger', 'GER']
 ColorScheme = PlainText # Color scheme name = Literal[wv_colors.COLOR_CODES.keys()]
 
 # Type combinations
@@ -29,6 +30,19 @@ PinIndex = int # Zero-based pin index
 Wire = Union[int, PlainText] # Wire number or Literal['s'] for shield
 NoneOrMorePinIndices = Union[PinIndex, Tuple[PinIndex, ...], None]  # None, one, or a tuple of zero-based pin indices
 OneOrMoreWires = Union[Wire, Tuple[Wire, ...]] # One or a tuple of wires
+
+
+@dataclass
+class Metadata:
+    title: PlainText
+    description: Optional[MultilineHypertext] = None
+    notes: Optional[MultilineHypertext] = None
+
+
+@dataclass
+class Options:
+    color_mode: ColorMode = 'SHORT'
+    mini_bom_mode: bool = True
 
 
 @dataclass

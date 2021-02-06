@@ -32,7 +32,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
                 'unit': part.unit,
             }
-            if harness.mini_bom_mode:
+            if harness.options.mini_bom_mode:
                 id = get_bom_index(harness.bom(), bom_entry_key({**asdict(part), 'description': part.description}))
                 rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', **common_args))
             else:
