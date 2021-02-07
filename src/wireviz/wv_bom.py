@@ -6,6 +6,7 @@ from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from wireviz.DataClasses import AdditionalComponent, Connector, Cable
+from wireviz.wv_colors import translate_color
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import clean_whitespace
 
@@ -69,7 +70,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                            + (f', {connector.type}' if connector.type else '')
                            + (f', {connector.subtype}' if connector.subtype else '')
                            + (f', {connector.pincount} pins' if connector.show_pincount else '')
-                           + (f', {connector.color}' if connector.color else ''))
+                           + (f', {translate_color(connector.color, harness.options.color_mode)}' if connector.color else ''))
             bom_entries.append({
                 'description': description, 'designators': connector.name if connector.show_name else None,
                 **optional_fields(connector),
@@ -99,7 +100,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                     description = ('Wire'
                                    + (f', {cable.type}' if cable.type else '')
                                    + (f', {cable.gauge} {cable.gauge_unit}' if cable.gauge else '')
-                                   + (f', {color}' if color else ''))
+                                   + (f', {translate_color(color, harness.options.color_mode)}' if color else ''))
                     bom_entries.append({
                         'description': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
                         **{k: index_if_list(v, index) for k, v in optional_fields(cable).items()},

@@ -11,7 +11,7 @@ import re
 
 from wireviz import wv_colors, __version__, APP_NAME, APP_URL
 from wireviz.DataClasses import Metadata, Options, Connector, Cable
-from wireviz.wv_colors import get_color_hex
+from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
     html_caption, remove_links, html_line_breaks
 from wireviz.wv_bom import manufacturer_info_field, component_table_entry, \
@@ -128,7 +128,8 @@ class Harness:
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
-                     connector.color, html_colorbar(connector.color)],
+                     translate_color(connector.color, self.options.color_mode) if connector.color else None,
+                     html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
@@ -150,7 +151,7 @@ class Harness:
                         pinhtml.append(f'    <td>{pinlabel}</td>')
                     if connector.pincolors:
                         if pincolor in wv_colors._color_hex.keys():
-                            pinhtml.append(f'    <td sides="tbl">{pincolor}</td>')
+                            pinhtml.append(f'    <td sides="tbl">{translate_color(pincolor, self.options.color_mode)}</td>')
                             pinhtml.append( '    <td sides="tbr">')
                             pinhtml.append( '     <table border="0" cellborder="1"><tr>')
                             pinhtml.append(f'      <td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
@@ -213,7 +214,8 @@ class Harness:
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
                      f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
-                     cable.color, html_colorbar(cable.color)],
+                     translate_color(cable.color, self.options.color_mode) if cable.color else None,
+                     html_colorbar(cable.color)],
                     '<!-- wire table -->',
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]
