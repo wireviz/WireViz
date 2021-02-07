@@ -66,7 +66,8 @@ def generate_bom(harness):
                                + (f', {cable.type}' if cable.type else '')
                                + (f', {cable.wirecount}')
                                + (f' x {cable.gauge} {cable.gauge_unit}' if cable.gauge else ' wires')
-                               + (' shielded' if cable.shield else ''))
+                               + ( ' shielded' if cable.shield else '')
+                               + (f', {translate_color(cable.color, harness.options.color_mode)}' if cable.color else ''))
                 bom_entries.append({
                     'item': description, 'qty': cable.length, 'unit': cable.length_unit, 'designators': cable.name if cable.show_name else None,
                     'manufacturer': cable.manufacturer, 'mpn': cable.mpn, 'pn': cable.pn
