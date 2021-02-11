@@ -35,6 +35,8 @@ additional_bom_items:  # custom items to add to BOM
   - <bom-item>           # BOM item (see below)
   ...
 
+tweak:  # optional tweaking of .gv output
+  ...
 ```
 
 ## Metadata entries
@@ -327,6 +329,30 @@ Alternatively items can be added to just the BOM by putting them in the section 
   manufacturer: <str>  # manufacturer name  
 ```
 
+## Tweak entries
+
+```yaml
+  # Optional tweaking of the .gv output.
+  # This feature is experimental and might change
+  # or be removed in future versions.
+
+  override:  # dict of .gv entries to override
+    # Each entry is identified by its leading string
+    # in lines beginning with a TAB character.
+    # The leading string might be in "quotes" in 
+    # the .gv output. This leading string must be
+    # followed by attributes in [square brackets].
+    # Entries containing HTML in an attribute are
+    # not supported.
+    <str>:  # leading string of .gv entry
+      <str> : <str>  # attribute and its new value
+      # Any number of attributes can be overridden
+      # for each entry
+
+  append:  # single or list of .gv entries to append
+    <str>  # strings to append might have multiple lines
+```
+
 ## Colors
 
 Colors are defined via uppercase, two character strings.
@@ -403,6 +429,7 @@ The following attributes accept multiline strings:
 - `manufacturer`
 - `mpn`
 - `image.caption`
+- `tweak.append`
 
 ### Method 1
 
