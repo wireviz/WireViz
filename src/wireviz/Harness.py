@@ -111,6 +111,10 @@ class Harness:
 
         for connector in self.connectors.values():
 
+            # If no wires connected (except maybe loop wires)?
+            if not (connector.ports_left or connector.ports_right):
+                connector.ports_left = True  # Use left side pins.
+
             html = []
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
