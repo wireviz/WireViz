@@ -122,6 +122,7 @@ class AdditionalComponent:
 @dataclass
 class Connector:
     name: Designator
+    bgcolor: Optional[Color] = None
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
     supplier: Optional[MultilineHypertext] = None
@@ -206,6 +207,7 @@ class Connector:
 @dataclass
 class Cable:
     name: Designator
+    bgcolor: Optional[Color] = None
     manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None

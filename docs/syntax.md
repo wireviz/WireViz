@@ -121,6 +121,7 @@ tweak:  # optional tweaking of .gv output
                      # no color marks will be added to remaining pins
 
   # rendering information (all optional)
+  bgcolor: <color>       # Background color of diagram connector box
   style: <style>         # may be set to simple for single pin connectors
   show_name: <bool>      # defaults to true for regular connectors,
                          # false for simple connectors
@@ -198,6 +199,7 @@ Since the auto-incremented and auto-assigned designator is not known to the user
   wirelabels: <List>  # optional; one label for each wire
 
   # rendering information (all optional)
+  bgcolor: <color>          # Background color of diagram cable box
   show_name: <bool>         # defaults to true
   show_wirecount: <bool>    # defaults to true
   show_wirenumbers: <bool>  # defaults to true for cables; false for bundles
