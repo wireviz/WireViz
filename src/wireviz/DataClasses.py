@@ -123,6 +123,7 @@ class AdditionalComponent:
 class Connector:
     name: Designator
     bgcolor: Optional[Color] = None
+    bgcolor_title: Optional[Color] = None
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
     supplier: Optional[MultilineHypertext] = None
@@ -208,6 +209,7 @@ class Connector:
 class Cable:
     name: Designator
     bgcolor: Optional[Color] = None
+    bgcolor_title: Optional[Color] = None
     manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None

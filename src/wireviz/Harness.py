@@ -12,7 +12,8 @@ import re
 from wireviz import wv_colors, __version__, APP_NAME, APP_URL
 from wireviz.DataClasses import Metadata, Options, Tweak, Connector, Cable
 from wireviz.wv_colors import get_color_hex, translate_color
-from wireviz.wv_gv_html import nested_html_table, html_bgcolor, html_colorbar, \
+from wireviz.wv_gv_html import nested_html_table, \
+    html_bgcolor_attr, html_bgcolor, html_colorbar, \
     html_image, html_caption, remove_links, html_line_breaks
 from wireviz.wv_bom import pn_info_string, component_table_entry, \
     get_additional_component_table, bom_list, generate_bom, \
@@ -125,7 +126,8 @@ class Harness:
 
             html = []
 
-            rows = [[f'{html_bgcolor(connector.bgcolor)}{remove_links(connector.name)}' if connector.show_name else None],
+            rows = [[f'{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}'
+                        if connector.show_name else None],
                     [pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
                      html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
                      html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
@@ -139,7 +141,7 @@ class Harness:
                     [html_caption(connector.image)]]
             rows.extend(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
-            html.extend(nested_html_table(rows))
+            html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
 
             if connector.style != 'simple':
                 pinhtml = []
@@ -209,7 +211,8 @@ class Harness:
                 elif cable.gauge_unit.upper() == 'AWG':
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
-            rows = [[f'{html_bgcolor(cable.bgcolor)}{remove_links(cable.name)}' if cable.show_name else None],
+            rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
+                        if cable.show_name else None],
                     [pn_info_string(HEADER_PN, None,
                         remove_links(cable.pn)) if not isinstance(cable.pn, list) else None,
                      html_line_breaks(pn_info_string(HEADER_MPN,
@@ -231,7 +234,7 @@ class Harness:
 
             rows.extend(get_additional_component_table(self, cable))
             rows.append([html_line_breaks(cable.notes)])
-            html.extend(nested_html_table(rows))
+            html.extend(nested_html_table(rows, html_bgcolor_attr(cable.bgcolor)))
 
             wirehtml = []
             wirehtml.append('<table border="0" cellspacing="0" cellborder="0">')  # conductor table
