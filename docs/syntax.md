@@ -323,6 +323,7 @@ Parts can be added to a connector or cable in the section `<additional-component
   mpn: <str>           # manufacturer part number
   supplier: <str>      # supplier name  
   spn: <str>           # supplier part number
+  bgcolor: <color>     # Background color of entry in diagram component box
 ```
 
 Alternatively items can be added to just the BOM by putting them in the section `<bom-item>` above.
