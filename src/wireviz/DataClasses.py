@@ -41,6 +41,7 @@ class Metadata:
 
 @dataclass
 class Options:
+    fontname: PlainText = 'arial'
     color_mode: ColorMode = 'SHORT'
     mini_bom_mode: bool = True
 

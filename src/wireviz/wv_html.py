@@ -6,17 +6,17 @@ from typing import List, Union
 import re
 
 from wireviz import __version__, APP_NAME, APP_URL
-from wireviz.DataClasses import Metadata
+from wireviz.DataClasses import Metadata, Options
 from wireviz.wv_helper import flatten2d, open_file_read, open_file_write
 
-def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata):
+def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata, options: Options):
     with open_file_write(f'{filename}.html') as file:
         file.write('<!DOCTYPE html>\n')
         file.write('<html lang="en"><head>\n')
         file.write(' <meta charset="UTF-8">\n')
         file.write(f' <meta name="generator" content="{APP_NAME} {__version__} - {APP_URL}">\n')
         file.write(f' <title>{metadata.title}</title>\n')
-        file.write('</head><body style="font-family:Arial">\n')
+        file.write(f'</head><body style="font-family:{options.fontname}">\n')
 
         file.write(f'<h1>{metadata.title}</h1>\n')
         if metadata.description:
