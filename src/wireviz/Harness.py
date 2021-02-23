@@ -98,6 +98,7 @@ class Harness:
                  bgcolor=wv_colors.translate_color(self.options.bgcolor, "HEX"),
                  nodesep='0.33',
                  fontname=self.options.fontname)
+        # Currently, fontname seems to be the only of these node attributes not overridden for each node.
         dot.attr('node', shape='record',
                  style='filled',
                  fillcolor='white',
@@ -337,7 +338,8 @@ class Harness:
 
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
-                     style='filled,dashed' if cable.category == 'bundle' else '', margin='0', fillcolor='white')
+                     style='filled,dashed' if cable.category == 'bundle' else 'filled',
+                     margin='0', fillcolor='white')
 
         return dot
 
