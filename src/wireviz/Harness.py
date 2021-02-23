@@ -95,7 +95,7 @@ class Harness:
         dot.body.append(f'// {APP_URL}')
         dot.attr('graph', rankdir='LR',
                  ranksep='2',
-                 bgcolor='white',
+                 bgcolor=wv_colors.translate_color(self.options.bgcolor, "HEX"),
                  nodesep='0.33',
                  fontname=self.options.fontname)
         dot.attr('node', shape='record',

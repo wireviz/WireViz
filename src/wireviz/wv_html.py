@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Union
 import re
 
-from wireviz import __version__, APP_NAME, APP_URL
+from wireviz import __version__, APP_NAME, APP_URL, wv_colors
 from wireviz.DataClasses import Metadata, Options
 from wireviz.wv_helper import flatten2d, open_file_read, open_file_write
 
@@ -16,7 +16,8 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         file.write(' <meta charset="UTF-8">\n')
         file.write(f' <meta name="generator" content="{APP_NAME} {__version__} - {APP_URL}">\n')
         file.write(f' <title>{metadata.title}</title>\n')
-        file.write(f'</head><body style="font-family:{options.fontname}">\n')
+        file.write(f'</head><body style="font-family:{options.fontname};background-color:'
+                   f'{wv_colors.translate_color(options.bgcolor, "HEX")}">\n')
 
         file.write(f'<h1>{metadata.title}</h1>\n')
         if metadata.description:
