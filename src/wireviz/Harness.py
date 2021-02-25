@@ -95,11 +95,11 @@ class Harness:
                  bgcolor=wv_colors.translate_color(self.options.bgcolor, "HEX"),
                  nodesep='0.33',
                  fontname=self.options.fontname)
-        # Currently, size and fontname seem to be the only of these node attributes not overridden for each node.
-        dot.attr('node', shape='record',
+        dot.attr('node',
+                 shape='none',
                  width='0', height='0', margin='0',  # Actual size of the node is entirely determined by the label.
                  style='filled',
-                 fillcolor='white',
+                 fillcolor=wv_colors.translate_color(self.options.bgcolor_node or self.options.bgcolor, "HEX"),
                  fontname=self.options.fontname)
         dot.attr('edge', style='bold',
                  fontname=self.options.fontname)
@@ -163,7 +163,7 @@ class Harness:
                 html = [row.replace('<!-- connector table -->', '\n'.join(pinhtml)) for row in html]
 
             html = '\n'.join(html)
-            dot.node(connector.name, label=f'<\n{html}\n>', shape='none', margin='0', style='filled', fillcolor='white')
+            dot.node(connector.name, label=f'<\n{html}\n>')
 
             if len(connector.loops) > 0:
                 dot.attr('edge', color='#000000:#ffffff:#000000')
@@ -332,8 +332,7 @@ class Harness:
 
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
-                     style='filled,dashed' if cable.category == 'bundle' else 'filled',
-                     margin='0', fillcolor='white')
+                     style='filled,dashed' if cable.category == 'bundle' else 'filled')
 
         return dot
 
