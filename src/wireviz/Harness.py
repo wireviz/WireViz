@@ -95,8 +95,9 @@ class Harness:
                  bgcolor=wv_colors.translate_color(self.options.bgcolor, "HEX"),
                  nodesep='0.33',
                  fontname=self.options.fontname)
-        # Currently, fontname seems to be the only of these node attributes not overridden for each node.
+        # Currently, size and fontname seem to be the only of these node attributes not overridden for each node.
         dot.attr('node', shape='record',
+                 width='0', height='0', margin='0',  # Actual size of the node is entirely determined by the label.
                  style='filled',
                  fillcolor='white',
                  fontname=self.options.fontname)
