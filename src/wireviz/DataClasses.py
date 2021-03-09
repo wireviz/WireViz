@@ -269,7 +269,7 @@ class Cable:
                     raise Exception('lists of part data are only supported for bundles')
 
         # by default, show wire numbers for cables, hide for bundles
-        if not self.show_wirenumbers:
+        if self.show_wirenumbers is None:
             self.show_wirenumbers = self.category != 'bundle'
 
         for i, item in enumerate(self.additional_components):
