@@ -1,4 +1,3 @@
-.
 graphviz
 pillow
 pyyaml
