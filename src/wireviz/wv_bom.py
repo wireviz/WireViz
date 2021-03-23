@@ -36,7 +36,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
             columns = []
             if harness.show_bom_item_numbers:
                 columns.append(bom_bubble(id))
-            columns.append(f'{part.qty}' + (f' {part.unit}' if part.unit else ' x'))
+            columns.append(f'{part.qty * component.get_qty_multiplier(part.qty_multiplier)}' + (f' {part.unit}' if part.unit else ' x'))
             columns.append(f'{part.type}')
             if harness.show_part_numbers:
                 columns.append(f'P/N: {part.pn}' if part.pn else '')
