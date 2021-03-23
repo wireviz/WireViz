@@ -1,5 +1,23 @@
 # Change Log
 
+## [0.3](https://github.com/formatc1702/WireViz/tree/v0.3) (202X-XX-XX)
+
+### New features
+
+- Allow referencing a cable's/bundle's wires by color or by label ([#70](https://github.com/formatc1702/WireViz/issues/70), [#169](https://github.com/formatc1702/WireViz/issues/169), [#193](https://github.com/formatc1702/WireViz/issues/193), [#194](https://github.com/formatc1702/WireViz/pull/194))
+- Allow additional BOM items within components ([#50](https://github.com/formatc1702/WireViz/issues/50), [#115](https://github.com/formatc1702/WireViz/pull/115))
+- Add support for length units in cables and wires ([#7](https://github.com/formatc1702/WireViz/issues/7), [#196](https://github.com/formatc1702/WireViz/pull/196) (with work from [#161](https://github.com/formatc1702/WireViz/pull/161), [#162](https://github.com/formatc1702/WireViz/pull/162), [#171](https://github.com/formatc1702/WireViz/pull/171)), [#198](https://github.com/formatc1702/WireViz/pull/198), [#205](https://github.com/formatc1702/WireViz/issues/205). [#206](https://github.com/formatc1702/WireViz/pull/206))
+- Add option to define connector pin colors ([#53](https://github.com/formatc1702/WireViz/issues/53), [#141](https://github.com/formatc1702/WireViz/pull/141))
+- Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
+
+
+## Misc. fixes
+
+- Improve type hinting ([#156](https://github.com/formatc1702/WireViz/issues/156), [#163](https://github.com/formatc1702/WireViz/pull/163))
+- Move BOM management and HTML functions to separate modules ([#151](https://github.com/formatc1702/WireViz/issues/151), [#192](https://github.com/formatc1702/WireViz/pull/192))
+- Bug fixes ([#218](https://github.com/formatc1702/WireViz/pull/218), [#221](https://github.com/formatc1702/WireViz/pull/221))
+
+
 ## [0.2](https://github.com/formatc1702/WireViz/tree/v0.2) (2020-10-17)
 
 ### Backward incompatible changes
@@ -16,6 +34,7 @@ See the [syntax description](syntax.md) for details.
 
 
 ### New features
+
 - Add bidirectional AWG/mm2 conversion ([#40](https://github.com/formatc1702/WireViz/issues/40), [#41](https://github.com/formatc1702/WireViz/pull/41))
 - Add support for part numbers ([#11](https://github.com/formatc1702/WireViz/pull/11), [#114](https://github.com/formatc1702/WireViz/issues/114), [#121](https://github.com/formatc1702/WireViz/pull/121))
 - Add support for multicolored wires ([#12](https://github.com/formatc1702/WireViz/issues/12), [#17](https://github.com/formatc1702/WireViz/pull/17), [#96](https://github.com/formatc1702/WireViz/pull/96), [#131](https://github.com/formatc1702/WireViz/issues/131), [#132](https://github.com/formatc1702/WireViz/pull/132))

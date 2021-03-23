@@ -56,6 +56,11 @@ additional_bom_items:  # custom items to add to BOM
   pins: <List>       # if omitted, is autofilled with [1, 2, ..., pincount]
   pinlabels: <List>  # if omitted, is autofilled with blanks
 
+  # pin color marks (optional)
+  pincolors: <List>  # list of colors to be assigned to the respective pins;
+                     # if list length is lower than connector pinout,
+                     # no color marks will be added to remaining pins
+
   # rendering information (all optional)
   style: <style>         # may be set to simple for single pin connectors
   show_name: <bool>      # defaults to true for regular connectors,
@@ -129,9 +134,12 @@ Since the auto-incremented and auto-assigned designator is not known to the user
   colors: <List>     # list of colors (see below)
   color_code: <str>  # one of the supported cable color codes (see below)
 
+  wirelabels: <List>  # optional; one label for each wire
+
   # rendering information (all optional)
-  show_name: <bool>       # defaults to true
-  show_wirecount: <bool>  # defaults to true
+  show_name: <bool>         # defaults to true
+  show_wirecount: <bool>    # defaults to true
+  show_wirenumbers: <bool>  # defaults to true for cables; false for bundles
 
 ```
 
@@ -168,6 +176,8 @@ connections:
 - The maximum number of items is unlimited.
 - Items must alternatingly belong to the `connectors` and the `cables` sections.
 - When a connection set defines multiple parallel connections, the number of specified `<pin>`s and `<wire>`s for each component in the set must match. When specifying only one designator, one is auto-generated for each connection of the set.
+- `<pin>` may reference a pin's unique ID (as per the connector's `pins` attribute, auto-numbered from 1 by default) or its label (as per `pinlabels`).
+- `<wire>` may reference a wire's number within a cable/bundle, its label (as per `wirelabels`) or, if unambiguous, its color.
 
 ### Single connections
 
@@ -216,6 +226,7 @@ For connectors with `autogenerate: true`, a new instance, with auto-generated de
 
   - `<int>` to refer to a specific wire, using its number.
   - `<int>-<int>` auto-expands to a range.
+  - `<str>` to refer to a wire's label or color, if unambiguous.
 
 
 ## BOM items and additional components
