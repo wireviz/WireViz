@@ -38,12 +38,11 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 columns.append(f'{manufacturer_str}' if manufacturer_str else '')
             columns.append(f'{part.note}' if part.note else '')
 
-            rowstr = '<tr>' + ''.join([f'<td align="left" balign="left">{html_line_breaks(col)}</td>' for col in columns]) + '</tr>'
+            rowstr = '\n   <tr>\n' + ''.join([f'    <td align="left" balign="left">{html_line_breaks(col)}</td>\n' for col in columns]) + '   </tr>'
             rows.append(rowstr)
 
-    print(rows)
     pre = '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
-    post = '</table>'
+    post = '\n  </table>'
     if len(rows) > 0:
         tbl = pre + ''.join(rows) + post
     else:
