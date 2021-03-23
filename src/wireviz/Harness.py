@@ -197,16 +197,17 @@ class Harness:
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
             rows = [[remove_links(cable.name) if cable.show_name else None],
-                    [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
-                     html_line_breaks(manufacturer_info_field(
-                        cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
-                        cable.mpn if not isinstance(cable.mpn, list) else None))],
-                    [html_line_breaks(cable.type),
+                    [bom_bubble('###') if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
+                     html_line_breaks(cable.type),
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
                      f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
                      cable.color, html_colorbar(cable.color)],
+                    [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
+                     html_line_breaks(manufacturer_info_field(
+                        cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
+                        cable.mpn if not isinstance(cable.mpn, list) else None))],
                     '<!-- wire table -->',
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]
