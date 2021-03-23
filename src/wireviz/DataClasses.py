@@ -105,6 +105,7 @@ class Connector:
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
     loops: List[List[Pin]] = field(default_factory=list)
+    bom_item_number: Optional[int] = None
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
@@ -189,6 +190,7 @@ class Cable:
     show_name: bool = True
     show_wirecount: bool = True
     show_wirenumbers: Optional[bool] = None
+    bom_item_number: Optional[int] = None
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 

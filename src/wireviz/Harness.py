@@ -115,7 +115,7 @@ class Harness:
             html = []
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
-                    [bom_bubble('###') if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
+                    [bom_bubble(connector.bom_item_number) if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
                      html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
@@ -197,7 +197,7 @@ class Harness:
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
             rows = [[remove_links(cable.name) if cable.show_name else None],
-                    [bom_bubble('###') if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
+                    [bom_bubble(cable.bom_item_number) if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
                      html_line_breaks(cable.type),
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
