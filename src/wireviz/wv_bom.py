@@ -31,14 +31,20 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
             columns = []
             if harness.show_bom_item_numbers:
                 columns.append(bom_bubble(id))
-            columns.append(f'{part.qty * component.get_qty_multiplier(part.qty_multiplier)}' + (f' {part.unit}' if part.unit else ' x'))
+            columns.append(f'{part.qty * component.get_qty_multiplier(part.qty_multiplier)}' + (f' {part.unit}' if part.unit else 'x'))
             columns.append(f'{part.type}')
             if harness.show_part_numbers:
                 columns.append(f'P/N: {part.pn}' if part.pn else '')
                 columns.append(f'{manufacturer_str}' if manufacturer_str else '')
             columns.append(f'{part.note}' if part.note else '')
 
-            rowstr = '\n   <tr>\n' + ''.join([f'    <td align="left" balign="left">{html_line_breaks(col)}</td>\n' for col in columns]) + '   </tr>'
+            # TODO: Remove empty columns
+
+            rowstr = '\n   <tr>\n'
+            for index, column in enumerate(columns):
+                sides = "tbl" if index == 0 else "tbr" if index == len(columns) -1 else "tb"
+                rowstr = rowstr + f'    <td align="left" balign="left" sides="{sides}">{html_line_breaks(column)}</td>\n'
+            rowstr = rowstr + '   </tr>'
             rows.append(rowstr)
 
     pre = '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'

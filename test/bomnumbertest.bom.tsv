@@ -1,0 +1,9 @@
+Id	Item	Qty	Unit	Designators	P/N	Manufacturer	MPN
+1	Cable, 4 x 0.25 mm²	99	m	W1	qwerty		uiop
+2	Connector, Plug, 4 pins	1		X1	123	ACME	ABC
+3	Connector, Receptacle, 4 pins	1		X2	234	ACME	DEF
+4	Crimp	1		X2	876	ACME	WVU
+5	Crimp	4		X1	987	ACME	ZYX
+6	Housing	1		X1	345	OTHER	
+7	Label	1		X1			
+8	Sleeving	5	m	W1			
