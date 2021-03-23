@@ -1,69 +1,126 @@
-templates: # defining templates to be used later on
-  - &molex_f
-    type: Molex KK 254
-    subtype: female
-  - &con_i2c
-    pinlabels: [GND, +5V, SCL, SDA]
-  - &wire_i2c
-    category: bundle
-    gauge: 0.14 mm2
-    colors: [BK, RD, YE, GN]
-
 connectors:
   X1:
-    <<: *molex_f # copying items from the template
-    pinlabels: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, N/C]
+    type: KK 254
+    pn: CON-245-8
+    manufacturer: Molex
+    mpn: '0022013087'
+    subtype: female
+    pincount: 8
+    pinlabels: [Audio L, Audio R, Audio GND, N/C, I2C GND, I2C +5V, SCL, SDA]
+    additional_parameters:
+      Sleeving removal: 20 mm
+      Insulation removal: 2 mm
+    additional_components:
+      -
+        type: Crimp
+        pn: CRI-254
+        manufacturer: Molex
+        mpn: '008500032'
+        qty_multiplier: populated
+      -
+        type: Label
+        pn: LAB-444
+        note: '"C745-X1"'
+    notes: |
+      - Attach to main PCB
+      - Ensure proper contact
+      - Clamp down cables after attaching
   X2:
-    <<: *molex_f
-    <<: *con_i2c # it is possible to copy from more than one template
+    type: 3.5 mm
+    subtype: jack
+    color: BK
+    pins: [T,R,S]
+    show_pincount: false
+    pinlabels: [L, R, GND]
+    image:
+      src: resources/stereo-phone-plug-TRS.png
+      caption: Tip, Ring, and Sleeve
   X3:
-    <<: *molex_f
-    <<: *con_i2c
+    type: KK 254
+    subtype: female
+    pinlabels: [VCC, GND, SCL, SDA]
+    pincolors: [RD, BK, GN, BU]
   X4:
-    <<: *molex_f
-    pinlabels: [GND, +12V, MISO, MOSI, SCK]
-  ferrule_crimp:
+    type: D-Sub
+    subtype: female
+    pincount: 9
+    pn: CON-D9-F
+    pinlabels: [GND, +5V, SCL, SDA, N/C, +12V IN, GND, +12V OUT, GND]
+    additional_components:
+      -
+        type: Casing, plastic
+        pn: CAS-D9
+      -
+        type: Mounting screws, M3 x 8
+        qty: 2
+  F:
     style: simple
     autogenerate: true
     type: Crimp ferrule
-    subtype: 0.25 mm²
-    color: YE
+    subtype: 0.5 mm²
+    color: OG
 
 cables:
   W1:
-    <<: *wire_i2c
-    length: 0.2
-    show_equiv: true
-  W2:
-    <<: *wire_i2c
-    length: 0.4
-    show_equiv: true
-  W3:
-    category: bundle
-    gauge: 0.14 mm2
-    length: 0.3
-    colors: [BK, BU, OG, VT]
-    show_equiv: true
-  W4:
+    wirecount: 3
+    shield: true
+    length: 0.5
     gauge: 0.25 mm2
-    length: 0.3
-    colors: [BK, RD]
     show_equiv: true
+    colors: [WH, RD, BK]
+    color: GY
+    additional_components:
+      -
+        type: Heatshrink D=5mm
+        qty: 15
+        unit: mm
+        note: left
+      -
+        type: Heatshrink D=5mm
+        qty: 25
+        unit: mm
+        note: right
+  W2: &wire_i2c
+    wirecount: 4
+    length: 0.2
+    gauge: 0.25 mm2
+    show_equiv: true
+    color_code: IEC
+  W3:
+    <<: *wire_i2c
+    color_code: DIN
+  W4: &wire_power
+    category: bundle
+    show_name: false
+    wirecount: 2
+    colors: [RD, BK]
+    gauge: 0.5 mm2
+    show_equiv: true
+    length: 1.0
+    additional_parameters:
+      Twist rate: 10/m
+      Twist direction: CCW
+  W5:
+    <<: *wire_power
 
 connections:
   -
-    - X1: [1-4]
-    - W1: [1-4]
-    - X2: [1-4]
+    - X1: [Audio L, Audio R, Audio GND, Audio GND]
+    - W1: [1-3,s]
+    - X2: [T,R,S,S]
   -
-    - X1: [1-4]
+    - X1: [I2C GND, I2C +5V, SCL, SDA]
     - W2: [1-4]
-    - X3: [1-4]
+    - X3: [GND, VCC, SCL, SDA]
   -
-    - X1: [1,5-7]
+    - X1: [I2C GND, I2C +5V, SCL, SDA]
     - W3: [1-4]
-    - X4: [1,3-5]
+    - X4: [1,2,3,4]
   -
-    - ferrule_crimp
+    - F
     - W4: [1,2]
-    - X4: [1,2]
+    - X4: [6,7]
+  -
+    - X4: [8,9]
+    - W5: [1,2]
+    - F

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import Optional, List, Tuple, Union
+from typing import Optional, List, Dict, Tuple, Union
 from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 
@@ -76,6 +76,7 @@ class AdditionalComponent:
     qty: float = 1
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
+    note: Optional[str] = None
 
     @property
     def description(self) -> str:
@@ -93,6 +94,7 @@ class Connector:
     type: Optional[MultilineHypertext] = None
     subtype: Optional[MultilineHypertext] = None
     pincount: Optional[int] = None
+    additional_parameters: Optional[Dict] = None
     image: Optional[Image] = None
     notes: Optional[MultilineHypertext] = None
     pinlabels: List[Pin] = field(default_factory=list)
@@ -104,6 +106,7 @@ class Connector:
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
     loops: List[List[Pin]] = field(default_factory=list)
+    bom_item_number: Optional[int] = None
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
@@ -180,6 +183,7 @@ class Cable:
     color: Optional[Color] = None
     wirecount: Optional[int] = None
     shield: Union[bool, Color] = False
+    additional_parameters: Optional[Dict] = None
     image: Optional[Image] = None
     notes: Optional[MultilineHypertext] = None
     colors: List[Colors] = field(default_factory=list)
@@ -188,6 +192,7 @@ class Cable:
     show_name: bool = True
     show_wirecount: bool = True
     show_wirenumbers: Optional[bool] = None
+    bom_item_number: Optional[int] = None
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 

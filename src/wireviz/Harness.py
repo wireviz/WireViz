@@ -12,8 +12,8 @@ from wireviz import wv_colors, __version__, APP_NAME, APP_URL
 from wireviz.DataClasses import Connector, Cable
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
-    html_caption, remove_links, html_line_breaks
-from wireviz.wv_bom import manufacturer_info_field, component_table_entry, \
+    html_caption, remove_links, html_line_breaks, bom_bubble, nested_html_table_dict
+from wireviz.wv_bom import manufacturer_info_field, \
     get_additional_component_table, bom_list, generate_bom
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
@@ -24,7 +24,8 @@ class Harness:
 
     def __init__(self):
         self.color_mode = 'SHORT'
-        self.mini_bom_mode = True
+        self.show_part_numbers = True      # TODO: Make configurable via YAML
+        self.show_bom_item_numbers = True  # TODO: Make configurable via YAML
         self.connectors = {}
         self.cables = {}
         self._bom = []  # Internal Cache for generated bom
@@ -114,17 +115,20 @@ class Harness:
             html = []
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
-                    [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
-                     html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))],
-                    [html_line_breaks(connector.type),
+                    [bom_bubble(connector.bom_item_number) if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
+                     html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
                      connector.color, html_colorbar(connector.color)],
+                    [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
+                     html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))] if self.show_part_numbers else None,
+                    nested_html_table_dict(connector.additional_parameters),
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
-            rows.extend(get_additional_component_table(self, connector))
+            rows.append(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
+
             html.extend(nested_html_table(rows))
 
             if connector.style != 'simple':
@@ -195,21 +199,23 @@ class Harness:
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
             rows = [[remove_links(cable.name) if cable.show_name else None],
-                    [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
-                     html_line_breaks(manufacturer_info_field(
-                        cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
-                        cable.mpn if not isinstance(cable.mpn, list) else None))],
-                    [html_line_breaks(cable.type),
+                    [bom_bubble(cable.bom_item_number) if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
+                     html_line_breaks(cable.type),
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
                      '+ S' if cable.shield else None,
                      f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
                      cable.color, html_colorbar(cable.color)],
+                    [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
+                     html_line_breaks(manufacturer_info_field(
+                        cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
+                        cable.mpn if not isinstance(cable.mpn, list) else None))],
+                    nested_html_table_dict(cable.additional_parameters),
                     '<!-- wire table -->',
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]
 
-            rows.extend(get_additional_component_table(self, cable))
+            rows.append(get_additional_component_table(self, cable))  # TODO: reimplement
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
