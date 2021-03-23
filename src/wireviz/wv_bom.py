@@ -20,6 +20,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
     """Return a list of diagram node table row strings with additional components."""
     rows = []
     if component.additional_components:
+        parts = []
         for part in component.additional_components:
             # if True:
             #     id = get_bom_index(harness.bom(), part)
@@ -38,11 +39,18 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 columns.append(f'{manufacturer_str}' if manufacturer_str else '')
             columns.append(f'{part.note}' if part.note else '')
 
-            # TODO: Remove empty columns
+            parts.append(columns)
 
+        # remove unused columns
+        transp = list(map(list, zip(*parts)))            # transpose list
+        transp = [item for item in transp if any(item)]  # remove empty rows (easier)
+        parts = list(map(list, zip(*transp)))            # transpose back
+
+        # generate HTML output
+        for part in parts:
             rowstr = '\n   <tr>\n'
-            for index, column in enumerate(columns):
-                sides = "tbl" if index == 0 else "tbr" if index == len(columns) -1 else "tb"
+            for index, column in enumerate(part):
+                sides = "tbl" if index == 0 else "tbr" if index == len(part) -1 else "tb"
                 rowstr = rowstr + f'    <td align="left" balign="left" sides="{sides}">{html_line_breaks(column)}</td>\n'
             rowstr = rowstr + '   </tr>'
             rows.append(rowstr)
@@ -52,7 +60,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
     if len(rows) > 0:
         tbl = pre + ''.join(rows) + post
     else:
-        return None
+        tbl = ''
     return tbl
 
 def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOMEntry]:
