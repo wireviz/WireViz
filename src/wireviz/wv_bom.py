@@ -60,7 +60,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
     if len(rows) > 0:
         tbl = pre + ''.join(rows) + post
     else:
-        tbl = ''
+        tbl = None
     return tbl
 
 def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOMEntry]:
