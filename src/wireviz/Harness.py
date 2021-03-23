@@ -12,7 +12,7 @@ from wireviz import wv_colors, __version__, APP_NAME, APP_URL
 from wireviz.DataClasses import Connector, Cable
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
-    html_caption, remove_links, html_line_breaks
+    html_caption, remove_links, html_line_breaks, bom_bubble
 from wireviz.wv_bom import manufacturer_info_field, component_table_entry, \
     get_additional_component_table, bom_list, generate_bom
 from wireviz.wv_html import generate_html_output
@@ -115,7 +115,7 @@ class Harness:
             html = []
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
-                    ['&lt;BOM Number&gt;' if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
+                    [bom_bubble('###') if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
                      html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,

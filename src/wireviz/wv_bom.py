@@ -6,7 +6,7 @@ from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from wireviz.DataClasses import AdditionalComponent, Connector, Cable
-from wireviz.wv_gv_html import html_line_breaks
+from wireviz.wv_gv_html import html_line_breaks, bom_bubble
 from wireviz.wv_helper import clean_whitespace
 
 BOMColumn = str  # = Literal['id', 'description', 'qty', 'unit', 'designators', 'pn', 'manufacturer', 'mpn']
@@ -35,7 +35,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
             manufacturer_str = manufacturer_info_field(part.manufacturer, part.mpn)
             columns = []
             if harness.show_bom_item_numbers:
-                columns.append(f'<table border="0"><tr><td border="1" style="rounded">{id}</td></tr></table>')
+                columns.append(bom_bubble(id))
             columns.append(f'{part.qty}' + (f' {part.unit}' if part.unit else ' x'))
             columns.append(f'{part.type}')
             if harness.show_part_numbers:

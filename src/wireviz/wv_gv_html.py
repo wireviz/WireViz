@@ -64,3 +64,6 @@ def html_size_attr(image):
 
 def html_line_breaks(inp):
     return remove_links(inp).replace('\n', '<br />') if isinstance(inp, str) else inp
+
+def bom_bubble(inp):
+    return(f'<table border="0"><tr><td border="1" style="rounded">{inp}</td></tr></table>')
