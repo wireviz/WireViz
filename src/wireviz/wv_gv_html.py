@@ -1,11 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from typing import List, Union
+from typing import List, Dict, Union
 import re
 
 from wireviz.wv_colors import translate_color
 from wireviz.wv_helper import remove_links
+
+def nested_html_table_dict(rows):
+    if isinstance(rows, Dict):
+        html = []
+        html.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
+        for (key, value) in rows.items():
+            html.append(f'   <tr><td align="left" balign="left">{key}</td>')
+            html.append(f'   <td align="left" balign="left">{value}</td></tr>')
+        html.append('  </table>')
+        out = '\n'.join(html)
+    else:
+        out = None
+    return out
 
 def nested_html_table(rows):
     # input: list, each item may be scalar or list

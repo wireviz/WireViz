@@ -12,7 +12,7 @@ from wireviz import wv_colors, __version__, APP_NAME, APP_URL
 from wireviz.DataClasses import Connector, Cable
 from wireviz.wv_colors import get_color_hex
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
-    html_caption, remove_links, html_line_breaks, bom_bubble
+    html_caption, remove_links, html_line_breaks, bom_bubble, nested_html_table_dict
 from wireviz.wv_bom import manufacturer_info_field, \
     get_additional_component_table, bom_list, generate_bom
 from wireviz.wv_html import generate_html_output
@@ -122,11 +122,13 @@ class Harness:
                      connector.color, html_colorbar(connector.color)],
                     [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
                      html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))] if self.show_part_numbers else None,
+                    nested_html_table_dict(connector.additional_parameters),
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
             rows.append(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
+
             html.extend(nested_html_table(rows))
 
             if connector.style != 'simple':
@@ -208,6 +210,7 @@ class Harness:
                      html_line_breaks(manufacturer_info_field(
                         cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
                         cable.mpn if not isinstance(cable.mpn, list) else None))],
+                    nested_html_table_dict(cable.additional_parameters),
                     '<!-- wire table -->',
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]

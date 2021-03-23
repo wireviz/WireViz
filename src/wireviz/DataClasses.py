@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import Optional, List, Tuple, Union
+from typing import Optional, List, Dict, Tuple, Union
 from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 
@@ -94,6 +94,7 @@ class Connector:
     type: Optional[MultilineHypertext] = None
     subtype: Optional[MultilineHypertext] = None
     pincount: Optional[int] = None
+    additional_parameters: Optional[Dict] = None
     image: Optional[Image] = None
     notes: Optional[MultilineHypertext] = None
     pinlabels: List[Pin] = field(default_factory=list)
@@ -182,6 +183,7 @@ class Cable:
     color: Optional[Color] = None
     wirecount: Optional[int] = None
     shield: Union[bool, Color] = False
+    additional_parameters: Optional[Dict] = None
     image: Optional[Image] = None
     notes: Optional[MultilineHypertext] = None
     colors: List[Colors] = field(default_factory=list)
