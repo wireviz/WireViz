@@ -20,7 +20,6 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
     """Return a list of diagram node table row strings with additional components."""
     rows = []
     if component.additional_components:
-        # rows.append(["Additional components"])
         for part in component.additional_components:
             # if True:
             #     id = get_bom_index(harness.bom(), part)
