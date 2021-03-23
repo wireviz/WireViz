@@ -13,7 +13,7 @@ def nested_html_table_dict(rows):
         html.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
         for (key, value) in rows.items():
             html.append(f'   <tr><td align="left" balign="left">{key}</td>')
-            html.append(f'   <td align="left" balign="left">{value}</td></tr>')
+            html.append(f'   <td align="left" balign="left">{html_line_breaks(value)}</td></tr>')
         html.append('  </table>')
         out = '\n'.join(html)
     else:
