@@ -20,18 +20,40 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
     """Return a list of diagram node table row strings with additional components."""
     rows = []
     if component.additional_components:
-        rows.append(["Additional components"])
+        # rows.append(["Additional components"])
         for part in component.additional_components:
             common_args = {
                 'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
                 'unit': part.unit,
             }
-            if harness.mini_bom_mode:
-                id = get_bom_index(harness.bom(), part)
-                rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', **common_args))
-            else:
-                rows.append(component_table_entry(part.description, **common_args, **optional_fields(part)))
-    return rows
+            # if True:
+            #     id = get_bom_index(harness.bom(), part)
+            #     rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', **common_args))
+            # else:
+            #     rows.append(component_table_entry(part.description, **common_args, **optional_fields(part)))
+            id = get_bom_index(harness.bom(), part)
+            manufacturer_str = manufacturer_info_field(part.manufacturer, part.mpn)
+            columns = []
+            if harness.show_bom_item_numbers:
+                columns.append(f'<table border="0"><tr><td border="1" style="rounded">{id}</td></tr></table>')
+            columns.append(f'{part.qty}' + (f' {part.unit}' if part.unit else ' x'))
+            columns.append(f'{part.type}')
+            if harness.show_part_numbers:
+                columns.append(f'P/N: {part.pn}' if part.pn else '')
+                columns.append(f'{manufacturer_str}' if manufacturer_str else '')
+            # TODO: Add note column as proposed in #222
+
+            rowstr = '<tr>' + ''.join([f'<td align="left" balign="left">{col}</td>' for col in columns]) + '</tr>'
+            rows.append(rowstr)
+
+    print(rows)
+    pre = '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
+    post = '</table>'
+    if len(rows) > 0:
+        tbl = pre + ''.join(rows) + post
+    else:
+        return None
+    return tbl
 
 def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOMEntry]:
     """Return a list of BOM entries with additional components."""
@@ -157,9 +179,9 @@ def component_table_entry(
               + (manufacturer_str or ''))
     # format the above output as left aligned text in a single visible cell
     # indent is set to two to match the indent in the generated html table
-    return f'''<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
+    return f'''<tr>
    <td align="left" balign="left">{html_line_breaks(output)}</td>
-  </tr></table>'''
+  </tr>'''
 
 def manufacturer_info_field(manufacturer: Optional[str], mpn: Optional[str]) -> Optional[str]:
     """Return the manufacturer and/or the mpn in one single string or None otherwise."""

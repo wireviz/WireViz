@@ -24,7 +24,8 @@ class Harness:
 
     def __init__(self):
         self.color_mode = 'SHORT'
-        self.mini_bom_mode = True
+        self.show_part_numbers = True      # TODO: Make configurable via YAML
+        self.show_bom_item_numbers = True  # TODO: Make configurable via YAML
         self.connectors = {}
         self.cables = {}
         self._bom = []  # Internal Cache for generated bom
@@ -114,16 +115,17 @@ class Harness:
             html = []
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
-                    [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
-                     html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))],
-                    [html_line_breaks(connector.type),
+                    ['&lt;BOM Number&gt;' if self.show_bom_item_numbers else None,  # TODO: Show actual BOM number
+                     html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
                      connector.color, html_colorbar(connector.color)],
+                    [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
+                     html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))] if self.show_part_numbers else None,
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
-            rows.extend(get_additional_component_table(self, connector))
+            rows.append(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows))
 
@@ -209,7 +211,7 @@ class Harness:
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]
 
-            rows.extend(get_additional_component_table(self, cable))
+            rows.append(get_additional_component_table(self, cable))  # TODO: reimplement
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows))
 
