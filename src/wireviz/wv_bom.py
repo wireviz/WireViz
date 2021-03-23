@@ -22,10 +22,6 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
     if component.additional_components:
         # rows.append(["Additional components"])
         for part in component.additional_components:
-            common_args = {
-                'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
-                'unit': part.unit,
-            }
             # if True:
             #     id = get_bom_index(harness.bom(), part)
             #     rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', **common_args))
@@ -43,7 +39,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 columns.append(f'{manufacturer_str}' if manufacturer_str else '')
             columns.append(f'{part.note}' if part.note else '')
 
-            rowstr = '<tr>' + ''.join([f'<td align="left" balign="left">{col}</td>' for col in columns]) + '</tr>'
+            rowstr = '<tr>' + ''.join([f'<td align="left" balign="left">{html_line_breaks(col)}</td>' for col in columns]) + '</tr>'
             rows.append(rowstr)
 
     print(rows)
@@ -159,29 +155,6 @@ def bom_list(bom: List[BOMEntry]) -> List[List[str]]:
     }
     return ([[bom_headings.get(k, k.capitalize()) for k in keys]] +  # Create header row with key names
             [[make_str(entry.get(k)) for k in keys] for entry in bom])  # Create string list for each entry row
-
-def component_table_entry(
-        type: str,
-        qty: Union[int, float],
-        unit: Optional[str] = None,
-        pn: Optional[str] = None,
-        manufacturer: Optional[str] = None,
-        mpn: Optional[str] = None,
-    ) -> str:
-    """Return a diagram node table row string with an additional component."""
-    manufacturer_str = manufacturer_info_field(manufacturer, mpn)
-    output = (f'{qty}'
-              + (f' {unit}' if unit else '')
-              + f' x {type}'
-              + ('<br/>' if pn or manufacturer_str else '')
-              + (f'P/N: {pn}' if pn else '')
-              + (', ' if pn and manufacturer_str else '')
-              + (manufacturer_str or ''))
-    # format the above output as left aligned text in a single visible cell
-    # indent is set to two to match the indent in the generated html table
-    return f'''<tr>
-   <td align="left" balign="left">{html_line_breaks(output)}</td>
-  </tr>'''
 
 def manufacturer_info_field(manufacturer: Optional[str], mpn: Optional[str]) -> Optional[str]:
     """Return the manufacturer and/or the mpn in one single string or None otherwise."""
