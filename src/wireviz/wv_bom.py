@@ -41,7 +41,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
             if harness.show_part_numbers:
                 columns.append(f'P/N: {part.pn}' if part.pn else '')
                 columns.append(f'{manufacturer_str}' if manufacturer_str else '')
-            # TODO: Add note column as proposed in #222
+            columns.append(f'{part.note}' if part.note else '')
 
             rowstr = '<tr>' + ''.join([f'<td align="left" balign="left">{col}</td>' for col in columns]) + '</tr>'
             rows.append(rowstr)

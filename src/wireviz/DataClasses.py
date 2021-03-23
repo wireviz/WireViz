@@ -76,6 +76,7 @@ class AdditionalComponent:
     qty: float = 1
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
+    note: Optional[str] = None
 
     @property
     def description(self) -> str:
