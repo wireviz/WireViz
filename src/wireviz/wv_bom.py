@@ -9,6 +9,7 @@ from wireviz.DataClasses import AdditionalComponent, Connector, Cable
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import clean_whitespace
 
+BOMKey = Tuple[str, ...]
 BOMColumn = str  # = Literal['id', 'description', 'qty', 'unit', 'designators', 'pn', 'manufacturer', 'mpn']
 BOMEntry = Dict[BOMColumn, Union[str, int, float, List[str], None]]
 
@@ -27,7 +28,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 'unit': part.unit,
             }
             if harness.mini_bom_mode:
-                id = get_bom_index(harness.bom(), part)
+                id = get_bom_index(harness.bom(), bom_types_group({**asdict(part), 'description': part.description}))
                 rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', **common_args))
             else:
                 rows.append(component_table_entry(part.description, **common_args, **optional_fields(part)))
@@ -46,9 +47,9 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
         })
     return bom_entries
 
-def bom_types_group(entry: BOMEntry) -> Tuple[str, ...]:
+def bom_types_group(entry: BOMEntry) -> BOMKey:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
-    return tuple(make_str(entry.get(key)) for key in ('description', 'unit', 'manufacturer', 'mpn', 'pn'))
+    return tuple(clean_whitespace(make_str(entry.get(key))) for key in ('description', 'unit', 'manufacturer', 'mpn', 'pn'))
 
 def generate_bom(harness: "Harness") -> List[BOMEntry]:
     """Return a list of BOM entries generated from the harness."""
@@ -117,10 +118,8 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
     # add an incrementing id to each bom entry
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
 
-def get_bom_index(bom: List[BOMEntry], part: AdditionalComponent) -> int:
+def get_bom_index(bom: List[BOMEntry], target: BOMKey) -> int:
     """Return id of BOM entry or raise exception if not found."""
-    # Remove linebreaks and clean whitespace of values in search
-    target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(part), 'description': part.description}))
     for entry in bom:
         if bom_types_group(entry) == target:
             return entry['id']
