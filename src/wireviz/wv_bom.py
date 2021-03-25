@@ -49,7 +49,9 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
 
 def bom_types_group(entry: BOMEntry) -> BOMKey:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
-    return tuple(clean_whitespace(make_str(entry.get(key))) for key in ('description', 'unit', 'manufacturer', 'mpn', 'pn'))
+    if 'key' not in entry:
+        entry['key'] = tuple(clean_whitespace(make_str(entry.get(k))) for k in ('description', 'unit', 'manufacturer', 'mpn', 'pn'))
+    return entry['key']
 
 def generate_bom(harness: "Harness") -> List[BOMEntry]:
     """Return a list of BOM entries generated from the harness."""
