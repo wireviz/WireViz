@@ -118,10 +118,13 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
     return [{**entry, 'id': index} for index, entry in enumerate(bom, 1)]
 
 def get_bom_index(bom: List[BOMEntry], part: AdditionalComponent) -> int:
-    """Return id of BOM entry or raise StopIteration if not found."""
+    """Return id of BOM entry or raise exception if not found."""
     # Remove linebreaks and clean whitespace of values in search
     target = tuple(clean_whitespace(v) for v in bom_types_group({**asdict(part), 'description': part.description}))
-    return next(entry['id'] for entry in bom if bom_types_group(entry) == target)
+    for entry in bom:
+        if bom_types_group(entry) == target:
+            return entry['id']
+    raise Exception('Internal error: No BOM entry found matching: ' + '|'.join(target))
 
 def bom_list(bom: List[BOMEntry]) -> List[List[str]]:
     """Return list of BOM rows as lists of column strings with headings in top row."""
