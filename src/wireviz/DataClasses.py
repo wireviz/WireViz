@@ -73,6 +73,7 @@ class AdditionalComponent:
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
     pn: Optional[Hypertext] = None
+    url: Optional[PlainText] = None
     qty: float = 1
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
@@ -88,6 +89,7 @@ class Connector:
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
     pn: Optional[Hypertext] = None
+    url: Optional[PlainText] = None
     style: Optional[str] = None
     category: Optional[str] = None
     type: Optional[MultilineHypertext] = None
@@ -170,6 +172,7 @@ class Cable:
     manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     pn: Union[Hypertext, List[Hypertext], None] = None
+    url: Optional[PlainText] = None
     category: Optional[str] = None
     type: Optional[MultilineHypertext] = None
     gauge: Optional[float] = None

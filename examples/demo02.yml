@@ -2,12 +2,14 @@ templates: # defining templates to be used later on
   - &molex_f
     type: Molex KK 254
     subtype: female
+    url: "https://www.molex.com/molex/products/family/kk_254_rpc_connector_system"
   - &con_i2c
     pinlabels: [GND, +5V, SCL, SDA]
   - &wire_i2c
     category: bundle
     gauge: 0.14 mm2
     colors: [BK, RD, YE, GN]
+    url: [bk.html, rd.html, ye.html, gn.html]
 
 connectors:
   X1:
@@ -67,3 +69,15 @@ connections:
     - ferrule_crimp
     - W4: [1,2]
     - X4: [1,2]
+
+additional_bom_items:
+  - # define an additional item to add to the bill of materials
+    description: Label, pinout information
+    qty: 2
+    designators:
+      - X2
+      - X3
+    manufacturer: generic company
+    mpn: Label1
+    pn: Label-ID-1
+    url: "https://www.bradyid.com/wire-cable-labels/bmp71-bmp61-m611-tls-2200-nylon-cloth-wire-general-id-labels-cps-2958789"
