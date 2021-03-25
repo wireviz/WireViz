@@ -28,7 +28,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
                 'unit': part.unit,
             }
             if harness.mini_bom_mode:
-                id = get_bom_index(harness.bom(), bom_types_group({**asdict(part), 'description': part.description}))
+                id = get_bom_index(harness.bom(), bom_entry_key({**asdict(part), 'description': part.description}))
                 rows.append(component_table_entry(f'#{id} ({part.type.rstrip()})', **common_args))
             else:
                 rows.append(component_table_entry(part.description, **common_args, **optional_fields(part)))
@@ -47,7 +47,7 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
         })
     return bom_entries
 
-def bom_types_group(entry: BOMEntry) -> BOMKey:
+def bom_entry_key(entry: BOMEntry) -> BOMKey:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
     if 'key' not in entry:
         entry['key'] = tuple(clean_whitespace(make_str(entry.get(k))) for k in ('description', 'unit', 'manufacturer', 'mpn', 'pn'))
@@ -111,7 +111,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
 
     # deduplicate bom
     bom = []
-    for _, group in groupby(sorted(bom_entries, key=bom_types_group), key=bom_types_group):
+    for _, group in groupby(sorted(bom_entries, key=bom_entry_key), key=bom_entry_key):
         group_entries = list(group)
         designators = sum((make_list(entry.get('designators')) for entry in group_entries), [])
         total_qty = sum(entry.get('qty', 1) for entry in group_entries)
@@ -123,7 +123,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
 def get_bom_index(bom: List[BOMEntry], target: BOMKey) -> int:
     """Return id of BOM entry or raise exception if not found."""
     for entry in bom:
-        if bom_types_group(entry) == target:
+        if bom_entry_key(entry) == target:
             return entry['id']
     raise Exception('Internal error: No BOM entry found matching: ' + '|'.join(target))
 
