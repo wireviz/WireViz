@@ -12,6 +12,7 @@ from wireviz.wv_gv_html import html_line_breaks
 
 def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata, options: Options):
 
+    # load HTML template
     if 'name' in metadata.get('template',{}):
         # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
         templatefile = smart_file_resolve(f'{metadata["template"]["name"]}.html', [Path(filename).parent, Path(__file__).parent / 'templates'])
@@ -58,10 +59,11 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
     html = html.replace('<!-- %bom% -->', bom_html)
     html = html.replace('<!-- %bom_reversed% -->', bom_html_reversed)
 
+    # insert generator
+    html = html.replace('<!-- %generator% -->', f'{APP_NAME} {__version__} - {APP_URL}')
     # insert other metadata
     if metadata:
 
-        html = html.replace('<!-- %generator% -->', f'{APP_NAME} {__version__} - {APP_URL}')
         html = html.replace(f'"sheetsize_default"', '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))) # include quotes so no replacement happens within <style> definition
 
         # TODO: handle multi-page documents
@@ -69,11 +71,11 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         html = html.replace('<!-- %sheet_total% -->', 'of 1')
 
         # fill out other generic metadata
-        for item, value in metadata.items():
-            if isinstance(value, (str, int, float)):
-                html = html.replace(f'<!-- %{item}% -->', value)
-            elif isinstance(value, Dict):  # useful for authors, revisions
-                for index, (category, entry) in enumerate(value.items()):
+        for item, contents in metadata.items():
+            if isinstance(contents, (str, int, float)):
+                html = html.replace(f'<!-- %{item}% -->', contents)
+            elif isinstance(contents, Dict):  # useful for authors, revisions
+                for index, (category, entry) in enumerate(contents.items()):
                     if isinstance(entry, Dict):
                         html = html.replace(f'<!-- %{item}_{index+1}% -->', str(category))
                         for entry_key, entry_value in entry.items():
