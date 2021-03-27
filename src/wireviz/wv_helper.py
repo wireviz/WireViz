@@ -126,7 +126,7 @@ def smart_file_resolve(filename, possible_paths):
             return filename
         else:
             raise Exception(f'{filename} does not exist.')
-    else:  # sarch all possible paths in decreasing order of precedence
+    else:  # search all possible paths in decreasing order of precedence
         possible_paths = [Path(path).resolve() for path in possible_paths]
         for possible_path in possible_paths:
             resolved_path = (possible_path / filename).resolve()
