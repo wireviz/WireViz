@@ -61,14 +61,15 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
 
     # insert generator
     html = html.replace('<!-- %generator% -->', f'{APP_NAME} {__version__} - {APP_URL}')
+    
     # insert other metadata
     if metadata:
 
         html = html.replace(f'"sheetsize_default"', '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))) # include quotes so no replacement happens within <style> definition
 
         # TODO: handle multi-page documents
-        html = html.replace('<!-- %sheet_current% -->', 'Sheet<br />1')
-        html = html.replace('<!-- %sheet_total% -->', 'of 1')
+        html = html.replace('<!-- %sheet_current% -->', '1')
+        html = html.replace('<!-- %sheet_total% -->', '1')
 
         # fill out other generic metadata
         for item, contents in metadata.items():
