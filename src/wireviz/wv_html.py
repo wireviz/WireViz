@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
-from typing import List, Union
+from typing import List, Dict, Union
 import re
 
 from wireviz import __version__, APP_NAME, APP_URL, wv_colors
@@ -62,28 +62,6 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
     if metadata:
 
         html = html.replace('<!-- %generator% -->', f'{APP_NAME} {__version__} - {APP_URL}')
-
-        # fill out authors
-        for i, (k, v) in enumerate(metadata.get('authors', {}).items(), 1):
-            title = k
-            name = v['name']
-            date = v['date'].strftime('%Y-%m-%d')
-            html = html.replace(f'<!-- %process_{i}_title% -->', title)
-            html = html.replace(f'<!-- %process_{i}_name% -->', name)
-            html = html.replace(f'<!-- %process_{i}_date% -->', date)
-
-        # fill out revisions
-        for i, (k, v) in enumerate(metadata.get('revisions', {}).items(), 1):
-            # TODO: for more than 8 revisions, keep only the 8 most recent ones
-            number = k
-            changelog = v['changelog']
-            name = v['name']
-            date = v['date'].strftime('%Y-%m-%d')
-            html = html.replace(f'<!-- %rev_{i}_number% -->', '{:02d}'.format(number))
-            html = html.replace(f'<!-- %rev_{i}_changelog% -->', changelog)
-            html = html.replace(f'<!-- %rev_{i}_name% -->', name)
-            html = html.replace(f'<!-- %rev_{i}_date% -->', date)
-
         html = html.replace(f'"sheetsize_default"', '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))) # include quotes so no replacement happens within <style> definition
 
         # TODO: handle multi-page documents
@@ -91,11 +69,15 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         html = html.replace('<!-- %sheet_total% -->', 'of 1')
 
         # fill out other generic metadata
-        for k, v in metadata.items():
-            if isinstance(v, (str, int, float)):
-                html = html.replace(f'<!-- %{k}% -->', v)
-            # TODO: Support smart handling of lists and dicts?
-
+        for item, value in metadata.items():
+            if isinstance(value, (str, int, float)):
+                html = html.replace(f'<!-- %{item}% -->', value)
+            elif isinstance(value, Dict):  # useful for authors, revisions
+                for index, (category, entry) in enumerate(value.items()):
+                    if isinstance(entry, Dict):
+                        html = html.replace(f'<!-- %{item}_{index+1}% -->', str(category))
+                        for entry_key, entry_value in entry.items():
+                            html = html.replace(f'<!-- %{item}_{index+1}_{entry_key}% -->', str(entry_value))
 
 
     with open(f'{filename}.html','w') as file:
