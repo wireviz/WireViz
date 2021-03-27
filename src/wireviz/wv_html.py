@@ -7,47 +7,88 @@ import re
 
 from wireviz import __version__, APP_NAME, APP_URL, wv_colors
 from wireviz.DataClasses import Metadata, Options
-from wireviz.wv_helper import flatten2d, open_file_read, open_file_write
+from wireviz.wv_helper import flatten2d, open_file_read, open_file_write, smart_file_resolve
+from wireviz.wv_gv_html import html_line_breaks
 
 def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata, options: Options):
-    with open_file_write(f'{filename}.html') as file:
-        file.write('<!DOCTYPE html>\n')
-        file.write('<html lang="en"><head>\n')
-        file.write(' <meta charset="UTF-8">\n')
-        file.write(f' <meta name="generator" content="{APP_NAME} {__version__} - {APP_URL}">\n')
-        file.write(f' <title>{metadata.title}</title>\n')
-        file.write(f'</head><body style="font-family:{options.fontname};background-color:'
-                   f'{wv_colors.translate_color(options.bgcolor, "HEX")}">\n')
 
-        file.write(f'<h1>{metadata.title}</h1>\n')
-        if metadata.description:
-            file.write(f'<p>{metadata.description}</p>\n')
-        file.write('<h2>Diagram</h2>\n')
-        with open_file_read(f'{filename}.svg') as svg:
-            file.write(re.sub(
-                '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
-                '<!-- XML and DOCTYPE declarations from SVG file removed -->',
-                svg.read(1024), 1))
-            for svgdata in svg:
-                file.write(svgdata)
+    # fall back to built-in simple template if necessary
+    templatename = metadata.get('template',{}).get('name', 'simple')
+    # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
+    templatefile = smart_file_resolve(f'{templatename}.html', [Path(filename).parent, Path(__file__).parent / 'templates'])
 
-        file.write('<h2>Bill of Materials</h2>\n')
-        listy = flatten2d(bom_list)
-        file.write('<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">\n')
-        file.write(' <tr>\n')
-        for item in listy[0]:
-            file.write(f'  <th style="text-align:left; border:1px solid #000000; padding: 8px">{item}</th>\n')
-        file.write(' </tr>\n')
-        for row in listy[1:]:
-            file.write(' <tr>\n')
-            for i, item in enumerate(row):
-                item_str = item.replace('\u00b2', '&sup2;')
-                align = '; text-align:right' if listy[0][i] == 'Qty' else ''
-                file.write(f'  <td style="border:1px solid #000000; padding: 4px{align}">{item_str}</td>\n')
-            file.write(' </tr>\n')
-        file.write('</table>\n')
+    with open(templatefile, 'r') as file:
+        html = file.read()
 
-        if metadata.notes:
-            file.write(f'<h2>Notes</h2>\n<p>{metadata.notes}</p>\n')
+    # embed SVG diagram
+    with open(f'{filename}.svg') as file:
+        svgdata = file.read()
+        svgdata = re.sub(
+                  '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
+                  '<!-- XML and DOCTYPE declarations from SVG file removed -->',
+                  svgdata, 1)
+    html = html.replace('<!-- diagram -->', svgdata)
 
-        file.write('</body></html>\n')
+    # generate BOM table
+    bom = flatten2d(bom_list)
+
+    # generate BOM header (may be at the top or bottom of the table)
+    bom_header_html = '  <tr>\n'
+    for item in bom[0]:
+        th_class = f'bom_col_{item.lower()}'
+        bom_header_html = f'{bom_header_html}    <th class="{th_class}">{item}</th>\n'
+    bom_header_html = f'{bom_header_html}  </tr>\n'
+
+    # generate BOM contents
+    bom_contents = []
+    for row in bom[1:]:
+        row_html = '  <tr>\n'
+        for i, item in enumerate(row):
+            td_class = f'bom_col_{bom[0][i].lower()}'
+            row_html = f'{row_html}    <td class="{td_class}">{item}</td>\n'
+        row_html = f'{row_html}  </tr>\n'
+        bom_contents.append(row_html)
+
+    bom_html = '<table>\n' + bom_header_html + ''.join(bom_contents) + '</table>\n'
+    bom_html_reversed = '<table>\n' + ''.join(list(reversed(bom_contents))) + bom_header_html + '</table>\n'
+
+    # insert BOM table
+    html = html.replace('<!-- bom -->', bom_html)
+    html = html.replace('<!-- bom_reversed -->', bom_html_reversed)
+
+    # fill out title block
+    if metadata:
+        html = html.replace('<!-- title -->', metadata.get('title', ''))
+        html = html.replace('<!-- pn -->', metadata.get('pn', ''))
+        html = html.replace('<!-- company -->', metadata.get('company', ''))
+        html = html.replace('<!-- description -->', html_line_breaks(metadata.get('description', '')))
+        html = html.replace('<!-- notes -->', html_line_breaks(metadata.get('notes', '')))
+        html = html.replace('<!-- generator -->', f'{APP_NAME} {__version__} - {APP_URL}')
+
+        # TODO: handle multi-page documents
+        html = html.replace('<!-- sheet_current -->', 'Sheet<br />1')
+        html = html.replace('<!-- sheet_total -->', 'of 1')
+
+        for i, (k, v) in enumerate(metadata.get('authors', {}).items(), 1):
+            title = k
+            name = v['name']
+            date = v['date'].strftime('%Y-%m-%d')
+            html = html.replace(f'<!-- process_{i}_title -->', title)
+            html = html.replace(f'<!-- process_{i}_name -->', name)
+            html = html.replace(f'<!-- process_{i}_date -->', date)
+
+        for i, (k, v) in enumerate(metadata.get('revisions', {}).items(), 1):
+            # TODO: for more than 8 revisions, keep only the 8 most recent ones
+            number = k
+            changelog = v['changelog']
+            name = v['name']
+            date = v['date'].strftime('%Y-%m-%d')
+            html = html.replace(f'<!-- rev_{i}_number -->', '{:02d}'.format(number))
+            html = html.replace(f'<!-- rev_{i}_changelog -->', changelog)
+            html = html.replace(f'<!-- rev_{i}_name -->', name)
+            html = html.replace(f'<!-- rev_{i}_date -->', date)
+
+        html = html.replace(f'"sheetsize_default"', '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))) # include quotes so no replacement happens within <style> definition
+
+    with open(f'{filename}.html','w') as file:
+        file.write(html)
