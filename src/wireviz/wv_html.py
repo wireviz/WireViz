@@ -29,7 +29,7 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
                   '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
                   '<!-- XML and DOCTYPE declarations from SVG file removed -->',
                   svgdata, 1)
-    html = html.replace('<!-- diagram -->', svgdata)
+    html = html.replace('<!-- %diagram% -->', svgdata)
 
     # generate BOM table
     bom = flatten2d(bom_list)
@@ -55,42 +55,48 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
     bom_html_reversed = '<table>\n' + ''.join(list(reversed(bom_contents))) + bom_header_html + '</table>\n'
 
     # insert BOM table
-    html = html.replace('<!-- bom -->', bom_html)
-    html = html.replace('<!-- bom_reversed -->', bom_html_reversed)
+    html = html.replace('<!-- %bom% -->', bom_html)
+    html = html.replace('<!-- %bom_reversed% -->', bom_html_reversed)
 
-    # fill out title block
+    # insert other metadata
     if metadata:
-        html = html.replace('<!-- title -->', metadata.get('title', ''))
-        html = html.replace('<!-- pn -->', metadata.get('pn', ''))
-        html = html.replace('<!-- company -->', metadata.get('company', ''))
-        html = html.replace('<!-- description -->', html_line_breaks(metadata.get('description', '')))
-        html = html.replace('<!-- notes -->', html_line_breaks(metadata.get('notes', '')))
-        html = html.replace('<!-- generator -->', f'{APP_NAME} {__version__} - {APP_URL}')
 
-        # TODO: handle multi-page documents
-        html = html.replace('<!-- sheet_current -->', 'Sheet<br />1')
-        html = html.replace('<!-- sheet_total -->', 'of 1')
+        html = html.replace('<!-- %generator% -->', f'{APP_NAME} {__version__} - {APP_URL}')
 
+        # fill out authors
         for i, (k, v) in enumerate(metadata.get('authors', {}).items(), 1):
             title = k
             name = v['name']
             date = v['date'].strftime('%Y-%m-%d')
-            html = html.replace(f'<!-- process_{i}_title -->', title)
-            html = html.replace(f'<!-- process_{i}_name -->', name)
-            html = html.replace(f'<!-- process_{i}_date -->', date)
+            html = html.replace(f'<!-- %process_{i}_title% -->', title)
+            html = html.replace(f'<!-- %process_{i}_name% -->', name)
+            html = html.replace(f'<!-- %process_{i}_date% -->', date)
 
+        # fill out revisions
         for i, (k, v) in enumerate(metadata.get('revisions', {}).items(), 1):
             # TODO: for more than 8 revisions, keep only the 8 most recent ones
             number = k
             changelog = v['changelog']
             name = v['name']
             date = v['date'].strftime('%Y-%m-%d')
-            html = html.replace(f'<!-- rev_{i}_number -->', '{:02d}'.format(number))
-            html = html.replace(f'<!-- rev_{i}_changelog -->', changelog)
-            html = html.replace(f'<!-- rev_{i}_name -->', name)
-            html = html.replace(f'<!-- rev_{i}_date -->', date)
+            html = html.replace(f'<!-- %rev_{i}_number% -->', '{:02d}'.format(number))
+            html = html.replace(f'<!-- %rev_{i}_changelog% -->', changelog)
+            html = html.replace(f'<!-- %rev_{i}_name% -->', name)
+            html = html.replace(f'<!-- %rev_{i}_date% -->', date)
 
         html = html.replace(f'"sheetsize_default"', '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))) # include quotes so no replacement happens within <style> definition
+
+        # TODO: handle multi-page documents
+        html = html.replace('<!-- %sheet_current% -->', 'Sheet<br />1')
+        html = html.replace('<!-- %sheet_total% -->', 'of 1')
+
+        # fill out other generic metadata
+        for k, v in metadata.items():
+            if isinstance(v, (str, int, float)):
+                html = html.replace(f'<!-- %{k}% -->', v)
+            # TODO: Support smart handling of lists and dicts?
+
+
 
     with open(f'{filename}.html','w') as file:
         file.write(html)
