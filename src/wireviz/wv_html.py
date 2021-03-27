@@ -12,10 +12,12 @@ from wireviz.wv_gv_html import html_line_breaks
 
 def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata, options: Options):
 
-    # fall back to built-in simple template if necessary
-    templatename = metadata.get('template',{}).get('name', 'simple')
-    # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
-    templatefile = smart_file_resolve(f'{templatename}.html', [Path(filename).parent, Path(__file__).parent / 'templates'])
+    if 'name' in metadata.get('template',{}):
+        # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
+        templatefile = smart_file_resolve(f'{metadata["template"]["name"]}.html', [Path(filename).parent, Path(__file__).parent / 'templates'])
+    else:
+        # fall back to built-in simple template if no template was provided
+        templatefile = Path(__file__).parent / 'templates/simple.html'
 
     with open(templatefile, 'r') as file:
         html = file.read()
