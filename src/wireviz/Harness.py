@@ -102,7 +102,7 @@ class Harness:
                  shape='none',
                  width='0', height='0', margin='0',  # Actual size of the node is entirely determined by the label.
                  style='filled',
-                 fillcolor=wv_colors.translate_color(self.options.bgcolor_node or self.options.bgcolor, "HEX"),
+                 fillcolor=wv_colors.translate_color(self.options.bgcolor_node, "HEX"),
                  fontname=self.options.fontname)
         dot.attr('edge', style='bold',
                  fontname=self.options.fontname)
@@ -170,7 +170,8 @@ class Harness:
                 html = [row.replace('<!-- connector table -->', '\n'.join(pinhtml)) for row in html]
 
             html = '\n'.join(html)
-            dot.node(connector.name, label=f'<\n{html}\n>')
+            dot.node(connector.name, label=f'<\n{html}\n>', shape='box', style='filled',
+                     fillcolor=translate_color(self.options.bgcolor_connector, "HEX"))
 
             if len(connector.loops) > 0:
                 dot.attr('edge', color='#000000:#ffffff:#000000')
@@ -337,9 +338,11 @@ class Harness:
                         to_string = ''
                     html = [row.replace(f'<!-- {connection.via_port}_out -->', to_string) for row in html]
 
+            style, bgcolor = ('filled,dashed', self.options.bgcolor_bundle) if cable.category == 'bundle' else \
+                             ('filled',        self.options.bgcolor_cable)
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
-                     style='filled,dashed' if cable.category == 'bundle' else 'filled')
+                     style=style, fillcolor=translate_color(bgcolor, "HEX"))
 
         return dot
 
