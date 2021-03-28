@@ -61,7 +61,7 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
 
     # insert generator
     html = html.replace('<!-- %generator% -->', f'{APP_NAME} {__version__} - {APP_URL}')
-    
+
     # insert other metadata
     if metadata:
 
@@ -74,13 +74,13 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         # fill out other generic metadata
         for item, contents in metadata.items():
             if isinstance(contents, (str, int, float)):
-                html = html.replace(f'<!-- %{item}% -->', contents)
+                html = html.replace(f'<!-- %{item}% -->', html_line_breaks(contents))
             elif isinstance(contents, Dict):  # useful for authors, revisions
                 for index, (category, entry) in enumerate(contents.items()):
                     if isinstance(entry, Dict):
                         html = html.replace(f'<!-- %{item}_{index+1}% -->', str(category))
                         for entry_key, entry_value in entry.items():
-                            html = html.replace(f'<!-- %{item}_{index+1}_{entry_key}% -->', str(entry_value))
+                            html = html.replace(f'<!-- %{item}_{index+1}_{entry_key}% -->', html_line_breaks(str(entry_value)))
 
 
     with open(f'{filename}.html','w') as file:
