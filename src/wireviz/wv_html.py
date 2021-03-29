@@ -20,11 +20,11 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         # fall back to built-in simple template if no template was provided
         templatefile = Path(__file__).parent / 'templates/simple.html'
 
-    with open(templatefile, 'r') as file:
+    with open_file_read(templatefile) as file:
         html = file.read()
 
     # embed SVG diagram
-    with open(f'{filename}.svg') as file:
+    with open_file_read(f'{filename}.svg') as file:
         svgdata = file.read()
         svgdata = re.sub(
                   '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
@@ -74,7 +74,7 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         # fill out other generic metadata
         for item, contents in metadata.items():
             if isinstance(contents, (str, int, float)):
-                html = html.replace(f'<!-- %{item}% -->', html_line_breaks(contents))
+                html = html.replace(f'<!-- %{item}% -->', html_line_breaks(str(contents)))
             elif isinstance(contents, Dict):  # useful for authors, revisions
                 for index, (category, entry) in enumerate(contents.items()):
                     if isinstance(entry, Dict):
@@ -83,5 +83,5 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
                             html = html.replace(f'<!-- %{item}_{index+1}_{entry_key}% -->', html_line_breaks(str(entry_value)))
 
 
-    with open(f'{filename}.html','w') as file:
+    with open_file_write(f'{filename}.html') as file:
         file.write(html)
