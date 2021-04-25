@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from typing import Dict, List, Optional, Tuple, Union
-from dataclasses import dataclass, field, InitVar
+from dataclasses import asdict, dataclass, field, InitVar
 from pathlib import Path
 
 from wireviz.wv_helper import int2tuple, aspect_ratio
-from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES
+from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES, translate_color
 
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
@@ -13,6 +13,7 @@ PlainText = str # Text not containing HTML tags nor newlines
 Hypertext = str # Text possibly including HTML hyperlinks that are removed in all outputs except HTML output
 MultilineHypertext = str # Hypertext possibly also including newlines to break lines in diagram output
 Designator = PlainText # Case insensitive unique name of connector or cable
+Points = float  # Size in points = 1/72 inch
 
 # Literal type aliases below are commented to avoid requiring python 3.8
 ConnectorMultiplier = PlainText # = Literal['pincount', 'populated']
@@ -33,25 +34,65 @@ class Metadata(dict):
 
 
 @dataclass
+class Look:
+    """Colors and font that defines how an element should look like."""
+    color: Optional[Color] = None
+    bgcolor: Optional[Color] = None
+    fontcolor: Optional[Color] = None
+    fontname: Optional[PlainText] = None
+    fontsize: Optional[Points] = None
+
+    def _2dict(self) -> dict:
+        """Return dict of strings with color values translated to hex."""
+        return {
+            k:translate_color(v, "hex") if 'color' in k else str(v) for k,v in asdict(self).items()
+        }
+
+    def graph_args(self) -> dict:
+        """Return dict with arguments to a dot graph."""
+        return {k:v for k,v in self._2dict().items() if k != 'color'}
+
+    def node_args(self) -> dict:
+        """Return dict with arguments to a dot node with filled style."""
+        return {k.replace('bg', 'fill'):v for k,v in self._2dict().items()}
+
+    def html_style(self, color_prefix: Optional[str] = None, include_all: bool = True) -> str:
+        """Return HTML style value containing all non-empty option values."""
+        translated = Look(**self._2dict())
+        return ' '.join(value for value in (
+            f'{color_prefix} {translated.color};' if self.color and color_prefix else None,
+            f'background-color: {translated.bgcolor};' if self.bgcolor and include_all else None,
+            f'color: {translated.fontcolor};' if self.fontcolor and include_all else None,
+            f'font-family: {self.fontname};' if self.fontname and include_all else None,
+            f'font-size: {self.fontsize}pt;' if self.fontsize and include_all else None,
+        ) if value)
+
+DEFAULT_LOOK = Look(
+    color = 'BK',
+    bgcolor = 'WH',
+    fontcolor = 'BK',
+    fontname = 'arial',
+    fontsize = 14,
+)
+
+
+@dataclass
 class Options:
-    fontname: PlainText = 'arial'
-    bgcolor: Color = 'WH'
-    bgcolor_node: Optional[Color] = 'WH'
-    bgcolor_connector: Optional[Color] = None
-    bgcolor_cable: Optional[Color] = None
-    bgcolor_bundle: Optional[Color] = None
+    base: Look = field(default_factory=dict)
+    node: Look = field(default_factory=dict)
+    connector: Look = field(default_factory=dict)
+    cable: Look = field(default_factory=dict)
+    bundle: Look = field(default_factory=dict)
     color_mode: ColorMode = 'SHORT'
     mini_bom_mode: bool = True
 
     def __post_init__(self):
-        if not self.bgcolor_node:
-            self.bgcolor_node = self.bgcolor
-        if not self.bgcolor_connector:
-            self.bgcolor_connector = self.bgcolor_node
-        if not self.bgcolor_cable:
-            self.bgcolor_cable = self.bgcolor_node
-        if not self.bgcolor_bundle:
-            self.bgcolor_bundle = self.bgcolor_cable
+        # Build initialization dicts with default values followed by dict entries from YAML input.
+        self.base = Look(**{**asdict(DEFAULT_LOOK), **self.base})
+        self.node = Look(**{**asdict(self.base), **self.node})
+        self.connector = Look(**{**asdict(self.node), **self.connector})
+        self.cable = Look(**{**asdict(self.node), **self.cable})
+        self.bundle = Look(**{**asdict(self.cable), **self.bundle})
 
 
 @dataclass
@@ -67,8 +108,8 @@ class Image:
     src: str
     scale: Optional[ImageScale] = None
     # Attributes of the image cell <td> containing the image:
-    width: Optional[int] = None
-    height: Optional[int] = None
+    width: Optional[Points] = None
+    height: Optional[Points] = None
     fixedsize: Optional[bool] = None
     bgcolor: Optional[Color] = None
     # Contents of the text cell <td> just below the image cell:

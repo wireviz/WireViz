@@ -15,9 +15,7 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         file.write(' <meta charset="UTF-8">\n')
         file.write(f' <meta name="generator" content="{APP_NAME} {__version__} - {APP_URL}">\n')
         file.write(f' <title>{metadata["title"]}</title>\n')
-        file.write(f'</head><body style="font-family:{options.fontname};background-color:'
-                   f'{wv_colors.translate_color(options.bgcolor, "HEX")}">\n')
-
+        file.write(f'</head><body style="{options.base.html_style()}">\n')
         file.write(f'<h1>{metadata["title"]}</h1>\n')
         description = metadata.get('description')
         if description:
@@ -33,17 +31,18 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
 
         file.write('<h2>Bill of Materials</h2>\n')
         listy = flatten2d(bom_list)
-        file.write('<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">\n')
+        border = options.base.html_style(color_prefix="border: 1px solid", include_all=False)
+        file.write(f'<table style="{border} border-spacing: 0px;">\n')
         file.write(' <tr>\n')
         for item in listy[0]:
-            file.write(f'  <th style="text-align:left; border:1px solid #000000; padding: 8px">{item}</th>\n')
+            file.write(f'  <th style="{border} padding: 8px; text-align:left;">{item}</th>\n')
         file.write(' </tr>\n')
         for row in listy[1:]:
             file.write(' <tr>\n')
             for i, item in enumerate(row):
                 item_str = item.replace('\u00b2', '&sup2;')
                 align = '; text-align:right' if listy[0][i] == 'Qty' else ''
-                file.write(f'  <td style="border:1px solid #000000; padding: 4px{align}">{item_str}</td>\n')
+                file.write(f'  <td style="{border} padding: 4px{align};">{item_str}</td>\n')
             file.write(' </tr>\n')
         file.write('</table>\n')
 

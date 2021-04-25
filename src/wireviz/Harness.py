@@ -97,17 +97,16 @@ class Harness:
         dot.body.append(f'// {APP_URL}')
         dot.attr('graph', rankdir='LR',
                  ranksep='2',
-                 bgcolor=wv_colors.translate_color(self.options.bgcolor, "HEX"),
                  nodesep='0.33',
-                 fontname=self.options.fontname)
-        dot.attr('node',
-                 shape='none',
-                 width='0', height='0', margin='0',  # Actual size of the node is entirely determined by the label.
+                 **self.options.base.graph_args())
+        dot.attr('node', shape='none',
                  style='filled',
-                 fillcolor=wv_colors.translate_color(self.options.bgcolor_node, "HEX"),
-                 fontname=self.options.fontname)
+                 width='0', height='0', margin='0',  # Actual size of the node is entirely determined by the label.
+                 **self.options.node.node_args())
         dot.attr('edge', style='bold',
-                 fontname=self.options.fontname)
+                 **self.options.base.node_args())
+
+        wire_border_hex = wv_colors.get_color_hex(self.options.base.color)[0]
 
         # prepare ports on connectors depending on which side they will connect
         for _, cable in self.cables.items():
@@ -175,10 +174,11 @@ class Harness:
 
             html = '\n'.join(html)
             dot.node(connector.name, label=f'<\n{html}\n>', shape='box', style='filled',
-                     fillcolor=translate_color(self.options.bgcolor_connector, "HEX"))
+                     **self.options.connector.node_args())
 
             if len(connector.loops) > 0:
-                dot.attr('edge', color='#000000:#ffffff:#000000')
+                # TODO: Use self.options.wire.color and self.options.wire.bgcolor here?
+                dot.attr('edge', color=f'{wire_border_hex}:#ffffff:{wire_border_hex}')
                 if connector.ports_left:
                     loop_side = 'l'
                     loop_dir = 'w'
@@ -258,10 +258,11 @@ class Harness:
                 wirehtml.append(f'    <td><!-- {i}_out --></td>')
                 wirehtml.append('   </tr>')
 
-                bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
+                bgcolors = [wire_border_hex] + get_color_hex(connection_color, pad=pad) + [wire_border_hex]
                 wirehtml.append(f'   <tr>')
                 wirehtml.append(f'    <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}">')
                 wirehtml.append('     <table cellspacing="0" cellborder="0" border="0">')
+                # TODO: Reverse curved wire colors instead? Test also with empty wire colors! wv_colors.default_color ??
                 for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
                     wirehtml.append(f'      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>')
                 wirehtml.append('     </table>')
@@ -301,10 +302,10 @@ class Harness:
                 if isinstance(cable.shield, str):
                     # shield is shown with specified color and black borders
                     shield_color_hex = wv_colors.get_color_hex(cable.shield)[0]
-                    attributes = f'height="6" bgcolor="{shield_color_hex}" border="2" sides="tb"'
+                    attributes = f'height="6" bgcolor="{shield_color_hex}" color="{wire_border_hex}" border="2" sides="tb"'
                 else:
                     # shield is shown as a thin black wire
-                    attributes = f'height="2" bgcolor="#000000" border="0"'
+                    attributes = f'height="2" bgcolor="{wire_border_hex}" border="0"'
                 wirehtml.append(f'   <tr><td colspan="3" cellpadding="0" {attributes} port="ws"></td></tr>')
 
             wirehtml.append('   <tr><td>&nbsp;</td></tr>')
@@ -315,10 +316,10 @@ class Harness:
             # connections
             for connection in cable.connections:
                 if isinstance(connection.via_port, int):  # check if it's an actual wire and not a shield
-                    dot.attr('edge', color=':'.join(['#000000'] + wv_colors.get_color_hex(cable.colors[connection.via_port - 1], pad=pad) + ['#000000']))
+                    dot.attr('edge', color=':'.join([wire_border_hex] + wv_colors.get_color_hex(cable.colors[connection.via_port - 1], pad=pad) + [wire_border_hex]))
                 else:  # it's a shield connection
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
-                    dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000')
+                    dot.attr('edge', color=':'.join([wire_border_hex, shield_color_hex, wire_border_hex]) if isinstance(cable.shield, str) else wire_border_hex)
                 if connection.from_port is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
                     from_port = f':p{connection.from_port+1}r' if from_connector.style != 'simple' else ''
@@ -352,11 +353,10 @@ class Harness:
                         to_string = ''
                     html = [row.replace(f'<!-- {connection.via_port}_out -->', to_string) for row in html]
 
-            style, bgcolor = ('filled,dashed', self.options.bgcolor_bundle) if cable.category == 'bundle' else \
-                             ('filled',        self.options.bgcolor_cable)
+            style, options = ('filled,dashed', self.options.bundle) if cable.category == 'bundle' else \
+                             ('filled',        self.options.cable)
             html = '\n'.join(html)
-            dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
-                     style=style, fillcolor=translate_color(bgcolor, "HEX"))
+            dot.node(cable.name, label=f'<\n{html}\n>', shape='box', style=style, **options.node_args())
 
         def typecheck(name: str, value: Any, expect: type) -> None:
             if not isinstance(value, expect):
