@@ -143,7 +143,7 @@ class Harness:
                         continue
                     pinhtml.append('   <tr>')
                     if connector.ports_left:
-                        pinhtml.append(f'    <td port="p{pinid}l">{pinname}</td>')
+                        pinhtml.append(f'    <td port="p{pinid+1}l">{pinname}</td>')
                     if pinlabel:
                         pinhtml.append(f'    <td>{pinlabel}</td>')
                     if connector.pincolors:
@@ -158,7 +158,7 @@ class Harness:
                             pinhtml.append( '    <td colspan="2"></td>')
 
                     if connector.ports_right:
-                        pinhtml.append(f'    <td port="p{pinid}r">{pinname}</td>')
+                        pinhtml.append(f'    <td port="p{pinid+1}r">{pinname}</td>')
                     pinhtml.append('   </tr>')
 
                 pinhtml.append('  </table>')
@@ -301,7 +301,7 @@ class Harness:
                     dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000')
                 if connection.from_port is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
-                    from_port = f':p{connection.from_port}r' if from_connector.style != 'simple' else ''
+                    from_port = f':p{connection.from_port+1}r' if from_connector.style != 'simple' else ''
                     code_left_1 = f'{connection.from_name}{from_port}:e'
                     code_left_2 = f'{cable.name}:w{connection.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
@@ -318,7 +318,7 @@ class Harness:
                 if connection.to_port is not None:  # connect to right
                     to_connector = self.connectors[connection.to_name]
                     code_right_1 = f'{cable.name}:w{connection.via_port}:e'
-                    to_port = f':p{connection.to_port}l' if self.connectors[connection.to_name].style != 'simple' else ''
+                    to_port = f':p{connection.to_port+1}l' if self.connectors[connection.to_name].style != 'simple' else ''
                     code_right_2 = f'{connection.to_name}{to_port}:w'
                     dot.edge(code_right_1, code_right_2)
                     if to_connector.show_name:
