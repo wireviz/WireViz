@@ -138,12 +138,12 @@ class Harness:
                 pinhtml = []
                 pinhtml.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
 
-                for pinid, (pinname, pinlabel, pincolor) in enumerate(zip_longest(connector.pins, connector.pinlabels, connector.pincolors)):
+                for pinindex, (pinname, pinlabel, pincolor) in enumerate(zip_longest(connector.pins, connector.pinlabels, connector.pincolors)):
                     if connector.hide_disconnected_pins and not connector.visible_pins.get(pinname, False):
                         continue
                     pinhtml.append('   <tr>')
                     if connector.ports_left:
-                        pinhtml.append(f'    <td port="p{pinid+1}l">{pinname}</td>')
+                        pinhtml.append(f'    <td port="p{pinindex+1}l">{pinname}</td>')
                     if pinlabel:
                         pinhtml.append(f'    <td>{pinlabel}</td>')
                     if connector.pincolors:
@@ -158,7 +158,7 @@ class Harness:
                             pinhtml.append( '    <td colspan="2"></td>')
 
                     if connector.ports_right:
-                        pinhtml.append(f'    <td port="p{pinid+1}r">{pinname}</td>')
+                        pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
                     pinhtml.append('   </tr>')
 
                 pinhtml.append('  </table>')
