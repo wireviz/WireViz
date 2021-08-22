@@ -25,8 +25,9 @@ ColorScheme = PlainText # Color scheme name = Literal[wv_colors.COLOR_CODES.keys
 # Type combinations
 Colors = PlainText # One or more two-letter color names (Color) concatenated into one string
 Pin = Union[int, PlainText] # Pin identifier
+PinIndex = int # Zero-based pin index
 Wire = Union[int, PlainText] # Wire number or Literal['s'] for shield
-NoneOrMorePins = Union[Pin, Tuple[Pin, ...], None] # None, one, or a tuple of pins
+NoneOrMorePinIndices = Union[PinIndex, Tuple[PinIndex, ...], None]  # None, one, or a tuple of zero-based pin indices
 OneOrMoreWires = Union[Wire, Tuple[Wire, ...]] # One or a tuple of wires
 
 
@@ -277,8 +278,8 @@ class Cable:
                 self.additional_components[i] = AdditionalComponent(**item)
 
     # The *_pin arguments accept a tuple, but it seems not in use with the current code.
-    def connect(self, from_name: Optional[Designator], from_pin: NoneOrMorePins, via_wire: OneOrMoreWires,
-                to_name: Optional[Designator], to_pin: NoneOrMorePins) -> None:
+    def connect(self, from_name: Optional[Designator], from_pin: NoneOrMorePinIndices, via_wire: OneOrMoreWires,
+                to_name: Optional[Designator], to_pin: NoneOrMorePinIndices) -> None:
         from_pin = int2tuple(from_pin)
         via_wire = int2tuple(via_wire)
         to_pin = int2tuple(to_pin)
@@ -305,7 +306,7 @@ class Cable:
 @dataclass
 class Connection:
     from_name: Optional[Designator]
-    from_port: Optional[Pin]
+    from_port: Optional[PinIndex]
     via_port: Wire
     to_name: Optional[Designator]
-    to_port: Optional[Pin]
+    to_port: Optional[PinIndex]
