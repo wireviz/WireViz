@@ -23,7 +23,6 @@
 - Move BOM management and HTML functions to separate modules ([#151](https://github.com/formatc1702/WireViz/issues/151), [#192](https://github.com/formatc1702/WireViz/pull/192))
 - Simplify BOM code ([#197](https://github.com/formatc1702/WireViz/pull/197))
 - Bug fixes ([#218](https://github.com/formatc1702/WireViz/pull/218), [#221](https://github.com/formatc1702/WireViz/pull/221))
-<!-- Placeholder -->
 
 ## Known issues
 
