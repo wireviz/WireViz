@@ -3,6 +3,12 @@
 ## Main sections
 
 ```yaml
+metadata:  # dictionary of meta-information describing the harness
+  <key>   : <value>  # any number of key value pairs (see below)
+  ...
+options:  # dictionary of common attributes for the whole harness
+  <str>   : <value>  # optional harness attributes (see below)
+  ...
 connectors:  # dictionary of all used connectors
   <str>   :    # unique connector designator/name
     ...          # connector attributes (see below)
@@ -29,6 +35,55 @@ additional_bom_items:  # custom items to add to BOM
   - <bom-item>           # BOM item (see below)
   ...
 
+```
+
+## Metadata entries
+
+```yaml
+  # Meta-information describing the harness
+
+  # Each key/value pair replaces all key references in
+  # the HTML output template with the belonging value.
+  # Typical keys are 'title', 'description', and 'notes',
+  # but any key is accepted. Unused keys are ignored.
+  <key>   : <value>  # Any valid YAML syntax is accepted
+  # If no value is specified for 'title', then the
+  # output filename without extension is used.
+```
+
+## Options
+
+```yaml
+  # Common attributes for the whole harness.
+  # All entries are optional and have default values.
+
+  # Background color of diagram and HTML output
+  bgcolor: <color>             # Default = 'WH'
+
+  # Background color of other diagram elements
+  bgcolor_node: <color>        # Default = 'WH'
+  bgcolor_connector: <color>   # Default = bgcolor_node
+  bgcolor_cable: <color>       # Default = bgcolor_node
+  bgcolor_bundle: <color>      # Default = bgcolor_cable
+
+  # How to display colors as text in the diagram
+  # 'full' : Lowercase full color name
+  # 'FULL' : Uppercase full color name
+  # 'hex'  : Lowercase hexadecimal values
+  # 'HEX'  : Uppercase hexadecimal values
+  # 'short': Lowercase short color name
+  # 'SHORT': Uppercase short color name
+  # 'ger'  : Lowercase short German color name
+  # 'GER'  : Uppercase short German color name
+  color_mode: <str>            # Default = 'SHORT'
+
+  # Fontname to use in diagram and HTML output
+  fontname: <str>              # Default = 'arial'
+
+  # If True, show only a BOM entry reference together with basic info
+  # about additional components inside the diagram node (connector/cable box).
+  # If False, show all info about additional components inside the diagram node.
+  mini_bom_mode: <bool>        # Default = True
 ```
 
 ## Connector attributes
