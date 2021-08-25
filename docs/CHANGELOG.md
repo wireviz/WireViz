@@ -9,6 +9,8 @@
 - Add support for length units in cables and wires ([#7](https://github.com/formatc1702/WireViz/issues/7), [#196](https://github.com/formatc1702/WireViz/pull/196) (with work from [#161](https://github.com/formatc1702/WireViz/pull/161), [#162](https://github.com/formatc1702/WireViz/pull/162), [#171](https://github.com/formatc1702/WireViz/pull/171)), [#198](https://github.com/formatc1702/WireViz/pull/198), [#205](https://github.com/formatc1702/WireViz/issues/205). [#206](https://github.com/formatc1702/WireViz/pull/206))
 - Add option to define connector pin colors ([#53](https://github.com/formatc1702/WireViz/issues/53), [#141](https://github.com/formatc1702/WireViz/pull/141))
 - Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
+- Add harness metadata section ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
+- Add graph rendering options (colors, font, color name display style, ...) ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
 
 
 ## Misc. fixes
