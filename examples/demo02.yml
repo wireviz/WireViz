@@ -1,3 +1,26 @@
+metadata:
+
+  title: WireViz Demo 2
+  pn: WV-DEMO-02
+
+  authors:
+    Created:
+      name: D. Rojas
+      date: 2020-05-20
+    Approved:
+      name: D. Rojas
+      date: 2020-05-20
+
+  revisions:
+    A:
+      name: D. Rojas
+      date: 2020-10-17
+      changelog: WireViz 0.2 release
+
+  template:
+    name: din-6771
+    sheetsize: A3
+
 templates: # defining templates to be used later on
   - &molex_f
     type: Molex KK 254
