@@ -5,6 +5,8 @@ connectors:
     subtype: female
     manufacturer: '<a href="https://www.molex.com/">Molex</a>' # set manufacter name
     mpn: '<a href="https://www.molex.com/molex/products/part-detail/crimp_housings/0022013047">22013047</a>' # set manufacturer part number
+    supplier: Digimouse
+    spn: 1234
     # add a list of additional components to a part (shown in graph)
     additional_components:
       -
@@ -27,6 +29,8 @@ cables:
     color_code: IEC
     manufacturer: CablesCo
     mpn: ABC123
+    supplier: Cables R Us
+    spn: 999-888-777
     pn: CAB1
   W2:
     category: bundle
@@ -35,6 +39,8 @@ cables:
     colors: [YE, BK, BK, RD]
     manufacturer: [WiresCo,WiresCo,WiresCo,WiresCo] # set a manufacter per wire
     mpn: [W1-YE,W1-BK,W1-BK,W1-RD]
+    supplier: [WireShack,WireShack,WireShack,WireShack]
+    spn: [1001,1002,1002,1009]
     pn: [WIRE1,WIRE2,WIRE2,WIRE3]
     # add a list of additional components to a part (shown in graph)
     additional_components:
