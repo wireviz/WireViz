@@ -161,8 +161,8 @@ def component_table_entry(
         spn: Optional[str] = None,
     ) -> str:
     """Return a diagram node table row string with an additional component."""
-    manufacturer_str = manufacturer_info_field(manufacturer, mpn)
-    supplier_str = manufacturer_info_field(supplier, spn)
+    manufacturer_str = pn_info_string("mpn", manufacturer, mpn)
+    supplier_str = pn_info_string("spn", supplier, spn)
     part_number_list = [pn, manufacturer_str, supplier_str]
     output = (f'{qty}'
               + (f' {unit}' if unit else '')
@@ -175,10 +175,10 @@ def component_table_entry(
    <td align="left" balign="left">{html_line_breaks(output)}</td>
   </tr></table>'''
 
-def manufacturer_info_field(manufacturer: Optional[str], mpn: Optional[str]) -> Optional[str]:
-    """Return the manufacturer and/or the mpn in one single string or None otherwise."""
-    if manufacturer or mpn:
-        return f'{manufacturer if manufacturer else "MPN"}{": " + str(mpn) if mpn else ""}'
+def pn_info_string(nametype: str, name: Optional[str], number: Optional[str]) -> Optional[str]:
+    """Return the company name and/or the part number in one single string or None otherwise."""
+    if name or number:
+        return f'{name if name else nametype.upper()}{": " + str(number) if number else ""}'
     else:
         return None
 
