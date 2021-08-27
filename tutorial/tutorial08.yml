@@ -1,3 +1,6 @@
+options:
+  mini_bom_mode: false
+
 connectors:
   X1: &template1 # define a template for later use
     type: Molex KK 254
@@ -15,6 +18,14 @@ connectors:
         qty_multiplier: populated # multipier for quantity (number of populated pins)
         manufacturer: Molex # set manufacter name
         mpn: 08500030 # set manufacturer part number
+      -
+        type: Test
+        qty: 1
+        pn: ABC
+        manufacturer: Molex
+        mpn: 45454
+        supplier: Mousikey
+        spn: 9999
   X2:
     <<: *template1 # reuse template
     pn: CON4 # set an internal part number for just this connector
