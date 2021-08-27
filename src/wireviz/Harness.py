@@ -125,7 +125,8 @@ class Harness:
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
                     [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
-                     html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn))],
+                     html_line_breaks(manufacturer_info_field(connector.manufacturer, connector.mpn)),
+                     html_line_breaks(manufacturer_info_field(connector.supplier, connector.spn))],
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
@@ -210,7 +211,10 @@ class Harness:
                     [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
                      html_line_breaks(manufacturer_info_field(
                         cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
-                        cable.mpn if not isinstance(cable.mpn, list) else None))],
+                        cable.mpn if not isinstance(cable.mpn, list) else None)),
+                     html_line_breaks(manufacturer_info_field(
+                        cable.supplier if not isinstance(cable.supplier, list) else None,
+                        cable.spn if not isinstance(cable.spn, list) else None))],
                     [html_line_breaks(cable.type),
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
                      f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
@@ -266,8 +270,13 @@ class Harness:
                     manufacturer_info = manufacturer_info_field(
                         cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
                         cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
+                    supplier_info = manufacturer_info_field(
+                        cable.supplier[i - 1] if isinstance(cable.supplier, list) else None,
+                        cable.spn[i - 1] if isinstance(cable.spn, list) else None)
                     if manufacturer_info:
                         wireidentification.append(html_line_breaks(manufacturer_info))
+                    if supplier_info:
+                        wireidentification.append(html_line_breaks(supplier_info))
                     # print parameters into a table row under the wire
                     if len(wireidentification) > 0 :
                         wirehtml.append('   <tr><td colspan="3">')
