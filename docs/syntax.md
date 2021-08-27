@@ -100,8 +100,10 @@ additional_bom_items:  # custom items to add to BOM
   # product information (all optional)
   ignore_in_bom: <bool>  # if set to true the connector is not added to the BOM
   pn: <str>              # [internal] part number
-  mpn: <str>             # manufacturer part number
   manufacturer: <str>    # manufacturer name
+  mpn: <str>             # manufacturer part number
+  supplier: <str>        # supplier name
+  spn: <str>             # supplier part number
   additional_components: # additional components
     - <additional-component> # additional component (see below)
 
@@ -173,8 +175,10 @@ Since the auto-incremented and auto-assigned designator is not known to the user
   # product information (all optional)
   ignore_in_bom: <bool>  # if set to true the cable or wires are not added to the BOM
   pn: <str>              # [internal] part number
-  mpn: <str>             # manufacturer part number
   manufacturer: <str>    # manufacturer name
+  mpn: <str>             # manufacturer part number
+  supplier: <str>        # supplier name
+  spn: <str>             # supplier part number
   additional_components: # additional components
     - <additional-component> # additional component (see below)
 
@@ -309,8 +313,10 @@ Parts can be added to a connector or cable in the section `<additional-component
                   # total_length     sum of lengths of each wire in the bundle
   unit: <str>
   pn: <str>            # [internal] part number
-  mpn: <str>           # manufacturer part number
   manufacturer: <str>  # manufacturer name  
+  mpn: <str>           # manufacturer part number
+  supplier: <str>      # supplier name  
+  spn: <str>           # supplier part number
 ```
 
 Alternatively items can be added to just the BOM by putting them in the section `<bom-item>` above.
@@ -323,8 +329,10 @@ Alternatively items can be added to just the BOM by putting them in the section 
   unit: <str>   
   designators: <List>
   pn: <str>            # [internal] part number
-  mpn: <str>           # manufacturer part number
   manufacturer: <str>  # manufacturer name  
+  mpn: <str>           # manufacturer part number
+  supplier: <str>      # supplier name  
+  spn: <str>           # supplier part number
 ```
 
 ## Colors
@@ -402,6 +410,8 @@ The following attributes accept multiline strings:
 - `notes`
 - `manufacturer`
 - `mpn`
+- `supplier`
+- `spn`
 - `image.caption`
 
 ### Method 1
