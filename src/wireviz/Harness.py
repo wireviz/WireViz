@@ -15,7 +15,8 @@ from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
     html_caption, remove_links, html_line_breaks
 from wireviz.wv_bom import pn_info_string, component_table_entry, \
-    get_additional_component_table, bom_list, generate_bom
+    get_additional_component_table, bom_list, generate_bom, \
+    HEADER_MPN, HEADER_SPN
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
     open_file_read, open_file_write
@@ -125,8 +126,8 @@ class Harness:
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
                     [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
-                     html_line_breaks(pn_info_string(HDR_MPN, connector.manufacturer, connector.mpn)),
-                     html_line_breaks(pn_info_string(HDR_SPN, connector.supplier, connector.spn))],
+                     html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
+                     html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
                      f'{connector.pincount}-pin' if connector.show_pincount else None,
@@ -209,10 +210,10 @@ class Harness:
 
             rows = [[remove_links(cable.name) if cable.show_name else None],
                     [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
-                     html_line_breaks(pn_info_string(HDR_MPN,
+                     html_line_breaks(pn_info_string(HEADER_MPN,
                         cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
                         cable.mpn if not isinstance(cable.mpn, list) else None)),
-                     html_line_breaks(pn_info_string(HDR_SPN,
+                     html_line_breaks(pn_info_string(HEADER_SPN,
                         cable.supplier if not isinstance(cable.supplier, list) else None,
                         cable.spn if not isinstance(cable.spn, list) else None))],
                     [html_line_breaks(cable.type),
@@ -267,10 +268,10 @@ class Harness:
                     wireidentification = []
                     if isinstance(cable.pn, list):
                         wireidentification.append(f'P/N: {remove_links(cable.pn[i - 1])}')
-                    manufacturer_info = pn_info_string(HDR_MPN,
+                    manufacturer_info = pn_info_string(HEADER_MPN,
                         cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
                         cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
-                    supplier_info = pn_info_string(HDR_SPN,
+                    supplier_info = pn_info_string(HEADER_SPN,
                         cable.supplier[i - 1] if isinstance(cable.supplier, list) else None,
                         cable.spn[i - 1] if isinstance(cable.spn, list) else None)
                     if manufacturer_info:
