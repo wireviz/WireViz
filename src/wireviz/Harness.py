@@ -16,7 +16,7 @@ from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
     html_caption, remove_links, html_line_breaks
 from wireviz.wv_bom import pn_info_string, component_table_entry, \
     get_additional_component_table, bom_list, generate_bom, \
-    HEADER_MPN, HEADER_SPN
+    HEADER_PN, HEADER_MPN, HEADER_SPN
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
     open_file_read, open_file_write
@@ -125,7 +125,7 @@ class Harness:
             html = []
 
             rows = [[remove_links(connector.name) if connector.show_name else None],
-                    [f'P/N: {remove_links(connector.pn)}' if connector.pn else None,
+                    [pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
                      html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
                      html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
                     [html_line_breaks(connector.type),
@@ -209,7 +209,8 @@ class Harness:
                     awg_fmt = f' ({mm2_equiv(cable.gauge)} mm\u00B2)'
 
             rows = [[remove_links(cable.name) if cable.show_name else None],
-                    [f'P/N: {remove_links(cable.pn)}' if (cable.pn and not isinstance(cable.pn, list)) else None,
+                    [pn_info_string(HEADER_PN, None,
+                        remove_links(cable.pn)) if not isinstance(cable.pn, list) else None,
                      html_line_breaks(pn_info_string(HEADER_MPN,
                         cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
                         cable.mpn if not isinstance(cable.mpn, list) else None)),
@@ -267,7 +268,7 @@ class Harness:
                     # create a list of wire parameters
                     wireidentification = []
                     if isinstance(cable.pn, list):
-                        wireidentification.append(f'P/N: {remove_links(cable.pn[i - 1])}')
+                        wireidentification.append(pn_info_string(HEADER_PN, None, remove_links(cable.pn[i - 1])))
                     manufacturer_info = pn_info_string(HEADER_MPN,
                         cable.manufacturer[i - 1] if isinstance(cable.manufacturer, list) else None,
                         cable.mpn[i - 1] if isinstance(cable.mpn, list) else None)
