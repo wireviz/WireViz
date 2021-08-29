@@ -169,7 +169,7 @@ def component_table_entry(
     output = (f'{qty}'
               + (f' {unit}' if unit else '')
               + f' x {type}'
-              + ('<br/>' if any([part_number_list]) else '')
+              + ('<br/>' if any(part_number_list) else '')
               + (', '.join([x for x in part_number_list if x])))
     # format the above output as left aligned text in a single visible cell
     # indent is set to two to match the indent in the generated html table
