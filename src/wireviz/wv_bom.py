@@ -174,17 +174,18 @@ def component_table_entry(
               + (f' {unit}' if unit else '')
               + f' x {type}'
               + ('<br/>' if any(part_number_list) else '')
-              + (', '.join([x for x in part_number_list if x])))
+              + (', '.join([pn for pn in part_number_list if pn])))
     # format the above output as left aligned text in a single visible cell
     # indent is set to two to match the indent in the generated html table
     return f'''<table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
    <td align="left" balign="left">{html_line_breaks(output)}</td>
   </tr></table>'''
 
-def pn_info_string(nametype: str, name: Optional[str], number: Optional[str]) -> Optional[str]:
+def pn_info_string(header: str, name: Optional[str], number: Optional[str]) -> Optional[str]:
     """Return the company name and/or the part number in one single string or None otherwise."""
+    number = str(number).strip() if number is not None else ''
     if name or number:
-        return f'{name if name else nametype.upper()}{": " + str(number) if number else ""}'
+        return f'{name if name else header}{": " + number if number else ""}'
     else:
         return None
 
