@@ -3,7 +3,7 @@
 
 from graphviz import Graph
 from collections import Counter
-from typing import List, Union
+from typing import Any, List, Union
 from dataclasses import dataclass
 from pathlib import Path
 from itertools import zip_longest
@@ -345,9 +345,9 @@ class Harness:
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
                      style=style, fillcolor=translate_color(bgcolor, "HEX"))
 
-        def typecheck(name: str, var, type) -> None:
-            if not isinstance(var, type):
-                raise Exception(f'Unexpected value type of {name}: {var}')
+        def typecheck(name: str, value: Any, expect: type) -> None:
+            if not isinstance(value, expect):
+                raise Exception(f'Unexpected value type of {name}: Expected {expect}, got {type(value)}\n{value}')
 
         # TODO?: Differ between override attributes and HTML?
         if self.tweak.override is not None:
@@ -380,7 +380,7 @@ class Harness:
                     typecheck(f'tweak.append[{i}]', element, str)
                 dot.body.extend(self.tweak.append)
             else:
-                typecheck(f'tweak.append', self.tweak.append, str)
+                typecheck('tweak.append', self.tweak.append, str)
                 dot.body.append(self.tweak.append)
 
         return dot

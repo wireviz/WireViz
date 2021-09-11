@@ -329,7 +329,7 @@ Alternatively items can be added to just the BOM by putting them in the section 
   manufacturer: <str>  # manufacturer name  
 ```
 
-## Tweak entries
+## GraphViz tweaking (experimental)
 
 ```yaml
   # Optional tweaking of the .gv output.
@@ -342,15 +342,14 @@ Alternatively items can be added to just the BOM by putting them in the section 
     # The leading string might be in "quotes" in 
     # the .gv output. This leading string must be
     # followed by attributes in [square brackets].
-    # Entries containing HTML in an attribute are
+    # Entries with an attribute containing HTML are
     # not supported.
     <str>:  # leading string of .gv entry
       <str> : <str>  # attribute and its new value
       # Any number of attributes can be overridden
       # for each entry
 
-  append:  # single or list of .gv entries to append
-    <str>  # strings to append might have multiple lines
+  append: <str/list> # string or list of strings to append to the .gv output
 ```
 
 ## Colors
