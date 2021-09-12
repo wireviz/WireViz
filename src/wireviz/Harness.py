@@ -367,11 +367,16 @@ class Harness:
                     keyword = match and match[2]
                     if keyword in self.tweak.override.keys():
                         for attr, value in self.tweak.override[keyword].items():
+                            # TODO?: If value is None: delete attr?
                             if len(value) == 0 or ' ' in value:
                                 value = value.replace('"', r'\"')
                                 value = f'"{value}"'
-                            # TODO?: If value is None: delete attr, and if attr not found: append it?
-                            entry = re.sub(f'{attr}=("[^"]*"|[^] ]*)', f'{attr}={value}', entry)
+                            entry, n_subs = re.subn(f'{attr}=("[^"]*"|[^] ]*)', f'{attr}={value}', entry)
+                            if n_subs < 1:
+                                # If attr not found, then append it
+                                entry = re.sub(r'\]$', f' {attr}={value}]', entry)
+                            elif n_subs > 1:
+                                print(f'Harness.create_graph() warning: {attr} overridden {n_subs} times in {keyword}!')
                         dot.body[i] = entry
 
         if self.tweak.append is not None:

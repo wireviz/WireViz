@@ -347,7 +347,8 @@ Alternatively items can be added to just the BOM by putting them in the section 
     <str>:  # leading string of .gv entry
       <str> : <str>  # attribute and its new value
       # Any number of attributes can be overridden
-      # for each entry
+      # for each entry. Attributes not already existing
+      # in the entry will be appended to the entry.
 
   append: <str/list> # string or list of strings to append to the .gv output
 ```
