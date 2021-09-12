@@ -345,10 +345,11 @@ Alternatively items can be added to just the BOM by putting them in the section 
     # Entries with an attribute containing HTML are
     # not supported.
     <str>:  # leading string of .gv entry
-      <str> : <str>  # attribute and its new value
+      <str> : <str/null>  # attribute and its new value
       # Any number of attributes can be overridden
       # for each entry. Attributes not already existing
       # in the entry will be appended to the entry.
+      # Use null as new value to delete an attribute.
 
   append: <str/list> # string or list of strings to append to the .gv output
 ```

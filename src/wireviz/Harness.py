@@ -357,7 +357,7 @@ class Harness:
                 typecheck(f'tweak.override.{k} value', d, dict)
                 for a, v in d.items():
                     typecheck(f'tweak.override.{k}.{a} key', a, str)
-                    typecheck(f'tweak.override.{k}.{a} value', v, str)
+                    typecheck(f'tweak.override.{k}.{a} value', v, (str, type(None)))
 
             # Override generated attributes of selected entries matching tweak.override.
             for i, entry in enumerate(dot.body):
@@ -367,7 +367,14 @@ class Harness:
                     keyword = match and match[2]
                     if keyword in self.tweak.override.keys():
                         for attr, value in self.tweak.override[keyword].items():
-                            # TODO?: If value is None: delete attr?
+                            if value is None:
+                                entry, n_subs = re.subn(f'( +)?{attr}=("[^"]*"|[^] ]*)(?(1)| *)', '', entry)
+                                if n_subs < 1:
+                                    print(f'Harness.create_graph() warning: {attr} not found in {keyword}!')
+                                elif n_subs > 1:
+                                    print(f'Harness.create_graph() warning: {attr} removed {n_subs} times in {keyword}!')
+                                continue
+
                             if len(value) == 0 or ' ' in value:
                                 value = value.replace('"', r'\"')
                                 value = f'"{value}"'
@@ -377,6 +384,7 @@ class Harness:
                                 entry = re.sub(r'\]$', f' {attr}={value}]', entry)
                             elif n_subs > 1:
                                 print(f'Harness.create_graph() warning: {attr} overridden {n_subs} times in {keyword}!')
+
                         dot.body[i] = entry
 
         if self.tweak.append is not None:

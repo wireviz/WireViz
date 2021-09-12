@@ -61,7 +61,7 @@ class Options:
 
 @dataclass
 class Tweak:
-    override: Optional[Dict[Designator, Dict[str, str]]] = None
+    override: Optional[Dict[Designator, Dict[str, Optional[str]]]] = None
     append: Union[str, List[str], None] = None
 
 
