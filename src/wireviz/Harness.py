@@ -3,14 +3,14 @@
 
 from graphviz import Graph
 from collections import Counter
-from typing import List, Union
+from typing import Any, List, Union
 from dataclasses import dataclass
 from pathlib import Path
 from itertools import zip_longest
 import re
 
 from wireviz import wv_colors, __version__, APP_NAME, APP_URL
-from wireviz.DataClasses import Metadata, Options, Connector, Cable
+from wireviz.DataClasses import Metadata, Options, Tweak, Connector, Cable
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, html_colorbar, html_image, \
     html_caption, remove_links, html_line_breaks
@@ -26,6 +26,7 @@ from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
 class Harness:
     metadata: Metadata
     options: Options
+    tweak: Tweak
 
     def __post_init__(self):
         self.connectors = {}
@@ -354,6 +355,57 @@ class Harness:
             html = '\n'.join(html)
             dot.node(cable.name, label=f'<\n{html}\n>', shape='box',
                      style=style, fillcolor=translate_color(bgcolor, "HEX"))
+
+        def typecheck(name: str, value: Any, expect: type) -> None:
+            if not isinstance(value, expect):
+                raise Exception(f'Unexpected value type of {name}: Expected {expect}, got {type(value)}\n{value}')
+
+        # TODO?: Differ between override attributes and HTML?
+        if self.tweak.override is not None:
+            typecheck('tweak.override', self.tweak.override, dict)
+            for k, d in self.tweak.override.items():
+                typecheck(f'tweak.override.{k} key', k, str)
+                typecheck(f'tweak.override.{k} value', d, dict)
+                for a, v in d.items():
+                    typecheck(f'tweak.override.{k}.{a} key', a, str)
+                    typecheck(f'tweak.override.{k}.{a} value', v, (str, type(None)))
+
+            # Override generated attributes of selected entries matching tweak.override.
+            for i, entry in enumerate(dot.body):
+                if isinstance(entry, str):
+                    # Find a possibly quoted keyword after leading TAB(s) and followed by [ ].
+                    match = re.match(r'^\t*(")?((?(1)[^"]|[^ "])+)(?(1)") \[.*\]$', entry, re.S)
+                    keyword = match and match[2]
+                    if keyword in self.tweak.override.keys():
+                        for attr, value in self.tweak.override[keyword].items():
+                            if value is None:
+                                entry, n_subs = re.subn(f'( +)?{attr}=("[^"]*"|[^] ]*)(?(1)| *)', '', entry)
+                                if n_subs < 1:
+                                    print(f'Harness.create_graph() warning: {attr} not found in {keyword}!')
+                                elif n_subs > 1:
+                                    print(f'Harness.create_graph() warning: {attr} removed {n_subs} times in {keyword}!')
+                                continue
+
+                            if len(value) == 0 or ' ' in value:
+                                value = value.replace('"', r'\"')
+                                value = f'"{value}"'
+                            entry, n_subs = re.subn(f'{attr}=("[^"]*"|[^] ]*)', f'{attr}={value}', entry)
+                            if n_subs < 1:
+                                # If attr not found, then append it
+                                entry = re.sub(r'\]$', f' {attr}={value}]', entry)
+                            elif n_subs > 1:
+                                print(f'Harness.create_graph() warning: {attr} overridden {n_subs} times in {keyword}!')
+
+                        dot.body[i] = entry
+
+        if self.tweak.append is not None:
+            if isinstance(self.tweak.append, list):
+                for i, element in enumerate(self.tweak.append, 1):
+                    typecheck(f'tweak.append[{i}]', element, str)
+                dot.body.extend(self.tweak.append)
+            else:
+                typecheck('tweak.append', self.tweak.append, str)
+                dot.body.append(self.tweak.append)
 
         return dot
 
