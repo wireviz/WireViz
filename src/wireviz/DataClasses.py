@@ -60,6 +60,12 @@ class Options:
 
 
 @dataclass
+class Tweak:
+    override: Optional[Dict[Designator, Dict[str, Optional[str]]]] = None
+    append: Union[str, List[str], None] = None
+
+
+@dataclass
 class Image:
     gv_dir: InitVar[Path] # Directory of .gv file injected as context during parsing
     # Attributes of the image object <img>:

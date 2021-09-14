@@ -13,7 +13,7 @@ if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import __version__
-from wireviz.DataClasses import Metadata, Options
+from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read
 
@@ -38,6 +38,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
     harness = Harness(
         metadata = Metadata(**yaml_data.get('metadata', {})),
         options = Options(**yaml_data.get('options', {})),
+        tweak = Tweak(**yaml_data.get('tweak', {})),
     )
     if 'title' not in harness.metadata:
         harness.metadata['title'] = Path(file_out).stem
