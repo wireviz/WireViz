@@ -107,6 +107,8 @@ class AdditionalComponent:
     subtype: Optional[MultilineHypertext] = None
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
+    supplier: Optional[MultilineHypertext] = None
+    spn: Optional[MultilineHypertext] = None
     pn: Optional[Hypertext] = None
     qty: float = 1
     unit: Optional[str] = None
@@ -122,6 +124,8 @@ class Connector:
     name: Designator
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
+    supplier: Optional[MultilineHypertext] = None
+    spn: Optional[MultilineHypertext] = None
     pn: Optional[Hypertext] = None
     style: Optional[str] = None
     category: Optional[str] = None
@@ -204,6 +208,8 @@ class Cable:
     name: Designator
     manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+    supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+    spn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     pn: Union[Hypertext, List[Hypertext], None] = None
     category: Optional[str] = None
     type: Optional[MultilineHypertext] = None
@@ -294,7 +300,7 @@ class Cable:
                 raise Exception('"s" may not be used as a wire label for a shielded cable.')
 
         # if lists of part numbers are provided check this is a bundle and that it matches the wirecount.
-        for idfield in [self.manufacturer, self.mpn, self.pn]:
+        for idfield in [self.manufacturer, self.mpn, self.supplier, self.spn, self.pn]:
             if isinstance(idfield, list):
                 if self.category == "bundle":
                     # check the length
