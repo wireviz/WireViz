@@ -11,6 +11,7 @@
 - Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
 - Add harness metadata section ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
 - Add graph rendering options (colors, font, color name display style, ...) ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
+- Add optional tweaking of the .gv output ([#215](https://github.com/formatc1702/WireViz/pull/215)) (experimental)
 
 
 ## Misc. fixes
