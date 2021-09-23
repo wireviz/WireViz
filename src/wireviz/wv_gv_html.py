@@ -14,6 +14,8 @@ def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], table_a
     # attributes in any leading <tdX> inside a list are injected into to the preceeding <td> tag
     html = []
     html.append(f'<table border="0" cellspacing="0" cellpadding="0"{table_attrs or ""}>')
+
+    num_rows = 0
     for row in rows:
         if isinstance(row, List):
             if len(row) > 0 and any(row):
@@ -25,10 +27,14 @@ def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], table_a
                         html.append(f'   <td balign="left">{cell}</td>'.replace('><tdX', ''))
                 html.append('  </tr></table>')
                 html.append(' </td></tr>')
+                num_rows = num_rows + 1
         elif row is not None:
             html.append(' <tr><td>')
             html.append(f'  {row}')
             html.append(' </td></tr>')
+            num_rows = num_rows + 1
+    if num_rows == 0:  # empty table
+        html.append('<tr><td></td></tr>')  # generate empty cell to avoid GraphViz errors
     html.append('</table>')
     return html
 
