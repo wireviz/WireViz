@@ -139,10 +139,12 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             else:
                 pass # strings do not reveal connectioncount
         if not any(connectioncount):
-            raise Exception('No item in connection set revealed number of connections')
-            # TODO: The following should be a valid connection set,
-            #       even though no item reveals the connection count;
-            #       the count is not needed because only a component-level mate happens.
+            # no item in the list revealed connection count;
+            # assume connection count is 1
+            connectioncount = [1]
+            # Example: The following is a valid connection set,
+            #          even though no item reveals the connection count;
+            #          the count is not needed because only a component-level mate happens.
             # -
             #   - CONNECTOR
             #   - ==>
