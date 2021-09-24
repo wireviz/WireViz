@@ -6,7 +6,7 @@ from dataclasses import dataclass, field, InitVar
 from pathlib import Path
 
 from wireviz.wv_helper import int2tuple, aspect_ratio
-from wireviz import wv_colors
+from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES
 
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
@@ -19,12 +19,8 @@ Designator = PlainText # Case insensitive unique name of connector or cable
 ConnectorMultiplier = PlainText # = Literal['pincount', 'populated']
 CableMultiplier = PlainText # = Literal['wirecount', 'terminations', 'length', 'total_length']
 ImageScale = PlainText # = Literal['false', 'true', 'width', 'height', 'both']
-Color = PlainText # Two-letter color name = Literal[wv_colors._color_hex.keys()]
-ColorMode = PlainText # = Literal['full', 'FULL', 'hex', 'HEX', 'short', 'SHORT', 'ger', 'GER']
-ColorScheme = PlainText # Color scheme name = Literal[wv_colors.COLOR_CODES.keys()]
 
 # Type combinations
-Colors = PlainText # One or more two-letter color names (Color) concatenated into one string
 Pin = Union[int, PlainText] # Pin identifier
 PinIndex = int # Zero-based pin index
 Wire = Union[int, PlainText] # Wire number or Literal['s'] for shield
@@ -284,9 +280,9 @@ class Cable:
             if self.colors:  # use custom color palette (partly or looped if needed)
                 pass
             elif self.color_code:  # use standard color palette (partly or looped if needed)
-                if self.color_code not in wv_colors.COLOR_CODES:
+                if self.color_code not in COLOR_CODES:
                     raise Exception('Unknown color code')
-                self.colors = wv_colors.COLOR_CODES[self.color_code]
+                self.colors = COLOR_CODES[self.color_code]
             else:  # no colors defined, add dummy colors
                 self.colors = [''] * self.wirecount
 
