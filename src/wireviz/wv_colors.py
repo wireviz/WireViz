@@ -3,8 +3,6 @@
 
 from typing import Dict, List
 
-from wireviz.DataClasses import Color, Colors
-
 COLOR_CODES = {
     'DIN': ['WH', 'BN', 'GN', 'YE', 'GY', 'PK', 'BU', 'RD', 'BK', 'VT', 'GYPK', 'RDBU', 'WHGN', 'BNGN', 'WHYE', 'YEBN',
             'WHGY', 'GYBN', 'WHPK', 'PKBN', 'WHBU', 'BNBU', 'WHRD', 'BNRD', 'WHBK', 'BNBK', 'GYGN', 'YEGY', 'PKGN',
@@ -112,7 +110,14 @@ color_default = '#ffffff'
 _hex_digits = set('0123456789abcdefABCDEF')
 
 
-def get_color_hex(input, pad=False):
+# Literal type aliases below are commented to avoid requiring python 3.8
+Color = str  # Two-letter color name = Literal[_color_hex.keys()]
+Colors = str  # One or more two-letter color names (Color) concatenated into one string
+ColorMode = str  # = Literal['full', 'FULL', 'hex', 'HEX', 'short', 'SHORT', 'ger', 'GER']
+ColorScheme = str  # Color scheme name = Literal[COLOR_CODES.keys()]
+
+
+def get_color_hex(input: Colors, pad: bool = False) -> List[str]:
     """Return list of hex colors from either a string of color names or :-separated hex colors."""
     if input is None or input == '':
         return [color_default]
@@ -156,7 +161,7 @@ def get_color_translation(translate: Dict[Color, str], input: Colors) -> List[st
            [translate.get(input[i:i+2], '??') for i in range(0, len(input), 2)]
 
 
-def translate_color(input, color_mode):
+def translate_color(input: Colors, color_mode: ColorMode) -> str:
     if input == '' or input is None:
         return ''
     upper = color_mode.isupper()
