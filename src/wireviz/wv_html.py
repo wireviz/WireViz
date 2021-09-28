@@ -79,10 +79,13 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
 
         replacements['"sheetsize_default"'] = '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))  # include quotes so no replacement happens within <style> definition
 
-
     # perform replacements
-    for before, after in replacements.items():
-        html = html.replace(before, after)
+    # regex replacement adapted from:
+    # https://gist.github.com/bgusach/a967e0587d6e01e889fd1d776c5f3729
+    replacements_sorted = sorted(replacements, key=len, reverse=True)  # longer replacements first, just in case
+    replacements_escaped = map(re.escape, replacements_sorted)
+    pattern = re.compile("|".join(replacements_escaped))
+    html = pattern.sub(lambda match: replacements[match.group(0)], html)
 
     with open_file_write(f'{filename}.html') as file:
         file.write(html)
