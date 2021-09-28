@@ -3,8 +3,7 @@
 from typing import List, Optional, Union
 import re
 
-from wireviz.DataClasses import Color
-from wireviz.wv_colors import translate_color
+from wireviz.wv_colors import Color, translate_color
 from wireviz.wv_helper import remove_links
 
 def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], table_attrs: str = '') -> str:
