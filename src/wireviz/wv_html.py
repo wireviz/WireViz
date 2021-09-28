@@ -29,7 +29,6 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
                   '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
                   '<!-- XML and DOCTYPE declarations from SVG file removed -->',
                   svgdata, 1)
-    html = html.replace('<!-- %diagram% -->', svgdata)
 
     # generate BOM table
     bom = flatten2d(bom_list)
@@ -54,33 +53,34 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
     bom_html = '<table>\n' + bom_header_html + ''.join(bom_contents) + '</table>\n'
     bom_html_reversed = '<table>\n' + ''.join(list(reversed(bom_contents))) + bom_header_html + '</table>\n'
 
-    # insert BOM table
-    html = html.replace('<!-- %bom% -->', bom_html)
-    html = html.replace('<!-- %bom_reversed% -->', bom_html_reversed)
+    # prepare simple replacements
+    replacements = {
+        '<!-- %generator% -->': f'{APP_NAME} {__version__} - {APP_URL}',
+        '<!-- %diagram% -->': svgdata,
+        '<!-- %bom% -->': bom_html,
+        '<!-- %bom_reversed% -->': bom_html_reversed,
+        '<!-- %sheet_current% -->': '1',  # TODO: handle multi-page documents
+        '<!-- %sheet_total% -->': '1',    # TODO: handle multi-page documents
+    }
 
-    # insert generator
-    html = html.replace('<!-- %generator% -->', f'{APP_NAME} {__version__} - {APP_URL}')
-
-    # insert other metadata
+    # prepare metadata replacements
     if metadata:
-
-        html = html.replace(f'"sheetsize_default"', '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))) # include quotes so no replacement happens within <style> definition
-
-        # TODO: handle multi-page documents
-        html = html.replace('<!-- %sheet_current% -->', '1')
-        html = html.replace('<!-- %sheet_total% -->', '1')
-
-        # fill out other generic metadata
         for item, contents in metadata.items():
             if isinstance(contents, (str, int, float)):
-                html = html.replace(f'<!-- %{item}% -->', html_line_breaks(str(contents)))
+                replacements[f'<!-- %{item}% -->'] = html_line_breaks(str(contents))
             elif isinstance(contents, Dict):  # useful for authors, revisions
                 for index, (category, entry) in enumerate(contents.items()):
                     if isinstance(entry, Dict):
-                        html = html.replace(f'<!-- %{item}_{index+1}% -->', str(category))
+                        replacements[f'<!-- %{item}_{index+1}% -->'] = str(category)
                         for entry_key, entry_value in entry.items():
-                            html = html.replace(f'<!-- %{item}_{index+1}_{entry_key}% -->', html_line_breaks(str(entry_value)))
+                            replacements[f'<!-- %{item}_{index+1}_{entry_key}% -->'] = html_line_breaks(str(entry_value))
 
+        replacements['"sheetsize_default"'] = '"{}"'.format(metadata.get('template',{}).get('sheetsize', ''))  # include quotes so no replacement happens within <style> definition
+
+
+    # perform replacements
+    for before, after in replacements.items():
+        html = html.replace(before, after)
 
     with open_file_write(f'{filename}.html') as file:
         file.write(html)
