@@ -56,6 +56,8 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
     # prepare simple replacements
     replacements = {
         '<!-- %generator% -->': f'{APP_NAME} {__version__} - {APP_URL}',
+        '<!-- %fontname% -->': options.fontname,
+        '<!-- %bgcolor% -->': options.bgcolor,  # TODO: currently not working, requires translation from 2-char color code to HTML
         '<!-- %diagram% -->': svgdata,
         '<!-- %bom% -->': bom_html,
         '<!-- %bom_reversed% -->': bom_html_reversed,
