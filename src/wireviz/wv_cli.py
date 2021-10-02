@@ -4,6 +4,9 @@ import sys
 
 import click
 
+if __name__ == '__main__':
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 from wireviz import APP_NAME, __version__
 import wireviz.wireviz as wv
 from wireviz.wv_helper import open_file_read
@@ -19,7 +22,7 @@ epilog += ', '.join([f'{key} ({value.upper()})' for key, value in format_codes.i
 @click.option('-p', '--prepend', default=None, type=Path, help='YAML file to prepend to the input file (optional).')
 @click.option('-o', '--output-file', default=None, type=Path, help='File name (without extension) to use for output, if different from input file name.')
 @click.option('-V', '--version', is_flag=True, default=False, help=f'Output {APP_NAME} version and exit.')
-def main(file, format, prepend, output_file, version):
+def wireviz(file, format, prepend, output_file, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
@@ -79,5 +82,4 @@ def main(file, format, prepend, output_file, version):
     print()
 
 if __name__ == '__main__':
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
     wireviz()
