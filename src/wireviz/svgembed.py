@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import re
 import base64
 from pathlib import Path
+import re
 from typing import Union
 
 mime_subtype_replacements = {'jpg': 'jpeg', 'tif': 'tiff'}
