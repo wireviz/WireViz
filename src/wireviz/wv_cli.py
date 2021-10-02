@@ -77,7 +77,7 @@ def wireviz(file, format, prepend, output_file, version):
 
         yaml_input = prepend_input + yaml_input
 
-        wv.parse(yaml_input, file_out=file_out, return_types=return_types)
+        wv.parse_text(yaml_input, file_out=file_out, return_types=return_types)
 
     print()
 

@@ -3,7 +3,7 @@
 
 from pathlib import Path
 import sys
-from typing import Any, Tuple
+from typing import Any, Dict, Tuple
 
 import yaml
 
@@ -15,11 +15,11 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read
 
 
-def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv')) -> Any:
+def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv')) -> Any:
     """
-    Parses yaml input string and does the high-level harness conversion
+    Parses a YAML input string and does the high-level harness conversion
 
-    :param yaml_input: a string containing the yaml input data
+    :param yaml_input: a string containing the YAML input data
     :param file_out:
     :param return_types: if None, then returns None; if the value is a string, then a
         corresponding data format will be returned; if the value is a tuple of strings,
@@ -29,8 +29,23 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
          - "svg" - will return the SVG data
          - "harness" - will return the `Harness` instance
     """
+    yaml_data = yaml.safe_load(yaml_str)
+    return parse(yaml_data=yaml_data, file_out=file_out, return_types=return_types )
 
-    yaml_data = yaml.safe_load(yaml_input)
+def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv')) -> Any:
+    """
+    Parses a YAML dictionary and does the high-level harness conversion
+
+    :param yaml_data: a dictionary containing the YAML data
+    :param file_out:
+    :param return_types: if None, then returns None; if the value is a string, then a
+        corresponding data format will be returned; if the value is a tuple of strings,
+        then for every valid format in the `return_types` tuple, another return type
+        will be generated and returned in the same order; currently supports:
+         - "png" - will return the PNG data
+         - "svg" - will return the SVG data
+         - "harness" - will return the `Harness` instance
+    """
 
 
     # define variables =========================================================
