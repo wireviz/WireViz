@@ -17,6 +17,7 @@ setup(
     long_description=open(README_PATH).read(),
     long_description_content_type='text/markdown',
     install_requires=[
+        'click',
         'pyyaml',
         'pillow',
         'graphviz',
@@ -27,7 +28,9 @@ setup(
     package_dir={'': 'src'},
     packages=find_packages('src'),
     entry_points={
-        'console_scripts': ['wireviz=wireviz.wireviz:main'],
+        'console_scripts': [
+            'wireviz=wireviz.wv_cli:main',
+            ],
         },
     classifiers=[
         'Development Status :: 4 - Beta',
