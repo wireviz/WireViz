@@ -292,3 +292,6 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
     file_out = file_out.resolve()
 
     parse(yaml_input, file_out=file_out)
+
+if __name__ == '__main__':
+    print('When running from the command line, please use wv_cli.py instead.')

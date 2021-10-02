@@ -29,7 +29,7 @@ setup(
     packages=find_packages('src'),
     entry_points={
         'console_scripts': [
-            'wireviz=wireviz.wv_cli:main',
+            'wireviz=wireviz.wv_cli:wireviz',
             ],
         },
     classifiers=[
