@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import argparse
 from pathlib import Path
 import sys
 from typing import Any, Tuple
@@ -11,7 +10,6 @@ import yaml
 if __name__ == '__main__':
     sys.path.insert(0, str(Path(__file__).parent.parent))  # add src/wireviz to PATH
 
-from wireviz import __version__
 from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read
@@ -294,49 +292,3 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
     file_out = file_out.resolve()
 
     parse(yaml_input, file_out=file_out)
-
-
-def parse_cmdline():
-    parser = argparse.ArgumentParser(
-        description='Generate cable and wiring harness documentation from YAML descriptions',
-    )
-    parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
-    parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
-    parser.add_argument('-o', '--output_file', action='store', type=str, metavar='OUTPUT')
-    # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
-    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
-    return parser.parse_args()
-
-
-def main():
-
-    args = parse_cmdline()
-
-    file_in = Path(args.input_file)
-
-    if not file_in.exists():
-        print(f'Error: input file {file_in} inaccessible or does not exist, check path')
-        sys.exit(1)
-
-    with open_file_read(file_in) as fh:
-        yaml_input = fh.read()
-
-    if args.prepend_file:
-        if not Path(args.prepend_file).exists():
-            print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
-            sys.exit(1)
-        with open_file_read(args.prepend_file) as fh:
-            prepend = fh.read()
-            yaml_input = prepend + yaml_input
-
-    if not args.output_file:
-        file_out = file_in.parent / file_in.stem  # extension will be added by graphviz output function
-    else:
-        file_out = Path(args.output_file)
-    file_out = file_out.resolve()
-
-    parse(yaml_input, file_out=file_out)
-
-
-if __name__ == '__main__':
-    main()
