@@ -8,14 +8,21 @@ from wireviz import APP_NAME, __version__
 import wireviz.wireviz as wv
 from wireviz.wv_helper import open_file_read
 
+format_codes = {'p': 'png', 's': 'svg', 't': 'tsv', 'c': 'csv', 'h': 'html', 'P': 'pdf'}
 
-@click.command()
-@click.argument('filepath', nargs=-1)
-@click.option('-f', '--format', default='hpst')
-@click.option('-p', '--prepend', default=None)
-@click.option('-o', '--output-file', default=None)
-@click.option('-V', '--version', is_flag=True, default=False)
-def main(filepath, format, prepend, output_file, version):
+epilog = 'The -f or --format option accepts a string containing one or more of the following characters to specify which file types to output:\n'
+epilog += ', '.join([f'{key} ({value.upper()})' for key, value in format_codes.items()])
+
+@click.command(epilog=epilog)
+@click.argument('file', nargs=-1)
+@click.option('-f', '--format', default='hpst', type=str, show_default=True, help='Output formats (see below).')
+@click.option('-p', '--prepend', default=None, type=Path, help='YAML file to prepend to the input file (optional).')
+@click.option('-o', '--output-file', default=None, type=Path, help='File name (without extension) to use for output, if different from input file name.')
+@click.option('-V', '--version', is_flag=True, default=False, help=f'Output {APP_NAME} version and exit.')
+def main(file, format, prepend, output_file, version):
+    """
+    Parses the provided FILE and generates the specified outputs.
+    """
     print()
     print(f'{APP_NAME} {__version__}')
     if version:
@@ -23,14 +30,13 @@ def main(filepath, format, prepend, output_file, version):
 
     # get list of files
     try:
-        _ = iter(filepath)
+        _ = iter(file)
     except TypeError:
-        filepaths = [filepath]
+        filepaths = [file]
     else:
-        filepaths = list(filepath)
+        filepaths = list(file)
 
     # determine output formats
-    format_codes = {'p': 'png', 's': 'svg', 't': 'tsv', 'c': 'csv', 'h': 'html', 'P': 'pdf'}
     return_types = []
     for code in format:
         if code in format_codes:
