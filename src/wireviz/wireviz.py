@@ -3,7 +3,7 @@
 
 from pathlib import Path
 import sys
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
 import yaml
 
@@ -15,7 +15,7 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read
 
 
-def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv')) -> Any:
+def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv'), image_paths: List = []) -> Any:
     """
     Parses a YAML input string and does the high-level harness conversion
 
@@ -30,9 +30,9 @@ def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None,
          - "harness" - will return the `Harness` instance
     """
     yaml_data = yaml.safe_load(yaml_str)
-    return parse(yaml_data=yaml_data, file_out=file_out, return_types=return_types )
+    return parse(yaml_data=yaml_data, file_out=file_out, return_types=return_types, image_paths=image_paths)
 
-def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv')) -> Any:
+def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv'), image_paths: List = []) -> Any:
     """
     Parses a YAML dictionary and does the high-level harness conversion
 
@@ -79,9 +79,10 @@ def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, st
                         # The Image dataclass might need to open an image file with a relative path.
                         image = attribs.get('image')
                         if isinstance(image, dict):
-                            image['gv_dir'] = Path(file_out if file_out else '').parent # Inject context
-
-                        # store component templates only; do not generate instances yet
+                            image['gv_dir'] = Path(file_out if file_out else '').parent # Inject context # TODO: remove
+                            image_path = image['src']
+                            if image_path and not Path(image_path).is_absolute():  # resolve relative image path
+                                image['src'] = smart_file_resolve(image_path, image_paths)
                         if sec == 'connectors':
                             template_connectors[key] = attribs
                         elif sec == 'cables':
@@ -298,7 +299,7 @@ def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, st
 def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
     yaml_file = Path(yaml_file)
     with open_file_read(yaml_file) as file:
-        yaml_input = file.read()
+        yaml_str = file.read()
 
     if file_out:
         file_out = Path(file_out)
@@ -306,7 +307,7 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
         file_out = yaml_file.parent / yaml_file.stem
     file_out = file_out.resolve()
 
-    parse(yaml_input, file_out=file_out)
+    parse_text(yaml_str, file_out=file_out, image_paths=[Path(yaml_file).parent])
 
 if __name__ == '__main__':
     print('When running from the command line, please use wv_cli.py instead.')

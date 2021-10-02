@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from typing import List
+from typing import Dict, List
 from pathlib import Path
 import re
 

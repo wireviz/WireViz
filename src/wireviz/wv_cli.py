@@ -49,6 +49,7 @@ def wireviz(file, format, prepend, output_file, version):
     return_types = tuple(sorted(set(return_types)))
     return_types_str = f'[{"|".join(return_types)}]' if len(return_types) > 1 else return_types[0]
 
+    image_paths = []
     # check prepend file
     if prepend:
         prepend = Path(prepend)
@@ -58,8 +59,10 @@ def wireviz(file, format, prepend, output_file, version):
 
         with open_file_read(prepend) as file_handle:
             prepend_input = file_handle.read() + '\n'
+        prepend_dir = prepend.parent
     else:
         prepend_input = ''
+        prepend_dir = None
 
     # run WireVIz on each input file
     for file in filepaths:
@@ -74,10 +77,11 @@ def wireviz(file, format, prepend, output_file, version):
 
         with open_file_read(file) as file_handle:
             yaml_input = file_handle.read()
+        file_dir = file.parent
 
         yaml_input = prepend_input + yaml_input
 
-        wv.parse_text(yaml_input, file_out=file_out, return_types=return_types)
+        wv.parse_text(yaml_input, file_out=file_out, return_types=return_types, image_paths=[file_dir, prepend_dir])
 
     print()
 
