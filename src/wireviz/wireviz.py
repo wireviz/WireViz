@@ -15,7 +15,7 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read
 
 
-def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
+def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv')) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
@@ -260,7 +260,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
             harness.add_bom_item(line)
 
     if file_out is not None:
-        harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
+        harness.output(filename=file_out, fmt=return_types, view=False)
 
     if return_types is not None:
         returns = []

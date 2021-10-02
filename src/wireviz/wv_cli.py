@@ -8,7 +8,7 @@ from wireviz import APP_NAME, __version__
 import wireviz.wireviz as wv
 from wireviz.wv_helper import open_file_read
 
-format_codes = {'p': 'png', 's': 'svg', 't': 'tsv', 'c': 'csv', 'h': 'html', 'P': 'pdf'}
+format_codes = {'c': 'csv', 'g': 'gv', 'p': 'png', 's': 'svg', 't': 'tsv', 'c': 'csv', 'h': 'html', 'P': 'pdf'}
 
 epilog = 'The -f or --format option accepts a string containing one or more of the following characters to specify which file types to output:\n'
 epilog += ', '.join([f'{key} ({value.upper()})' for key, value in format_codes.items()])
@@ -74,7 +74,7 @@ def main(file, format, prepend, output_file, version):
 
         yaml_input = prepend_input + yaml_input
 
-        wv.parse(yaml_input, file_out=file_out)
+        wv.parse(yaml_input, file_out=file_out, return_types=return_types)
 
     print()
 
