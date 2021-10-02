@@ -137,7 +137,9 @@ def aspect_ratio(image_src):
     return 1 # Assume 1:1 when unable to read actual image size
 
 
-def smart_file_resolve(filename: str, possible_paths: List[str]) -> Path:
+def smart_file_resolve(filename: str, possible_paths: (str, List[str])) -> Path:
+    if not isinstance(possible_paths, List):
+        possible_paths = [possible_paths]
     filename = Path(filename)
     if filename.is_absolute():
         if filename.exists():
@@ -145,7 +147,7 @@ def smart_file_resolve(filename: str, possible_paths: List[str]) -> Path:
         else:
             raise Exception(f'{filename} does not exist.')
     else:  # search all possible paths in decreasing order of precedence
-        possible_paths = [Path(path).resolve() for path in possible_paths]
+        possible_paths = [Path(path).resolve() for path in possible_paths if path is not None]
         for possible_path in possible_paths:
             resolved_path = (possible_path / filename).resolve()
             if (resolved_path).exists():
