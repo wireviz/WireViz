@@ -5,7 +5,7 @@ import argparse
 import os
 from pathlib import Path
 import sys
-from typing import Any, Tuple
+from typing import Any, List, Tuple
 
 import yaml
 
@@ -14,10 +14,10 @@ if __name__ == '__main__':
 
 from wireviz import __version__
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, open_file_read
+from wireviz.wv_helper import expand, open_file_read, smart_file_resolve
 
 
-def parse(yaml_input: str, base_path: (str, Path) = None, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
+def parse(yaml_input: str, base_path: (str, Path, List) = None, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
@@ -49,7 +49,7 @@ def parse(yaml_input: str, base_path: (str, Path) = None, file_out: (str, Path) 
                         if isinstance(image, dict):
                             image_path = image['src']
                             if image_path and not Path(image_path).is_absolute():  # resolve relative image path
-                                image['src'] = (Path(base_path) / image_path).resolve()
+                                image['src'] = smart_file_resolve(image_path, base_path)
 
                         if sec == 'connectors':
                             if not attribs.get('autogenerate', False):
@@ -237,6 +237,8 @@ def main():
     with open_file_read(args.input_file) as fh:
         yaml_input = fh.read()
 
+    base_path = [Path(args.input_file).parent]
+
     if args.prepend_file:
         if not os.path.exists(args.prepend_file):
             print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
@@ -244,6 +246,7 @@ def main():
         with open_file_read(args.prepend_file) as fh:
             prepend = fh.read()
             yaml_input = prepend + yaml_input
+        base_path.append(Path(args.prepend_file).parent)
 
     if not args.output_file:
         file_out = args.input_file
@@ -253,7 +256,7 @@ def main():
         file_out = args.output_file
     file_out = os.path.abspath(file_out)
 
-    parse(yaml_input, base_path=Path(args.input_file).parent, file_out=file_out)
+    parse(yaml_input, base_path=base_path, file_out=file_out)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from pathlib import Path
 from typing import List
 import re
 
@@ -117,3 +118,22 @@ def aspect_ratio(image_src):
     except Exception as error:
         print(f'aspect_ratio(): {type(error).__name__}: {error}')
     return 1 # Assume 1:1 when unable to read actual image size
+
+def smart_file_resolve(filename: str, possible_paths: (str, List[str])) -> Path:
+    if not isinstance(possible_paths, List):
+        possible_paths = [possible_paths]
+    filename = Path(filename)
+    if filename.is_absolute():
+        if filename.exists():
+            return filename
+        else:
+            raise Exception(f'{filename} does not exist.')
+    else:  # search all possible paths in decreasing order of precedence
+        possible_paths = [Path(path).resolve() for path in possible_paths if path is not None]
+        for possible_path in possible_paths:
+            resolved_path = (possible_path / filename).resolve()
+            if (resolved_path).exists():
+                return resolved_path
+        else:
+            raise Exception(f'{filename} was not found in any of the following locations: \n' +
+                            '\n'.join([str(x) for x in possible_paths]))
