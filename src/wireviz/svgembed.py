@@ -9,20 +9,24 @@ from typing import Union
 mime_subtype_replacements = {'jpg': 'jpeg', 'tif': 'tiff'}
 
 def embed_svg_images(svg_in: str, base_path: Union[str, Path] = Path.cwd()) -> str:
-    # first, find any image references in SVG data, and cache the respective base64-encoded image
     images_b64 = {}  # cache of base64-encoded images
-    re_xlink=re.compile(r'xlink:href="(?P<URL>.*?)"', re.IGNORECASE)
-    for xlink in re_xlink.finditer(svg_in):
-        imgurl = xlink.group('URL')
+
+    def image_tag(pre: str, url: str, post: str) -> str:
+        return f'<image{pre} xlink:href="{url}"{post}>'
+
+    def replace(match: re.Match) -> str:
+        imgurl = match['URL']
         if not imgurl in images_b64:  # only encode/cache every unique URL once
             imgurl_abs = (Path(base_path) / imgurl).resolve()
             images_b64[imgurl] = base64.b64encode(imgurl_abs.read_bytes()).decode('utf-8')
-    # second, replace links with the base64-encoded data
-    svg_out = svg_in
-    for url, b64 in images_b64.items():
-        svg_out = svg_out.replace(url, f'data:image/{get_mime_subtype(url)};base64, {b64}')
+        return image_tag(
+            match['PRE'] or '',
+            f'data:image/{get_mime_subtype(imgurl)};base64, {images_b64[imgurl]}',
+            match['POST'] or '')
 
-    return svg_out
+    pattern = re.compile(
+        image_tag(r'(?P<PRE> [^>]*?)?', r'(?P<URL>[^"]*?)', r'(?P<POST> [^>]*?)?'), re.IGNORECASE)
+    return pattern.sub(replace, svg_in)
 
 
 def get_mime_subtype(filename: Union[str, Path]) -> str:
