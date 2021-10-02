@@ -24,11 +24,10 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
 
     # embed SVG diagram
     with open_file_read(f'{filename}.svg') as file:
-        svgdata = file.read()
         svgdata = re.sub(
-                  '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
-                  '<!-- XML and DOCTYPE declarations from SVG file removed -->',
-                  svgdata, 1)
+            '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
+            '<!-- XML and DOCTYPE declarations from SVG file removed -->',
+            file.read(), 1)
 
     # generate BOM table
     bom = flatten2d(bom_list)
@@ -57,7 +56,7 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
     replacements = {
         '<!-- %generator% -->': f'{APP_NAME} {__version__} - {APP_URL}',
         '<!-- %fontname% -->': options.fontname,
-        '<!-- %bgcolor% -->': options.bgcolor,  # TODO: currently not working, requires translation from 2-char color code to HTML
+        '<!-- %bgcolor% -->': wv_colors.translate_color(options.bgcolor, "hex"),
         '<!-- %diagram% -->': svgdata,
         '<!-- %bom% -->': bom_html,
         '<!-- %bom_reversed% -->': bom_html_reversed,
