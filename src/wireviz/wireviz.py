@@ -15,7 +15,7 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read
 
 
-def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv'), image_paths: List = []) -> Any:
+def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('html','png','svg','tsv'), image_paths: List = []) -> Any:
     """
     Parses a YAML input string and does the high-level harness conversion
 
@@ -32,7 +32,7 @@ def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None,
     yaml_data = yaml.safe_load(yaml_str)
     return parse(yaml_data=yaml_data, file_out=file_out, return_types=return_types, image_paths=image_paths)
 
-def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('gv','html','png','svg','tsv'), image_paths: List = []) -> Any:
+def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('html','png','svg','tsv'), image_paths: List = []) -> Any:
     """
     Parses a YAML dictionary and does the high-level harness conversion
 
