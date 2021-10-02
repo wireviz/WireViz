@@ -464,19 +464,37 @@ class Harness:
         data.seek(0)
         return data.read()
 
-    def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('pdf', )) -> None:
+    def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('gv','html','png','svg','tsv')) -> None:
         # graphical output
         graph = self.create_graph()
+        svg_already_exists = Path(f'{filename}.svg').exists()  # if SVG already exists, do not delete later
+        # graphical output
         for f in fmt:
-            graph.format = f
-            graph.render(filename=filename, view=view, cleanup=cleanup)
-        graph.save(filename=f'{filename}.gv')
-        # bom output
+            if f in ('png', 'svg', 'html'):
+                if f == 'html':  # if HTML format is specified,
+                    f = 'svg'    # generate SVG for embedding into HTML
+                # TODO: prevent rendering SVG twice when both SVG and HTML are specified
+                graph.format = f
+                graph.render(filename=filename, view=view, cleanup=cleanup)
+        # GraphViz output
+        if 'gv' in fmt:
+            graph.save(filename=f'{filename}.gv')
+        # BOM output
         bomlist = bom_list(self.bom())
-        with open_file_write(f'{filename}.bom.tsv') as file:
-            file.write(tuplelist2tsv(bomlist))
+        if 'tsv' in fmt:
+            with open_file_write(f'{filename}.bom.tsv') as file:
+                file.write(tuplelist2tsv(bomlist))
+        if 'csv' in fmt:
+            print('CSV output is not yet supported')  # TODO: implement CSV output (preferrably using CSV library)
         # HTML output
-        generate_html_output(filename, bomlist, self.metadata, self.options)
+        if 'html' in fmt:
+            generate_html_output(filename, bomlist, self.metadata, self.options)
+        # PDF output
+        if 'pdf' in fmt:
+            print('PDF output is not yet supported')  # TODO: implement PDF output
+        # delete SVG if not needed
+        if 'html' in fmt and not 'svg' in fmt and not svg_already_exists:
+            Path(f'{filename}.svg').unlink()
 
     def bom(self):
         if not self._bom:
