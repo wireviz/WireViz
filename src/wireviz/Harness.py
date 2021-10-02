@@ -464,7 +464,7 @@ class Harness:
         data.seek(0)
         return data.read()
 
-    def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('gv','html','png','svg','tsv')) -> None:
+    def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('html','png','svg','tsv')) -> None:
         # graphical output
         graph = self.create_graph()
         svg_already_exists = Path(f'{filename}.svg').exists()  # if SVG already exists, do not delete later
