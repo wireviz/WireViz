@@ -15,7 +15,7 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         file.write(' <meta charset="UTF-8">\n')
         file.write(f' <meta name="generator" content="{APP_NAME} {__version__} - {APP_URL}">\n')
         file.write(f' <title>{metadata["title"]}</title>\n')
-        file.write(f'</head><body style="{options.base.html_style()}">\n')
+        file.write(f'</head><body style="{options.html_style()}">\n')
         file.write(f'<h1>{metadata["title"]}</h1>\n')
         description = metadata.get('description')
         if description:
@@ -31,7 +31,7 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
 
         file.write('<h2>Bill of Materials</h2>\n')
         listy = flatten2d(bom_list)
-        border = options.base.html_style(color_prefix="border: 1px solid", include_all=False)
+        border = options.html_style(color_prefix="border: 1px solid", include_all=False)
         file.write(f'<table style="{border} border-spacing: 0px;">\n')
         file.write(' <tr>\n')
         for item in listy[0]:

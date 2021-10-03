@@ -98,15 +98,15 @@ class Harness:
         dot.attr('graph', rankdir='LR',
                  ranksep='2',
                  nodesep='0.33',
-                 **self.options.base.graph_args())
+                 **self.options.graph_args())
         dot.attr('node', shape='none',
                  style='filled',
                  width='0', height='0', margin='0',  # Actual size of the node is entirely determined by the label.
                  **self.options.node.node_args())
         dot.attr('edge', style='bold',
-                 **self.options.base.node_args())
+                 **self.options.node_args())
 
-        wire_border_hex = wv_colors.get_color_hex(self.options.base.bordercolor)[0]
+        wire_border_hex = wv_colors.get_color_hex(self.options.bordercolor)[0]
 
         # prepare ports on connectors depending on which side they will connect
         for _, cable in self.cables.items():

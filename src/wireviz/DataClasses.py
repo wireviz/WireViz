@@ -42,11 +42,15 @@ class Look:
     fontname: Optional[PlainText] = None
     fontsize: Optional[Points] = None
 
+    def lookdict(self) -> dict:
+        """Return Look attributes as dict."""
+        return {k:v for k,v in asdict(self).items() if k in asdict(DEFAULT_LOOK).keys()}
+
     def _2dict(self) -> dict:
         """Return dict of non-None strings with color values translated to hex."""
         return {
             k:translate_color(v, "hex") if 'color' in k else str(v)
-            for k,v in asdict(self).items() if v is not None
+            for k,v in self.lookdict().items() if v is not None
         }
 
     def graph_args(self) -> dict:
@@ -78,8 +82,7 @@ DEFAULT_LOOK = Look(
 
 
 @dataclass
-class Options:
-    base: Look = field(default_factory=dict)
+class Options(Look):
     node: Look = field(default_factory=dict)
     connector: Look = field(default_factory=dict)
     cable: Look = field(default_factory=dict)
@@ -89,8 +92,7 @@ class Options:
 
     def __post_init__(self):
         # Build initialization dicts with default values followed by dict entries from YAML input.
-        self.base = Look(**{**asdict(DEFAULT_LOOK), **self.base})
-        self.node = Look(**{**asdict(self.base), **self.node})
+        self.node = Look(**{**self.lookdict(), **self.node})
         self.connector = Look(**{**asdict(self.node), **self.connector})
         self.cable = Look(**{**asdict(self.node), **self.cable})
         self.bundle = Look(**{**asdict(self.cable), **self.bundle})
