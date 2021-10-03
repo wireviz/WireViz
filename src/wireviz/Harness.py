@@ -106,7 +106,7 @@ class Harness:
         dot.attr('edge', style='bold',
                  **self.options.base.node_args())
 
-        wire_border_hex = wv_colors.get_color_hex(self.options.base.color)[0]
+        wire_border_hex = wv_colors.get_color_hex(self.options.base.bordercolor)[0]
 
         # prepare ports on connectors depending on which side they will connect
         for _, cable in self.cables.items():

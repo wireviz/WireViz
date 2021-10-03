@@ -36,7 +36,7 @@ class Metadata(dict):
 @dataclass
 class Look:
     """Colors and font that defines how an element should look like."""
-    color: Optional[Color] = None
+    bordercolor: Optional[Color] = None
     bgcolor: Optional[Color] = None
     fontcolor: Optional[Color] = None
     fontname: Optional[PlainText] = None
@@ -51,17 +51,17 @@ class Look:
 
     def graph_args(self) -> dict:
         """Return dict with arguments to a dot graph."""
-        return {k:v for k,v in self._2dict().items() if k != 'color'}
+        return {k:v for k,v in self._2dict().items() if k != 'bordercolor'}
 
     def node_args(self) -> dict:
         """Return dict with arguments to a dot node with filled style."""
-        return {k.replace('bg', 'fill'):v for k,v in self._2dict().items()}
+        return {k.replace('border', '').replace('bg', 'fill'):v for k,v in self._2dict().items()}
 
     def html_style(self, color_prefix: Optional[str] = None, include_all: bool = True) -> str:
         """Return HTML style value containing all non-empty option values."""
         translated = Look(**self._2dict())
         return ' '.join(value for value in (
-            f'{color_prefix} {translated.color};' if self.color and color_prefix else None,
+            f'{color_prefix} {translated.bordercolor};' if self.bordercolor and color_prefix else None,
             f'background-color: {translated.bgcolor};' if self.bgcolor and include_all else None,
             f'color: {translated.fontcolor};' if self.fontcolor and include_all else None,
             f'font-family: {self.fontname};' if self.fontname and include_all else None,
@@ -69,7 +69,7 @@ class Look:
         ) if value)
 
 DEFAULT_LOOK = Look(
-    color = 'BK',
+    bordercolor = 'BK',
     bgcolor = 'WH',
     fontcolor = 'BK',
     fontname = 'arial',

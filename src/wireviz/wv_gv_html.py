@@ -40,7 +40,7 @@ def nested_html_table(rows: List[Union[GvHtml, List[Optional[GvHtmlX]], None]], 
 def table_attr(look: Optional[Look]) -> GvHtmlAttr:
     """Return table tag attributes containing all non-empty table option values."""
     return '' if not look else ''.join({
-        f' {k}="{v}"' for k,v in look._2dict().items() if v and 'font' not in k})
+        f' {k.replace("border", "")}="{v}"' for k,v in look._2dict().items() if v and 'font' not in k})
 
 def font_attr(look: Optional[Look]) -> GvHtmlAttr:
     """Return font tag attributes containing all non-empty font option values."""
