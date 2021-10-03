@@ -43,9 +43,10 @@ class Look:
     fontsize: Optional[Points] = None
 
     def _2dict(self) -> dict:
-        """Return dict of strings with color values translated to hex."""
+        """Return dict of non-None strings with color values translated to hex."""
         return {
-            k:translate_color(v, "hex") if 'color' in k else str(v) for k,v in asdict(self).items()
+            k:translate_color(v, "hex") if 'color' in k else str(v)
+            for k,v in asdict(self).items() if v is not None
         }
 
     def graph_args(self) -> dict:
@@ -111,12 +112,15 @@ class Image:
     width: Optional[Points] = None
     height: Optional[Points] = None
     fixedsize: Optional[bool] = None
-    bgcolor: Optional[Color] = None
+    box: Optional[Look] = None
     # Contents of the text cell <td> just below the image cell:
     caption: Optional[MultilineHypertext] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
     def __post_init__(self, gv_dir):
+
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
 
         if self.fixedsize is None:
             # Default True if any dimension specified unless self.scale also is specified.
@@ -150,7 +154,11 @@ class AdditionalComponent:
     qty: float = 1
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
-    bgcolor: Optional[Color] = None
+    box: Optional[Look] = None
+
+    def __post_init__(self) -> None:
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
 
     @property
     def description(self) -> str:
@@ -160,8 +168,8 @@ class AdditionalComponent:
 @dataclass
 class Connector:
     name: Designator
-    bgcolor: Optional[Color] = None
-    bgcolor_title: Optional[Color] = None
+    box: Optional[Look] = None
+    title: Optional[Look] = None
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
     supplier: Optional[MultilineHypertext] = None
@@ -188,6 +196,10 @@ class Connector:
 
     def __post_init__(self) -> None:
 
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
+        if isinstance(self.title, dict):
+            self.title = Look(**self.title)
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
@@ -246,8 +258,8 @@ class Connector:
 @dataclass
 class Cable:
     name: Designator
-    bgcolor: Optional[Color] = None
-    bgcolor_title: Optional[Color] = None
+    box: Optional[Look] = None
+    title: Optional[Look] = None
     manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None
@@ -276,6 +288,10 @@ class Cable:
 
     def __post_init__(self) -> None:
 
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
+        if isinstance(self.title, dict):
+            self.title = Look(**self.title)
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
