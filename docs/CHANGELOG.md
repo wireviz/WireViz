@@ -24,6 +24,11 @@
 - Simplify BOM code ([#197](https://github.com/formatc1702/WireViz/pull/197))
 - Bug fixes ([#218](https://github.com/formatc1702/WireViz/pull/218), [#221](https://github.com/formatc1702/WireViz/pull/221))
 
+## Known issues
+
+- Including images in the harness may lead to issues in the following cases: ([#189](https://github.com/formatc1702/WireViz/pull/189), [#220](https://github.com/formatc1702/WireViz/issues/220))
+  - When using the `-o`/`--output_file` CLI option, specifying an output path in a different directory from the input file
+  - When using the `--prepend-file` CLI option, specifying a prepend file in a different directory from the mail input file
 
 ## [0.2](https://github.com/formatc1702/WireViz/tree/v0.2) (2020-10-17)
 
