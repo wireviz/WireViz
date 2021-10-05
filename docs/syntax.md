@@ -119,11 +119,15 @@ Since the auto-incremented and auto-assigned designator is not known to the user
                           #                  but unavailable for auto-conversion
   show_equiv: <bool>      # defaults to false; can auto-convert between mm2 and AWG
                           # and display the result when set to true
-  length: <int/float>     # is assumed to be in meters
-  shield: <bool/color>    # defaults to false
-                          # setting to true will display the shield as a thin black line
-                          # using a color (see below) will render the shield in that color
-                          # using 's' as the wire number
+  length: <int/float>[ <unit>]  # <int/float> is assumed to be in meters unless <unit> is specified
+                                # e.g. length: 2.5 -> assumed to be 2.5 m
+                                # or   length: 2.5 ft -> "ft" is used as the unit
+                                # Units are not converted during BOM generation;
+                                # different units result in separate BOM entries.
+  shield: <bool/color>  # defaults to false
+                        # setting to true will display the shield as a thin black line
+                        # using a color (see below) will render the shield in that color
+                        # A shield can be accessed by using 's' as the wire ID
   color: <color>  # see below
   image: <image>  # see below
   notes: <str>   
