@@ -9,7 +9,7 @@ from typing import Any, Tuple
 import yaml
 
 if __name__ == '__main__':
-    sys.path.insert(0, str(Path(__file__).parent.parent))
+    sys.path.insert(0, str(Path(__file__).parent.parent))  # add src/wireviz to PATH
 
 from wireviz import __version__
 from wireviz.DataClasses import Metadata, Options, Tweak
