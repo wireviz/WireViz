@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
+from pathlib import Path
 from setuptools import setup, find_packages
 
 from src.wireviz import __version__, CMD_NAME, APP_URL
@@ -11,7 +11,7 @@ from src.wireviz import __version__, CMD_NAME, APP_URL
 # README file and 2) it's easier to type in the README file than to put a raw
 # string in below ...
 def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    return open(Path(__file__).parent / fname).read()
 
 setup(
     name=CMD_NAME,
@@ -19,7 +19,7 @@ setup(
     author='Daniel Rojas',
     #author_email='',
     description='Easily document cables and wiring harnesses',
-    long_description=read(os.path.join(os.path.dirname(__file__), 'docs/README.md')),
+    long_description=read(Path(__file__).parent / 'docs/README.md'),
     long_description_content_type='text/markdown',
     install_requires=[
         'pyyaml',

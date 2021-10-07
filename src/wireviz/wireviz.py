@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import os
 from pathlib import Path
 import sys
 from typing import Any, Tuple
@@ -10,7 +9,7 @@ from typing import Any, Tuple
 import yaml
 
 if __name__ == '__main__':
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+    sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from wireviz import __version__
 from wireviz.DataClasses import Metadata, Options, Tweak
@@ -284,13 +283,15 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
 
 def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
+    yaml_file = Path(yaml_file)
     with open_file_read(yaml_file) as file:
         yaml_input = file.read()
 
-    if not file_out:
-        fn, fext = os.path.splitext(yaml_file)
-        file_out = fn
-    file_out = os.path.abspath(file_out)
+    if file_out:
+        file_out = Path(file_out)
+    else:
+        file_out = yaml_file.parent / yaml_file.stem
+    file_out = file_out.resolve()
 
     parse(yaml_input, file_out=file_out)
 
@@ -311,7 +312,7 @@ def main():
 
     args = parse_cmdline()
 
-    if not os.path.exists(args.input_file):
+    if not Path(args.input_file).exists():
         print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
@@ -319,7 +320,7 @@ def main():
         yaml_input = fh.read()
 
     if args.prepend_file:
-        if not os.path.exists(args.prepend_file):
+        if not Path(args.prepend_file).exists():
             print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
             sys.exit(1)
         with open_file_read(args.prepend_file) as fh:
@@ -327,12 +328,11 @@ def main():
             yaml_input = prepend + yaml_input
 
     if not args.output_file:
-        file_out = args.input_file
-        pre, _ = os.path.splitext(file_out)
-        file_out = pre  # extension will be added by graphviz output function
+        file_out = Path(args.input_file)
+        file_out = file_out.parent / file_out.stem  # extension will be added by graphviz output function
     else:
-        file_out = args.output_file
-    file_out = os.path.abspath(file_out)
+        file_out = Path(args.output_file)
+    file_out = file_out.resolve()
 
     parse(yaml_input, file_out=file_out)
 

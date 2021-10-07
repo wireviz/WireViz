@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import sys
 import os
 from pathlib import Path
+import sys
 
 script_path = Path(__file__).absolute()
 
@@ -94,7 +94,7 @@ def clean_generated(groupkeys):
         for filename in collect_filenames('Cleaning', key, generated_extensions):
             if filename.is_file():
                 print(f'  rm "{filename}"')
-                os.remove(filename)
+                Path(filename).unlink()
 
 
 def compare_generated(groupkeys, branch = '', include_graphviz_output = False):
