@@ -11,8 +11,11 @@
       background-color: <!-- %bgcolor% -->;
     }
 
-    table {
+    table, td, th, #frame {
       border: 0.35mm solid black; /* line weight based on DIN 15 */
+    }
+
+    table {
       padding: 0;
       border-bottom: 0;
       border-right: 0;
@@ -20,7 +23,6 @@
     }
 
     td, th {
-      border: 0.25mm solid black; /* line weight based on DIN 15 */
       border-top: 0;
       border-left: 0;
 
@@ -34,7 +36,6 @@
 
     #frame {
       position: relative;
-      border: 0.35mm solid black
     }
 
     .A4, .sheetsize_default { /* portrait */
