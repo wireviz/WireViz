@@ -312,11 +312,13 @@ def main():
 
     args = parse_cmdline()
 
-    if not Path(args.input_file).exists():
-        print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
+    file_in = Path(args.input_file)
+
+    if not file_in.exists():
+        print(f'Error: input file {file_in} inaccessible or does not exist, check path')
         sys.exit(1)
 
-    with open_file_read(args.input_file) as fh:
+    with open_file_read(file_in) as fh:
         yaml_input = fh.read()
 
     if args.prepend_file:
@@ -328,8 +330,7 @@ def main():
             yaml_input = prepend + yaml_input
 
     if not args.output_file:
-        file_out = Path(args.input_file)
-        file_out = file_out.parent / file_out.stem  # extension will be added by graphviz output function
+        file_out = file_in.parent / file_in.stem  # extension will be added by graphviz output function
     else:
         file_out = Path(args.output_file)
     file_out = file_out.resolve()
