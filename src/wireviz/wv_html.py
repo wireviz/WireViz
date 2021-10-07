@@ -12,9 +12,10 @@ from wireviz.wv_gv_html import html_line_breaks
 def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata, options: Options):
 
     # load HTML template
-    if 'name' in metadata.get('template',{}):
+    templatename = metadata.get('template',{}).get('name')
+    if templatename:
         # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
-        templatefile = smart_file_resolve(f'{metadata["template"]["name"]}.html', [Path(filename).parent, Path(__file__).parent / 'templates'])
+        templatefile = smart_file_resolve(f'{templatename}.html', [Path(filename).parent, Path(__file__).parent / 'templates'])
     else:
         # fall back to built-in simple template if no template was provided
         templatefile = Path(__file__).parent / 'templates/simple.html'
@@ -49,8 +50,8 @@ def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], 
         row_html = f'{row_html}  </tr>\n'
         bom_contents.append(row_html)
 
-    bom_html = '<table>\n' + bom_header_html + ''.join(bom_contents) + '</table>\n'
-    bom_html_reversed = '<table>\n' + ''.join(list(reversed(bom_contents))) + bom_header_html + '</table>\n'
+    bom_html = '<table class="bom">\n' + bom_header_html + ''.join(bom_contents) + '</table>\n'
+    bom_html_reversed = '<table class="bom">\n' + ''.join(list(reversed(bom_contents))) + bom_header_html + '</table>\n'
 
     # prepare simple replacements
     replacements = {

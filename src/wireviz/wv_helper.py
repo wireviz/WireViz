@@ -150,7 +150,7 @@ def smart_file_resolve(filename: str, possible_paths: (str, List[str])) -> Path:
         possible_paths = [Path(path).resolve() for path in possible_paths if path is not None]
         for possible_path in possible_paths:
             resolved_path = (possible_path / filename).resolve()
-            if (resolved_path).exists():
+            if resolved_path.exists():
                 return resolved_path
         else:
             raise Exception(f'{filename} was not found in any of the following locations: \n' +
