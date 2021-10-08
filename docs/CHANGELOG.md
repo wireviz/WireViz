@@ -10,7 +10,7 @@
 - Add option to define connector pin colors ([#53](https://github.com/formatc1702/WireViz/issues/53), [#141](https://github.com/formatc1702/WireViz/pull/141))
 - Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
 - Add harness metadata section ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
-- Add support for supplier and supplier part number information ([#240](https://github.com/formatc1702/WireViz/issues/240), [#241](https://github.com/formatc1702/WireViz/pull/241/)])
+- Add support for supplier and supplier part number information ([#240](https://github.com/formatc1702/WireViz/issues/240), [#241](https://github.com/formatc1702/WireViz/pull/241/))
 - Add graph rendering options (colors, font, color name display style, ...) ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
 - Add support for background colors for cables and connectors, as well as for some individual cells ([#210](https://github.com/formatc1702/WireViz/issues/210), [#219](https://github.com/formatc1702/WireViz/pull/219))
 - Add optional tweaking of the .gv output ([#215](https://github.com/formatc1702/WireViz/pull/215)) (experimental)
