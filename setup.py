@@ -6,12 +6,7 @@ from setuptools import setup, find_packages
 
 from src.wireviz import __version__, CMD_NAME, APP_URL
 
-# Utility function to read the README file.
-# Used for the long_description.  It's nice, because now 1) we have a top level
-# README file and 2) it's easier to type in the README file than to put a raw
-# string in below ...
-def read(fname):
-    return open(Path(__file__).parent / fname).read()
+README_PATH = Path(__file__).parent / 'docs' / 'README.md'
 
 setup(
     name=CMD_NAME,
@@ -19,7 +14,7 @@ setup(
     author='Daniel Rojas',
     #author_email='',
     description='Easily document cables and wiring harnesses',
-    long_description=read(Path(__file__).parent / 'docs/README.md'),
+    long_description=open(README_PATH).read(),
     long_description_content_type='text/markdown',
     install_requires=[
         'pyyaml',
