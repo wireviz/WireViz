@@ -1,5 +1,5 @@
-Item	Qty	Unit	Designators
-Connector, Molex Micro-Fit, female, 2 pins	3		X2, X3, X4
-Connector, Molex Micro-Fit, male, 2 pins	1		X1
-Wire, 0.25 mm², BK	0.6	m	W1
-Wire, 0.25 mm², RD	0.6	m	W1
+Id	Description	Qty	Unit	Designators
+1	Connector, Molex Micro-Fit, female, 2 pins	3		X2, X3, X4
+2	Connector, Molex Micro-Fit, male, 2 pins	1		X1
+3	Wire, 0.25 mm², BK	0.6	m	W1
+4	Wire, 0.25 mm², RD	0.6	m	W1

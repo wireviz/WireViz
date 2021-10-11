@@ -324,25 +324,47 @@ connections:
 [Source](tutorial07.yml) - [Bill of Materials](tutorial07.bom.tsv)
 
 
-## 08 - Part numbers
+## 08 - Part numbers and additional components
 
 * Part number information can be added to parts
   * Only provided fields will be added to the diagram and bom
 * Bundles can have part information specified by wire
-* Additional parts can be added to the bom
+* Additional parts can be added to components or just to the bom
+  * quantities of additional components can be multiplied by features from parent connector or cable
 
 
 ```yaml
+options:
+  mini_bom_mode: false
+
 connectors:
   X1: &template1 # define a template for later use
     type: Molex KK 254
     pincount: 4
     subtype: female
-    manufacturer: Molex # set manufacter name
-    mpn: 22013047 # set manufacturer part number
+    manufacturer: '<a href="https://www.molex.com/">Molex</a>' # set manufacter name
+    mpn: '<a href="https://www.molex.com/molex/products/part-detail/crimp_housings/0022013047">22013047</a>' # set manufacturer part number
+    supplier: Digimouse
+    spn: 1234
+    # add a list of additional components to a part (shown in graph)
+    additional_components:
+      -
+        type: Crimp # short identifier used in graph
+        subtype: Molex KK 254, 22-30 AWG # extra information added to type in bom
+        qty_multiplier: populated # multipier for quantity (number of populated pins)
+        manufacturer: Molex # set manufacter name
+        mpn: 08500030 # set manufacturer part number
+      -
+        type: Test
+        qty: 1
+        pn: ABC
+        manufacturer: Molex
+        mpn: 45454
+        supplier: Mousikey
+        spn: 9999
   X2:
     <<: *template1 # reuse template
-    pn: CON4 # set an internal part number
+    pn: CON4 # set an internal part number for just this connector
   X3:
     <<: *template1 # reuse template
 
@@ -354,6 +376,8 @@ cables:
     color_code: IEC
     manufacturer: CablesCo
     mpn: ABC123
+    supplier: Cables R Us
+    spn: 999-888-777
     pn: CAB1
   W2:
     category: bundle
@@ -362,7 +386,17 @@ cables:
     colors: [YE, BK, BK, RD]
     manufacturer: [WiresCo,WiresCo,WiresCo,WiresCo] # set a manufacter per wire
     mpn: [W1-YE,W1-BK,W1-BK,W1-RD]
+    supplier: [WireShack,WireShack,WireShack,WireShack]
+    spn: [1001,1002,1002,1009]
     pn: [WIRE1,WIRE2,WIRE2,WIRE3]
+    # add a list of additional components to a part (shown in graph)
+    additional_components:
+      -
+        type: Sleve # short identifier used in graph
+        subtype: Braided nylon, black, 3mm # extra information added to type in bom
+        qty_multiplier: length # multipier for quantity (length of cable)
+        unit: m
+        pn: SLV-1
 
 
 connections:
@@ -376,14 +410,14 @@ connections:
     - X3: [1-4]
 
 additional_bom_items:
-  - # define an additional item to add to the bill of materials
+  - # define an additional item to add to the bill of materials (does not appear in graph)
     description: Label, pinout information
     qty: 2
     designators:
       - X2
       - X3
-    manufacturer: generic company
-    mpn: Label1
+    manufacturer: '<a href="https://www.bradyid.com">Brady</a>'
+    mpn: '<a href="https://www.bradyid.com/wire-cable-labels/bmp71-bmp61-m611-tls-2200-nylon-cloth-wire-general-id-labels-cps-2958789">B-499</a>'
     pn: Label-ID-1
 ```
 

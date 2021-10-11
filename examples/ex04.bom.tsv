@@ -1,8 +1,8 @@
-Item	Qty	Unit	Designators
-Connector, Crimp ferrule	12		
-Wire, 0.25 mm², BN	0.2	m	W1
-Wire, 0.25 mm², BU	0.2	m	W1
-Wire, 0.25 mm², GN	0.2	m	W1
-Wire, 0.25 mm², OG	0.2	m	W1
-Wire, 0.25 mm², RD	0.2	m	W1
-Wire, 0.25 mm², YE	0.2	m	W1
+Id	Description	Qty	Unit	Designators
+1	Connector, Crimp ferrule	12		
+2	Wire, 0.25 mm², BN	0.2	m	W1
+3	Wire, 0.25 mm², BU	0.2	m	W1
+4	Wire, 0.25 mm², GN	0.2	m	W1
+5	Wire, 0.25 mm², OG	0.2	m	W1
+6	Wire, 0.25 mm², RD	0.2	m	W1
+7	Wire, 0.25 mm², YE	0.2	m	W1

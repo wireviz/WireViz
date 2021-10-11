@@ -1,5 +1,5 @@
-Item	Qty	Unit	Designators
-Connector, Molex Micro-Fit, female, 2 pins	3		X2, X3, X4
-Connector, Molex Micro-Fit, male, 2 pins	1		X1
-Cable, 2 x 0.25 mm²	0.4	m	W1, W2
-Cable, 2 x 20 AWG	0.2	m	W3
+Id	Description	Qty	Unit	Designators
+1	Cable, 2 x 0.25 mm²	0.4	m	W1, W2
+2	Cable, 2 x 20 AWG	0.2	m	W3
+3	Connector, Molex Micro-Fit, female, 2 pins	3		X2, X3, X4
+4	Connector, Molex Micro-Fit, male, 2 pins	1		X1

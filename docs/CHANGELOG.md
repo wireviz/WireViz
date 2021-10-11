@@ -1,5 +1,35 @@
 # Change Log
 
+## [0.3](https://github.com/formatc1702/WireViz/tree/v0.3) (2021-10-11)
+
+### New features
+
+- Allow referencing a cable's/bundle's wires by color or by label ([#70](https://github.com/formatc1702/WireViz/issues/70), [#169](https://github.com/formatc1702/WireViz/issues/169), [#193](https://github.com/formatc1702/WireViz/issues/193), [#194](https://github.com/formatc1702/WireViz/pull/194))
+- Allow additional BOM items within components ([#50](https://github.com/formatc1702/WireViz/issues/50), [#115](https://github.com/formatc1702/WireViz/pull/115))
+- Add support for length units in cables and wires ([#7](https://github.com/formatc1702/WireViz/issues/7), [#196](https://github.com/formatc1702/WireViz/pull/196) (with work from [#161](https://github.com/formatc1702/WireViz/pull/161), [#162](https://github.com/formatc1702/WireViz/pull/162), [#171](https://github.com/formatc1702/WireViz/pull/171)), [#198](https://github.com/formatc1702/WireViz/pull/198), [#205](https://github.com/formatc1702/WireViz/issues/205). [#206](https://github.com/formatc1702/WireViz/pull/206))
+- Add option to define connector pin colors ([#53](https://github.com/formatc1702/WireViz/issues/53), [#141](https://github.com/formatc1702/WireViz/pull/141))
+- Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
+- Add harness metadata section ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
+- Add support for supplier and supplier part number information ([#240](https://github.com/formatc1702/WireViz/issues/240), [#241](https://github.com/formatc1702/WireViz/pull/241/))
+- Add graph rendering options (colors, font, color name display style, ...) ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
+- Add support for background colors for cables and connectors, as well as for some individual cells ([#210](https://github.com/formatc1702/WireViz/issues/210), [#219](https://github.com/formatc1702/WireViz/pull/219))
+- Add optional tweaking of the .gv output ([#215](https://github.com/formatc1702/WireViz/pull/215)) (experimental)
+
+
+## Misc. fixes
+
+- Remove case-sensitivity issues with pin names and labels ([#160](https://github.com/formatc1702/WireViz/issues/160), [#229](https://github.com/formatc1702/WireViz/pull/229))
+- Improve type hinting ([#156](https://github.com/formatc1702/WireViz/issues/156), [#163](https://github.com/formatc1702/WireViz/pull/163))
+- Move BOM management and HTML functions to separate modules ([#151](https://github.com/formatc1702/WireViz/issues/151), [#192](https://github.com/formatc1702/WireViz/pull/192))
+- Simplify BOM code ([#197](https://github.com/formatc1702/WireViz/pull/197))
+- Bug fixes ([#218](https://github.com/formatc1702/WireViz/pull/218), [#221](https://github.com/formatc1702/WireViz/pull/221))
+
+## Known issues
+
+- Including images in the harness may lead to issues in the following cases: ([#189](https://github.com/formatc1702/WireViz/pull/189), [#220](https://github.com/formatc1702/WireViz/issues/220))
+  - When using the `-o`/`--output_file` CLI option, specifying an output path in a different directory from the input file
+  - When using the `--prepend-file` CLI option, specifying a prepend file in a different directory from the mail input file
+
 ## [0.2](https://github.com/formatc1702/WireViz/tree/v0.2) (2020-10-17)
 
 ### Backward incompatible changes
@@ -16,6 +46,7 @@ See the [syntax description](syntax.md) for details.
 
 
 ### New features
+
 - Add bidirectional AWG/mm2 conversion ([#40](https://github.com/formatc1702/WireViz/issues/40), [#41](https://github.com/formatc1702/WireViz/pull/41))
 - Add support for part numbers ([#11](https://github.com/formatc1702/WireViz/pull/11), [#114](https://github.com/formatc1702/WireViz/issues/114), [#121](https://github.com/formatc1702/WireViz/pull/121))
 - Add support for multicolored wires ([#12](https://github.com/formatc1702/WireViz/issues/12), [#17](https://github.com/formatc1702/WireViz/pull/17), [#96](https://github.com/formatc1702/WireViz/pull/96), [#131](https://github.com/formatc1702/WireViz/issues/131), [#132](https://github.com/formatc1702/WireViz/pull/132))

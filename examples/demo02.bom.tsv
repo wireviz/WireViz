@@ -1,13 +1,13 @@
-Item	Qty	Unit	Designators
-Connector, Crimp ferrule, 0.25 mm², YE	2		
-Connector, Molex KK 254, female, 4 pins	2		X2, X3
-Connector, Molex KK 254, female, 5 pins	1		X4
-Connector, Molex KK 254, female, 8 pins	1		X1
-Cable, 2 x 0.25 mm²	0.3	m	W4
-Wire, 0.14 mm², BK	0.9	m	W1, W2, W3
-Wire, 0.14 mm², BU	0.3	m	W3
-Wire, 0.14 mm², GN	0.6	m	W1, W2
-Wire, 0.14 mm², OG	0.3	m	W3
-Wire, 0.14 mm², RD	0.6	m	W1, W2
-Wire, 0.14 mm², VT	0.3	m	W3
-Wire, 0.14 mm², YE	0.6	m	W1, W2
+Id	Description	Qty	Unit	Designators
+1	Cable, 2 x 0.25 mm²	0.3	m	W4
+2	Connector, Crimp ferrule, 0.25 mm², YE	2		
+3	Connector, Molex KK 254, female, 4 pins	2		X2, X3
+4	Connector, Molex KK 254, female, 5 pins	1		X4
+5	Connector, Molex KK 254, female, 8 pins	1		X1
+6	Wire, 0.14 mm², BK	0.9	m	W1, W2, W3
+7	Wire, 0.14 mm², BU	0.3	m	W3
+8	Wire, 0.14 mm², GN	0.6	m	W1, W2
+9	Wire, 0.14 mm², OG	0.3	m	W3
+10	Wire, 0.14 mm², RD	0.6	m	W1, W2
+11	Wire, 0.14 mm², VT	0.3	m	W3
+12	Wire, 0.14 mm², YE	0.6	m	W1, W2

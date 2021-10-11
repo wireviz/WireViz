@@ -28,7 +28,7 @@ cables:
 connections:
   -
     - Key: [S,R,T]
-    - W1: [1,2,3]
+    - W1: [WH,BN,GN]
   -
     - Key: S
     - W1: s
