@@ -1,4 +1,4 @@
-Item	Qty	Unit	Designators
-Connector, D-Sub, female, 9 pins	1		X1
-Connector, Molex KK 254, female, 3 pins	1		X2
-Cable, 3 x 0.25 mm² shielded	0.2	m	W1
+Id	Description	Qty	Unit	Designators
+1	Cable, 3 x 0.25 mm² shielded	0.2	m	W1
+2	Connector, D-Sub, female, 9 pins	1		X1
+3	Connector, Molex KK 254, female, 3 pins	1		X2

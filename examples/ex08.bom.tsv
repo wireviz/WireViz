@@ -1,3 +1,3 @@
-Item	Qty	Unit	Designators
-Connector, Phone Connector, male 3.5, 3 pins	1		Key
-Cable, 3 x 24 AWG shielded	0.2	m	W1
+Id	Description	Qty	Unit	Designators
+1	Cable, 3 x 24 AWG shielded, BK	0.2	m	W1
+2	Connector, Phone Connector, male 3.5	1		Key

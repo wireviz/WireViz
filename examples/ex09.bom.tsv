@@ -1,4 +1,4 @@
-Item	Qty	Unit	Designators
-Connector, D-Sub, male, 25 pins	1		X1
-Connector, F48, female, 48 pins	1		X2
-Cable, 12 x 0.25 mm² shielded	0.2	m	W1
+Id	Description	Qty	Unit	Designators
+1	Cable, 12 x 0.25 mm² shielded	0.2	m	W1
+2	Connector, D-Sub, male, 25 pins	1		X1
+3	Connector, F48, female, 48 pins	1		X2
