@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.4](https://github.com/formatc1702/WireViz/tree/v0.4) (20XX-XX-XX)
+
+
+
 ## [0.3](https://github.com/formatc1702/WireViz/tree/v0.3) (2021-10-11)
 
 ### New features
