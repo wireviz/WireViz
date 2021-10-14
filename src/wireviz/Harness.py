@@ -17,6 +17,7 @@ from wireviz.wv_gv_html import nested_html_table, \
 # from wireviz.wv_bom import pn_info_string, component_table_entry, \
 #     get_additional_component_table, bom_list, generate_bom, \
 #     HEADER_PN, HEADER_MPN, HEADER_SPN
+from wireviz.wv_bom_new import pn_info_string, HEADER_PN, HEADER_MPN, HEADER_SPN
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
     open_file_read, open_file_write

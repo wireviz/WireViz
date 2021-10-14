@@ -6,7 +6,7 @@ from pathlib import Path
 
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES
-
+from wireviz.wv_bom_new import Bom_hash, Bom_hash_list
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
 PlainText = str # Text not containing HTML tags nor newlines
@@ -115,6 +115,18 @@ class AdditionalComponent:
     def description(self) -> str:
         return self.type.rstrip() + (f', {self.subtype.rstrip()}' if self.subtype else '')
 
+    @property
+    def bom_hash(self) -> Bom_hash:
+        return Bom_hash(
+            self.description,
+            self.unit,
+            self.pn,
+            self.manufacturer,
+            self.mpn,
+            self.supplier,
+            self.spn,
+            )
+
 
 @dataclass
 class Connector:
@@ -188,6 +200,8 @@ class Connector:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
+        print(self.bom_hash)
+
     def activate_pin(self, pin: Pin) -> None:
         self.visible_pins[pin] = True
 
@@ -201,6 +215,28 @@ class Connector:
         else:
             raise ValueError(f'invalid qty multiplier parameter for connector {qty_multiplier}')
 
+    @property
+    def description(self) -> str:
+        substrs = [
+            'Connector',
+            self.type,
+            self.subtype,
+            self.pincount if self.show_pincount else None,
+            str(self.color) + ' (reimplement color translation!)' if self.color else None,  # translate_color(self.color, harness.options.color_mode)] <- get harness.color_mode!
+            ]
+        return ', '.join([str(s) for s in substrs if s is not None and s != ''])
+
+    @property
+    def bom_hash(self) -> Bom_hash:
+        return Bom_hash(
+            self.description,
+            None,
+            self.pn,
+            self.manufacturer,
+            self.mpn,
+            self.supplier,
+            self.spn,
+            )
 
 @dataclass
 class Cable:
@@ -318,6 +354,12 @@ class Cable:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
+        if self.category == 'bundle':
+            [print(elem) for elem in self.bom_hash]
+        else:
+            print(self.bom_hash)
+
+
     # The *_pin arguments accept a tuple, but it seems not in use with the current code.
     def connect(self, from_name: Optional[Designator], from_pin: NoneOrMorePinIndices, via_wire: OneOrMoreWires,
                 to_name: Optional[Designator], to_pin: NoneOrMorePinIndices) -> None:
@@ -342,6 +384,71 @@ class Cable:
             return self.length * self.wirecount
         else:
             raise ValueError(f'invalid qty multiplier parameter for cable {qty_multiplier}')
+
+    @property
+    def description(self) -> str:
+        if self.category == 'bundle':
+            desc_list = []
+            for index, color in enumerate(self.colors):
+                substrs = [
+                    'Wire',
+                    self.type,
+                    f'{self.gauge} {self.gauge_unit}' if self.gauge else None,
+                    str(self.color) + ' (reimplement color translation!)' if self.color else None,  # translate_color(self.color, harness.options.color_mode)] <- get harness.color_mode!
+                ]
+                desc_list.append(', '.join([s for s in substrs if s is not None and s != '']))
+            return desc_list
+        else:
+            substrs = [
+                ('', 'Cable'),
+                (', ', self.type),
+                (', ', self.wirecount),
+                (' ', f'x {self.gauge} {self.gauge_unit}' if self.gauge else ' wires'),
+                (' ', 'shielded' if self.shield else None),
+                (', ', str(self.color) + ' (reimplement color translation!)' if self.color else None)
+            ]
+            desc = ''.join([f'{s[0]}{s[1]}' for s in substrs if s[1] is not None and s[1] != ''])
+            return desc
+
+
+    @property
+    def bom_hash(self) -> Bom_hash:
+
+        def force_list(inp):
+            if isinstance(inp, list):
+                return inp
+            else:
+                return [inp for i in range(len(self.colors))]
+
+        if self.category == 'bundle':
+            # create a single item that includes the necessary fields,
+            # which may or may not be lists
+            _hash_list = Bom_hash_list(
+                self.description,
+                self.length_unit,
+                self.pn,
+                self.manufacturer,
+                self.mpn,
+                self.supplier,
+                self.spn,
+            )
+            # convert elements that are not lists, into lists
+            _hash_matrix = list(map(force_list, [elem for elem in _hash_list]))
+            # transpose list of lists, convert to tuple for next step
+            _hash_matrix = list(map(tuple, zip(*_hash_matrix)))
+            # generate list of Bom_hashes
+            hash_list = [Bom_hash(*item) for item in _hash_matrix]
+            return hash_list
+        else:
+            return Bom_hash(
+                self.description,
+                self.length_unit,
+                self.pn,
+                self.manufacturer,
+                self.mpn,
+                self.supplier,
+                self.spn,
+                )
 
 
 @dataclass
