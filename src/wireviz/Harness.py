@@ -40,11 +40,13 @@ class Harness:
     def add_cable(self, name: str, *args, **kwargs) -> None:
         self.cables[name] = Cable(name, *args, **kwargs)
 
-    def add_mate_pin(self, *args, **kwargs) -> None:
-        self.mates.append(MatePin(*args, **kwargs))
+    def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
+        from_pin_id = self.connectors[from_name].pins.index(from_pin)
+        to_pin_id = self.connectors[to_name].pins.index(to_pin)
+        self.mates.append(MatePin(from_name, from_pin_id, to_name, to_pin_id, arrow_type))
 
-    def add_mate_component(self, *args, **kwargs) -> None:
-        self.mates.append(MateComponent(*args, **kwargs))
+    def add_mate_component(self, from_name, to_name, arrow_type) -> None:
+        self.mates.append(MateComponent(from_name, to_name, arrow_type))
 
     def add_bom_item(self, item: dict) -> None:
         self.additional_bom_items.append(item)
@@ -447,9 +449,9 @@ class Harness:
                 raise Exception(f'{mate} is an unknown mate')
 
             dot.attr('edge', color=color, style='dashed', dir=dir)
-            from_port = f':p{mate.from_port}r' if isinstance(mate, MatePin) and self.connectors[mate.from_name].style != 'simple' else ''
+            from_port = f':p{mate.from_port+1}r' if isinstance(mate, MatePin) and self.connectors[mate.from_name].style != 'simple' else ''
             code_from = f'{mate.from_name}{from_port}:e'
-            to_port = f':p{mate.to_port}l' if isinstance(mate, MatePin) and self.connectors[mate.to_name].style != 'simple' else ''
+            to_port = f':p{mate.to_port+1}l' if isinstance(mate, MatePin) and self.connectors[mate.to_name].style != 'simple' else ''
             code_to = f'{mate.to_name}{to_port}:w'
             dot.edge(code_from, code_to)
 
