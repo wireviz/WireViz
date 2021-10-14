@@ -232,12 +232,12 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     if index_item == 0:  # list started with a cable, no connector to join on left side
                         from_name, from_pin = (None, None)
                     else:
-                        from_name, from_pin = get_single_key_and_value(connection_set[index_entry][index_item-1])
+                        from_name, from_pin = get_single_key_and_value(entry[index_item-1])
                     via_name, via_pin = (designator, item[designator])
                     if index_item == len(entry) - 1:  # list ends with a cable, no connector to join on right side
                         to_name, to_pin = (None, None)
                     else:
-                        to_name, to_pin = get_single_key_and_value(connection_set[index_entry][index_item+1])
+                        to_name, to_pin = get_single_key_and_value(entry[index_item+1])
                     harness.connect(from_name, from_pin, via_name, via_pin, to_name, to_pin)
 
                 elif is_arrow(designator):
@@ -246,9 +246,11 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
                     elif index_item == len(entry) - 1:  # list ends with an arrow
                         raise Exception('An arrow cannot be at the end of a connection set')
 
-                    from_name, from_pin = get_single_key_and_value(connection_set[index_entry][index_item-1])
+# self.connectors[from_name].pins.index(from_pin)
+                    # import pudb; pu.db
+                    from_name, from_pin = get_single_key_and_value(entry[index_item-1])
                     via_name,  via_pin  = (designator, None)
-                    to_name,   to_pin   = get_single_key_and_value(connection_set[index_entry][index_item+1])
+                    to_name,   to_pin   = get_single_key_and_value(entry[index_item+1])
                     if '-' in designator:  # mate pin by pin
                         harness.add_mate_pin(from_name, from_pin, to_name, to_pin, designator)
                     elif '=' in designator and index_entry == 0:  # mate two connectors as a whole
