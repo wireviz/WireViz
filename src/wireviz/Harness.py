@@ -14,9 +14,9 @@ from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, \
     html_bgcolor_attr, html_bgcolor, html_colorbar, \
     html_image, html_caption, remove_links, html_line_breaks
-from wireviz.wv_bom import pn_info_string, component_table_entry, \
-    get_additional_component_table, bom_list, generate_bom, \
-    HEADER_PN, HEADER_MPN, HEADER_SPN
+# from wireviz.wv_bom import pn_info_string, component_table_entry, \
+#     get_additional_component_table, bom_list, generate_bom, \
+#     HEADER_PN, HEADER_MPN, HEADER_SPN
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
     open_file_read, open_file_write
@@ -31,7 +31,7 @@ class Harness:
     def __post_init__(self):
         self.connectors = {}
         self.cables = {}
-        self._bom = []  # Internal Cache for generated bom
+        # self._bom = []  # Internal Cache for generated bom
         self.additional_bom_items = []
 
     def add_connector(self, name: str, *args, **kwargs) -> None:
@@ -138,7 +138,8 @@ class Harness:
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
-            rows.extend(get_additional_component_table(self, connector))
+            # rows.extend(get_additional_component_table(self, connector))
+            print('Reimplement additional component table!')
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
 
@@ -231,7 +232,8 @@ class Harness:
                     [html_image(cable.image)],
                     [html_caption(cable.image)]]
 
-            rows.extend(get_additional_component_table(self, cable))
+            # rows.extend(get_additional_component_table(self, cable))
+            print('Reimplement additional component table!')
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(cable.bgcolor)))
 
@@ -437,9 +439,10 @@ class Harness:
             graph.render(filename=filename, view=view, cleanup=cleanup)
         graph.save(filename=f'{filename}.gv')
         # bom output
-        bomlist = bom_list(self.bom())
-        with open_file_write(f'{filename}.bom.tsv') as file:
-            file.write(tuplelist2tsv(bomlist))
+        # bomlist = bom_list(self.bom())
+        # with open_file_write(f'{filename}.bom.tsv') as file:
+        #     file.write(tuplelist2tsv(bomlist))
+        bomlist = [[]]
         # HTML output
         generate_html_output(filename, bomlist, self.metadata, self.options)
 
