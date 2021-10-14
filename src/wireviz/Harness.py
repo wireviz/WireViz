@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from graphviz import Graph
-from collections import Counter
+from collections import Counter, defaultdict
 from typing import Any, List, Union
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,7 +9,7 @@ from itertools import zip_longest
 import re
 
 from wireviz import wv_colors, __version__, APP_NAME, APP_URL
-from wireviz.DataClasses import Metadata, Options, Tweak, Connector, Cable
+from wireviz.DataClasses import AdditionalComponent, Metadata, Options, Tweak, Connector, Cable
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, \
     html_bgcolor_attr, html_bgcolor, html_colorbar, \
@@ -32,17 +32,56 @@ class Harness:
     def __post_init__(self):
         self.connectors = {}
         self.cables = {}
-        # self._bom = []  # Internal Cache for generated bom
+        # self.bom = defaultdict(lambda: defaultdict(list))  # https://stackoverflow.com/questions/19189274
+        self.bom = defaultdict(dict)
         self.additional_bom_items = []
 
     def add_connector(self, name: str, *args, **kwargs) -> None:
         self.connectors[name] = Connector(name, *args, **kwargs)
+        self._add_to_internal_bom(self.connectors[name])
 
     def add_cable(self, name: str, *args, **kwargs) -> None:
         self.cables[name] = Cable(name, *args, **kwargs)
+        self._add_to_internal_bom(self.cables[name])
 
-    def add_bom_item(self, item: dict) -> None:
-        self.additional_bom_items.append(item)
+    def add_additional_bom_item(self, item: dict) -> None:
+        # import pudb; pu.db
+        new_item = AdditionalComponent(**item)
+        self.additional_bom_items.append(new_item)
+        self._add_to_internal_bom(new_item)
+
+    def _add_to_internal_bom(self, item):
+
+        def _add(thing, designator=None, qty=1):
+            # generate entry
+            bom_entry = self.bom[thing]
+            # initialize missing fields
+            if not 'qty' in bom_entry:
+                bom_entry['qty'] = 0
+            if not 'designators' in bom_entry:
+                bom_entry['designators'] = []
+            # update fields
+            bom_entry['qty'] += qty
+            if designator:
+                bom_entry['designators'].append(designator)
+
+        if isinstance(item, Connector):
+            _add(item.bom_hash, designator=item.name)
+            for comp in item.additional_components:
+                _add(comp.bom_hash, designator=item.name, qty=comp.qty)
+        elif isinstance(item, Cable):
+            _bom_hash = item.bom_hash
+            if isinstance(_bom_hash, list):
+                for subhash in _bom_hash:
+                    _add(subhash, designator=item.name)
+            else:
+                _add(item.bom_hash, designator=item.name)
+            for comp in item.additional_components:
+                _add(comp.bom_hash, designator=item.name, qty=comp.qty)
+        elif isinstance(item, AdditionalComponent):  # additional component
+            _add(item.bom_hash, qty=item.qty)
+        else:
+            raise Exception(f'Unknown type of item:\n{item}')
 
     def connect(self, from_name: str, from_pin: (int, str), via_name: str, via_wire: (int, str), to_name: str, to_pin: (int, str)) -> None:
         # check from and to connectors
@@ -140,7 +179,7 @@ class Harness:
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
             # rows.extend(get_additional_component_table(self, connector))
-            print('Reimplement additional component table!')
+            rows.append(['Reimplement additional component table!'])
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
 
@@ -234,7 +273,7 @@ class Harness:
                     [html_caption(cable.image)]]
 
             # rows.extend(get_additional_component_table(self, cable))
-            print('Reimplement additional component table!')
+            rows.append(['Reimplement additional component table!'])
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(cable.bgcolor)))
 
@@ -433,6 +472,10 @@ class Harness:
         return data.read()
 
     def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('pdf', )) -> None:
+        for k, v in self.bom.items():
+            print(k)
+            print(v)
+            print()
         # graphical output
         graph = self.create_graph()
         for f in fmt:

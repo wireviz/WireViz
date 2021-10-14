@@ -110,6 +110,7 @@ class AdditionalComponent:
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
     bgcolor: Optional[Color] = None
+    designators: Optional[str] = None  # used for components define in the `additional_bom_items` YAML section
 
     @property
     def description(self) -> str:
@@ -200,7 +201,6 @@ class Connector:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
-        print(self.bom_hash)
 
     def activate_pin(self, pin: Pin) -> None:
         self.visible_pins[pin] = True
@@ -353,11 +353,6 @@ class Cable:
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
-
-        if self.category == 'bundle':
-            [print(elem) for elem in self.bom_hash]
-        else:
-            print(self.bom_hash)
 
 
     # The *_pin arguments accept a tuple, but it seems not in use with the current code.

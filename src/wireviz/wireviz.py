@@ -184,7 +184,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
     if "additional_bom_items" in yaml_data:
         for line in yaml_data["additional_bom_items"]:
-            harness.add_bom_item(line)
+            harness.add_additional_bom_item(line)
 
     if file_out is not None:
         harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
