@@ -13,7 +13,7 @@ from wireviz.DataClasses import AdditionalComponent, Metadata, Options, Tweak, C
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, \
     html_bgcolor_attr, html_bgcolor, html_colorbar, \
-    html_image, html_caption, remove_links, html_line_breaks
+    html_image, html_caption, remove_links, html_line_breaks, bom_bubble
 # from wireviz.wv_bom import pn_info_string, component_table_entry, \
 #     get_additional_component_table, bom_list, generate_bom, \
 #     HEADER_PN, HEADER_MPN, HEADER_SPN
@@ -52,34 +52,47 @@ class Harness:
 
     def _add_to_internal_bom(self, item):
 
-        def _add(thing, designator=None, qty=1):
+        if item.ignore_in_bom:
+            return
+
+        def _add(thing, designator=None, qty=1, category=None):
             # generate entry
             bom_entry = self.bom[thing]
             # initialize missing fields
             if not 'qty' in bom_entry:
                 bom_entry['qty'] = 0
             if not 'designators' in bom_entry:
-                bom_entry['designators'] = []
+                bom_entry['designators'] = set()
             # update fields
             bom_entry['qty'] += qty
             if designator:
-                bom_entry['designators'].append(designator)
+                if isinstance(designator, str):
+                    bom_entry['designators'].add(designator)
+                else:
+                    bom_entry['designators'].update(designator)
+            bom_entry['category'] = category
 
         if isinstance(item, Connector):
-            _add(item.bom_hash, designator=item.name)
+            _add(item.bom_hash, designator=item.name, category='connector')
             for comp in item.additional_components:
-                _add(comp.bom_hash, designator=item.name, qty=comp.qty)
+                if comp.ignore_in_bom:
+                    continue
+                _add(comp.bom_hash, designator=item.name, qty=comp.qty, category='connector/additional')
         elif isinstance(item, Cable):
             _bom_hash = item.bom_hash
             if isinstance(_bom_hash, list):
+                _cat = 'bundle'
                 for subhash in _bom_hash:
-                    _add(subhash, designator=item.name)
+                    _add(subhash, designator=item.name, category=_cat)
             else:
-                _add(item.bom_hash, designator=item.name)
+                _cat = 'cable'
+                _add(item.bom_hash, designator=item.name, category=_cat)
             for comp in item.additional_components:
-                _add(comp.bom_hash, designator=item.name, qty=comp.qty)
+                if comp.ignore_in_bom:
+                    continue
+                _add(comp.bom_hash, designator=item.name, qty=comp.qty, category=f'{_cat}/additional')
         elif isinstance(item, AdditionalComponent):  # additional component
-            _add(item.bom_hash, qty=item.qty)
+            _add(item.bom_hash, designator=item.designators, qty=item.qty, category='additional')
         else:
             raise Exception(f'Unknown type of item:\n{item}')
 
@@ -159,6 +172,8 @@ class Harness:
 
         for connector in self.connectors.values():
 
+            connector.bom_id = self.bom[connector.bom_hash]['bom_id']
+
             # If no wires connected (except maybe loop wires)?
             if not (connector.ports_left or connector.ports_right):
                 connector.ports_left = True  # Use left side pins.
@@ -167,7 +182,8 @@ class Harness:
 
             rows = [[f'{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}'
                         if connector.show_name else None],
-                    [pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
+                    [bom_bubble(connector.bom_id),
+                     pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
                      html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
                      html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
                     [html_line_breaks(connector.type),
@@ -239,6 +255,15 @@ class Harness:
 
         for cable in self.cables.values():
 
+            if isinstance(cable.bom_hash, list):
+                cable.bom_id = [self.bom[_hash]['bom_id'] for _hash in cable.bom_hash]
+                cable_bom_id_str = None
+                cable_bom_id_str_list = [bom_bubble(_id) for _id in cable.bom_id]
+            else:
+                cable.bom_id = self.bom[cable.bom_hash]['bom_id']
+                cable_bom_id_str = bom_bubble(cable.bom_id)
+                cable_bom_id_str_list = None
+
             html = []
 
             awg_fmt = ''
@@ -253,7 +278,8 @@ class Harness:
 
             rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
                         if cable.show_name else None],
-                    [pn_info_string(HEADER_PN, None,
+                    [cable_bom_id_str,
+                     pn_info_string(HEADER_PN, None,
                         remove_links(cable.pn)) if not isinstance(cable.pn, list) else None,
                      html_line_breaks(pn_info_string(HEADER_MPN,
                         cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
@@ -284,6 +310,8 @@ class Harness:
             for i, (connection_color, wirelabel) in enumerate(zip_longest(cable.colors, cable.wirelabels), 1):
                 wirehtml.append('   <tr>')
                 wirehtml.append(f'    <td><!-- {i}_in --></td>')
+                if cable_bom_id_str_list:
+                    wirehtml.append(f'<td>{cable_bom_id_str_list[i - 1]}</td>')
                 wirehtml.append(f'    <td>')
 
                 wireinfo = []
@@ -472,6 +500,12 @@ class Harness:
         return data.read()
 
     def output(self, filename: (str, Path), view: bool = False, cleanup: bool = True, fmt: tuple = ('pdf', )) -> None:
+        # bom generation
+        # sort BOM according to TODO key
+        # TODO
+        # assign BOM IDs
+        for i, (k, v) in enumerate(self.bom.items(), 1):
+            v['bom_id'] = i
         for k, v in self.bom.items():
             print(k)
             print(v)

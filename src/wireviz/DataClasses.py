@@ -111,6 +111,8 @@ class AdditionalComponent:
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
     bgcolor: Optional[Color] = None
     designators: Optional[str] = None  # used for components define in the `additional_bom_items` YAML section
+    bom_id: Optional[str] = None  # to be filled after harness is built
+    ignore_in_bom: bool = False  # for consistency with connectors and cables
 
     @property
     def description(self) -> str:
@@ -157,6 +159,7 @@ class Connector:
     loops: List[List[Pin]] = field(default_factory=list)
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
+    bom_id: Optional[str] = None  # to be filled after harness is built
 
     def __post_init__(self) -> None:
 
@@ -268,6 +271,7 @@ class Cable:
     show_wirenumbers: Optional[bool] = None
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
+    bom_id: Optional[str] = 'None'  # to be filled after harness is built
 
     def __post_init__(self) -> None:
 
