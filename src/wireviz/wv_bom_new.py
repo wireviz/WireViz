@@ -4,8 +4,8 @@ from collections import namedtuple
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 BOM_HASH_FIELDS = 'description unit pn manufacturer mpn supplier spn'
-Bom_hash = namedtuple('bom_item', BOM_HASH_FIELDS)
-Bom_hash_list = namedtuple('bom_hash_list', BOM_HASH_FIELDS)
+Bom_hash = namedtuple('Bom_hash', BOM_HASH_FIELDS)
+Bom_hash_list = namedtuple('Bom_hash_list', BOM_HASH_FIELDS)
 
 HEADER_PN = 'P/N'
 HEADER_MPN = 'MPN'
