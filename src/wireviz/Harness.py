@@ -1,25 +1,57 @@
 # -*- coding: utf-8 -*-
 
-from graphviz import Graph
-from collections import Counter
-from typing import Any, List, Union
-from dataclasses import dataclass
-from pathlib import Path
-from itertools import zip_longest
 import re
+from collections import Counter
+from dataclasses import dataclass
+from itertools import zip_longest
+from pathlib import Path
+from typing import Any, List, Union
 
-from wireviz import wv_colors, __version__, APP_NAME, APP_URL
-from wireviz.DataClasses import Cable, Connector, MatePin, MateComponent, Metadata, Options, Tweak, Side
+from graphviz import Graph
+
+from wireviz import APP_NAME, APP_URL, __version__, wv_colors
+from wireviz.DataClasses import (
+    Cable,
+    Connector,
+    MateComponent,
+    MatePin,
+    Metadata,
+    Options,
+    Tweak,
+	Side,
+)
+from wireviz.wv_bom import (
+    HEADER_MPN,
+    HEADER_PN,
+    HEADER_SPN,
+    bom_list,
+    component_table_entry,
+    generate_bom,
+    get_additional_component_table,
+    pn_info_string,
+)
 from wireviz.wv_colors import get_color_hex, translate_color
-from wireviz.wv_gv_html import nested_html_table, \
-    html_bgcolor_attr, html_bgcolor, html_colorbar, \
-    html_image, html_caption, remove_links, html_line_breaks
-from wireviz.wv_bom import pn_info_string, component_table_entry, \
-    get_additional_component_table, bom_list, generate_bom, \
-    HEADER_PN, HEADER_MPN, HEADER_SPN
+from wireviz.wv_gv_html import (
+    html_bgcolor,
+    html_bgcolor_attr,
+    html_caption,
+    html_colorbar,
+    html_image,
+    html_line_breaks,
+    nested_html_table,
+    remove_links,
+)
+from wireviz.wv_helper import (
+    awg_equiv,
+    flatten2d,
+    is_arrow,
+    mm2_equiv,
+    open_file_read,
+    open_file_write,
+    tuplelist2tsv,
+)
 from wireviz.wv_html import generate_html_output
-from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
-    open_file_read, open_file_write, is_arrow
+
 
 @dataclass
 class Harness:

@@ -2,9 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from pathlib import Path
-from setuptools import setup, find_packages
 
-from src.wireviz import __version__, CMD_NAME, APP_URL
+from setuptools import find_packages, setup
+
+from src.wireviz import APP_URL, CMD_NAME, __version__
 
 README_PATH = Path(__file__).parent / 'docs' / 'README.md'
 

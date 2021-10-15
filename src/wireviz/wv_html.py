@@ -1,13 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import re
 from pathlib import Path
 from typing import Dict, List, Union
-import re
 
-from wireviz import __version__, APP_NAME, APP_URL, wv_colors
+from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import Metadata, Options
-from wireviz.wv_helper import flatten2d, open_file_read, open_file_write, smart_file_resolve
 from wireviz.wv_gv_html import html_line_breaks
+from wireviz.wv_helper import (
+    flatten2d,
+    open_file_read,
+    open_file_write,
+    smart_file_resolve,
+)
+
 
 def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata, options: Options):
 
