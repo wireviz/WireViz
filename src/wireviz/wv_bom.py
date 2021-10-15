@@ -214,11 +214,8 @@ def get_bom_index(bom: List[BOMEntry], target: BOMKey) -> int:
 def bom_list(bom: List[BOMEntry]) -> List[List[str]]:
     """Return list of BOM rows as lists of column strings with headings in top row."""
     keys = list(BOM_COLUMNS_ALWAYS)  # Always include this fixed set of BOM columns.
-    for (
-        fieldname
-    ) in (
-        BOM_COLUMNS_OPTIONAL
-    ):  # Include only those optional BOM columns that are in use.
+    for fieldname in BOM_COLUMNS_OPTIONAL:
+        # Include only those optional BOM columns that are in use.
         if any(entry.get(fieldname) for entry in bom):
             keys.append(fieldname)
     # Custom mapping from internal name to BOM column headers.

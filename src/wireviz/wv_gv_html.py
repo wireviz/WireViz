@@ -25,15 +25,15 @@ def nested_html_table(
         if isinstance(row, List):
             if len(row) > 0 and any(row):
                 html.append(" <tr><td>")
-                html.append(
-                    '  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>'
-                )
+                # fmt: off
+                html.append('  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>')
+                # fmt: on
                 for cell in row:
                     if cell is not None:
                         # Inject attributes to the preceeding <td> tag where needed
-                        html.append(
-                            f'   <td balign="left">{cell}</td>'.replace("><tdX", "")
-                        )
+                        # fmt: off
+                        html.append(f'   <td balign="left">{cell}</td>'.replace("><tdX", ""))
+                        # fmt: on
                 html.append("  </tr></table>")
                 html.append(" </td></tr>")
                 num_rows = num_rows + 1
@@ -43,9 +43,8 @@ def nested_html_table(
             html.append(" </td></tr>")
             num_rows = num_rows + 1
     if num_rows == 0:  # empty table
-        html.append(
-            "<tr><td></td></tr>"
-        )  # generate empty cell to avoid GraphViz errors
+        # generate empty cell to avoid GraphViz errors
+        html.append("<tr><td></td></tr>")
     html.append("</table>")
     return html
 

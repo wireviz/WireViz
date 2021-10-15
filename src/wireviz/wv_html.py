@@ -104,14 +104,15 @@ def generate_html_output(
 
         replacements['"sheetsize_default"'] = '"{}"'.format(
             metadata.get("template", {}).get("sheetsize", "")
-        )  # include quotes so no replacement happens within <style> definition
+        )
+        # include quotes so no replacement happens within <style> definition
 
     # perform replacements
     # regex replacement adapted from:
     # https://gist.github.com/bgusach/a967e0587d6e01e889fd1d776c5f3729
-    replacements_sorted = sorted(
-        replacements, key=len, reverse=True
-    )  # longer replacements first, just in case
+
+    # longer replacements first, just in case
+    replacements_sorted = sorted(replacements, key=len, reverse=True)
     replacements_escaped = map(re.escape, replacements_sorted)
     pattern = re.compile("|".join(replacements_escaped))
     html = pattern.sub(lambda match: replacements[match.group(0)], html)

@@ -98,13 +98,12 @@ class Image:
             self.fixedsize = (self.width or self.height) and self.scale is None
 
         if self.scale is None:
-            self.scale = (
-                "false"
-                if not self.width and not self.height
-                else "both"
-                if self.width and self.height
-                else "true"
-            )  # When only one dimension is specified.
+            if not self.width and not self.height:
+                self.scale = "false"
+            elif self.width and self.height:
+                self.scale = "both"
+            else:
+                self.scale = "true"  # When only one dimension is specified.
 
         if self.fixedsize:
             # If only one dimension is specified, compute the other
@@ -133,9 +132,8 @@ class AdditionalComponent:
 
     @property
     def description(self) -> str:
-        return self.type.rstrip() + (
-            f", {self.subtype.rstrip()}" if self.subtype else ""
-        )
+        s = self.type.rstrip() + f", {self.subtype.rstrip()}" if self.subtype else ""
+        return s
 
 
 @dataclass
@@ -203,9 +201,8 @@ class Connector:
             self.show_name = self.style != "simple" and self.name[0:2] != "__"
 
         if self.show_pincount is None:
-            self.show_pincount = (
-                self.style != "simple"
-            )  # hide pincount for simple (1 pin) connectors by default
+            # hide pincount for simple (1 pin) connectors by default
+            self.show_pincount = self.style != "simple"
 
         for loop in self.loops:
             # TODO: check that pins to connect actually exist
@@ -322,9 +319,8 @@ class Cable:
         if self.wirecount:  # number of wires explicitly defined
             if self.colors:  # use custom color palette (partly or looped if needed)
                 pass
-            elif (
-                self.color_code
-            ):  # use standard color palette (partly or looped if needed)
+            elif self.color_code:
+                # use standard color palette (partly or looped if needed)
                 if self.color_code not in COLOR_CODES:
                     raise Exception("Unknown color code")
                 self.colors = COLOR_CODES[self.color_code]
@@ -361,14 +357,12 @@ class Cable:
                     raise Exception("lists of part data are only supported for bundles")
 
         if self.show_name is None:
-            self.show_name = (
-                self.name[0:2] != "__"
-            )  # hide designators for auto-generated cables by default
+            # hide designators for auto-generated cables by default
+            self.show_name = self.name[0:2] != "__"
 
         if not self.show_wirenumbers:
-            self.show_wirenumbers = (
-                self.category != "bundle"
-            )  # by default, show wire numbers for cables, hide for bundles
+            # by default, show wire numbers for cables, hide for bundles
+            self.show_wirenumbers = self.category != "bundle"
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
@@ -383,6 +377,7 @@ class Cable:
         to_name: Optional[Designator],
         to_pin: NoneOrMorePinIndices,
     ) -> None:
+
         from_pin = int2tuple(from_pin)
         via_wire = int2tuple(via_wire)
         to_pin = int2tuple(to_pin)

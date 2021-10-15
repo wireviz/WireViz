@@ -58,9 +58,8 @@ def expand(yaml_data):
                 else:  # a == b
                     output.append(a)  # range of length 1
             except:
-                output.append(
-                    e
-                )  # '-' was not a delimiter between two ints, pass e through unchanged
+                # '-' was not a delimiter between two ints, pass e through unchanged
+                output.append(e)
         else:
             try:
                 x = int(e)  # single int

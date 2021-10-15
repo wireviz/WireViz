@@ -130,9 +130,8 @@ class Harness:
                     raise Exception(
                         f"{via_name}:{via_wire} is used for more than one wire."
                     )
-                via_wire = (
-                    cable.colors.index(via_wire) + 1
-                )  # list index starts at 0, wire IDs start at 1
+                # list index starts at 0, wire IDs start at 1
+                via_wire = cable.colors.index(via_wire) + 1
             elif via_wire in cable.wirelabels:
                 if cable.wirelabels.count(via_wire) > 1:
                     raise Exception(
@@ -180,37 +179,22 @@ class Harness:
                 connector.ports_left = True  # Use left side pins.
 
             html = []
+            # fmt: off
+            rows = [[f'{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}'
+                        if connector.show_name else None],
+                    [pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
+                     html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
+                     html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
+                    [html_line_breaks(connector.type),
+                     html_line_breaks(connector.subtype),
+                     f'{connector.pincount}-pin' if connector.show_pincount else None,
+                     translate_color(connector.color, self.options.color_mode) if connector.color else None,
+                     html_colorbar(connector.color)],
+                    '<!-- connector table -->' if connector.style != 'simple' else None,
+                    [html_image(connector.image)],
+                    [html_caption(connector.image)]]
+            # fmt: on
 
-            rows = [
-                [
-                    f"{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}"
-                    if connector.show_name
-                    else None
-                ],
-                [
-                    pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
-                    html_line_breaks(
-                        pn_info_string(
-                            HEADER_MPN, connector.manufacturer, connector.mpn
-                        )
-                    ),
-                    html_line_breaks(
-                        pn_info_string(HEADER_SPN, connector.supplier, connector.spn)
-                    ),
-                ],
-                [
-                    html_line_breaks(connector.type),
-                    html_line_breaks(connector.subtype),
-                    f"{connector.pincount}-pin" if connector.show_pincount else None,
-                    translate_color(connector.color, self.options.color_mode)
-                    if connector.color
-                    else None,
-                    html_colorbar(connector.color),
-                ],
-                "<!-- connector table -->" if connector.style != "simple" else None,
-                [html_image(connector.image)],
-                [html_caption(connector.image)],
-            ]
             rows.extend(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
@@ -231,6 +215,7 @@ class Harness:
                         and not connector.visible_pins.get(pinname, False)
                     ):
                         continue
+
                     pinhtml.append("   <tr>")
                     if connector.ports_left:
                         pinhtml.append(f'    <td port="p{pinindex+1}l">{pinname}</td>')
@@ -238,16 +223,14 @@ class Harness:
                         pinhtml.append(f"    <td>{pinlabel}</td>")
                     if connector.pincolors:
                         if pincolor in wv_colors._color_hex.keys():
-                            pinhtml.append(
-                                f'    <td sides="tbl">{translate_color(pincolor, self.options.color_mode)}</td>'
-                            )
-                            pinhtml.append('    <td sides="tbr">')
-                            pinhtml.append('     <table border="0" cellborder="1"><tr>')
-                            pinhtml.append(
-                                f'      <td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>'
-                            )
-                            pinhtml.append("     </tr></table>")
-                            pinhtml.append("    </td>")
+                            # fmt: off
+                            pinhtml.append(f'    <td sides="tbl">{translate_color(pincolor, self.options.color_mode)}</td>')
+                            pinhtml.append( '    <td sides="tbr">')
+                            pinhtml.append( '     <table border="0" cellborder="1"><tr>')
+                            pinhtml.append(f'      <td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
+                            pinhtml.append( '     </tr></table>')
+                            pinhtml.append( '    </td>')
+                            # fmt: on
                         else:
                             pinhtml.append('    <td colspan="2"></td>')
 
@@ -309,61 +292,36 @@ class Harness:
                 elif cable.gauge_unit.upper() == "AWG":
                     awg_fmt = f" ({mm2_equiv(cable.gauge)} mm\u00B2)"
 
-            rows = [
-                [
-                    f"{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}"
-                    if cable.show_name
-                    else None
-                ],
-                [
-                    pn_info_string(HEADER_PN, None, remove_links(cable.pn))
-                    if not isinstance(cable.pn, list)
-                    else None,
-                    html_line_breaks(
-                        pn_info_string(
-                            HEADER_MPN,
-                            cable.manufacturer
-                            if not isinstance(cable.manufacturer, list)
-                            else None,
-                            cable.mpn if not isinstance(cable.mpn, list) else None,
-                        )
-                    ),
-                    html_line_breaks(
-                        pn_info_string(
-                            HEADER_SPN,
-                            cable.supplier
-                            if not isinstance(cable.supplier, list)
-                            else None,
-                            cable.spn if not isinstance(cable.spn, list) else None,
-                        )
-                    ),
-                ],
-                [
-                    html_line_breaks(cable.type),
-                    f"{cable.wirecount}x" if cable.show_wirecount else None,
-                    f"{cable.gauge} {cable.gauge_unit}{awg_fmt}"
-                    if cable.gauge
-                    else None,
-                    "+ S" if cable.shield else None,
-                    f"{cable.length} {cable.length_unit}" if cable.length > 0 else None,
-                    translate_color(cable.color, self.options.color_mode)
-                    if cable.color
-                    else None,
-                    html_colorbar(cable.color),
-                ],
-                "<!-- wire table -->",
-                [html_image(cable.image)],
-                [html_caption(cable.image)],
-            ]
+            # fmt: off
+            rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
+                        if cable.show_name else None],
+                    [pn_info_string(HEADER_PN, None,
+                        remove_links(cable.pn)) if not isinstance(cable.pn, list) else None,
+                     html_line_breaks(pn_info_string(HEADER_MPN,
+                        cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
+                        cable.mpn if not isinstance(cable.mpn, list) else None)),
+                     html_line_breaks(pn_info_string(HEADER_SPN,
+                        cable.supplier if not isinstance(cable.supplier, list) else None,
+                        cable.spn if not isinstance(cable.spn, list) else None))],
+                    [html_line_breaks(cable.type),
+                     f'{cable.wirecount}x' if cable.show_wirecount else None,
+                     f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
+                     '+ S' if cable.shield else None,
+                     f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
+                     translate_color(cable.color, self.options.color_mode) if cable.color else None,
+                     html_colorbar(cable.color)],
+                    '<!-- wire table -->',
+                    [html_image(cable.image)],
+                    [html_caption(cable.image)]]
+            # fmt: on
 
             rows.extend(get_additional_component_table(self, cable))
             rows.append([html_line_breaks(cable.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(cable.bgcolor)))
 
             wirehtml = []
-            wirehtml.append(
-                '<table border="0" cellspacing="0" cellborder="0">'
-            )  # conductor table
+            # conductor table
+            wirehtml.append('<table border="0" cellspacing="0" cellborder="0">')
             wirehtml.append("   <tr><td>&nbsp;</td></tr>")
 
             for i, (connection_color, wirelabel) in enumerate(
@@ -389,28 +347,20 @@ class Harness:
                 wirehtml.append(f"    <td><!-- {i}_out --></td>")
                 wirehtml.append("   </tr>")
 
-                bgcolors = (
-                    ["#000000"] + get_color_hex(connection_color, pad=pad) + ["#000000"]
-                )
+                # fmt: off
+                bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
                 wirehtml.append(f"   <tr>")
-                wirehtml.append(
-                    f'    <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}">'
-                )
-                wirehtml.append(
-                    '     <table cellspacing="0" cellborder="0" border="0">'
-                )
-                for j, bgcolor in enumerate(
-                    bgcolors[::-1]
-                ):  # Reverse to match the curved wires when more than 2 colors
-                    wirehtml.append(
-                        f'      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>'
-                    )
+                wirehtml.append(f'    <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}">')
+                wirehtml.append('     <table cellspacing="0" cellborder="0" border="0">')
+                for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
+                    wirehtml.append(f'      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>')
                 wirehtml.append("     </table>")
                 wirehtml.append("    </td>")
                 wirehtml.append("   </tr>")
-                if (
-                    cable.category == "bundle"
-                ):  # for bundles individual wires can have part information
+                # fmt: on
+
+                # for bundles, individual wires can have part information
+                if cable.category == "bundle":
                     # create a list of wire parameters
                     wireidentification = []
                     if isinstance(cable.pn, list):
@@ -439,14 +389,14 @@ class Harness:
                         wireidentification.append(html_line_breaks(supplier_info))
                     # print parameters into a table row under the wire
                     if len(wireidentification) > 0:
+                        # fmt: off
                         wirehtml.append('   <tr><td colspan="3">')
-                        wirehtml.append(
-                            '    <table border="0" cellspacing="0" cellborder="0"><tr>'
-                        )
+                        wirehtml.append('    <table border="0" cellspacing="0" cellborder="0"><tr>')
                         for attrib in wireidentification:
                             wirehtml.append(f"     <td>{attrib}</td>")
                         wirehtml.append("    </tr></table>")
                         wirehtml.append("   </td></tr>")
+                        # fmt: on
 
             if cable.shield:
                 wirehtml.append("   <tr><td>&nbsp;</td></tr>")  # spacer
@@ -464,9 +414,9 @@ class Harness:
                 else:
                     # shield is shown as a thin black wire
                     attributes = f'height="2" bgcolor="#000000" border="0"'
-                wirehtml.append(
-                    f'   <tr><td colspan="3" cellpadding="0" {attributes} port="ws"></td></tr>'
-                )
+                # fmt: off
+                wirehtml.append(f'   <tr><td colspan="3" cellpadding="0" {attributes} port="ws"></td></tr>')
+                # fmt: on
 
             wirehtml.append("   <tr><td>&nbsp;</td></tr>")
             wirehtml.append("  </table>")
@@ -477,9 +427,8 @@ class Harness:
 
             # connections
             for connection in cable.connections:
-                if isinstance(
-                    connection.via_port, int
-                ):  # check if it's an actual wire and not a shield
+                if isinstance(connection.via_port, int):
+                    # check if it's an actual wire and not a shield
                     dot.attr(
                         "edge",
                         color=":".join(
@@ -734,15 +683,15 @@ class Harness:
             with open_file_write(f"{filename}.bom.tsv") as file:
                 file.write(tuplelist2tsv(bomlist))
         if "csv" in fmt:
-            print(
-                "CSV output is not yet supported"
-            )  # TODO: implement CSV output (preferrably using CSV library)
+            # TODO: implement CSV output (preferrably using CSV library)
+            print("CSV output is not yet supported")
         # HTML output
         if "html" in fmt:
             generate_html_output(filename, bomlist, self.metadata, self.options)
         # PDF output
         if "pdf" in fmt:
-            print("PDF output is not yet supported")  # TODO: implement PDF output
+            # TODO: implement PDF output
+            print("PDF output is not yet supported")
         # delete SVG if not needed
         if "html" in fmt and not "svg" in fmt and not svg_already_exists:
             Path(f"{filename}.svg").unlink()
