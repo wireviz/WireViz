@@ -18,7 +18,7 @@ format_codes = {'c': 'csv', 'g': 'gv', 'h': 'html', 'p': 'png', 'P': 'pdf', 's':
 epilog = 'The -f or --format option accepts a string containing one or more of the following characters to specify which file types to output:\n'
 epilog += ', '.join([f'{key} ({value.upper()})' for key, value in format_codes.items()])
 
-@click.command(epilog=epilog)
+@click.command(epilog=epilog, no_args_is_help=True)
 @click.argument('file', nargs=-1)
 @click.option('-f', '--format', default='hpst', type=str, show_default=True, help='Output formats (see below).')
 @click.option('-p', '--prepend', default=None, type=Path, help='YAML file to prepend to the input file (optional).')
