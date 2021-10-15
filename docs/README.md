@@ -81,10 +81,11 @@ Output file:
 
 [Source](../examples/demo02.yml) - [Bill of Materials](../examples/demo02.bom.tsv)
 
-### Tutorial and example gallery
+### Syntax, tutorial and example gallery
 
-See the [tutorial page](../tutorial/readme.md) for sample code,
-as well as the [example gallery](../examples/readme.md) to see more of what WireViz can do.
+Read the [syntax description](syntax.md) to learn about WireViz' features and how to use them.
+
+See the [tutorial page](../tutorial/readme.md) for sample code, as well as the [example gallery](../examples/readme.md) to see more of what WireViz can do.
 
 
 ## Usage
@@ -135,15 +136,16 @@ mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 
+Wildcars in the file path are also supported to process multiple files at once, e.g.:
+```
+$ wireviz ~/path/to/files/*.yml
+```
+
 To see how to specify the output formats, as well as additional options, run:
 
 ```
 $ wireviz --help
 ```
-
-### Syntax description
-
-A description of the WireViz YAML input syntax can be found [here](syntax.md).
 
 
 ### (Re-)Building the example projects
