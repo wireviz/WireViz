@@ -116,3 +116,9 @@ def aspect_ratio(image_src):
     except Exception as error:
         print(f'aspect_ratio(): {type(error).__name__}: {error}')
     return 1 # Assume 1:1 when unable to read actual image size
+
+def remove_empty_columns(inp: List[List]) -> List[List]:
+    transp = list(map(list, zip(*inp)))            # transpose list
+    transp = [item for item in transp if any(item)]  # remove empty rows (easier)
+    out = list(map(list, zip(*transp)))            # transpose back
+    return out

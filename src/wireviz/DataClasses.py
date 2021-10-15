@@ -7,6 +7,7 @@ from pathlib import Path
 from wireviz.wv_helper import int2tuple, aspect_ratio
 from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES
 from wireviz.wv_bom_new import Bom_hash, Bom_hash_list
+from wireviz.wv_gv_html import nested_html_table, bom_bubble
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
 PlainText = str # Text not containing HTML tags nor newlines
@@ -180,6 +181,15 @@ class TopLevelGraphicalComponent(GraphicalComponent):
 
     show_name: bool = True
 
+    def gen_add_bom_table(self):
+        if self.additional_components:
+            rows = []
+            for comp in self.additional_components:
+                rows.append([bom_bubble(comp.bom_id), comp.qty, comp.description, comp.pn])
+            return rows
+        else:
+            return None
+
 
 @dataclass
 class Connector(TopLevelGraphicalComponent):
@@ -241,7 +251,6 @@ class Connector(TopLevelGraphicalComponent):
     def activate_pin(self, pin: Pin) -> None:
         self.visible_pins[pin] = True
 
-    @property
     def qty_factor(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
         if not qty_multiplier:
             return 1
@@ -376,7 +385,6 @@ class Cable(TopLevelGraphicalComponent):
         for i, _ in enumerate(from_pin):
             self.connections.append(Connection(from_name, from_pin[i], via_wire[i], to_name, to_pin[i]))
 
-    @property
     def qty_factor(self, qty_multiplier: Optional[CableMultiplier]) -> float:
         if not qty_multiplier:
             return 1

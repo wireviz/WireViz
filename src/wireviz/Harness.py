@@ -13,14 +13,14 @@ from wireviz.DataClasses import AdditionalComponent, Metadata, Options, Tweak, C
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, \
     html_bgcolor_attr, html_bgcolor, html_colorbar, \
-    html_image, html_caption, remove_links, html_line_breaks, bom_bubble
+    html_image, html_caption, remove_links, html_line_breaks, bom_bubble, html_table
 # from wireviz.wv_bom import pn_info_string, component_table_entry, \
 #     get_additional_component_table, bom_list, generate_bom, \
 #     HEADER_PN, HEADER_MPN, HEADER_SPN
 from wireviz.wv_bom_new import pn_info_string, HEADER_PN, HEADER_MPN, HEADER_SPN
 from wireviz.wv_html import generate_html_output
 from wireviz.wv_helper import awg_equiv, mm2_equiv, tuplelist2tsv, flatten2d, \
-    open_file_read, open_file_write
+    open_file_read, open_file_write, remove_empty_columns
 
 
 @dataclass
@@ -192,9 +192,10 @@ class Harness:
                      html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
                     [html_image(connector.image)],
-                    [html_caption(connector.image)]]
+                    [html_caption(connector.image)],
+                    html_table(remove_empty_columns(connector.gen_add_bom_table()), 2)]
             # rows.extend(get_additional_component_table(self, connector))
-            rows.append(['Reimplement additional component table!'])
+            # rows.append()
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
 
@@ -522,8 +523,8 @@ class Harness:
         bomlist = [[]]
         # HTML output
         generate_html_output(filename, bomlist, self.metadata, self.options)
-
-    def bom(self):
-        if not self._bom:
-            self._bom = generate_bom(self)
-        return self._bom
+    #
+    # def bom(self):
+    #     if not self._bom:
+    #         self._bom = generate_bom(self)
+    #     return self._bom

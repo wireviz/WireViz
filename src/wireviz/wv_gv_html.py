@@ -32,6 +32,18 @@ def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], table_a
     html.append('</table>')
     return html
 
+def html_table(rows: List[List[str]], indent_level: int = 0) -> str:
+    html = []
+    html.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
+    for row in rows:
+        html.append(' <tr>')
+        for item in row:
+            html.append(f'  <td>{item}</td>')
+        html.append(' </tr>')
+    html.append('</table>')
+    html = [' '*indent_level + row for row in html]
+    return '\n'.join(html)
+
 def html_bgcolor_attr(color: Color) -> str:
     """Return attributes for bgcolor or '' if no color."""
     return f' bgcolor="{translate_color(color, "HEX")}"' if color else ''
@@ -74,7 +86,6 @@ def html_size_attr(image):
 
 def html_line_breaks(inp):
     return remove_links(inp).replace('\n', '<br />') if isinstance(inp, str) else inp
-
 
 def bom_bubble(inp):
     return(f'<table border="0"><tr><td border="1" style="rounded">{inp}</td></tr></table>')
