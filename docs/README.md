@@ -125,7 +125,7 @@ If you would like to contribute to this project, make sure you read the [contrib
 $ wireviz ~/path/to/file/mywire.yml
 ```
 
-This will output the following files
+Depending on the options specified, this will output some or all of the following files:
 
 ```
 mywire.gv         GraphViz output
@@ -135,13 +135,11 @@ mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 
-#### Command line options
+To see how to specify the output formats, as well as additional options, run:
 
-- `--prepend-file <FILE>` to prepend an additional YAML file. Useful for part libraries and templates shared among multiple cables/harnesses.
-- `-o <OUTPUT>` or `--output_file <OUTPUT>` to generate output files with a name different from the input file.
-- `-V` or `--version` to display the WireViz version.
-- `-h` or `--help` to see a summary of the usage help text.
-
+```
+$ wireviz --help
+```
 
 ### Syntax description
 
