@@ -261,8 +261,6 @@ def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, st
                     elif index_item == len(entry) - 1:  # list ends with an arrow
                         raise Exception('An arrow cannot be at the end of a connection set')
 
-# self.connectors[from_name].pins.index(from_pin)
-                    # import pudb; pu.db
                     from_name, from_pin = get_single_key_and_value(entry[index_item-1])
                     via_name,  via_pin  = (designator, None)
                     to_name,   to_pin   = get_single_key_and_value(entry[index_item+1])
