@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict, List
-from pathlib import Path
 import re
+from pathlib import Path
+from typing import Dict, List
 
 awg_equiv_table = {
     '0.09': '28',

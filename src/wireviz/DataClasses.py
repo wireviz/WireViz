@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from dataclasses import InitVar, dataclass, field
 from enum import Enum, auto
-from typing import Dict, List, Optional, Tuple, Union
-from dataclasses import dataclass, field, InitVar
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Union
 
-from wireviz.wv_helper import int2tuple, aspect_ratio
-from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES
-
+from wireviz.wv_colors import COLOR_CODES, Color, ColorMode, Colors, ColorScheme
+from wireviz.wv_helper import aspect_ratio, int2tuple
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
 PlainText = str # Text not containing HTML tags nor newlines

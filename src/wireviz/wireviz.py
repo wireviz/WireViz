@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 import yaml
@@ -12,7 +12,13 @@ if __name__ == '__main__':
 
 from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read, smart_file_resolve
+from wireviz.wv_helper import (
+    expand,
+    get_single_key_and_value,
+    is_arrow,
+    open_file_read,
+    smart_file_resolve,
+)
 
 
 def parse_text(yaml_str: str, file_out: (str, Path) = None, output_formats: (None, str, Tuple[str]) = ('html','png','svg','tsv'), return_types: (None, str, Tuple[str]) = None, image_paths: List = []) -> Any:

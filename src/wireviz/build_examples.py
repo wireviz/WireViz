@@ -3,15 +3,15 @@
 
 import argparse
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 script_path = Path(__file__).absolute()
 
 sys.path.insert(0, str(script_path.parent.parent))  # to find wireviz module
-from wireviz import wireviz, __version__, APP_NAME
-from wv_helper import open_file_write, open_file_read, open_file_append
+from wv_helper import open_file_append, open_file_read, open_file_write
 
+from wireviz import APP_NAME, __version__, wireviz
 
 dir = script_path.parent.parent.parent
 readme = 'readme.md'

@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import click
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from wireviz import APP_NAME, __version__
 import wireviz.wireviz as wv
+from wireviz import APP_NAME, __version__
 from wireviz.wv_helper import open_file_read
 
 format_codes = {'c': 'csv', 'g': 'gv', 'h': 'html', 'p': 'png', 'P': 'pdf', 's': 'svg', 't': 'tsv'}

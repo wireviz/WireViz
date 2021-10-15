@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from typing import List, Optional, Union
 import re
+from typing import List, Optional, Union
 
 from wireviz.DataClasses import Color
 from wireviz.wv_colors import translate_color
 from wireviz.wv_helper import remove_links
+
 
 def nested_html_table(rows: List[Union[str, List[Optional[str]], None]], table_attrs: str = '') -> str:
     # input: list, each item may be scalar or list
@@ -73,6 +74,7 @@ def html_caption(image):
 
 def html_size_attr(image):
     from wireviz.DataClasses import Image
+
     # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
     return ((f' width="{image.width}"'   if image.width else '')
         +   (f' height="{image.height}"' if image.height else '')
