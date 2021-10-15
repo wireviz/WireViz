@@ -41,6 +41,7 @@ class Options:
     bgcolor_cable: Optional[Color] = None
     bgcolor_bundle: Optional[Color] = None
     color_mode: ColorMode = 'SHORT'
+    show_bom_ids: bool = False
     mini_bom_mode: bool = True
 
     def __post_init__(self):

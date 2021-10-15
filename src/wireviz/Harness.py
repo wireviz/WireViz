@@ -181,7 +181,7 @@ class Harness:
 
             rows = [[f'{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}'
                         if connector.show_name else None],
-                    [bom_bubble(connector.bom_id),
+                    [bom_bubble(connector.bom_id) if self.options.show_bom_ids else None,
                      pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
                      html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
                      html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
@@ -257,10 +257,10 @@ class Harness:
             if isinstance(cable.bom_hash, list):
                 cable.bom_id = [self.bom[_hash]['bom_id'] for _hash in cable.bom_hash]
                 cable_bom_id_str = None
-                cable_bom_id_str_list = [bom_bubble(_id) for _id in cable.bom_id]
+                cable_bom_id_str_list = [bom_bubble(_id) for _id in cable.bom_id] if self.options.show_bom_ids else None
             else:
                 cable.bom_id = self.bom[cable.bom_hash]['bom_id']
-                cable_bom_id_str = bom_bubble(cable.bom_id)
+                cable_bom_id_str = bom_bubble(cable.bom_id) if self.options.show_bom_ids else None
                 cable_bom_id_str_list = None
 
             html = []
