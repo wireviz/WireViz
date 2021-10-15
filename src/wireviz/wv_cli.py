@@ -23,7 +23,8 @@ format_codes = {
     "t": "tsv",
 }
 
-epilog = "The -f or --format option accepts a string containing one or more of the following characters to specify which file types to output:\n"
+epilog = "The -f or --format option accepts a string containing one or more of the "
+epilog += "following characters to specify which file types to output:\n"
 epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
 
 
