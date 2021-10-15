@@ -12,7 +12,7 @@ if __name__ == '__main__':
 
 from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read
+from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read, smart_file_resolve
 
 
 def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('html','png','svg','tsv'), image_paths: List = []) -> Any:
@@ -82,7 +82,6 @@ def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, st
                         # The Image dataclass might need to open an image file with a relative path.
                         image = attribs.get('image')
                         if isinstance(image, dict):
-                            image['gv_dir'] = Path(file_out if file_out else '').parent # Inject context # TODO: remove
                             image_path = image['src']
                             if image_path and not Path(image_path).is_absolute():  # resolve relative image path
                                 image['src'] = smart_file_resolve(image_path, image_paths)
