@@ -98,68 +98,100 @@ class Image:
 
 
 @dataclass
-class AdditionalComponent:
-    type: MultilineHypertext
-    subtype: Optional[MultilineHypertext] = None
-    manufacturer: Optional[MultilineHypertext] = None
-    mpn: Optional[MultilineHypertext] = None
-    supplier: Optional[MultilineHypertext] = None
-    spn: Optional[MultilineHypertext] = None
-    pn: Optional[Hypertext] = None
+class Component:
+    type: Union[MultilineHypertext, List[MultilineHypertext]] = None
+    subtype: Union[MultilineHypertext, List[MultilineHypertext]] = None
+    category: Optional[str] = None  # currently only used by cables, to define bundles
+
+    pn: Union[Hypertext, List[Hypertext], None] = None
+    manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+    mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+    supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+    spn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
+
+    ignore_in_bom: bool = False
+    bom_id: Optional[str] = None  # to be filled after harness is built
+
+    @property
+    def bom_hash(self) -> Bom_hash:
+
+        def force_list(inp):
+            if isinstance(inp, list):
+                return inp
+            else:
+                return [inp for i in range(len(self.colors))]
+
+        if self.category == 'bundle':
+            # create a single item that includes the necessary fields,
+            # which may or may not be lists
+            _hash_list = Bom_hash_list(
+                self.description,
+                self.unit,
+                self.pn,
+                self.manufacturer,
+                self.mpn,
+                self.supplier,
+                self.spn,
+            )
+            # convert elements that are not lists, into lists
+            _hash_matrix = list(map(force_list, [elem for elem in _hash_list]))
+            # transpose list of lists, convert to tuple for next step
+            _hash_matrix = list(map(tuple, zip(*_hash_matrix)))
+            # generate list of Bom_hashes
+            hash_list = [Bom_hash(*item) for item in _hash_matrix]
+            return hash_list
+        else:
+            return Bom_hash(
+                self.description,
+                self.unit,
+                self.pn,
+                self.manufacturer,
+                self.mpn,
+                self.supplier,
+                self.spn,
+                )
+
+
+@dataclass
+class GraphicalComponent(Component):
+    bgcolor: Optional[Color] = None
+
+@dataclass
+class AdditionalComponent(Component):
     qty: float = 1
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
-    bgcolor: Optional[Color] = None
     designators: Optional[str] = None  # used for components define in the `additional_bom_items` YAML section
-    bom_id: Optional[str] = None  # to be filled after harness is built
-    ignore_in_bom: bool = False  # for consistency with connectors and cables
 
     @property
     def description(self) -> str:
         return self.type.rstrip() + (f', {self.subtype.rstrip()}' if self.subtype else '')
 
-    @property
-    def bom_hash(self) -> Bom_hash:
-        return Bom_hash(
-            self.description,
-            self.unit,
-            self.pn,
-            self.manufacturer,
-            self.mpn,
-            self.supplier,
-            self.spn,
-            )
+
+@dataclass
+class TopLevelGraphicalComponent(GraphicalComponent):
+    name: Designator = None
+    bgcolor_title: Optional[Color] = None
+    color: Optional[Color] = None
+    image: Optional[Image] = None
+    notes: Optional[MultilineHypertext] = None
+    additional_components: List[AdditionalComponent] = field(default_factory=list)
+
+    show_name: bool = True
 
 
 @dataclass
-class Connector:
-    name: Designator
-    bgcolor: Optional[Color] = None
-    bgcolor_title: Optional[Color] = None
-    manufacturer: Optional[MultilineHypertext] = None
-    mpn: Optional[MultilineHypertext] = None
-    supplier: Optional[MultilineHypertext] = None
-    spn: Optional[MultilineHypertext] = None
-    pn: Optional[Hypertext] = None
+class Connector(TopLevelGraphicalComponent):
     style: Optional[str] = None
-    category: Optional[str] = None
-    type: Optional[MultilineHypertext] = None
-    subtype: Optional[MultilineHypertext] = None
     pincount: Optional[int] = None
-    image: Optional[Image] = None
-    notes: Optional[MultilineHypertext] = None
     pins: List[Pin] = field(default_factory=list)
     pinlabels: List[Pin] = field(default_factory=list)
     pincolors: List[Color] = field(default_factory=list)
-    color: Optional[Color] = None
-    show_name: Optional[bool] = None
     show_pincount: Optional[bool] = None
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
     loops: List[List[Pin]] = field(default_factory=list)
-    ignore_in_bom: bool = False
-    additional_components: List[AdditionalComponent] = field(default_factory=list)
-    bom_id: Optional[str] = None  # to be filled after harness is built
+    unit = None
 
     def __post_init__(self) -> None:
 
@@ -208,7 +240,8 @@ class Connector:
     def activate_pin(self, pin: Pin) -> None:
         self.visible_pins[pin] = True
 
-    def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
+    @property
+    def qty_factor(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
         if not qty_multiplier:
             return 1
         elif qty_multiplier == 'pincount':
@@ -229,49 +262,21 @@ class Connector:
             ]
         return ', '.join([str(s) for s in substrs if s is not None and s != ''])
 
-    @property
-    def bom_hash(self) -> Bom_hash:
-        return Bom_hash(
-            self.description,
-            None,
-            self.pn,
-            self.manufacturer,
-            self.mpn,
-            self.supplier,
-            self.spn,
-            )
 
 @dataclass
-class Cable:
-    name: Designator
-    bgcolor: Optional[Color] = None
-    bgcolor_title: Optional[Color] = None
-    manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    spn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    pn: Union[Hypertext, List[Hypertext], None] = None
-    category: Optional[str] = None
-    type: Optional[MultilineHypertext] = None
+class Cable(TopLevelGraphicalComponent):
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
     show_equiv: bool = False
     length: float = 0
     length_unit: Optional[str] = None
-    color: Optional[Color] = None
     wirecount: Optional[int] = None
     shield: Union[bool, Color] = False
-    image: Optional[Image] = None
-    notes: Optional[MultilineHypertext] = None
     colors: List[Colors] = field(default_factory=list)
     wirelabels: List[Wire] = field(default_factory=list)
     color_code: Optional[ColorScheme] = None
-    show_name: bool = True
     show_wirecount: bool = True
     show_wirenumbers: Optional[bool] = None
-    ignore_in_bom: bool = False
-    additional_components: List[AdditionalComponent] = field(default_factory=list)
-    bom_id: Optional[str] = 'None'  # to be filled after harness is built
 
     def __post_init__(self) -> None:
 
@@ -370,7 +375,8 @@ class Cable:
         for i, _ in enumerate(from_pin):
             self.connections.append(Connection(from_name, from_pin[i], via_wire[i], to_name, to_pin[i]))
 
-    def get_qty_multiplier(self, qty_multiplier: Optional[CableMultiplier]) -> float:
+    @property
+    def qty_factor(self, qty_multiplier: Optional[CableMultiplier]) -> float:
         if not qty_multiplier:
             return 1
         elif qty_multiplier == 'wirecount':
@@ -385,6 +391,10 @@ class Cable:
             raise ValueError(f'invalid qty multiplier parameter for cable {qty_multiplier}')
 
     @property
+    def unit(self):  # for compatibility with parent class
+        return self.length_unit
+
+    @property
     def description(self) -> str:
         if self.category == 'bundle':
             desc_list = []
@@ -392,6 +402,7 @@ class Cable:
                 substrs = [
                     'Wire',
                     self.type,
+                    self.subtype,
                     f'{self.gauge} {self.gauge_unit}' if self.gauge else None,
                     str(self.color) + ' (reimplement color translation!)' if self.color else None,  # translate_color(self.color, harness.options.color_mode)] <- get harness.color_mode!
                 ]
@@ -401,6 +412,7 @@ class Cable:
             substrs = [
                 ('', 'Cable'),
                 (', ', self.type),
+                (', ', self.subtype),
                 (', ', self.wirecount),
                 (' ', f'x {self.gauge} {self.gauge_unit}' if self.gauge else ' wires'),
                 (' ', 'shielded' if self.shield else None),
@@ -408,46 +420,6 @@ class Cable:
             ]
             desc = ''.join([f'{s[0]}{s[1]}' for s in substrs if s[1] is not None and s[1] != ''])
             return desc
-
-
-    @property
-    def bom_hash(self) -> Bom_hash:
-
-        def force_list(inp):
-            if isinstance(inp, list):
-                return inp
-            else:
-                return [inp for i in range(len(self.colors))]
-
-        if self.category == 'bundle':
-            # create a single item that includes the necessary fields,
-            # which may or may not be lists
-            _hash_list = Bom_hash_list(
-                self.description,
-                self.length_unit,
-                self.pn,
-                self.manufacturer,
-                self.mpn,
-                self.supplier,
-                self.spn,
-            )
-            # convert elements that are not lists, into lists
-            _hash_matrix = list(map(force_list, [elem for elem in _hash_list]))
-            # transpose list of lists, convert to tuple for next step
-            _hash_matrix = list(map(tuple, zip(*_hash_matrix)))
-            # generate list of Bom_hashes
-            hash_list = [Bom_hash(*item) for item in _hash_matrix]
-            return hash_list
-        else:
-            return Bom_hash(
-                self.description,
-                self.length_unit,
-                self.pn,
-                self.manufacturer,
-                self.mpn,
-                self.supplier,
-                self.spn,
-                )
 
 
 @dataclass

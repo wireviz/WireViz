@@ -37,15 +37,14 @@ class Harness:
         self.additional_bom_items = []
 
     def add_connector(self, name: str, *args, **kwargs) -> None:
-        self.connectors[name] = Connector(name, *args, **kwargs)
+        self.connectors[name] = Connector(name=name, *args, **kwargs)
         self._add_to_internal_bom(self.connectors[name])
 
     def add_cable(self, name: str, *args, **kwargs) -> None:
-        self.cables[name] = Cable(name, *args, **kwargs)
+        self.cables[name] = Cable(name=name, *args, **kwargs)
         self._add_to_internal_bom(self.cables[name])
 
     def add_additional_bom_item(self, item: dict) -> None:
-        # import pudb; pu.db
         new_item = AdditionalComponent(**item)
         self.additional_bom_items.append(new_item)
         self._add_to_internal_bom(new_item)
