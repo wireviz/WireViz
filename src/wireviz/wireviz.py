@@ -309,5 +309,8 @@ def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
 
     parse_text(yaml_str, file_out=file_out, image_paths=[Path(yaml_file).parent])
 
-if __name__ == '__main__':
+def main():
     print('When running from the command line, please use wv_cli.py instead.')
+
+if __name__ == '__main__':
+    main()
