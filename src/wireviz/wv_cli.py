@@ -42,14 +42,14 @@ def wireviz(file, format, prepend, output_file, version):
         filepaths = list(file)
 
     # determine output formats
-    return_types = []
+    output_formats = []
     for code in format:
         if code in format_codes:
-            return_types.append(format_codes[code])
+            output_formats.append(format_codes[code])
         else:
             raise Exception(f'Unknown output format: {code}')
-    return_types = tuple(sorted(set(return_types)))
-    return_types_str = f'[{"|".join(return_types)}]' if len(return_types) > 1 else return_types[0]
+    output_formats = tuple(sorted(set(output_formats)))
+    output_formats_str = f'[{"|".join(output_formats)}]' if len(output_formats) > 1 else output_formats[0]
 
     image_paths = []
     # check prepend file
@@ -75,7 +75,7 @@ def wireviz(file, format, prepend, output_file, version):
         file_out = file.with_suffix('') if not output_file else output_file
 
         print('Input file:  ', file)
-        print('Output file: ', f'{file_out}.{return_types_str}')
+        print('Output file: ', f'{file_out}.{output_formats_str}')
 
         with open_file_read(file) as file_handle:
             yaml_input = file_handle.read()
@@ -83,7 +83,7 @@ def wireviz(file, format, prepend, output_file, version):
 
         yaml_input = prepend_input + yaml_input
 
-        wv.parse_text(yaml_input, file_out=file_out, return_types=return_types, image_paths=[file_dir, prepend_dir])
+        wv.parse_text(yaml_input, file_out=file_out, output_formats=output_formats, image_paths=[file_dir, prepend_dir])
 
     print()
 

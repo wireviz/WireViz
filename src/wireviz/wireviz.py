@@ -15,12 +15,13 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, get_single_key_and_value, is_arrow, open_file_read, smart_file_resolve
 
 
-def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('html','png','svg','tsv'), image_paths: List = []) -> Any:
+def parse_text(yaml_str: str, file_out: (str, Path) = None, output_formats: (None, str, Tuple[str]) = ('html','png','svg','tsv'), return_types: (None, str, Tuple[str]) = None, image_paths: List = []) -> Any:
     """
     Parses a YAML input string and does the high-level harness conversion
 
     :param yaml_input: a string containing the YAML input data
     :param file_out:
+    :param output_formats:
     :param return_types: if None, then returns None; if the value is a string, then a
         corresponding data format will be returned; if the value is a tuple of strings,
         then for every valid format in the `return_types` tuple, another return type
@@ -30,14 +31,15 @@ def parse_text(yaml_str: str, file_out: (str, Path) = None, return_types: (None,
          - "harness" - will return the `Harness` instance
     """
     yaml_data = yaml.safe_load(yaml_str)
-    return parse(yaml_data=yaml_data, file_out=file_out, return_types=return_types, image_paths=image_paths)
+    return parse(yaml_data=yaml_data, file_out=file_out, output_formats=output_formats, return_types=return_types, image_paths=image_paths)
 
-def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = ('html','png','svg','tsv'), image_paths: List = []) -> Any:
+def parse(yaml_data: Dict, file_out: (str, Path) = None, output_formats: (None, str, Tuple[str]) = ('html','png','svg','tsv'), return_types: (None, str, Tuple[str]) = None, image_paths: List = []) -> Any:
     """
     Parses a YAML dictionary and does the high-level harness conversion
 
     :param yaml_data: a dictionary containing the YAML data
     :param file_out:
+    :param output_formats:
     :param return_types: if None, then returns None; if the value is a string, then a
         corresponding data format will be returned; if the value is a tuple of strings,
         then for every valid format in the `return_types` tuple, another return type
@@ -273,7 +275,7 @@ def parse(yaml_data: Dict, file_out: (str, Path) = None, return_types: (None, st
             harness.add_bom_item(line)
 
     if file_out is not None:
-        harness.output(filename=file_out, fmt=return_types, view=False)
+        harness.output(filename=file_out, fmt=output_formats, view=False)
 
     if return_types is not None:
         returns = []
