@@ -13,7 +13,7 @@ from wireviz import APP_NAME, __version__
 import wireviz.wireviz as wv
 from wireviz.wv_helper import open_file_read
 
-format_codes = {'c': 'csv', 'g': 'gv', 'p': 'png', 's': 'svg', 't': 'tsv', 'c': 'csv', 'h': 'html', 'P': 'pdf'}
+format_codes = {'c': 'csv', 'g': 'gv', 'h': 'html', 'p': 'png', 'P': 'pdf', 's': 'svg', 't': 'tsv'}
 
 epilog = 'The -f or --format option accepts a string containing one or more of the following characters to specify which file types to output:\n'
 epilog += ', '.join([f'{key} ({value.upper()})' for key, value in format_codes.items()])
