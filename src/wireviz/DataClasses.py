@@ -9,30 +9,41 @@ from wireviz.wv_colors import COLOR_CODES, Color, ColorMode, Colors, ColorScheme
 from wireviz.wv_helper import aspect_ratio, int2tuple
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
-PlainText = str # Text not containing HTML tags nor newlines
-Hypertext = str # Text possibly including HTML hyperlinks that are removed in all outputs except HTML output
-MultilineHypertext = str # Hypertext possibly also including newlines to break lines in diagram output
-Designator = PlainText # Case insensitive unique name of connector or cable
+PlainText = str  # Text not containing HTML tags nor newlines
+Hypertext = str  # Text possibly including HTML hyperlinks that are removed in all outputs except HTML output
+MultilineHypertext = (
+    str  # Hypertext possibly also including newlines to break lines in diagram output
+)
+
+Designator = PlainText  # Case insensitive unique name of connector or cable
 
 # Literal type aliases below are commented to avoid requiring python 3.8
-ConnectorMultiplier = PlainText # = Literal['pincount', 'populated']
-CableMultiplier = PlainText # = Literal['wirecount', 'terminations', 'length', 'total_length']
-ImageScale = PlainText # = Literal['false', 'true', 'width', 'height', 'both']
+ConnectorMultiplier = PlainText  # = Literal['pincount', 'populated']
+CableMultiplier = (
+    PlainText  # = Literal['wirecount', 'terminations', 'length', 'total_length']
+)
+ImageScale = PlainText  # = Literal['false', 'true', 'width', 'height', 'both']
 
 # Type combinations
-Pin = Union[int, PlainText] # Pin identifier
-PinIndex = int # Zero-based pin index
-Wire = Union[int, PlainText] # Wire number or Literal['s'] for shield
-NoneOrMorePins = Union[Pin, Tuple[Pin, ...], None]  # None, one, or a tuple of pin identifiers
-NoneOrMorePinIndices = Union[PinIndex, Tuple[PinIndex, ...], None]  # None, one, or a tuple of zero-based pin indices
-OneOrMoreWires = Union[Wire, Tuple[Wire, ...]] # One or a tuple of wires
+Pin = Union[int, PlainText]  # Pin identifier
+PinIndex = int  # Zero-based pin index
+Wire = Union[int, PlainText]  # Wire number or Literal['s'] for shield
+NoneOrMorePins = Union[
+    Pin, Tuple[Pin, ...], None
+]  # None, one, or a tuple of pin identifiers
+NoneOrMorePinIndices = Union[
+    PinIndex, Tuple[PinIndex, ...], None
+]  # None, one, or a tuple of zero-based pin indices
+OneOrMoreWires = Union[Wire, Tuple[Wire, ...]]  # One or a tuple of wires
 
 # Metadata can contain whatever is needed by the HTML generation/template.
 MetadataKeys = PlainText  # Literal['title', 'description', 'notes', ...]
 
+
 class Side(Enum):
     LEFT = auto()
     RIGHT = auto()
+
 
 class Metadata(dict):
     pass
@@ -40,13 +51,13 @@ class Metadata(dict):
 
 @dataclass
 class Options:
-    fontname: PlainText = 'arial'
-    bgcolor: Color = 'WH'
-    bgcolor_node: Optional[Color] = 'WH'
+    fontname: PlainText = "arial"
+    bgcolor: Color = "WH"
+    bgcolor_node: Optional[Color] = "WH"
     bgcolor_connector: Optional[Color] = None
     bgcolor_cable: Optional[Color] = None
     bgcolor_bundle: Optional[Color] = None
-    color_mode: ColorMode = 'SHORT'
+    color_mode: ColorMode = "SHORT"
     mini_bom_mode: bool = True
 
     def __post_init__(self):
@@ -87,9 +98,13 @@ class Image:
             self.fixedsize = (self.width or self.height) and self.scale is None
 
         if self.scale is None:
-            self.scale = "false" if not self.width and not self.height \
-                else     "both"  if     self.width and     self.height \
-                else     "true" # When only one dimension is specified.
+            self.scale = (
+                "false"
+                if not self.width and not self.height
+                else "both"
+                if self.width and self.height
+                else "true"
+            )  # When only one dimension is specified.
 
         if self.fixedsize:
             # If only one dimension is specified, compute the other
@@ -118,7 +133,9 @@ class AdditionalComponent:
 
     @property
     def description(self) -> str:
-        return self.type.rstrip() + (f', {self.subtype.rstrip()}' if self.subtype else '')
+        return self.type.rstrip() + (
+            f", {self.subtype.rstrip()}" if self.subtype else ""
+        )
 
 
 @dataclass
@@ -158,36 +175,44 @@ class Connector:
         self.ports_right = False
         self.visible_pins = {}
 
-        if self.style == 'simple':
+        if self.style == "simple":
             if self.pincount and self.pincount > 1:
-                raise Exception('Connectors with style set to simple may only have one pin')
+                raise Exception(
+                    "Connectors with style set to simple may only have one pin"
+                )
             self.pincount = 1
 
         if not self.pincount:
-            self.pincount = max(len(self.pins), len(self.pinlabels), len(self.pincolors))
+            self.pincount = max(
+                len(self.pins), len(self.pinlabels), len(self.pincolors)
+            )
             if not self.pincount:
-                raise Exception('You need to specify at least one, pincount, pins, pinlabels, or pincolors')
+                raise Exception(
+                    "You need to specify at least one, pincount, pins, pinlabels, or pincolors"
+                )
 
         # create default list for pins (sequential) if not specified
         if not self.pins:
             self.pins = list(range(1, self.pincount + 1))
 
         if len(self.pins) != len(set(self.pins)):
-            raise Exception('Pins are not unique')
+            raise Exception("Pins are not unique")
 
         if self.show_name is None:
             # hide designators for simple and for auto-generated connectors by default
-            self.show_name = (self.style != 'simple' and self.name[0:2] != '__')
+            self.show_name = self.style != "simple" and self.name[0:2] != "__"
 
         if self.show_pincount is None:
-            self.show_pincount = self.style != 'simple' # hide pincount for simple (1 pin) connectors by default
+            self.show_pincount = (
+                self.style != "simple"
+            )  # hide pincount for simple (1 pin) connectors by default
 
         for loop in self.loops:
             # TODO: check that pins to connect actually exist
             # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
             # TODO: include properties of wire used to create the loop
             if len(loop) != 2:
-                raise Exception('Loops must be between exactly two pins!')
+                raise Exception("Loops must be between exactly two pins!")
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
@@ -203,12 +228,14 @@ class Connector:
     def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
         if not qty_multiplier:
             return 1
-        elif qty_multiplier == 'pincount':
+        elif qty_multiplier == "pincount":
             return self.pincount
-        elif qty_multiplier == 'populated':
+        elif qty_multiplier == "populated":
             return sum(self.visible_pins.values())
         else:
-            raise ValueError(f'invalid qty multiplier parameter for connector {qty_multiplier}')
+            raise ValueError(
+                f"invalid qty multiplier parameter for connector {qty_multiplier}"
+            )
 
 
 @dataclass
@@ -249,65 +276,79 @@ class Cable:
 
         if isinstance(self.gauge, str):  # gauge and unit specified
             try:
-                g, u = self.gauge.split(' ')
+                g, u = self.gauge.split(" ")
             except Exception:
-                raise Exception(f'Cable {self.name} gauge={self.gauge} - Gauge must be a number, or number and unit separated by a space')
+                raise Exception(
+                    f"Cable {self.name} gauge={self.gauge} - Gauge must be a number, or number and unit separated by a space"
+                )
             self.gauge = g
 
             if self.gauge_unit is not None:
-                print(f'Warning: Cable {self.name} gauge_unit={self.gauge_unit} is ignored because its gauge contains {u}')
-            if u.upper() == 'AWG':
+                print(
+                    f"Warning: Cable {self.name} gauge_unit={self.gauge_unit} is ignored because its gauge contains {u}"
+                )
+            if u.upper() == "AWG":
                 self.gauge_unit = u.upper()
             else:
-                self.gauge_unit = u.replace('mm2', 'mm\u00B2')
+                self.gauge_unit = u.replace("mm2", "mm\u00B2")
 
         elif self.gauge is not None:  # gauge specified, assume mm2
             if self.gauge_unit is None:
-                self.gauge_unit = 'mm\u00B2'
+                self.gauge_unit = "mm\u00B2"
         else:
             pass  # gauge not specified
 
         if isinstance(self.length, str):  # length and unit specified
             try:
-                L, u = self.length.split(' ')
+                L, u = self.length.split(" ")
                 L = float(L)
             except Exception:
-                raise Exception(f'Cable {self.name} length={self.length} - Length must be a number, or number and unit separated by a space')
+                raise Exception(
+                    f"Cable {self.name} length={self.length} - Length must be a number, or number and unit separated by a space"
+                )
             self.length = L
             if self.length_unit is not None:
-                print(f'Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}')
+                print(
+                    f"Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}"
+                )
             self.length_unit = u
         elif not any(isinstance(self.length, t) for t in [int, float]):
-            raise Exception(f'Cable {self.name} length has a non-numeric value')
+            raise Exception(f"Cable {self.name} length has a non-numeric value")
         elif self.length_unit is None:
-            self.length_unit = 'm'
+            self.length_unit = "m"
 
         self.connections = []
 
         if self.wirecount:  # number of wires explicitly defined
             if self.colors:  # use custom color palette (partly or looped if needed)
                 pass
-            elif self.color_code:  # use standard color palette (partly or looped if needed)
+            elif (
+                self.color_code
+            ):  # use standard color palette (partly or looped if needed)
                 if self.color_code not in COLOR_CODES:
-                    raise Exception('Unknown color code')
+                    raise Exception("Unknown color code")
                 self.colors = COLOR_CODES[self.color_code]
             else:  # no colors defined, add dummy colors
-                self.colors = [''] * self.wirecount
+                self.colors = [""] * self.wirecount
 
             # make color code loop around if more wires than colors
             if self.wirecount > len(self.colors):
                 m = self.wirecount // len(self.colors) + 1
                 self.colors = self.colors * int(m)
             # cut off excess after looping
-            self.colors = self.colors[:self.wirecount]
+            self.colors = self.colors[: self.wirecount]
         else:  # wirecount implicit in length of color list
             if not self.colors:
-                raise Exception('Unknown number of wires. Must specify wirecount or colors (implicit length)')
+                raise Exception(
+                    "Unknown number of wires. Must specify wirecount or colors (implicit length)"
+                )
             self.wirecount = len(self.colors)
 
         if self.wirelabels:
-            if self.shield and 's' in self.wirelabels:
-                raise Exception('"s" may not be used as a wire label for a shielded cable.')
+            if self.shield and "s" in self.wirelabels:
+                raise Exception(
+                    '"s" may not be used as a wire label for a shielded cable.'
+                )
 
         # if lists of part numbers are provided check this is a bundle and that it matches the wirecount.
         for idfield in [self.manufacturer, self.mpn, self.supplier, self.spn, self.pn]:
@@ -315,44 +356,58 @@ class Cable:
                 if self.category == "bundle":
                     # check the length
                     if len(idfield) != self.wirecount:
-                        raise Exception('lists of part data must match wirecount')
+                        raise Exception("lists of part data must match wirecount")
                 else:
-                    raise Exception('lists of part data are only supported for bundles')
+                    raise Exception("lists of part data are only supported for bundles")
 
         if self.show_name is None:
-            self.show_name = self.name[0:2] != '__'  # hide designators for auto-generated cables by default
+            self.show_name = (
+                self.name[0:2] != "__"
+            )  # hide designators for auto-generated cables by default
 
         if not self.show_wirenumbers:
-            self.show_wirenumbers = self.category != 'bundle'  # by default, show wire numbers for cables, hide for bundles
+            self.show_wirenumbers = (
+                self.category != "bundle"
+            )  # by default, show wire numbers for cables, hide for bundles
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
     # The *_pin arguments accept a tuple, but it seems not in use with the current code.
-    def connect(self, from_name: Optional[Designator], from_pin: NoneOrMorePinIndices, via_wire: OneOrMoreWires,
-                to_name: Optional[Designator], to_pin: NoneOrMorePinIndices) -> None:
+    def connect(
+        self,
+        from_name: Optional[Designator],
+        from_pin: NoneOrMorePinIndices,
+        via_wire: OneOrMoreWires,
+        to_name: Optional[Designator],
+        to_pin: NoneOrMorePinIndices,
+    ) -> None:
         from_pin = int2tuple(from_pin)
         via_wire = int2tuple(via_wire)
         to_pin = int2tuple(to_pin)
         if len(from_pin) != len(to_pin):
-            raise Exception('from_pin must have the same number of elements as to_pin')
+            raise Exception("from_pin must have the same number of elements as to_pin")
         for i, _ in enumerate(from_pin):
-            self.connections.append(Connection(from_name, from_pin[i], via_wire[i], to_name, to_pin[i]))
+            self.connections.append(
+                Connection(from_name, from_pin[i], via_wire[i], to_name, to_pin[i])
+            )
 
     def get_qty_multiplier(self, qty_multiplier: Optional[CableMultiplier]) -> float:
         if not qty_multiplier:
             return 1
-        elif qty_multiplier == 'wirecount':
+        elif qty_multiplier == "wirecount":
             return self.wirecount
-        elif qty_multiplier == 'terminations':
+        elif qty_multiplier == "terminations":
             return len(self.connections)
-        elif qty_multiplier == 'length':
+        elif qty_multiplier == "length":
             return self.length
-        elif qty_multiplier == 'total_length':
+        elif qty_multiplier == "total_length":
             return self.length * self.wirecount
         else:
-            raise ValueError(f'invalid qty multiplier parameter for cable {qty_multiplier}')
+            raise ValueError(
+                f"invalid qty multiplier parameter for cable {qty_multiplier}"
+            )
 
 
 @dataclass
@@ -363,6 +418,7 @@ class Connection:
     to_name: Optional[Designator]
     to_pin: Optional[Pin]
 
+
 @dataclass
 class MatePin:
     from_name: Designator
@@ -370,6 +426,7 @@ class MatePin:
     to_name: Designator
     to_pin: Pin
     shape: str
+
 
 @dataclass
 class MateComponent:
