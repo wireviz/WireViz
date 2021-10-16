@@ -153,7 +153,7 @@ def parse(
 
     # go through connection sets, generate and connect components ==============
 
-    template_separator_char = "."  # TODO: make user-configurable (in case user wants to use `.` as part of their template/component names)
+    template_separator_char = harness.options.template_separator
 
     def resolve_designator(inp, separator):
         if separator in inp:  # generate a new instance of an item

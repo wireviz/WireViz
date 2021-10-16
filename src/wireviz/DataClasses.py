@@ -59,6 +59,7 @@ class Options:
     bgcolor_bundle: Optional[Color] = None
     color_mode: ColorMode = "SHORT"
     mini_bom_mode: bool = True
+    template_separator: str = "."
 
     def __post_init__(self):
         if not self.bgcolor_node:
