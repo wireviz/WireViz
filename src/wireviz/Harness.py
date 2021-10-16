@@ -680,8 +680,7 @@ class Harness:
         # BOM output
         bomlist = bom_list(self.bom())
         if "tsv" in fmt:
-            with open_file_write(f"{filename}.bom.tsv") as file:
-                file.write(tuplelist2tsv(bomlist))
+            open_file_write(f"{filename}.bom.tsv").write(tuplelist2tsv(bomlist))
         if "csv" in fmt:
             # TODO: implement CSV output (preferrably using CSV library)
             print("CSV output is not yet supported")

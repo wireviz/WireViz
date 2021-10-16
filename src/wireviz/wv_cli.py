@@ -107,8 +107,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
                 raise Exception(f"File does not exist:\n{prepend_file}")
             print("Prepend file:", prepend_file)
 
-            with open_file_read(prepend_file) as file_handle:
-                prepend_input += file_handle.read() + "\n"
+            prepend_input += open_file_read(prepend_file).read() + "\n"
     else:
         prepend_input = ""
 
@@ -127,8 +126,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
         )
 
-        with open_file_read(file) as file_handle:
-            yaml_input = file_handle.read()
+        yaml_input = open_file_read(file).read()
         file_dir = file.parent
 
         yaml_input = prepend_input + yaml_input
