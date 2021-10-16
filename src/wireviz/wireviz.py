@@ -70,6 +70,8 @@ def parse(
             Required parameter if inp is not a path.
         image_paths (Path | str | List, optional):
             Paths to use when resolving any image paths included in the data.
+            Note: If inp is a path to a YAML file,
+            its parent directory will automatically be included in the list.
 
     Returns:
         Depending on the return_types parameter, may return:
@@ -89,6 +91,12 @@ def parse(
         output_dir = _get_output_dir(yaml_file, output_dir)
         output_name = _get_output_name(yaml_file, output_name)
         output_file = output_dir / output_name
+
+    if yaml_file:
+        # if reading from file, ensure that input file's parent directory is included in image_paths
+        default_image_path = yaml_file.parent.resolve()
+        if not default_image_path in [Path(x).resolve() for x in image_paths]:
+            image_paths.append(default_image_path)
 
     # define variables =========================================================
     # containers for parsed component data and connection sets
