@@ -37,7 +37,7 @@ def generate_html_output(
     html = open_file_read(templatefile).read()
 
     # embed SVG diagram
-    with open_file_read(f"{filename}.svg") as file:
+    with open_file_read(f"{filename}.tmp.svg") as file:
         svgdata = re.sub(
             "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
             "<!-- XML and DOCTYPE declarations from SVG file removed -->",

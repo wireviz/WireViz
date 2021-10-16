@@ -20,6 +20,7 @@ from wireviz.DataClasses import (
     Tweak,
     Side,
 )
+from wireviz.svgembed import embed_svg_images_file
 from wireviz.wv_bom import (
     HEADER_MPN,
     HEADER_PN,
@@ -646,13 +647,9 @@ class Harness:
 
     @property
     def svg(self):
-        from io import BytesIO
-
         graph = self.graph
-        data = BytesIO()
-        data.write(graph.pipe(format="svg"))
-        data.seek(0)
-        return data.read()
+        return embed_svg_images(graph.pipe(format="svg").decode("utf-8"), Path.cwd())
+
 
     def output(
         self,
@@ -671,9 +668,14 @@ class Harness:
             if f in ("png", "svg", "html"):
                 if f == "html":  # if HTML format is specified,
                     f = "svg"  # generate SVG for embedding into HTML
+                # SVG file will be renamed/deleted later
+                _filename = f"{filename}.tmp" if f == "svg" else filename
                 # TODO: prevent rendering SVG twice when both SVG and HTML are specified
                 graph.format = f
-                graph.render(filename=filename, view=view, cleanup=cleanup)
+                graph.render(filename=_filename, view=view, cleanup=cleanup)
+        # embed images into SVG output
+        if "svg" in fmt or "html" in fmt:
+            embed_svg_images_file(f"{filename}.tmp.svg")
         # GraphViz output
         if "gv" in fmt:
             graph.save(filename=f"{filename}.gv")
@@ -692,8 +694,11 @@ class Harness:
             # TODO: implement PDF output
             print("PDF output is not yet supported")
         # delete SVG if not needed
-        if "html" in fmt and not "svg" in fmt and not svg_already_exists:
-            Path(f"{filename}.svg").unlink()
+        if "html" in fmt and not "svg" in fmt:
+            # SVG file was just needed to generate HTML
+            Path(f"{filename}.tmp.svg").unlink()
+        elif "svg" in fmt:
+            Path(f"{filename}.tmp.svg").replace(f"{filename}.svg")
 
     def bom(self):
         if not self._bom:
