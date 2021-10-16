@@ -41,7 +41,8 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
 @click.option(
     "-p",
     "--prepend",
-    default=None,
+    default=[],
+    multiple=True,
     type=Path,
     help="YAML file to prepend to the input file (optional).",
 )
@@ -97,20 +98,19 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
         else output_formats[0]
     )
 
-    image_paths = []
     # check prepend file
-    if prepend:
-        prepend = Path(prepend)
-        if not prepend.exists():
-            raise Exception(f"File does not exist:\n{prepend}")
-        print("Prepend file:", prepend)
+    if len(prepend) > 0:
+        prepend_input = ""
+        for prepend_file in prepend:
+            prepend_file = Path(prepend_file)
+            if not prepend_file.exists():
+                raise Exception(f"File does not exist:\n{prepend_file}")
+            print("Prepend file:", prepend_file)
 
-        with open_file_read(prepend) as file_handle:
-            prepend_input = file_handle.read() + "\n"
-        prepend_dir = prepend.parent
+            with open_file_read(prepend_file) as file_handle:
+                prepend_input += file_handle.read() + "\n"
     else:
         prepend_input = ""
-        prepend_dir = None
 
     # run WireVIz on each input file
     for file in filepaths:
@@ -132,13 +132,16 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
         file_dir = file.parent
 
         yaml_input = prepend_input + yaml_input
+        image_paths = {file_dir}
+        for p in prepend:
+            image_paths.add(Path(p).parent)
 
         wv.parse(
             yaml_input,
             output_formats=output_formats,
             output_dir=_output_dir,
             output_name=_output_name,
-            image_paths=[file_dir, prepend_dir],
+            image_paths=list(image_paths),
         )
 
     print()
