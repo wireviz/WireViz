@@ -3,7 +3,7 @@
 
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Union, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 import yaml
 
