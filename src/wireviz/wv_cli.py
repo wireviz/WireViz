@@ -47,10 +47,17 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
 )
 @click.option(
     "-o",
-    "--output-file",
+    "--output-dir",
     default=None,
     type=Path,
-    help="File name (without extension) to use for output, if different from input file name.",
+    help="Directory to use for output files, if different from input file directory.",
+)
+@click.option(
+    "-O",
+    "--output-name",
+    default=None,
+    type=str,
+    help="File name (without extension) to use for output files, if different from input file name.",
 )
 @click.option(
     "-V",
@@ -59,7 +66,7 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def wireviz(file, format, prepend, output_file, version):
+def wireviz(file, format, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
@@ -111,10 +118,14 @@ def wireviz(file, format, prepend, output_file, version):
         if not file.exists():
             raise Exception(f"File does not exist:\n{file}")
 
-        file_out = file.with_suffix("") if not output_file else output_file
+        # file_out = file.with_suffix("") if not output_file else output_file
+        _output_dir = file.parent if not output_dir else output_dir
+        _output_name = file.stem if not output_name else output_name
 
         print("Input file:  ", file)
-        print("Output file: ", f"{file_out}.{output_formats_str}")
+        print(
+            "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
+        )
 
         with open_file_read(file) as file_handle:
             yaml_input = file_handle.read()
@@ -124,8 +135,9 @@ def wireviz(file, format, prepend, output_file, version):
 
         wv.parse(
             yaml_input,
-            file_out=file_out,
             output_formats=output_formats,
+            output_dir=_output_dir,
+            output_name=_output_name,
             image_paths=[file_dir, prepend_dir],
         )
 
