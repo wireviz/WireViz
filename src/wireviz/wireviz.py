@@ -24,14 +24,18 @@ from wireviz.wv_helper import (
 def parse(
     inp: (str, Path, Dict),
     output_formats: (None, str, Tuple[str]) = None,
-    output_path: (str, Path) = None,
+    output_dir: (str, Path) = None,
+    output_name: str = None,
     return_types: (None, str, Tuple[str]) = None,
     image_paths: List = [],
 ) -> Any:
 
-    yaml_data, yaml_path = get_yaml_data_and_path(inp)
-    if output_formats:  # need to write data to file, determine output path
-        output_path = get_output_path(yaml_path, output_path)
+    yaml_data, yaml_file = get_yaml_data_and_path(inp)
+    if output_formats:
+        # need to write data to file, determine output directory and filename
+        output_dir = get_output_dir(yaml_file, output_dir)
+        output_name = get_output_name(yaml_file, output_name)
+        output_file = output_dir / output_name
 
     # define variables =========================================================
     # containers for parsed component data and connection sets
@@ -297,7 +301,7 @@ def parse(
             harness.add_bom_item(line)
 
     if output_formats:
-        harness.output(filename=file_out, fmt=output_formats, view=False)
+        harness.output(filename=output_file, fmt=output_formats, view=False)
 
     if return_types:
         returns = []
@@ -341,15 +345,26 @@ def get_yaml_data_and_path(inp: (str, Path, Dict)) -> (Dict, Path):
     return yaml_data, yaml_path
 
 
-def get_output_path(input_path: Path, default_output_path: Path) -> Path:
-    if default_output_path:  # user-specified output path
-        output_path = Path(default_output_path)
-    else:  # auto-determine appropriate output path
-        if input_path:  # input comes from a file; place output in same directory
-            output_path = input_path.parent
-        else:  # input comes from str or dict, fall back to cwd
-            output_path = Path.cwd()
-    return output_path.resolve()
+def get_output_dir(input_file: Path, default_output_dir: Path) -> Path:
+    if default_output_dir:  # user-specified output directory
+        output_dir = Path(default_output_dir)
+    else:  # auto-determine appropriate output directory
+        if input_file:  # input comes from a file; place output in same directory
+            output_dir = input_file.parent
+        else:  # input comes from str or Dict; fall back to cwd
+            output_dir = Path.cwd()
+    return output_dir.resolve()
+
+
+def get_output_name(input_file: Path, default_output_name: Path) -> str:
+    if default_output_name:  # user-specified output name
+        output_name = default_output_name
+    else:  # auto-determine appropriate output name
+        if input_file:  # input comes from a file; use same file stem
+            output_name = input_file.stem
+        else:  # input comes from str or Dict; no fallback available
+            raise Exception("No output file name provided")
+    return output_name
 
 
 def main():
