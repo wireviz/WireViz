@@ -33,8 +33,8 @@ def parse(
     yaml_data, yaml_file = get_yaml_data_and_path(inp)
     if output_formats:
         # need to write data to file, determine output directory and filename
-        output_dir = get_output_dir(yaml_file, output_dir)
-        output_name = get_output_name(yaml_file, output_name)
+        output_dir = _get_output_dir(yaml_file, output_dir)
+        output_name = _get_output_name(yaml_file, output_name)
         output_file = output_dir / output_name
 
     # define variables =========================================================
@@ -321,7 +321,7 @@ def parse(
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def get_yaml_data_and_path(inp: (str, Path, Dict)) -> (Dict, Path):
+def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
     # determine whether inp is a file path, a YAML string, or a Dict
     if not isinstance(inp, Dict):  # received a str or a Path
         try:
@@ -345,7 +345,7 @@ def get_yaml_data_and_path(inp: (str, Path, Dict)) -> (Dict, Path):
     return yaml_data, yaml_path
 
 
-def get_output_dir(input_file: Path, default_output_dir: Path) -> Path:
+def _get_output_dir(input_file: Path, default_output_dir: Path) -> Path:
     if default_output_dir:  # user-specified output directory
         output_dir = Path(default_output_dir)
     else:  # auto-determine appropriate output directory
@@ -356,7 +356,7 @@ def get_output_dir(input_file: Path, default_output_dir: Path) -> Path:
     return output_dir.resolve()
 
 
-def get_output_name(input_file: Path, default_output_name: Path) -> str:
+def _get_output_name(input_file: Path, default_output_name: Path) -> str:
     if default_output_name:  # user-specified output name
         output_name = default_output_name
     else:  # auto-determine appropriate output name
