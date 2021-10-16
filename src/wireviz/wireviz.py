@@ -3,7 +3,7 @@
 
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Union, Tuple
 
 import yaml
 
@@ -22,15 +22,68 @@ from wireviz.wv_helper import (
 
 
 def parse(
-    inp: (str, Path, Dict),
-    output_formats: (None, str, Tuple[str]) = None,
-    output_dir: (str, Path) = None,
-    output_name: str = None,
-    return_types: (None, str, Tuple[str]) = None,
-    image_paths: List = [],
+    inp: Union[Path, str, Dict],
+    return_types: Union[None, str, Tuple[str]] = None,
+    output_formats: Union[None, str, Tuple[str]] = None,
+    output_dir: Union[str, Path] = None,
+    output_name: Union[None, str] = None,
+    image_paths: Union[Path, str, List] = [],
 ) -> Any:
+    """
+    This function takes an input, parses it as a WireViz Harness file,
+    and outputs the result as one or more files and/or as a function return value
 
-    yaml_data, yaml_file = get_yaml_data_and_path(inp)
+    Accepted inputs:
+        * A path to a YAML source file to parse
+        * A string containing the YAML data to parse
+        * A Python Dict containing the pre-parsed YAML data
+
+    Supported return types:
+        * "png":     the diagram as raw PNG data
+        * "svg":     the diagram as raw SVG data
+        * "harness": the diagram as a Harness Python object
+
+    Supported output formats:
+        * "csv":  the BOM, as a comma-separated text file
+        * "gv":   the diagram, as a GraphViz source file
+        * "html": the diagram and (depending on the template) the BOM, as a HTML file
+        * "png":  the diagram, as a PNG raster image
+        * "pdf":  the diagram and (depending on the template) the BOM, as a PDF file
+        * "svg":  the diagram, as a SVG vector image
+        * "tsv":  the BOM, as a tab-separated text file
+
+    Args:
+        inp (Path | str | Dict):
+            The input to be parsed (see above for accepted inputs).
+        return_types (optional):
+            One of the supported return types (see above), or a tuple of multiple return types.
+            If set to None, no output is returned by the function.
+        output_formats (optional):
+            One of the supported output types (see above), or a tuple of multiple output formats.
+            If set to None, no files are generated.
+        output_dir (Path | str, optional):
+            The directory to place the generated output files.
+            Defaults to inp's parent directory, or cwd if inp is not a path.
+        output_name (str, optional):
+            The name to use for the generated output files (without extension).
+            Defaults to inp's file name (without extension).
+            Required parameter if inp is not a path.
+        image_paths (Path | str | List, optional):
+            Paths to use when resolving any image paths included in the data.
+
+    Returns:
+        Depending on the return_types parameter, may return:
+        * None
+        * one of the following, or a tuple containing two or more of the following:
+            * PNG data
+            * SVG data
+            * a Harness object
+    """
+
+    if not output_formats and not return_types:
+        raise Exception("No output formats or return types specified")
+
+    yaml_data, yaml_file = _get_yaml_data_and_path(inp)
     if output_formats:
         # need to write data to file, determine output directory and filename
         output_dir = _get_output_dir(yaml_file, output_dir)
