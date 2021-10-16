@@ -9,7 +9,7 @@ from itertools import zip_longest
 import re
 
 from wireviz import wv_colors, __version__, APP_NAME, APP_URL
-from wireviz.DataClasses import Cable, Connector, MatePin, MateComponent, Metadata, Options, Tweak
+from wireviz.DataClasses import Cable, Connector, MatePin, MateComponent, Metadata, Options, Tweak, Side
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import nested_html_table, \
     html_bgcolor_attr, html_bgcolor, html_colorbar, \
@@ -41,9 +41,9 @@ class Harness:
         self.cables[name] = Cable(name, *args, **kwargs)
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
-        from_pin_id = self.connectors[from_name].pins.index(from_pin)
-        to_pin_id = self.connectors[to_name].pins.index(to_pin)
-        self.mates.append(MatePin(from_name, from_pin_id, to_name, to_pin_id, arrow_type))
+        self.mates.append(MatePin(from_name, from_pin, to_name, to_pin, arrow_type))
+        self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
+        self.connectors[to_name].activate_pin(to_pin, Side.LEFT)
 
     def add_mate_component(self, from_name, to_name, arrow_type) -> None:
         self.mates.append(MateComponent(from_name, to_name, arrow_type))
@@ -74,12 +74,7 @@ class Harness:
                     raise Exception(f'{name}:{pin} not found.')
 
         # check via cable
-        if is_arrow(via_name):
-            if '-' in via_name:
-                self.mates[(from_name, from_pin, to_name, to_pin)] = via_name
-            elif '=' in via_name:
-                self.mates[(from_name, to_name)] = via_name
-        elif via_name in self.cables:
+        if via_name in self.cables:
             cable = self.cables[via_name]
             # check if provided name is ambiguous
             if via_wire in cable.colors and via_wire in cable.wirelabels:
@@ -95,14 +90,12 @@ class Harness:
                     raise Exception(f'{via_name}:{via_wire} is used for more than one wire.')
                 via_wire = cable.wirelabels.index(via_wire) + 1  # list index starts at 0, wire IDs start at 1
 
-        from_pin_id = self.connectors[from_name].pins.index(from_pin) if from_pin is not None else None
-        to_pin_id = self.connectors[to_name].pins.index(to_pin) if to_pin is not None else None
-
-        self.cables[via_name].connect(from_name, from_pin_id, via_wire, to_name, to_pin_id)
+        # perform the actual connection
+        self.cables[via_name].connect(from_name, from_pin, via_wire, to_name, to_pin)
         if from_name in self.connectors:
-            self.connectors[from_name].activate_pin(from_pin)
+            self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
         if to_name in self.connectors:
-            self.connectors[to_name].activate_pin(to_pin)
+            self.connectors[to_name].activate_pin(to_pin, Side.LEFT)
 
     def create_graph(self) -> Graph:
         dot = Graph()
@@ -121,23 +114,6 @@ class Harness:
                  fontname=self.options.fontname)
         dot.attr('edge', style='bold',
                  fontname=self.options.fontname)
-
-        # prepare ports on connectors depending on which side they will connect
-        for _, cable in self.cables.items():
-            for connection_color in cable.connections:
-                if connection_color.from_port is not None:  # connect to left
-                    self.connectors[connection_color.from_name].ports_right = True
-                    self.connectors[connection_color.from_name].activate_pin(connection_color.from_port)
-                if connection_color.to_port is not None:  # connect to right
-                    self.connectors[connection_color.to_name].ports_left = True
-                    self.connectors[connection_color.to_name].activate_pin(connection_color.to_port)
-
-        for mate in self.mates:
-            if isinstance(mate, MatePin):
-                self.connectors[mate.from_name].ports_right = True
-                self.connectors[mate.from_name].activate_pin(mate.from_port)
-                self.connectors[mate.to_name].ports_left = True
-                self.connectors[mate.to_name].activate_pin(mate.to_port)
 
         for connector in self.connectors.values():
 
@@ -341,32 +317,34 @@ class Harness:
                 else:  # it's a shield connection
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
                     dot.attr('edge', color=':'.join(['#000000', shield_color_hex, '#000000']) if isinstance(cable.shield, str) else '#000000')
-                if connection.from_port is not None:  # connect to left
+                if connection.from_pin is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
-                    from_port = f':p{connection.from_port+1}r' if from_connector.style != 'simple' else ''
-                    code_left_1 = f'{connection.from_name}{from_port}:e'
+                    from_pin_index = from_connector.pins.index(connection.from_pin)
+                    from_port_str = f':p{from_pin_index+1}r' if from_connector.style != 'simple' else ''
+                    code_left_1 = f'{connection.from_name}{from_port_str}:e'
                     code_left_2 = f'{cable.name}:w{connection.via_port}:w'
                     dot.edge(code_left_1, code_left_2)
                     if from_connector.show_name:
-                        from_info = [str(connection.from_name), str(self.connectors[connection.from_name].pins[connection.from_port])]
+                        from_info = [str(connection.from_name), str(connection.from_pin)]
                         if from_connector.pinlabels:
-                            pinlabel = from_connector.pinlabels[connection.from_port]
+                            pinlabel = from_connector.pinlabels[from_pin_index]
                             if pinlabel != '':
                                 from_info.append(pinlabel)
                         from_string = ':'.join(from_info)
                     else:
                         from_string = ''
                     html = [row.replace(f'<!-- {connection.via_port}_in -->', from_string) for row in html]
-                if connection.to_port is not None:  # connect to right
+                if connection.to_pin is not None:  # connect to right
                     to_connector = self.connectors[connection.to_name]
+                    to_pin_index = to_connector.pins.index(connection.to_pin)
+                    to_port_str = f':p{to_pin_index+1}l' if to_connector.style != 'simple' else ''
                     code_right_1 = f'{cable.name}:w{connection.via_port}:e'
-                    to_port = f':p{connection.to_port+1}l' if self.connectors[connection.to_name].style != 'simple' else ''
-                    code_right_2 = f'{connection.to_name}{to_port}:w'
+                    code_right_2 = f'{connection.to_name}{to_port_str}:w'
                     dot.edge(code_right_1, code_right_2)
                     if to_connector.show_name:
-                        to_info = [str(connection.to_name), str(self.connectors[connection.to_name].pins[connection.to_port])]
+                        to_info = [str(connection.to_name), str(connection.to_pin)]
                         if to_connector.pinlabels:
-                            pinlabel = to_connector.pinlabels[connection.to_port]
+                            pinlabel = to_connector.pinlabels[to_pin_index]
                             if pinlabel != '':
                                 to_info.append(pinlabel)
                         to_string = ':'.join(to_info)
@@ -448,11 +426,22 @@ class Harness:
             else:
                 raise Exception(f'{mate} is an unknown mate')
 
+            from_connector = self.connectors[mate.from_name]
+            if isinstance(mate, MatePin) and self.connectors[mate.from_name].style != 'simple':
+                from_pin_index = from_connector.pins.index(mate.from_pin)
+                from_port_str = f':p{from_pin_index+1}r'
+            else:  # MateComponent or style == 'simple'
+                from_port_str = ''
+            if isinstance(mate, MatePin) and self.connectors[mate.to_name].style != 'simple':
+                to_pin_index = to_connector.pins.index(mate.to_pin)
+                to_port_str = f':p{to_pin_index+1}l' if isinstance(mate, MatePin) and self.connectors[mate.to_name].style != 'simple' else ''
+            else:  # MateComponent or style == 'simple'
+                to_port_str = ''
+            code_from = f'{mate.from_name}{from_port_str}:e'
+            to_connector = self.connectors[mate.to_name]
+            code_to = f'{mate.to_name}{to_port_str}:w'
+
             dot.attr('edge', color=color, style='dashed', dir=dir)
-            from_port = f':p{mate.from_port+1}r' if isinstance(mate, MatePin) and self.connectors[mate.from_name].style != 'simple' else ''
-            code_from = f'{mate.from_name}{from_port}:e'
-            to_port = f':p{mate.to_port+1}l' if isinstance(mate, MatePin) and self.connectors[mate.to_name].style != 'simple' else ''
-            code_to = f'{mate.to_name}{to_port}:w'
             dot.edge(code_from, code_to)
 
         return dot
