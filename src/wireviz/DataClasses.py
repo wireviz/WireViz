@@ -40,9 +40,7 @@ OneOrMoreWires = Union[Wire, Tuple[Wire, ...]]  # One or a tuple of wires
 MetadataKeys = PlainText  # Literal['title', 'description', 'notes', ...]
 
 
-class Side(Enum):
-    LEFT = auto()
-    RIGHT = auto()
+Side = Enum("Side", "LEFT RIGHT")
 
 
 class Metadata(dict):
