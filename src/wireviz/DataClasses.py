@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from enum import Enum, auto
 from typing import Dict, List, Optional, Tuple, Union
 from dataclasses import dataclass, field, InitVar
 from pathlib import Path
@@ -23,11 +24,17 @@ ImageScale = PlainText # = Literal['false', 'true', 'width', 'height', 'both']
 Pin = Union[int, PlainText] # Pin identifier
 PinIndex = int # Zero-based pin index
 Wire = Union[int, PlainText] # Wire number or Literal['s'] for shield
+NoneOrMorePins = Union[Pin, Tuple[Pin, ...], None]  # None, one, or a tuple of pin identifiers
 NoneOrMorePinIndices = Union[PinIndex, Tuple[PinIndex, ...], None]  # None, one, or a tuple of zero-based pin indices
 OneOrMoreWires = Union[Wire, Tuple[Wire, ...]] # One or a tuple of wires
 
 # Metadata can contain whatever is needed by the HTML generation/template.
 MetadataKeys = PlainText  # Literal['title', 'description', 'notes', ...]
+
+class Side(Enum):
+    LEFT = auto()
+    RIGHT = auto()
+
 class Metadata(dict):
     pass
 
@@ -188,8 +195,12 @@ class Connector:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
-    def activate_pin(self, pin: Pin) -> None:
+    def activate_pin(self, pin: Pin, side: Side) -> None:
         self.visible_pins[pin] = True
+        if side == Side.LEFT:
+            self.ports_left = True
+        elif side == Side.RIGHT:
+            self.ports_right = True
 
     def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
         if not qty_multiplier:
@@ -349,17 +360,17 @@ class Cable:
 @dataclass
 class Connection:
     from_name: Optional[Designator]
-    from_port: Optional[PinIndex]
+    from_pin: Optional[Pin]
     via_port: Wire
     to_name: Optional[Designator]
-    to_port: Optional[PinIndex]
+    to_pin: Optional[Pin]
 
 @dataclass
 class MatePin:
     from_name: Designator
-    from_port: PinIndex
+    from_pin: Pin
     to_name: Designator
-    to_port: PinIndex
+    to_pin: Pin
     shape: str
 
 @dataclass
