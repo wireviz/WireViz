@@ -34,8 +34,7 @@ def generate_html_output(
         # fall back to built-in simple template if no template was provided
         templatefile = Path(__file__).parent / "templates/simple.html"
 
-    with open_file_read(templatefile) as file:
-        html = file.read()
+    html = open_file_read(templatefile).read()
 
     # embed SVG diagram
     with open_file_read(f"{filename}.svg") as file:
@@ -117,5 +116,4 @@ def generate_html_output(
     pattern = re.compile("|".join(replacements_escaped))
     html = pattern.sub(lambda match: replacements[match.group(0)], html)
 
-    with open_file_write(f"{filename}.html") as file:
-        file.write(html)
+    open_file_write(f"{filename}.html").write(html)
