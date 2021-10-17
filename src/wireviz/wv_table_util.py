@@ -24,13 +24,25 @@ class Tag:
     contents: str
     attribs: Attribs = field(default_factory=Attribs)
     flat: bool = False
+    empty_is_none: bool = False
+
+    def __post_init__(self):
+        if self.attribs is None:
+            self.attribs = Attribs({})
+        elif isinstance(self.attribs, Dict):
+            self.attribs = Attribs(self.attribs)
+        elif not isinstance(self.attribs, Attribs):
+            raise Exception(
+                "Tag.attribs must be of type None, Dict, or Attribs, "
+                f"but type {type(self.attribs).__name__} was given instead:\n"
+                f"{self.attribs}"
+            )
 
     @property
     def tagname(self):
         return type(self).__name__.lower()
 
     def get_contents(self):
-        # import pudb; pudb.set_trace()
         separator = "" if self.flat else "\n"
         if isinstance(self.contents, Iterable) and not isinstance(self.contents, str):
             return separator.join([str(c) for c in self.contents if c is not None])
@@ -41,18 +53,21 @@ class Tag:
 
     def __repr__(self):
         separator = "" if self.flat else "\n"
-        html = [
-            f"<{self.tagname}{str(self.attribs)}>",
-            self.get_contents(),
-            f"</{self.tagname}>",
-        ]
-        return separator.join(html)
+        if self.contents is None and self.empty_is_none:
+            return ""
+        else:
+            html = [
+                f"<{self.tagname}{str(self.attribs)}>",
+                self.get_contents(),
+                f"</{self.tagname}>",
+            ]
+            return separator.join(html)
 
 
 @dataclass
 class TagSingleton(Tag):
     def __repr__(self):
-        return f"<{self.tagname}{self.attribs} />"
+        return f"<{self.tagname}{str(self.attribs)} />"
 
 
 @dataclass
