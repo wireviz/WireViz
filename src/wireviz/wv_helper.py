@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 awg_equiv_table = {
     "0.09": "28",
@@ -176,3 +176,14 @@ def smart_file_resolve(filename: str, possible_paths: (str, List[str])) -> Path:
                 f"{filename} was not found in any of the following locations: \n"
                 + "\n".join([str(x) for x in possible_paths])
             )
+
+
+def pn_info_string(
+    header: str, name: Optional[str], number: Optional[str]
+) -> Optional[str]:
+    """Return the company name and/or the part number in one single string or None otherwise."""
+    number = str(number).strip() if number is not None else ""
+    if name or number:
+        return f'{name if name else header}{": " + number if number else ""}'
+    else:
+        return None

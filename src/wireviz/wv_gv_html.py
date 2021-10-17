@@ -1,11 +1,155 @@
 # -*- coding: utf-8 -*-
 
 import re
+from itertools import zip_longest
 from typing import List, Optional, Union
 
-from wireviz.DataClasses import Color
+from wireviz.DataClasses import Color, Connector, Options
 from wireviz.wv_colors import translate_color
-from wireviz.wv_helper import remove_links
+from wireviz.wv_helper import pn_info_string, remove_links
+from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
+
+HEADER_PN = "P/N"
+HEADER_MPN = "MPN"
+HEADER_SPN = "SPN"
+
+# TODO: remove harness argument; only used by get_additional_component_table()
+def gv_node_connector(connector: Connector, harness_options: Options) -> str:
+    # If no wires connected (except maybe loop wires)?
+    if not (connector.ports_left or connector.ports_right):
+        connector.ports_left = True  # Use left side pins by default
+
+    html = []
+    if connector.show_name:
+        row_name = [
+            f"{html_bgcolor(connector.bgcolor_title)}" f"{remove_links(connector.name)}"
+        ]
+    else:
+        row_name = []
+
+    row_pn = [
+        pn_info_string(HEADER_PN, None, connector.pn),
+        pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn),
+        pn_info_string(HEADER_SPN, connector.supplier, connector.spn),
+    ]
+    row_pn = [html_line_breaks(cell) for cell in row_pn]
+
+    row_info = [
+        html_line_breaks(connector.type),
+        html_line_breaks(connector.subtype),
+        f"{connector.pincount}-pin" if connector.show_pincount else None,
+        translate_color(connector.color, harness_options.color_mode),
+        html_colorbar(connector.color),
+    ]
+
+    if connector.style != "simple":
+        row_connector_table = "<!-- connector table -->"
+    else:
+        row_connector_table = None
+
+    row_image = [html_image(connector.image)]
+    row_image_caption = [html_caption(connector.image)]
+    row_notes = [html_line_breaks(connector.notes)]
+    # row_additional_component_table = get_additional_component_table(self, connector)
+    row_additional_component_table = None
+
+    rows = [
+        row_name,
+        row_pn,
+        row_info,
+        row_connector_table,
+        row_image,
+        row_image_caption,
+        row_additional_component_table,
+        row_notes,
+    ]
+
+    html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
+
+    if connector.style != "simple":
+        pinhtml = []
+        # fmt: off
+        # pinhtml.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
+        # fmt: on
+
+        pin_tuples = zip_longest(
+            connector.pins,
+            connector.pinlabels,
+            connector.pincolors,
+        )
+
+        contents = []
+        for pinindex, (pinname, pinlabel, pincolor) in enumerate(pin_tuples):
+            if connector.hide_disconnected_pins and not connector.visible_pins.get(
+                pinname, False
+            ):
+                continue
+
+            contents.append(gv_pin(pinindex, pinname, pinlabel, pincolor, connector))
+
+        table_attribs = {
+            "border": 0,
+            "cellspacing": 0,
+            "cellpadding": 3,
+            "cellborder": 1,
+        }
+        pinhtml.append(str(Table(contents, attribs=Attribs(table_attribs))))
+
+        pin_html_joined = "\n".join(pinhtml)
+
+        html = [
+            row.replace("<!-- connector table -->", pin_html_joined) for row in html
+        ]
+
+    html = "\n".join(html)
+
+    return html
+
+
+def gv_pin(pinindex, pinname, pinlabel, pincolor, connector):
+    pinhtml = []
+    pinhtml.append("   <tr>")
+    if connector.ports_left:
+        pinhtml.append(f'    <td port="p{pinindex+1}l">{pinname}</td>')
+    if pinlabel:
+        pinhtml.append(f"    <td>{pinlabel}</td>")
+    if connector.pincolors:
+        if pincolor in wv_colors._color_hex.keys():
+            # fmt: off
+            pinhtml.append(f'    <td sides="tbl">{translate_color(pincolor, harness_options.color_mode)}</td>')
+            pinhtml.append( '    <td sides="tbr">')
+            pinhtml.append( '     <table border="0" cellborder="1"><tr>')
+            pinhtml.append(f'      <td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
+            pinhtml.append( '     </tr></table>')
+            pinhtml.append( '    </td>')
+            # fmt: on
+        else:
+            pinhtml.append('    <td colspan="2"></td>')
+
+    if connector.ports_right:
+        pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
+    pinhtml.append("   </tr>")
+
+    pinhtml = "\n".join(pinhtml)
+
+    return pinhtml
+
+
+def gv_connector_loops(connector: Connector) -> List:
+    loop_edges = []
+    if connector.ports_left:
+        loop_side = "l"
+        loop_dir = "w"
+    elif connector.ports_right:
+        loop_side = "r"
+        loop_dir = "e"
+    else:
+        raise Exception("No side for loops")
+    for loop in connector.loops:
+        head = f"{connector.name}:p{loop[0]}{loop_side}:{loop_dir}"
+        tail = f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}"
+        loop_edges.append((head, tail))
+    return loop_edges
 
 
 def nested_html_table(
