@@ -178,13 +178,11 @@ class Harness:
         for connector in self.connectors.values():
             # generate connector node
             gv_html = gv_node_connector(connector, self.options)
-            _default_fillcolor = translate_color(self.options.bgcolor_connector, "HEX")
             dot.node(
                 connector.name,
                 label=f"<\n{gv_html}\n>",
                 shape="box",
                 style="filled",
-                fillcolor=_default_fillcolor,
             )
             # generate edges for connector loops
             if len(connector.loops) > 0:
