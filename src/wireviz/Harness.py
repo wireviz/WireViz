@@ -33,6 +33,9 @@ from wireviz.wv_bom import (
 )
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
+    gv_connector_loops,
+    gv_node_connector,
+    gv_pin,
     html_bgcolor,
     html_bgcolor_attr,
     html_caption,
@@ -174,102 +177,21 @@ class Harness:
         dot.attr("edge", style="bold", fontname=self.options.fontname)
 
         for connector in self.connectors.values():
-
-            # If no wires connected (except maybe loop wires)?
-            if not (connector.ports_left or connector.ports_right):
-                connector.ports_left = True  # Use left side pins.
-
-            html = []
-            # fmt: off
-            rows = [[f'{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}'
-                        if connector.show_name else None],
-                    [pn_info_string(HEADER_PN, None, remove_links(connector.pn)),
-                     html_line_breaks(pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn)),
-                     html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
-                    [html_line_breaks(connector.type),
-                     html_line_breaks(connector.subtype),
-                     f'{connector.pincount}-pin' if connector.show_pincount else None,
-                     translate_color(connector.color, self.options.color_mode) if connector.color else None,
-                     html_colorbar(connector.color)],
-                    '<!-- connector table -->' if connector.style != 'simple' else None,
-                    [html_image(connector.image)],
-                    [html_caption(connector.image)]]
-            # fmt: on
-
-            rows.extend(get_additional_component_table(self, connector))
-            rows.append([html_line_breaks(connector.notes)])
-            html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
-
-            if connector.style != "simple":
-                pinhtml = []
-                pinhtml.append(
-                    '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
-                )
-
-                for pinindex, (pinname, pinlabel, pincolor) in enumerate(
-                    zip_longest(
-                        connector.pins, connector.pinlabels, connector.pincolors
-                    )
-                ):
-                    if (
-                        connector.hide_disconnected_pins
-                        and not connector.visible_pins.get(pinname, False)
-                    ):
-                        continue
-
-                    pinhtml.append("   <tr>")
-                    if connector.ports_left:
-                        pinhtml.append(f'    <td port="p{pinindex+1}l">{pinname}</td>')
-                    if pinlabel:
-                        pinhtml.append(f"    <td>{pinlabel}</td>")
-                    if connector.pincolors:
-                        if pincolor in wv_colors._color_hex.keys():
-                            # fmt: off
-                            pinhtml.append(f'    <td sides="tbl">{translate_color(pincolor, self.options.color_mode)}</td>')
-                            pinhtml.append( '    <td sides="tbr">')
-                            pinhtml.append( '     <table border="0" cellborder="1"><tr>')
-                            pinhtml.append(f'      <td bgcolor="{wv_colors.translate_color(pincolor, "HEX")}" width="8" height="8" fixedsize="true"></td>')
-                            pinhtml.append( '     </tr></table>')
-                            pinhtml.append( '    </td>')
-                            # fmt: on
-                        else:
-                            pinhtml.append('    <td colspan="2"></td>')
-
-                    if connector.ports_right:
-                        pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
-                    pinhtml.append("   </tr>")
-
-                pinhtml.append("  </table>")
-
-                html = [
-                    row.replace("<!-- connector table -->", "\n".join(pinhtml))
-                    for row in html
-                ]
-
-            html = "\n".join(html)
+            gv_html = gv_node_connector(connector, self.options)
+            _default_fillcolor = translate_color(self.options.bgcolor_connector, "HEX")
             dot.node(
                 connector.name,
-                label=f"<\n{html}\n>",
+                label=f"<\n{gv_html}\n>",
                 shape="box",
                 style="filled",
-                fillcolor=translate_color(self.options.bgcolor_connector, "HEX"),
+                fillcolor=_default_fillcolor,
             )
 
             if len(connector.loops) > 0:
                 dot.attr("edge", color="#000000:#ffffff:#000000")
-                if connector.ports_left:
-                    loop_side = "l"
-                    loop_dir = "w"
-                elif connector.ports_right:
-                    loop_side = "r"
-                    loop_dir = "e"
-                else:
-                    raise Exception("No side for loops")
-                for loop in connector.loops:
-                    dot.edge(
-                        f"{connector.name}:p{loop[0]}{loop_side}:{loop_dir}",
-                        f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}",
-                    )
+                loops = gv_connector_loops(connector)
+                for head, tail in loops:
+                    dot.edge(head, tail)
 
         # determine if there are double- or triple-colored wires in the harness;
         # if so, pad single-color wires to make all wires of equal thickness

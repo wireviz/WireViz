@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from wireviz.DataClasses import AdditionalComponent, Cable, Color, Connector
 from wireviz.wv_colors import translate_color
 from wireviz.wv_gv_html import html_bgcolor_attr, html_line_breaks
-from wireviz.wv_helper import clean_whitespace
+from wireviz.wv_helper import clean_whitespace, pn_info_string
 
 BOM_COLUMNS_ALWAYS = ("id", "description", "qty", "unit", "designators")
 BOM_COLUMNS_OPTIONAL = ("pn", "manufacturer", "mpn", "supplier", "spn")
@@ -261,17 +261,6 @@ def component_table_entry(
     return f"""<table border="0" cellspacing="0" cellpadding="3" cellborder="1"{html_bgcolor_attr(bgcolor)}><tr>
    <td align="left" balign="left">{html_line_breaks(output)}</td>
   </tr></table>"""
-
-
-def pn_info_string(
-    header: str, name: Optional[str], number: Optional[str]
-) -> Optional[str]:
-    """Return the company name and/or the part number in one single string or None otherwise."""
-    number = str(number).strip() if number is not None else ""
-    if name or number:
-        return f'{name if name else header}{": " + number if number else ""}'
-    else:
-        return None
 
 
 def index_if_list(value: Any, index: int) -> Any:
