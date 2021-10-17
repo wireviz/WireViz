@@ -12,6 +12,7 @@
 <g id="node1" class="node">
 <title>X1</title>
 <polygon fill="#ffffff" stroke="black" points="139,-253 0,-253 0,0 139,0 139,-253"/>
+<polygon fill="#ffffff" stroke="transparent" points="0,0 0,-253 139,-253 139,0 0,0"/>
 <polygon fill="none" stroke="black" points="0.5,-229.5 0.5,-252.5 139.5,-252.5 139.5,-229.5 0.5,-229.5"/>
 <text text-anchor="start" x="61" y="-237.3" font-family="arial" font-size="14.00">X1</text>
 <polygon fill="none" stroke="black" points="0.5,-206.5 0.5,-229.5 48.5,-229.5 48.5,-206.5 0.5,-206.5"/>
@@ -133,6 +134,7 @@
 <g id="node2" class="node">
 <title>X2</title>
 <polygon fill="#ffffff" stroke="black" points="825,-254 638,-254 638,-139 825,-139 825,-254"/>
+<polygon fill="#ffffff" stroke="transparent" points="638,-139 638,-254 825,-254 825,-139 638,-139"/>
 <polygon fill="none" stroke="black" points="638.5,-230.5 638.5,-253.5 825.5,-253.5 825.5,-230.5 638.5,-230.5"/>
 <text text-anchor="start" x="723" y="-238.3" font-family="arial" font-size="14.00">X2</text>
 <polygon fill="none" stroke="black" points="638.5,-207.5 638.5,-230.5 734.5,-230.5 734.5,-207.5 638.5,-207.5"/>
