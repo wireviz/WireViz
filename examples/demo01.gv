@@ -60,6 +60,8 @@ graph {
  </td></tr>
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
+	edge [color="#000000:#ffffff:#000000"]
+	X1:p7r:e -- X1:p8r:e
 	X2 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
  <tr><td>
