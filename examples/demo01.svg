@@ -57,6 +57,13 @@
 <polygon fill="none" stroke="black" points="82.5,0.5 82.5,-22.5 139.5,-22.5 139.5,0.5 82.5,0.5"/>
 <text text-anchor="start" x="107" y="-7.3" font-family="arial" font-size="14.00">9</text>
 </g>
+<!-- X1&#45;&#45;X1 -->
+<g id="edge1" class="edge">
+<title>X1:e&#45;&#45;X1:e</title>
+<path fill="none" stroke="#000000" stroke-width="2" d="M139.95,-54.55C192,-66.5 298,-66.5 296,-45 298,-23.5 192,-23.5 139.95,-35.45"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M139.5,-56.5C192,-68.5 298,-68.5 298,-45 298,-21.5 192,-21.5 139.5,-33.5"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M139.05,-58.45C192,-70.5 298,-70.5 300,-45 298,-19.5 192,-19.5 139.05,-31.55"/>
+</g>
 <!-- W1 -->
 <g id="node3" class="node">
 <title>W1</title>
@@ -97,28 +104,28 @@
 <text text-anchor="start" x="315.5" y="-89.3" font-family="arial" font-size="14.00"> </text>
 </g>
 <!-- X1&#45;&#45;W1 -->
-<g id="edge1" class="edge">
+<g id="edge2" class="edge">
 <title>X1:e&#45;&#45;W1:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M139,-100.5C217.18,-102.68 208.81,-195.68 283,-193.5"/>
 <path fill="none" stroke="#ffffff" stroke-width="2" d="M139,-102.5C215.19,-102.5 206.81,-195.5 283,-195.5"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M139,-104.5C213.19,-102.32 204.82,-195.32 283,-197.5"/>
 </g>
 <!-- X1&#45;&#45;W1 -->
-<g id="edge3" class="edge">
+<g id="edge4" class="edge">
 <title>X1:e&#45;&#45;W1:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M139,-170.5C202.76,-170.52 218.75,-168.52 283,-168.5"/>
 <path fill="none" stroke="#895956" stroke-width="2" d="M139,-172.5C203.01,-172.5 218.99,-170.5 283,-170.5"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M139,-174.5C203.25,-174.48 219.24,-172.48 283,-172.5"/>
 </g>
 <!-- X1&#45;&#45;W1 -->
-<g id="edge5" class="edge">
+<g id="edge6" class="edge">
 <title>X1:e&#45;&#45;W1:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M139,-147.5C202.54,-147.56 218.49,-143.56 283,-143.5"/>
 <path fill="none" stroke="#00ff00" stroke-width="2" d="M139,-149.5C203.02,-149.5 218.98,-145.5 283,-145.5"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M139,-151.5C203.51,-151.44 219.46,-147.44 283,-147.5"/>
 </g>
 <!-- X1&#45;&#45;W1 -->
-<g id="edge7" class="edge">
+<g id="edge8" class="edge">
 <title>X1:e&#45;&#45;W1:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M139,-102.5C203,-102.5 219,-103.5 283,-103.5"/>
 </g>
@@ -148,21 +155,21 @@
 <text text-anchor="start" x="764" y="-146.3" font-family="arial" font-size="14.00">TX</text>
 </g>
 <!-- W1&#45;&#45;X2 -->
-<g id="edge2" class="edge">
+<g id="edge3" class="edge">
 <title>W1:e&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M494,-193.5C558,-193.5 574,-193.5 638,-193.5"/>
 <path fill="none" stroke="#ffffff" stroke-width="2" d="M494,-195.5C558,-195.5 574,-195.5 638,-195.5"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M494,-197.5C558,-197.5 574,-197.5 638,-197.5"/>
 </g>
 <!-- W1&#45;&#45;X2 -->
-<g id="edge4" class="edge">
+<g id="edge5" class="edge">
 <title>W1:e&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M494,-168.5C557.04,-169.36 571.68,-148.36 638,-147.5"/>
 <path fill="none" stroke="#895956" stroke-width="2" d="M494,-170.5C558.68,-170.5 573.32,-149.5 638,-149.5"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M494,-172.5C560.32,-171.64 574.96,-150.64 638,-151.5"/>
 </g>
 <!-- W1&#45;&#45;X2 -->
-<g id="edge6" class="edge">
+<g id="edge7" class="edge">
 <title>W1:e&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M494,-143.5C560.9,-144.59 574.67,-171.59 638,-170.5"/>
 <path fill="none" stroke="#00ff00" stroke-width="2" d="M494,-145.5C559.12,-145.5 572.88,-172.5 638,-172.5"/>
