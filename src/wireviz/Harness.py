@@ -45,10 +45,8 @@ from wireviz.wv_gv_html import (
     remove_links,
 )
 from wireviz.wv_helper import (
-    awg_equiv,
     flatten2d,
     is_arrow,
-    mm2_equiv,
     open_file_read,
     open_file_write,
     tuplelist2tsv,
@@ -203,16 +201,6 @@ class Harness:
 
             html = []
 
-            awg_fmt = ""
-            if cable.show_equiv:
-                # Only convert units we actually know about, i.e. currently
-                # mm2 and awg --- other units _are_ technically allowed,
-                # and passed through as-is.
-                if cable.gauge_unit == "mm\u00B2":
-                    awg_fmt = f" ({awg_equiv(cable.gauge)} AWG)"
-                elif cable.gauge_unit.upper() == "AWG":
-                    awg_fmt = f" ({mm2_equiv(cable.gauge)} mm\u00B2)"
-
             # fmt: off
             rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
                         if cable.show_name else None],
@@ -226,7 +214,7 @@ class Harness:
                         cable.spn if not isinstance(cable.spn, list) else None))],
                     [html_line_breaks(cable.type),
                      f'{cable.wirecount}x' if cable.show_wirecount else None,
-                     f'{cable.gauge} {cable.gauge_unit}{awg_fmt}' if cable.gauge else None,
+                     cable.gauge_str,
                      '+ S' if cable.shield else None,
                      f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
                      translate_color(cable.color, self.options.color_mode) if cable.color else None,
