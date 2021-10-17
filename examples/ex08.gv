@@ -35,7 +35,7 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td balign="left" sides="TLR"><img scale="false" src="resources/stereo-phone-plug-TRS.png"/></td>
+   <td balign="left" sides="TLR"><img scale="false" src="/Users/daniel/Projects/WireViz/examples/resources/stereo-phone-plug-TRS.png"/></td>
   </tr></table>
  </td></tr>
  <tr><td>
@@ -135,7 +135,7 @@ graph {
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
    <td balign="left" sides="TLR">
     <table border="0" cellspacing="0" cellborder="0"><tr>
-     <td width="70.0" height="70" fixedsize="true"><img scale="true" src="resources/cable-WH+BN+GN+shield.png"/></td>
+     <td width="70.0" height="70" fixedsize="true"><img scale="true" src="/Users/daniel/Projects/WireViz/examples/resources/cable-WH+BN+GN+shield.png"/></td>
     </tr></table>
    </td>
   </tr></table>
