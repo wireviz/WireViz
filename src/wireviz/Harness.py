@@ -35,7 +35,6 @@ from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
     gv_connector_loops,
     gv_node_connector,
-    gv_pin,
     html_bgcolor,
     html_bgcolor_attr,
     html_caption,
@@ -177,6 +176,7 @@ class Harness:
         dot.attr("edge", style="bold", fontname=self.options.fontname)
 
         for connector in self.connectors.values():
+            # generate connector node
             gv_html = gv_node_connector(connector, self.options)
             _default_fillcolor = translate_color(self.options.bgcolor_connector, "HEX")
             dot.node(
@@ -186,7 +186,7 @@ class Harness:
                 style="filled",
                 fillcolor=_default_fillcolor,
             )
-
+            # generate edges for connector loops
             if len(connector.loops) > 0:
                 dot.attr("edge", color="#000000:#ffffff:#000000")
                 loops = gv_connector_loops(connector)
