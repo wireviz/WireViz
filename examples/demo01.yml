@@ -1,3 +1,6 @@
+metadata:
+  title: demo01
+
 connectors:
   X1:
     type: D-Sub
