@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
-from collections.abc import Iterable
 
 
 class Attribs(Dict):
@@ -23,21 +23,24 @@ class Attribs(Dict):
 class Tag:
     contents: str
     attribs: Attribs = field(default_factory=Attribs)
-    one_line: bool = False
+    flat: bool = False
 
     @property
     def tagname(self):
         return type(self).__name__.lower()
 
     def get_contents(self):
-        if isinstance(self.contents, Iterable):
-            return "\n".join([str(c) for c in self.contents])
+        # import pudb; pudb.set_trace()
+        separator = "" if self.flat else "\n"
+        if isinstance(self.contents, Iterable) and not isinstance(self.contents, str):
+            return separator.join([str(c) for c in self.contents if c is not None])
+        elif self.contents is None:
+            return ""
         else:
             return str(self.contents)
 
-
     def __repr__(self):
-        separator = "" if self.one_line else "\n"
+        separator = "" if self.flat else "\n"
         html = [
             f"<{self.tagname}{str(self.attribs)}>",
             self.get_contents(),
