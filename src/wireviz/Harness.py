@@ -17,8 +17,8 @@ from wireviz.DataClasses import (
     MatePin,
     Metadata,
     Options,
-    Tweak,
     Side,
+    Tweak,
 )
 from wireviz.svgembed import embed_svg_images_file
 from wireviz.wv_bom import (
@@ -649,7 +649,6 @@ class Harness:
     def svg(self):
         graph = self.graph
         return embed_svg_images(graph.pipe(format="svg").decode("utf-8"), Path.cwd())
-
 
     def output(
         self,
