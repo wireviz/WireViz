@@ -35,6 +35,7 @@ from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
     gv_connector_loops,
     gv_node_connector,
+    gv_node_cable,
     html_bgcolor,
     html_bgcolor_attr,
     html_caption,
@@ -198,6 +199,16 @@ class Harness:
         )
 
         for cable in self.cables.values():
+
+            gv_html = gv_node_cable(cable, self.options, pad)
+            dot.node(
+                cable.name,
+                label=f"<\n{gv_html}\n>",
+                shape="box",
+                # style=style,
+                # fillcolor=translate_color(bgcolor, "HEX"),
+            )
+            continue
 
             html = []
 

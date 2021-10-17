@@ -4,8 +4,8 @@ import re
 from itertools import zip_longest
 from typing import List, Optional, Union
 
-from wireviz.DataClasses import Color, Connector, Options
-from wireviz.wv_colors import translate_color
+from wireviz.DataClasses import Cable, Color, Connector, Options
+from wireviz.wv_colors import translate_color, get_color_hex
 from wireviz.wv_helper import pn_info_string, remove_links
 from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
 
@@ -21,68 +21,26 @@ def gv_node_connector(connector: Connector, harness_options: Options) -> Table:
 
     # generate all rows to be shown in the node
     if connector.show_name:
-        str_name = [f"{remove_links(connector.name)}"]
-        if connector.bgcolor_title:
-            row_name_attribs = {
-                "bgcolor": translate_color(connector.bgcolor_title, "HEX")
-            }
-            row_name = [Td(str_name, attribs=row_name_attribs)]
-        else:
-            row_name = [str_name]
+        str_name = f"{remove_links(connector.name)}"
+        row_name = [colored_cell(str_name, connector.bgcolor_title)]
     else:
         row_name = []
 
-    row_pn = [
-        pn_info_string(HEADER_PN, None, connector.pn),
-        pn_info_string(HEADER_MPN, connector.manufacturer, connector.mpn),
-        pn_info_string(HEADER_SPN, connector.supplier, connector.spn),
-    ]
-    row_pn = [html_line_breaks(cell) for cell in row_pn]
-
-    if connector.color:
-        colorbar_attribs = {
-            "bgcolor": translate_color(connector.color, "HEX"),
-            "width": 4,
-        }
-        colorbar_cell = Td("", attribs=colorbar_attribs)
-    else:
-        colorbar_cell = None
+    row_pn = par_number_cell_list(connector)
 
     row_info = [
         html_line_breaks(connector.type),
         html_line_breaks(connector.subtype),
         f"{connector.pincount}-pin" if connector.show_pincount else None,
         translate_color(connector.color, harness_options.color_mode),
-        colorbar_cell,
+        colorbar_cell(connector.color),
     ]
 
-    # <tdX{' sides="TLR"' if image.caption else ''}
-    # <tdX sides="BLR"{html_bgcolor_attr(image.bgcolor)}>
-    # {html_size_attr(image)}
-    if connector.image and connector.image.caption:
-        # import pudb; pudb.set_trace()
-        row_image_attribs = html_size_attr_dict(connector.image)
-        row_image_attribs["balign"] = "left"
-        row_image_attribs["sides"] = "TLR"
-        if connector.image.bgcolor:
-            row_image_attribs["bgcolor"] = translate_color(
-                connector.image.bgcolor, "HEX"
-            )
-        row_caption_attribs = {"balign": "left", "sides": "BLR"}
-        row_image = [Td(html_image_new(connector.image), attribs=row_image_attribs)]
-        row_image_caption = [
-            Td(
-                html_caption_new(connector.image),
-                attribs=row_caption_attribs,
-                flat=True,
-            )
-        ]
-    else:
-        row_image = []
-        row_image_caption = []
-    row_notes = [html_line_breaks(connector.notes)]
+    row_image, row_image_caption = image_and_caption_cells(connector)
+
     # row_additional_component_table = get_additional_component_table(self, connector)
     row_additional_component_table = None
+    row_notes = [html_line_breaks(connector.notes)]
 
     if connector.style != "simple":
         pin_tuples = zip_longest(
@@ -124,7 +82,9 @@ def gv_node_connector(connector: Connector, harness_options: Options) -> Table:
     if connector.bgcolor:
         tbl.attribs["bgcolor"] = translate_color(connector.bgcolor, "HEX")
     elif harness_options.bgcolor_connector:
-        tbl.attribs["bgcolor"]  = translate_color(harness_options.bgcolor_connector, "HEX")
+        tbl.attribs["bgcolor"] = translate_color(
+            harness_options.bgcolor_connector, "HEX"
+        )
 
     return tbl
 
@@ -157,6 +117,176 @@ def gv_connector_loops(connector: Connector) -> List:
         tail = f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}"
         loop_edges.append((head, tail))
     return loop_edges
+
+
+def gv_node_cable(cable: Cable, harness_options: Options, pad) -> Table:
+
+    if cable.show_name:
+        str_name = f"{remove_links(cable.name)}"
+        row_name = [colored_cell(str_name, cable.bgcolor_title)]
+    else:
+        row_name = []
+
+    row_pn = par_number_cell_list(cable)
+
+    row_info = [
+        html_line_breaks(cable.type),
+        f"{cable.wirecount}x" if cable.show_wirecount else None,
+        f"{cable.gauge_str}" if cable.gauge else None,
+        "+ S" if cable.shield else None,
+        f"{cable.length} {cable.length_unit}" if cable.length > 0 else None,
+        translate_color(cable.color, self.options.color_mode) if cable.color else None,
+        html_colorbar(cable.color),
+    ]
+
+    row_image, row_image_caption = image_and_caption_cells(cable)
+
+    row_conductor_table = str(gv_conductor_table(cable, harness_options, pad))
+
+    # row_additional_component_table = get_additional_component_table(self, cable)
+    row_additional_component_table = None
+    row_notes = [html_line_breaks(cable.notes)]
+
+    rows = [
+        row_name,
+        row_pn,
+        row_info,
+        row_conductor_table,
+        row_image,
+        row_image_caption,
+        row_additional_component_table,
+        row_notes,
+    ]
+
+    tbl = nested_table(rows)
+
+    return tbl
+
+
+def gv_conductor_table(cable, harness_options, pad) -> Table:
+
+    rows = []
+    rows.append(Tr(Td("&nbsp;")))
+
+    for i, (connection_color, wirelabel) in enumerate(
+        zip_longest(cable.colors, cable.wirelabels), 1
+    ):
+
+        # row above the wire
+        wireinfo = []
+        if cable.show_wirenumbers:
+            wireinfo.append(str(i))
+        colorstr = translate_color(connection_color, harness_options.color_mode)
+        if colorstr:
+            wireinfo.append(colorstr)
+        if cable.wirelabels:
+            wireinfo.append(wirelabel if wirelabel is not None else "")
+
+        cells_above = [
+            Td(f"<!-- {i}_in -->"),
+            Td(":".join(wireinfo)),
+            Td(f"<!-- {i}_out -->"),
+        ]
+        rows.append(Tr(cells_above))
+
+        # the wire itself
+        rows.append(Tr(gv_wire_cell(i, connection_color, pad)))
+
+    rows.append(Tr(Td("&nbsp;")))
+
+    table_attribs = {
+        "border": 0,
+        "cellspacing": 0,
+        "cellborder": 0,
+    }
+    tbl = Table(rows, attribs=table_attribs)
+
+    return tbl
+
+def gv_wire_cell(index, color, pad) -> Td:
+    bgcolors = ['#000000'] + get_color_hex(color, pad=pad) + ['#000000']
+    wire_inner_rows = []
+    for j, bgcolor in enumerate(bgcolors[::-1]):
+        wire_inner_cell_attribs = {
+            "colspan": 3,
+            "cellpadding": 0,
+            "height": 2,
+            "border": 0,
+            "bgcolor": bgcolor if bgcolor != "" else "BK",
+        }
+        wire_inner_rows.append(Tr(Td("", attribs=wire_inner_cell_attribs)))
+    wire_inner_table_attribs = {"cellspacing":0, "cellborder":0, "border":0}
+    wire_inner_table = Table(wire_inner_rows, wire_inner_table_attribs)
+    wire_outer_cell_attribs = {
+        "colspan": 3,
+        "border": 0,
+        "cellspacing": 0,
+        "port": f"w{index}",
+        "height": 2 * len(bgcolors),
+    }
+    wire_outer_cell = Td(wire_inner_table, attribs=wire_outer_cell_attribs)
+
+    return wire_outer_cell
+
+
+
+def colored_cell(contents, bgcolor) -> Td:
+    if bgcolor:
+        attribs = {"bgcolor": translate_color(bgcolor, "HEX")}
+    else:
+        attribs = {}
+    return Td(contents, attribs=attribs)
+
+
+def colorbar_cell(color) -> Td:
+    if color:
+        colorbar_attribs = {
+            "bgcolor": translate_color(color, "HEX"),
+            "width": 4,
+        }
+        return Td("", attribs=colorbar_attribs)
+    else:
+        return None
+
+
+def image_and_caption_cells(component):
+    if component.image:
+        row_image_attribs = html_size_attr_dict(component.image)
+        row_image_attribs["balign"] = "left"
+        if component.image.bgcolor:
+            row_image_attribs["bgcolor"] = translate_color(
+                component.image.bgcolor, "HEX"
+            )
+        if component.image.caption:
+            row_image_attribs["sides"] = "TLR"
+        row_image = [Td(html_image_new(component.image), attribs=row_image_attribs)]
+
+        if component.image.caption:
+            row_caption_attribs = {"balign": "left", "sides": "BLR"}
+            row_image_caption = [
+                Td(
+                    html_caption_new(component.image),
+                    attribs=row_caption_attribs,
+                    flat=True,
+                )
+            ]
+        else:
+            row_image_caption = None
+        return (row_image, row_image_caption)
+    else:
+        return (None, None)
+
+
+def par_number_cell_list(component) -> List[Td]:
+    cell_contents = [
+        pn_info_string(HEADER_PN, None, component.pn),
+        pn_info_string(HEADER_MPN, component.manufacturer, component.mpn),
+        pn_info_string(HEADER_SPN, component.supplier, component.spn),
+    ]
+    if any(cell_contents):
+        return [Td(html_line_breaks(cell)) for cell in cell_contents]
+    else:
+        return None
 
 
 def nested_table(rows_in: List[Tr]):
