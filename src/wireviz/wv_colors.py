@@ -178,8 +178,10 @@ def get_color_translation(translate: Dict[Color, str], input: Colors) -> List[st
 
 
 def translate_color(input: Colors, color_mode: ColorMode) -> str:
-    if input == "" or input is None:
+    if input == "":
         return ""
+    if input is None:
+        return None
     upper = color_mode.isupper()
     if not (color_mode.isupper() or color_mode.islower()):
         raise Exception("Unknown color mode capitalization")
