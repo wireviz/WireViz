@@ -34,15 +34,8 @@ from wireviz.wv_bom import (
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
     gv_connector_loops,
-    gv_node_cable,
-    gv_node_connector,
-    html_bgcolor,
-    html_bgcolor_attr,
-    html_caption,
-    html_colorbar,
-    html_image,
+    gv_node_component,
     html_line_breaks,
-    nested_html_table,
     remove_links,
 )
 from wireviz.wv_helper import (
@@ -176,7 +169,7 @@ class Harness:
 
         for connector in self.connectors.values():
             # generate connector node
-            gv_html = gv_node_connector(connector, self.options)
+            gv_html = gv_node_component(connector, self.options)
             dot.node(
                 connector.name,
                 label=f"<\n{gv_html}\n>",
@@ -200,7 +193,7 @@ class Harness:
 
         for cable in self.cables.values():
 
-            gv_html = gv_node_cable(cable, self.options, pad)
+            gv_html = gv_node_component(cable, self.options, pad)
             dot.node(
                 cable.name,
                 label=f"<\n{gv_html}\n>",
