@@ -5,7 +5,7 @@ from itertools import zip_longest
 from typing import List, Optional, Union
 
 from wireviz.DataClasses import Cable, Color, Connector, Options
-from wireviz.wv_colors import translate_color, get_color_hex
+from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_helper import pn_info_string, remove_links
 from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
 
@@ -90,9 +90,9 @@ def gv_node_connector(connector: Connector, harness_options: Options) -> Table:
 
 
 def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector):
-    cell_pin_left = Td(pin_name, attribs={"port": f"p{pin_index+1}l"}, flat=True)
-    cell_pin_label = Td(pin_label, flat=True, empty_is_none=True)
-    cell_pin_right = Td(pin_name, attribs={"port": f"p{pin_index+1}r"}, flat=True)
+    cell_pin_left = Td(pin_name, attribs={"port": f"p{pin_index+1}l"})
+    cell_pin_label = Td(pin_label, empty_is_none=True)
+    cell_pin_right = Td(pin_name, attribs={"port": f"p{pin_index+1}r"})
 
     cells = [
         cell_pin_left if connector.ports_left else None,
@@ -203,8 +203,9 @@ def gv_conductor_table(cable, harness_options, pad) -> Table:
 
     return tbl
 
+
 def gv_wire_cell(index, color, pad) -> Td:
-    bgcolors = ['#000000'] + get_color_hex(color, pad=pad) + ['#000000']
+    bgcolors = ["#000000"] + get_color_hex(color, pad=pad) + ["#000000"]
     wire_inner_rows = []
     for j, bgcolor in enumerate(bgcolors[::-1]):
         wire_inner_cell_attribs = {
@@ -215,7 +216,7 @@ def gv_wire_cell(index, color, pad) -> Td:
             "bgcolor": bgcolor if bgcolor != "" else "BK",
         }
         wire_inner_rows.append(Tr(Td("", attribs=wire_inner_cell_attribs)))
-    wire_inner_table_attribs = {"cellspacing":0, "cellborder":0, "border":0}
+    wire_inner_table_attribs = {"cellspacing": 0, "cellborder": 0, "border": 0}
     wire_inner_table = Table(wire_inner_rows, wire_inner_table_attribs)
     wire_outer_cell_attribs = {
         "colspan": 3,
@@ -227,7 +228,6 @@ def gv_wire_cell(index, color, pad) -> Td:
     wire_outer_cell = Td(wire_inner_table, attribs=wire_outer_cell_attribs)
 
     return wire_outer_cell
-
 
 
 def colored_cell(contents, bgcolor) -> Td:
@@ -267,7 +267,6 @@ def image_and_caption_cells(component):
                 Td(
                     html_caption_new(component.image),
                     attribs=row_caption_attribs,
-                    flat=True,
                 )
             ]
         else:
@@ -301,7 +300,7 @@ def nested_table(rows_in: List[Tr]):
                     inner_cells.append(cell)
                 else:
                     inner_cell_attribs = {"balign": "left"}
-                    inner_cells.append(Td(cell, attribs=inner_cell_attribs, flat=True))
+                    inner_cells.append(Td(cell, attribs=inner_cell_attribs))
 
             inner_table_attribs = {
                 "border": 0,

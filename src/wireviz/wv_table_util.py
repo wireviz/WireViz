@@ -4,6 +4,8 @@ from collections.abc import Iterable
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+indent_count = 1
+
 
 class Attribs(Dict):
     def __repr__(self):
@@ -42,23 +44,40 @@ class Tag:
     def tagname(self):
         return type(self).__name__.lower()
 
+    @property
+    def auto_flat(self):
+        if self.flat:  # force flat
+            return True
+        if not _is_iterable_not_str(self.contents):  # catch str, int, float, ...
+            if not isinstance(self.contents, Tag):  # avoid recursion
+                return not "\n" in str(self.contents)  # flatten if single line
+
+    def indent_lines(self, lines):
+        if self.auto_flat:
+            return lines
+        else:
+            indenter = " " * indent_count
+            return "\n".join(f"{indenter}{line}" for line in lines.split("\n"))
+
     def get_contents(self):
-        separator = "" if self.flat else "\n"
-        if isinstance(self.contents, Iterable) and not isinstance(self.contents, str):
-            return separator.join([str(c) for c in self.contents if c is not None])
+        separator = "" if self.auto_flat else "\n"
+        if _is_iterable_not_str(self.contents):
+            return separator.join(
+                [self.indent_lines(str(c)) for c in self.contents if c is not None]
+            )
         elif self.contents is None:
             return ""
-        else:
-            return str(self.contents)
+        else:  # str, int, float, etc.
+            return self.indent_lines(str(self.contents))
 
     def __repr__(self):
-        separator = "" if self.flat else "\n"
+        separator = "" if self.auto_flat else "\n"
         if self.contents is None and self.empty_is_none:
             return ""
         else:
             html = [
                 f"<{self.tagname}{str(self.attribs)}>",
-                self.get_contents(),
+                f"{self.get_contents()}",
                 f"</{self.tagname}>",
             ]
             return separator.join(html)
@@ -70,6 +89,11 @@ class TagSingleton(Tag):
         return f"<{self.tagname}{str(self.attribs)} />"
 
 
+def _is_iterable_not_str(inp):
+    # str is iterable, but should be treated as not iterable
+    return isinstance(inp, Iterable) and not isinstance(inp, str)
+
+
 @dataclass
 class Br(TagSingleton):
     pass
@@ -77,46 +101,11 @@ class Br(TagSingleton):
 
 class Td(Tag):
     pass
-    # contents: str = ""
-    #
-    # def __init__(self, contents, *args, **kwargs):
-    #     self.contents = contents
-    #     super().__init__(*args, **kwargs)
-    #
-    # def __repr__(self):
-    #     html = [
-    #         f"<td{self.attribs}>",
-    #         self.contents,
-    #         f"</td>",
-    #     ]
-    #     return "\n".join(html)
 
 
 class Tr(Tag):
     pass
-    # cells: List[Cell] = field(default_factory=list)
-    #
-    # def __init__(self, cells, *args, **kwargs):
-    #     self.cells = cells
-    #     super().__init__(*args, **kwargs)
-    #
-    # def __repr__(self):
-    #     html = [
-    #         f"<tr{self.attribs}>",
-    #         "\n".join([str(c) for c in self.cells]),
-    #         f"</tr>",
-    #     ]
-    #     return "\n".join(html)
 
 
 class Table(Tag):
     pass
-    # rows: List[Row] = field(default_factory=list)
-    #
-    # def __repr__(self):
-    #     html = [
-    #         f"<table{self.attribs}>",
-    #         "\n".join([str(r) for r in self.rows]),
-    #         "</table>",
-    #     ]
-    #     return "\n".join(html)
