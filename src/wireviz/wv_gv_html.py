@@ -116,6 +116,21 @@ def gv_node_component(
     return tbl
 
 
+def make_list_of_cells(inp) -> List[Td]:
+    # inp may be List,
+    if isinstance(inp, List):
+        # ensure all list items are Td
+        list_out = [item if isinstance(item, Td) else Td(item) for item in inp]
+        return list_out
+    else:
+        if inp is None:
+            return []
+        if isinstance(inp, Td):
+            return [inp]
+        else:
+            return [Td(inp)]
+
+
 def nested_table(cell_lists: List[Td]) -> Table:
     outer_table_attribs = {
         "border": 0,
@@ -154,21 +169,6 @@ def nested_table(cell_lists: List[Td]) -> Table:
     tbl = Table(rows, attribs=outer_table_attribs)
 
     return tbl
-
-
-def make_list_of_cells(inp) -> List[Td]:
-    # inp may be List,
-    if isinstance(inp, List):
-        # ensure all list items are Td
-        list_out = [item if isinstance(item, Td) else Td(item) for item in inp]
-        return list_out
-    else:
-        if inp is None:
-            return []
-        if isinstance(inp, Td):
-            return [inp]
-        else:
-            return [Td(inp)]
 
 
 def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector):
@@ -276,6 +276,18 @@ def colored_cell(contents, bgcolor) -> Td:
     return Td(contents, attribs=attribs)
 
 
+def part_number_str_list(component: Component) -> List[str]:
+    cell_contents = [
+        pn_info_string(HEADER_PN, None, component.pn),
+        pn_info_string(HEADER_MPN, component.manufacturer, component.mpn),
+        pn_info_string(HEADER_SPN, component.supplier, component.spn),
+    ]
+    if any(cell_contents):
+        return [html_line_breaks(cell) for cell in cell_contents]
+    else:
+        return None
+
+
 def colorbar_cell(color) -> Td:
     if color:
         colorbar_attribs = {
@@ -285,15 +297,6 @@ def colorbar_cell(color) -> Td:
         return Td("", attribs=colorbar_attribs)
     else:
         return None
-
-
-# def html_image_new(image):
-#     from wireviz.DataClasses import Image
-#     if not image:
-#         return None
-#     image_tag = Img(attribs={"scale": image.scale, "src": image.src})
-#     image_table = Table(Tr(Td(image_tag, attribs=html_size_attr_dict(image))), attribs={"border": 0, "cellspacing": 0, "cellborder": 0})
-#     return image_table
 
 
 def image_and_caption_cells(component: Component) -> (Td, Td):
@@ -326,63 +329,13 @@ def image_and_caption_cells(component: Component) -> (Td, Td):
     image_cell.attribs = Attribs(outer_cell_attribs)
 
     if component.image.caption:
-        caption_cell_attribs = {"balign": "left", "sides": "BLR", "id": "td_caption"}
         caption_cell = Td(
-            html_caption_new(component.image), attribs=caption_cell_attribs
+            f"{html_line_breaks(component.image.caption)}",
+            attribs={"balign": "left", "sides": "BLR", "id": "td_caption"},
         )
     else:
         caption_cell = None
     return (image_cell, caption_cell)
-
-
-def part_number_str_list(component: Component) -> List[str]:
-    cell_contents = [
-        pn_info_string(HEADER_PN, None, component.pn),
-        pn_info_string(HEADER_MPN, component.manufacturer, component.mpn),
-        pn_info_string(HEADER_SPN, component.supplier, component.spn),
-    ]
-    if any(cell_contents):
-        return [html_line_breaks(cell) for cell in cell_contents]
-    else:
-        return None
-
-
-# def html_image(image):
-#     from wireviz.DataClasses import Image
-#     if not image:
-#         return None
-#     # The leading attributes belong to the preceeding tag. See where used below.
-#     html = f'{html_size_attr(image)}><img scale="{image.scale}" src="{image.src}"/>'
-#     if image.fixedsize:
-#         # Close the preceeding tag and enclose the image cell in a table without
-#         # borders to avoid narrow borders when the fixed width < the node width.
-#         html = f""">
-#     <table border="0" cellspacing="0" cellborder="0"><tr>
-#      <td{html}</td>
-#     </tr></table>
-#    """
-#     return f"""<tdX{' sides="TLR"' if image.caption else ''}{html_bgcolor_attr(image.bgcolor)}{html}"""
-
-
-def html_caption_new(image):
-    from wireviz.DataClasses import Image
-
-    return f"{html_line_breaks(image.caption)}" if image and image.caption else None
-
-
-# def html_size_attr(image):
-#     from wireviz.DataClasses import Image
-#
-#     # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
-#     return (
-#         (
-#             (f' width="{image.width}"' if image.width else "")
-#             + (f' height="{image.height}"' if image.height else "")
-#             + (' fixedsize="true"' if image.fixedsize else "")
-#         )
-#         if image
-#         else ""
-#     )
 
 
 def html_size_attr_dict(image):
