@@ -138,8 +138,9 @@ class AdditionalComponent:
 
 
 @dataclass
-class Component():
+class Component:
     pass
+
 
 @dataclass
 class Connector(Component):
