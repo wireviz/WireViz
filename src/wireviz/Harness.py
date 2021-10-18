@@ -191,9 +191,11 @@ class Harness:
             for colorstr in cable.colors
         )
 
+        self.options._pad = pad
+
         for cable in self.cables.values():
 
-            gv_html = gv_node_component(cable, self.options, pad)
+            gv_html = gv_node_component(cable, self.options)
             dot.node(
                 cable.name,
                 label=f"<\n{gv_html}\n>",
@@ -205,32 +207,6 @@ class Harness:
 
             html = []
 
-            # fmt: off
-            rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
-                        if cable.show_name else None],
-                    [pn_info_string(HEADER_PN, None,
-                        remove_links(cable.pn)) if not isinstance(cable.pn, list) else None,
-                     html_line_breaks(pn_info_string(HEADER_MPN,
-                        cable.manufacturer if not isinstance(cable.manufacturer, list) else None,
-                        cable.mpn if not isinstance(cable.mpn, list) else None)),
-                     html_line_breaks(pn_info_string(HEADER_SPN,
-                        cable.supplier if not isinstance(cable.supplier, list) else None,
-                        cable.spn if not isinstance(cable.spn, list) else None))],
-                    [html_line_breaks(cable.type),
-                     f'{cable.wirecount}x' if cable.show_wirecount else None,
-                     cable.gauge_str,
-                     '+ S' if cable.shield else None,
-                     f'{cable.length} {cable.length_unit}' if cable.length > 0 else None,
-                     translate_color(cable.color, self.options.color_mode) if cable.color else None,
-                     html_colorbar(cable.color)],
-                    '<!-- wire table -->',
-                    [html_image(cable.image)],
-                    [html_caption(cable.image)]]
-            # fmt: on
-
-            rows.extend(get_additional_component_table(self, cable))
-            rows.append([html_line_breaks(cable.notes)])
-            html.extend(nested_html_table(rows, html_bgcolor_attr(cable.bgcolor)))
 
             wirehtml = []
             # conductor table
