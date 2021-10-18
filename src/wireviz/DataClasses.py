@@ -60,6 +60,10 @@ class Options:
     color_mode: ColorMode = "SHORT"
     mini_bom_mode: bool = True
     template_separator: str = "."
+    _pad: int = 0
+    # TODO: resolve template and image paths during rendering, not during YAML parsing
+    _template_paths: [List] = field(default_factory=list)
+    _image_paths: [List] = field(default_factory=list)
 
     def __post_init__(self):
         if not self.bgcolor_node:
