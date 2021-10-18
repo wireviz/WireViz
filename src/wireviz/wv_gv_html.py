@@ -4,7 +4,7 @@ import re
 from itertools import zip_longest
 from typing import List, Optional, Union
 
-from wireviz.DataClasses import Cable, Color, Connector, Options
+from wireviz.DataClasses import Cable, Color, Connector, Component, Options
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_helper import pn_info_string, remove_links
 from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
@@ -14,63 +14,80 @@ HEADER_MPN = "MPN"
 HEADER_SPN = "SPN"
 
 
-def gv_node_connector(connector: Connector, harness_options: Options) -> Table:
+def gv_node_component(component: Component, harness_options: Options, pad=None) -> Table:
     # If no wires connected (except maybe loop wires)?
-    if not (connector.ports_left or connector.ports_right):
-        connector.ports_left = True  # Use left side pins by default
+    if isinstance(component, Connector):
+        if not (component.ports_left or component.ports_right):
+            component.ports_left = True  # Use left side pins by default
 
     # generate all rows to be shown in the node
-    if connector.show_name:
-        str_name = f"{remove_links(connector.name)}"
-        row_name = [colored_cell(str_name, connector.bgcolor_title)]
+    if component.show_name:
+        str_name = f"{remove_links(component.name)}"
+        row_name = [colored_cell(str_name, component.bgcolor_title)]
     else:
         row_name = []
 
-    row_pn = par_number_cell_list(connector)
+    row_pn = par_number_cell_list(component)
 
-    row_info = [
-        html_line_breaks(connector.type),
-        html_line_breaks(connector.subtype),
-        f"{connector.pincount}-pin" if connector.show_pincount else None,
-        translate_color(connector.color, harness_options.color_mode),
-        colorbar_cell(connector.color),
-    ]
+    if isinstance(component, Connector):
+        row_info = [
+            html_line_breaks(component.type),
+            html_line_breaks(component.subtype),
+            f"{component.pincount}-pin" if component.show_pincount else None,
+            translate_color(component.color, harness_options.color_mode),
+            colorbar_cell(component.color),
+        ]
+    elif isinstance(component, Cable):
+        row_info = [
+            html_line_breaks(component.type),
+            f"{component.wirecount}x" if component.show_wirecount else None,
+            f"{component.gauge_str}" if component.gauge else None,
+            "+ S" if component.shield else None,
+            f"{component.length} {component.length_unit}" if component.length > 0 else None,
+            translate_color(component.color, harness_options.color_mode),
+            colorbar_cell(component.color),
+        ]
 
-    row_image, row_image_caption = image_and_caption_cells(connector)
+    row_image, row_image_caption = image_and_caption_cells(component)
 
     # row_additional_component_table = get_additional_component_table(self, connector)
     row_additional_component_table = None
-    row_notes = [html_line_breaks(connector.notes)]
+    row_notes = [html_line_breaks(component.notes)]
 
-    if connector.style != "simple":
-        pin_tuples = zip_longest(
-            connector.pins,
-            connector.pinlabels,
-            connector.pincolors,
-        )
 
-        pin_rows = []
-        for pinindex, (pinname, pinlabel, pincolor) in enumerate(pin_tuples):
-            if connector.should_show_pin(pinname):
-                pin_rows.append(
-                    gv_pin_row(pinindex, pinname, pinlabel, pincolor, connector)
-                )
+    if isinstance(component, Connector):
+        # pin table
+        if component.style != "simple":
+            pin_tuples = zip_longest(
+                component.pins,
+                component.pinlabels,
+                component.pincolors,
+            )
 
-        table_attribs = {
-            "border": 0,
-            "cellspacing": 0,
-            "cellpadding": 3,
-            "cellborder": 1,
-        }
-        row_connector_table = str(Table(pin_rows, attribs=table_attribs))
-    else:
-        row_connector_table = None
+            pin_rows = []
+            for pinindex, (pinname, pinlabel, pincolor) in enumerate(pin_tuples):
+                if component.should_show_pin(pinname):
+                    pin_rows.append(
+                        gv_pin_row(pinindex, pinname, pinlabel, pincolor, component)
+                    )
+
+            table_attribs = {
+                "border": 0,
+                "cellspacing": 0,
+                "cellpadding": 3,
+                "cellborder": 1,
+            }
+            row_ports = str(Table(pin_rows, attribs=table_attribs))
+        else:
+            row_ports = None
+    elif isinstance(component, Cable):
+        row_ports = str(gv_conductor_table(component, harness_options, pad))
 
     rows = [
         row_name,
         row_pn,
         row_info,
-        row_connector_table,
+        row_ports,
         row_image,
         row_image_caption,
         row_additional_component_table,
@@ -79,12 +96,18 @@ def gv_node_connector(connector: Connector, harness_options: Options) -> Table:
 
     tbl = nested_table(rows)
 
-    if connector.bgcolor:
-        tbl.attribs["bgcolor"] = translate_color(connector.bgcolor, "HEX")
-    elif harness_options.bgcolor_connector:
-        tbl.attribs["bgcolor"] = translate_color(
-            harness_options.bgcolor_connector, "HEX"
-        )
+    if component.bgcolor:
+        tbl.attribs["bgcolor"] = translate_color(component.bgcolor, "HEX")
+    else:
+        if isinstance(component, Connector) and harness_options.bgcolor_connector:
+            tbl.attribs["bgcolor"] = translate_color(
+                harness_options.bgcolor_connector, "HEX"
+            )
+        elif isinstance(component, Cable) and harness_options.bgcolor_cable:
+            tbl.attribs["bgcolor"] = translate_color(
+                harness_options.bgcolor_cable, "HEX"
+            )
+
 
     return tbl
 
@@ -117,50 +140,6 @@ def gv_connector_loops(connector: Connector) -> List:
         tail = f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}"
         loop_edges.append((head, tail))
     return loop_edges
-
-
-def gv_node_cable(cable: Cable, harness_options: Options, pad) -> Table:
-
-    if cable.show_name:
-        str_name = f"{remove_links(cable.name)}"
-        row_name = [colored_cell(str_name, cable.bgcolor_title)]
-    else:
-        row_name = []
-
-    row_pn = par_number_cell_list(cable)
-
-    row_info = [
-        html_line_breaks(cable.type),
-        f"{cable.wirecount}x" if cable.show_wirecount else None,
-        f"{cable.gauge_str}" if cable.gauge else None,
-        "+ S" if cable.shield else None,
-        f"{cable.length} {cable.length_unit}" if cable.length > 0 else None,
-        translate_color(cable.color, self.options.color_mode) if cable.color else None,
-        html_colorbar(cable.color),
-    ]
-
-    row_image, row_image_caption = image_and_caption_cells(cable)
-
-    row_conductor_table = str(gv_conductor_table(cable, harness_options, pad))
-
-    # row_additional_component_table = get_additional_component_table(self, cable)
-    row_additional_component_table = None
-    row_notes = [html_line_breaks(cable.notes)]
-
-    rows = [
-        row_name,
-        row_pn,
-        row_info,
-        row_conductor_table,
-        row_image,
-        row_image_caption,
-        row_additional_component_table,
-        row_notes,
-    ]
-
-    tbl = nested_table(rows)
-
-    return tbl
 
 
 def gv_conductor_table(cable, harness_options, pad) -> Table:
@@ -249,26 +228,45 @@ def colorbar_cell(color) -> Td:
         return None
 
 
+# def html_image_new(image):
+#     from wireviz.DataClasses import Image
+#     if not image:
+#         return None
+#     image_tag = Img(attribs={"scale": image.scale, "src": image.src})
+#     image_table = Table(Tr(Td(image_tag, attribs=html_size_attr_dict(image))), attribs={"border": 0, "cellspacing": 0, "cellborder": 0})
+#     return image_table
+
 def image_and_caption_cells(component):
     if component.image:
-        row_image_attribs = html_size_attr_dict(component.image)
-        row_image_attribs["balign"] = "left"
-        if component.image.bgcolor:
-            row_image_attribs["bgcolor"] = translate_color(
-                component.image.bgcolor, "HEX"
-            )
-        if component.image.caption:
-            row_image_attribs["sides"] = "TLR"
-        row_image = [Td(html_image_new(component.image), attribs=row_image_attribs)]
+        # outer_cell_attribs = {}
+        # outer_cell_attribs["balign"] = "left"
+        # outer_cell_attribs["bgcolor"] = translate_color(
+        #     component.image.bgcolor, "HEX"
+        # )
+        # if component.image.caption:
+        #     outer_cell_attribs["sides"] = "TLR"
+
+        image_tag = Img(attribs={"scale": component.image.scale, "src": component.image.src})
+        cell_attribs = html_size_attr_dict(component.image)
+        image_cell = Td(image_tag, attribs=cell_attribs)
+        image_row = Tr(image_cell)
+        image_table_attribs = {
+            "border": 0,
+            "cellspacing": 0,
+            "cellpadding": 0,
+            "cellborder": 1,
+        }
+        image_table = Table(image_row, attribs=image_table_attribs)
+        outer_cell = Td(image_table)
+        # return:
+        row_image = outer_cell
 
         if component.image.caption:
-            row_caption_attribs = {"balign": "left", "sides": "BLR"}
-            row_image_caption = [
-                Td(
-                    html_caption_new(component.image),
-                    attribs=row_caption_attribs,
-                )
-            ]
+            row_caption_attribs = {"balign": "left", "sides": "BLR", "id": "td_caption"}
+            row_image_caption = Td(
+                html_caption_new(component.image),
+                attribs=row_caption_attribs,
+            )
         else:
             row_image_caption = None
         return (row_image, row_image_caption)
@@ -288,12 +286,14 @@ def par_number_cell_list(component) -> List[Td]:
         return None
 
 
-def nested_table(rows_in: List[Tr]):
+def nested_table(rows_in: List[Tr]) -> Table:
     outer_rows = []
     for row in rows_in:
         if isinstance(row, List) and len(row) > 0 and any(row):
+            # row is a nested list
             # remove rows which are none
             row_no_empty = [cell for cell in row if cell is not None]
+            # if row item is Td, append directly; else convert to Td
             inner_cells = []
             for cell in row_no_empty:
                 if isinstance(cell, Td):
@@ -311,8 +311,13 @@ def nested_table(rows_in: List[Tr]):
             if len(inner_cells) > 0:
                 inner_table = Table(Tr(inner_cells), attribs=inner_table_attribs)
                 outer_rows.append(Tr(Td(inner_table)))
-        elif row is not None and any(row):
-            outer_rows.append(Tr(Td(row)))
+        elif row is not None:
+            if isinstance(row, Iterable) and not any(row):
+                continue
+            # row is a single item
+            # if item is Td, append directly; else convert to Td
+            cell = row if isinstance(row, Td) else Td(row)
+            outer_rows.append(Tr(cell))
     if len(outer_rows) == 0:
         outer_rows = Tr(Td(""))  # Generate empty cell to avoid GraphViz errors
     outer_table_attribs = {"border": 0, "cellspacing": 0, "cellpadding": 0}
@@ -321,106 +326,25 @@ def nested_table(rows_in: List[Tr]):
     return outer_table
 
 
-def nested_html_table(
-    rows: List[Union[str, List[Optional[str]], None]], table_attrs: str = ""
-) -> str:
-    # input: list, each item may be scalar or list
-    # output: a parent table with one child table per parent item that is list, and one cell per parent item that is scalar
-    # purpose: create the appearance of one table, where cell widths are independent between rows
-    # attributes in any leading <tdX> inside a list are injected into to the preceeding <td> tag
-    html = []
-    html.append(
-        f'<table border="0" cellspacing="0" cellpadding="0"{table_attrs or ""}>'
-    )
-
-    num_rows = 0
-    for row in rows:
-        if isinstance(row, List):
-            if len(row) > 0 and any(row):
-                html.append(" <tr><td>")
-                # fmt: off
-                html.append('  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>')
-                # fmt: on
-                for cell in row:
-                    if cell is not None:
-                        # Inject attributes to the preceeding <td> tag where needed
-                        # fmt: off
-                        html.append(f'   <td balign="left">{cell}</td>'.replace("><tdX", ""))
-                        # fmt: on
-                html.append("  </tr></table>")
-                html.append(" </td></tr>")
-                num_rows = num_rows + 1
-        elif row is not None:
-            html.append(" <tr><td>")
-            html.append(f"  {row}")
-            html.append(" </td></tr>")
-            num_rows = num_rows + 1
-    if num_rows == 0:  # empty table
-        # generate empty cell to avoid GraphViz errors
-        html.append("<tr><td></td></tr>")
-    html.append("</table>")
-    return html
 
 
-def html_bgcolor_attr(color: Color) -> str:
-    """Return attributes for bgcolor or '' if no color."""
-    return f' bgcolor="{translate_color(color, "HEX")}"' if color else ""
+# def html_image(image):
+#     from wireviz.DataClasses import Image
+#     if not image:
+#         return None
+#     # The leading attributes belong to the preceeding tag. See where used below.
+#     html = f'{html_size_attr(image)}><img scale="{image.scale}" src="{image.src}"/>'
+#     if image.fixedsize:
+#         # Close the preceeding tag and enclose the image cell in a table without
+#         # borders to avoid narrow borders when the fixed width < the node width.
+#         html = f""">
+#     <table border="0" cellspacing="0" cellborder="0"><tr>
+#      <td{html}</td>
+#     </tr></table>
+#    """
+#     return f"""<tdX{' sides="TLR"' if image.caption else ''}{html_bgcolor_attr(image.bgcolor)}{html}"""
 
 
-def html_bgcolor(color: Color, _extra_attr: str = "") -> str:
-    """Return <td> attributes prefix for bgcolor or '' if no color."""
-    return f"<tdX{html_bgcolor_attr(color)}{_extra_attr}>" if color else ""
-
-
-def html_colorbar(color: Color) -> str:
-    """Return <tdX> attributes prefix for bgcolor and minimum width or None if no color."""
-    return html_bgcolor(color, ' width="4"') if color else None
-
-
-def html_image(image):
-    from wireviz.DataClasses import Image
-
-    if not image:
-        return None
-    # The leading attributes belong to the preceeding tag. See where used below.
-    html = f'{html_size_attr(image)}><img scale="{image.scale}" src="{image.src}"/>'
-    if image.fixedsize:
-        # Close the preceeding tag and enclose the image cell in a table without
-        # borders to avoid narrow borders when the fixed width < the node width.
-        html = f""">
-    <table border="0" cellspacing="0" cellborder="0"><tr>
-     <td{html}</td>
-    </tr></table>
-   """
-    return f"""<tdX{' sides="TLR"' if image.caption else ''}{html_bgcolor_attr(image.bgcolor)}{html}"""
-
-
-def html_image_new(image):
-    from wireviz.DataClasses import Image
-
-    if not image:
-        return None
-    # The leading attributes belong to the preceeding tag. See where used below.
-    html = f'<img scale="{image.scale}" src="{image.src}"/>'
-    if image.fixedsize:
-        # Close the preceeding tag and enclose the image cell in a table without
-        # borders to avoid narrow borders when the fixed width < the node width.
-        html = f"""
-    <table border="0" cellspacing="0" cellborder="0"><tr>
-     <td>{html}</td>
-    </tr></table>
-   """
-    return f"{html_bgcolor_attr(image.bgcolor)}{html}"
-
-
-def html_caption(image):
-    from wireviz.DataClasses import Image
-
-    return (
-        f'<tdX sides="BLR"{html_bgcolor_attr(image.bgcolor)}>{html_line_breaks(image.caption)}'
-        if image and image.caption
-        else None
-    )
 
 
 def html_caption_new(image):
@@ -429,19 +353,19 @@ def html_caption_new(image):
     return f"{html_line_breaks(image.caption)}" if image and image.caption else None
 
 
-def html_size_attr(image):
-    from wireviz.DataClasses import Image
-
-    # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
-    return (
-        (
-            (f' width="{image.width}"' if image.width else "")
-            + (f' height="{image.height}"' if image.height else "")
-            + (' fixedsize="true"' if image.fixedsize else "")
-        )
-        if image
-        else ""
-    )
+# def html_size_attr(image):
+#     from wireviz.DataClasses import Image
+#
+#     # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
+#     return (
+#         (
+#             (f' width="{image.width}"' if image.width else "")
+#             + (f' height="{image.height}"' if image.height else "")
+#             + (' fixedsize="true"' if image.fixedsize else "")
+#         )
+#         if image
+#         else ""
+#     )
 
 
 def html_size_attr_dict(image):

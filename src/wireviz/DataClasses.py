@@ -138,7 +138,11 @@ class AdditionalComponent:
 
 
 @dataclass
-class Connector:
+class Component():
+    pass
+
+@dataclass
+class Connector(Component):
     name: Designator
     bgcolor: Optional[Color] = None
     bgcolor_title: Optional[Color] = None
@@ -243,7 +247,7 @@ class Connector:
 
 
 @dataclass
-class Cable:
+class Cable(Component):
     name: Designator
     bgcolor: Optional[Color] = None
     bgcolor_title: Optional[Color] = None

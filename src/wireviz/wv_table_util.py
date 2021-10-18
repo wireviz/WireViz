@@ -23,7 +23,7 @@ class Attribs(Dict):
 
 @dataclass
 class Tag:
-    contents: str
+    contents: str = None
     attribs: Attribs = field(default_factory=Attribs)
     flat: bool = False
     empty_is_none: bool = False
@@ -96,6 +96,10 @@ def _is_iterable_not_str(inp):
 
 @dataclass
 class Br(TagSingleton):
+    pass
+
+
+class Img(TagSingleton):
     pass
 
 
