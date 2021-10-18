@@ -34,8 +34,8 @@ from wireviz.wv_bom import (
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
     gv_connector_loops,
-    gv_node_connector,
     gv_node_cable,
+    gv_node_connector,
     html_bgcolor,
     html_bgcolor_attr,
     html_caption,
