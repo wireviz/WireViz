@@ -194,8 +194,11 @@ class Harness:
         self.options._pad = pad
 
         for cable in self.cables.values():
-
+            # generate cable node
             gv_html = gv_node_component(cable, self.options)
+            # TODO: PN info for bundles (per wire)
+            # shield
+            #
             dot.node(
                 cable.name,
                 label=f"<\n{gv_html}\n>",
@@ -204,6 +207,8 @@ class Harness:
                 # fillcolor=translate_color(bgcolor, "HEX"),
             )
             continue
+
+            # TODO: connection edges
 
             html = []
 
