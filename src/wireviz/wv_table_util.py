@@ -71,6 +71,9 @@ class Tag:
             return self.indent_lines(str(self.contents))
 
     def __repr__(self):
+        # if self.flat:
+        #     import pudb; pudb.set_trace()
+
         separator = "" if self.auto_flat else "\n"
         if self.contents is None and self.empty_is_none:
             return ""
@@ -80,7 +83,8 @@ class Tag:
                 f"{self.get_contents()}",
                 f"</{self.tagname}>",
             ]
-            return separator.join(html)
+            html_joined = separator.join(html)
+            return html_joined
 
 
 @dataclass
