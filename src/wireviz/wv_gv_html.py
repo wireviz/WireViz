@@ -53,38 +53,17 @@ def gv_node_component(
         ]
 
     line_image, line_image_caption = image_and_caption_cells(component)
-
     # line_additional_component_table = get_additional_component_table(self, connector)
     line_additional_component_table = None
     line_notes = [html_line_breaks(component.notes)]
 
     if isinstance(component, Connector):
-        # pin table
         if component.style != "simple":
-            pin_tuples = zip_longest(
-                component.pins,
-                component.pinlabels,
-                component.pincolors,
-            )
-
-            pin_rows = []
-            for pinindex, (pinname, pinlabel, pincolor) in enumerate(pin_tuples):
-                if component.should_show_pin(pinname):
-                    pin_rows.append(
-                        gv_pin_row(pinindex, pinname, pinlabel, pincolor, component)
-                    )
-
-            table_attribs = {
-                "border": 0,
-                "cellspacing": 0,
-                "cellpadding": 3,
-                "cellborder": 1,
-            }
-            line_ports = Table(pin_rows, attribs=table_attribs)
+            line_ports = gv_pin_table(component)
         else:
             line_ports = None
     elif isinstance(component, Cable):
-        line_ports = gv_conductor_table(component, harness_options, pad)
+        line_ports = gv_conductor_table(component, harness_options)
 
     lines = [
         line_name,
@@ -97,9 +76,7 @@ def gv_node_component(
         line_notes,
     ]
 
-    cell_lists = [make_list_of_cells(line) for line in lines]
-
-    tbl = nested_table(cell_lists)
+    tbl = nested_table(lines)
 
     if component.bgcolor:
         tbl.attribs["bgcolor"] = translate_color(component.bgcolor, "HEX")
@@ -131,19 +108,8 @@ def make_list_of_cells(inp) -> List[Td]:
             return [Td(inp)]
 
 
-def nested_table(cell_lists: List[Td]) -> Table:
-    outer_table_attribs = {
-        "border": 0,
-        "cellspacing": 0,
-        "cellpadding": 0,
-    }
-    inner_table_attribs = {
-        "border": 0,
-        "cellspacing": 0,
-        "cellpadding": 3,
-        "cellborder": 1,
-    }
-
+def nested_table(lines: List[Td]) -> Table:
+    cell_lists = [make_list_of_cells(line) for line in lines]
     rows = []
     for lst in cell_lists:
         if len(lst) == 0:
@@ -162,16 +128,51 @@ def nested_table(cell_lists: List[Td]) -> Table:
             inner_table = cells[0].contents
         else:
             # nest cell content inside a table
+            inner_table_attribs = {
+                "border": 0,
+                "cellspacing": 0,
+                "cellpadding": 3,
+                "cellborder": 1,
+            }
             inner_table = Table(Tr(cells), attribs=inner_table_attribs)
         rows.append(Tr(Td(inner_table)))
     if len(rows) == 0:  # create dummy row to avoid GraphViz errors due to empty <table>
         rows = Tr(Td(""))
+    outer_table_attribs = {
+        "border": 0,
+        "cellspacing": 0,
+        "cellpadding": 0,
+    }
     tbl = Table(rows, attribs=outer_table_attribs)
 
     return tbl
 
 
-def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector):
+def gv_pin_table(component) -> Table:
+    pin_tuples = zip_longest(
+        component.pins,
+        component.pinlabels,
+        component.pincolors,
+    )
+
+    pin_rows = []
+    for pinindex, (pinname, pinlabel, pincolor) in enumerate(pin_tuples):
+        if component.should_show_pin(pinname):
+            pin_rows.append(
+                gv_pin_row(pinindex, pinname, pinlabel, pincolor, component)
+            )
+
+    table_attribs = {
+        "border": 0,
+        "cellspacing": 0,
+        "cellpadding": 3,
+        "cellborder": 1,
+    }
+
+    return Table(pin_rows, attribs=table_attribs)
+
+
+def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector) -> Tr:
     cell_pin_left = Td(pin_name, attribs={"port": f"p{pin_index+1}l"})
     cell_pin_label = Td(pin_label, empty_is_none=True)
     cell_pin_right = Td(pin_name, attribs={"port": f"p{pin_index+1}r"})
@@ -201,7 +202,7 @@ def gv_connector_loops(connector: Connector) -> List:
     return loop_edges
 
 
-def gv_conductor_table(cable, harness_options, pad) -> Table:
+def gv_conductor_table(cable, harness_options) -> Table:
 
     rows = []
     rows.append(Tr(Td("&nbsp;")))
@@ -228,7 +229,7 @@ def gv_conductor_table(cable, harness_options, pad) -> Table:
         rows.append(Tr(cells_above))
 
         # the wire itself
-        rows.append(Tr(gv_wire_cell(i, connection_color, pad)))
+        rows.append(Tr(gv_wire_cell(i, connection_color, harness_options._pad)))
 
     rows.append(Tr(Td("&nbsp;")))
 
