@@ -16,29 +16,27 @@ class Attribs(Dict):
         for k, v in self.items():
             if v is not None:
                 html.append(f' {k}="{v}"')
-            else:
-                html.append(f" {k}")
+            # else:
+            #     html.append(f" {k}")
         return "".join(html)
 
 
 @dataclass
 class Tag:
-    contents: str = None
+    contents = None
     attribs: Attribs = field(default_factory=Attribs)
-    flat: bool = False
-    empty_is_none: bool = False
+    flat: bool = None
+    delete_if_empty: bool = False
 
-    def __post_init__(self):
-        if self.attribs is None:
-            self.attribs = Attribs({})
-        elif isinstance(self.attribs, Dict):
-            self.attribs = Attribs(self.attribs)
-        elif not isinstance(self.attribs, Attribs):
-            raise Exception(
-                "Tag.attribs must be of type None, Dict, or Attribs, "
-                f"but type {type(self.attribs).__name__} was given instead:\n"
-                f"{self.attribs}"
-            )
+    def __init__(self, contents, flat=None, delete_if_empty=False, **kwargs):
+        self.contents = contents
+        self.flat = flat
+        self.delete_if_empty = delete_if_empty
+        self.attribs = Attribs({**kwargs})
+
+    def update_attribs(self, **kwargs):
+        for k, v in kwargs.items():
+            self.attribs[k] = v
 
     @property
     def tagname(self):
@@ -46,36 +44,41 @@ class Tag:
 
     @property
     def auto_flat(self):
-        if self.flat:  # force flat
-            return True
+        if self.flat is not None:  # user specified
+            return self.flat
         if not _is_iterable_not_str(self.contents):  # catch str, int, float, ...
             if not isinstance(self.contents, Tag):  # avoid recursion
                 return not "\n" in str(self.contents)  # flatten if single line
 
-    def indent_lines(self, lines):
-        if self.auto_flat:
+    @property
+    def is_empty(self):
+        return self.get_contents(force_flat=True) == ""
+
+    def indent_lines(self, lines, force_flat=False):
+        if self.auto_flat or force_flat:
             return lines
         else:
             indenter = " " * indent_count
             return "\n".join(f"{indenter}{line}" for line in lines.split("\n"))
 
-    def get_contents(self):
-        separator = "" if self.auto_flat else "\n"
+    def get_contents(self, force_flat=False):
+        separator = "" if self.auto_flat or force_flat else "\n"
         if _is_iterable_not_str(self.contents):
             return separator.join(
-                [self.indent_lines(str(c)) for c in self.contents if c is not None]
+                [
+                    self.indent_lines(str(c), force_flat)
+                    for c in self.contents
+                    if c is not None
+                ]
             )
         elif self.contents is None:
             return ""
         else:  # str, int, float, etc.
-            return self.indent_lines(str(self.contents))
+            return self.indent_lines(str(self.contents), force_flat)
 
     def __repr__(self):
-        # if self.flat:
-        #     import pudb; pudb.set_trace()
-
         separator = "" if self.auto_flat else "\n"
-        if self.contents is None and self.empty_is_none:
+        if self.delete_if_empty and self.is_empty:
             return ""
         else:
             html = [
@@ -89,6 +92,9 @@ class Tag:
 
 @dataclass
 class TagSingleton(Tag):
+    def __init__(self, **kwargs):
+        self.attribs = Attribs({**kwargs})
+
     def __repr__(self):
         return f"<{self.tagname}{str(self.attribs)} />"
 
