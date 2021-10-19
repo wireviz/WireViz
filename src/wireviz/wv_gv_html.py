@@ -209,20 +209,36 @@ def gv_conductor_table(cable, harness_options) -> Table:
         rows.append(Tr(cells_above))
 
         # the wire itself
-        rows.append(Tr(gv_wire_cell(i, connection_color, harness_options._pad)))
+        color_list = ["#000000"] + get_color_hex(connection_color, pad=harness_options._pad) + ["#000000"]
+        rows.append(Tr(gv_wire_cell(i, color_list)))
 
         # row below the wire
         # TODO: PN stuff for bundles
+
+    if cable.shield:
+        rows.append(Tr(Td("&nbsp;")))  # spacer between wires and shield
+        # row above the shield
+        cells_above = [
+            Td("<!-- s_in -->"),
+            Td("Shield"),
+            Td("<!-- s_out -->"),
+        ]
+        rows.append(Tr(cells_above))
+        # thw shield itself
+        if isinstance(cable.shield, str):
+            color_list = ["#000000"] + get_color_hex(cable.shield) + ["#000000"]
+        else:
+            color_list = ["#000000"]
+        rows.append(Tr(gv_wire_cell("s", color_list)))
 
     rows.append(Tr(Td("&nbsp;")))  # spacer row on bottom
     tbl = Table(rows, border=0, cellspacing=0, cellborder=0)
     return tbl
 
 
-def gv_wire_cell(index, color, pad) -> Td:
-    bgcolors = ["#000000"] + get_color_hex(color, pad=pad) + ["#000000"]
+def gv_wire_cell(index, color_list) -> Td:
     wire_inner_rows = []
-    for j, bgcolor in enumerate(bgcolors[::-1]):
+    for j, bgcolor in enumerate(color_list[::-1]):
         wire_inner_cell_attribs = {
             "colspan": 3,
             "cellpadding": 0,
@@ -237,7 +253,7 @@ def gv_wire_cell(index, color, pad) -> Td:
         "border": 0,
         "cellspacing": 0,
         "port": f"w{index}",
-        "height": 2 * len(bgcolors),
+        "height": 2 * len(color_list),
     }
     wire_outer_cell = Td(wire_inner_table, **wire_outer_cell_attribs)
 

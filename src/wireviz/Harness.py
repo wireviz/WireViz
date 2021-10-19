@@ -188,117 +188,49 @@ class Harness:
                 # style=style,
                 # fillcolor=translate_color(bgcolor, "HEX"),
             )
-            continue
 
             # TODO: connection edges
 
-            html = []
 
-            wirehtml = []
-            # conductor table
-            wirehtml.append('<table border="0" cellspacing="0" cellborder="0">')
-            wirehtml.append("   <tr><td>&nbsp;</td></tr>")
+            # # for bundles, individual wires can have part information
+            # if cable.category == "bundle":
+            #     # create a list of wire parameters
+            #     wireidentification = []
+            #     if isinstance(cable.pn, list):
+            #         wireidentification.append(
+            #             pn_info_string(
+            #                 HEADER_PN, None, remove_links(cable.pn[i - 1])
+            #             )
+            #         )
+            #     manufacturer_info = pn_info_string(
+            #         HEADER_MPN,
+            #         cable.manufacturer[i - 1]
+            #         if isinstance(cable.manufacturer, list)
+            #         else None,
+            #         cable.mpn[i - 1] if isinstance(cable.mpn, list) else None,
+            #     )
+            #     supplier_info = pn_info_string(
+            #         HEADER_SPN,
+            #         cable.supplier[i - 1]
+            #         if isinstance(cable.supplier, list)
+            #         else None,
+            #         cable.spn[i - 1] if isinstance(cable.spn, list) else None,
+            #     )
+            #     if manufacturer_info:
+            #         wireidentification.append(html_line_breaks(manufacturer_info))
+            #     if supplier_info:
+            #         wireidentification.append(html_line_breaks(supplier_info))
+            #     # print parameters into a table row under the wire
+            #     if len(wireidentification) > 0:
+            #         # fmt: off
+            #         wirehtml.append('   <tr><td colspan="3">')
+            #         wirehtml.append('    <table border="0" cellspacing="0" cellborder="0"><tr>')
+            #         for attrib in wireidentification:
+            #             wirehtml.append(f"     <td>{attrib}</td>")
+            #         wirehtml.append("    </tr></table>")
+            #         wirehtml.append("   </td></tr>")
+            #         # fmt: on
 
-            for i, (connection_color, wirelabel) in enumerate(
-                zip_longest(cable.colors, cable.wirelabels), 1
-            ):
-                wirehtml.append("   <tr>")
-                wirehtml.append(f"    <td><!-- {i}_in --></td>")
-                wirehtml.append(f"    <td>")
-
-                wireinfo = []
-                if cable.show_wirenumbers:
-                    wireinfo.append(str(i))
-                colorstr = wv_colors.translate_color(
-                    connection_color, self.options.color_mode
-                )
-                if colorstr:
-                    wireinfo.append(colorstr)
-                if cable.wirelabels:
-                    wireinfo.append(wirelabel if wirelabel is not None else "")
-                wirehtml.append(f'     {":".join(wireinfo)}')
-
-                wirehtml.append(f"    </td>")
-                wirehtml.append(f"    <td><!-- {i}_out --></td>")
-                wirehtml.append("   </tr>")
-
-                # fmt: off
-                bgcolors = ['#000000'] + get_color_hex(connection_color, pad=pad) + ['#000000']
-                wirehtml.append(f"   <tr>")
-                wirehtml.append(f'    <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}">')
-                wirehtml.append('     <table cellspacing="0" cellborder="0" border="0">')
-                for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
-                    wirehtml.append(f'      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>')
-                wirehtml.append("     </table>")
-                wirehtml.append("    </td>")
-                wirehtml.append("   </tr>")
-                # fmt: on
-
-                # for bundles, individual wires can have part information
-                if cable.category == "bundle":
-                    # create a list of wire parameters
-                    wireidentification = []
-                    if isinstance(cable.pn, list):
-                        wireidentification.append(
-                            pn_info_string(
-                                HEADER_PN, None, remove_links(cable.pn[i - 1])
-                            )
-                        )
-                    manufacturer_info = pn_info_string(
-                        HEADER_MPN,
-                        cable.manufacturer[i - 1]
-                        if isinstance(cable.manufacturer, list)
-                        else None,
-                        cable.mpn[i - 1] if isinstance(cable.mpn, list) else None,
-                    )
-                    supplier_info = pn_info_string(
-                        HEADER_SPN,
-                        cable.supplier[i - 1]
-                        if isinstance(cable.supplier, list)
-                        else None,
-                        cable.spn[i - 1] if isinstance(cable.spn, list) else None,
-                    )
-                    if manufacturer_info:
-                        wireidentification.append(html_line_breaks(manufacturer_info))
-                    if supplier_info:
-                        wireidentification.append(html_line_breaks(supplier_info))
-                    # print parameters into a table row under the wire
-                    if len(wireidentification) > 0:
-                        # fmt: off
-                        wirehtml.append('   <tr><td colspan="3">')
-                        wirehtml.append('    <table border="0" cellspacing="0" cellborder="0"><tr>')
-                        for attrib in wireidentification:
-                            wirehtml.append(f"     <td>{attrib}</td>")
-                        wirehtml.append("    </tr></table>")
-                        wirehtml.append("   </td></tr>")
-                        # fmt: on
-
-            if cable.shield:
-                wirehtml.append("   <tr><td>&nbsp;</td></tr>")  # spacer
-                wirehtml.append("   <tr>")
-                wirehtml.append("    <td><!-- s_in --></td>")
-                wirehtml.append("    <td>Shield</td>")
-                wirehtml.append("    <td><!-- s_out --></td>")
-                wirehtml.append("   </tr>")
-                if isinstance(cable.shield, str):
-                    # shield is shown with specified color and black borders
-                    shield_color_hex = wv_colors.get_color_hex(cable.shield)[0]
-                    attributes = (
-                        f'height="6" bgcolor="{shield_color_hex}" border="2" sides="tb"'
-                    )
-                else:
-                    # shield is shown as a thin black wire
-                    attributes = f'height="2" bgcolor="#000000" border="0"'
-                # fmt: off
-                wirehtml.append(f'   <tr><td colspan="3" cellpadding="0" {attributes} port="ws"></td></tr>')
-                # fmt: on
-
-            wirehtml.append("   <tr><td>&nbsp;</td></tr>")
-            wirehtml.append("  </table>")
-
-            html = [
-                row.replace("<!-- wire table -->", "\n".join(wirehtml)) for row in html
-            ]
 
             # connections
             for connection in cable.connections:
@@ -316,11 +248,14 @@ class Harness:
                     )
                 else:  # it's a shield connection
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
+                    if isinstance(cable.shield, str):
+                        shield_color_hex = wv_colors.get_color_hex(cable.shield)[0]
+                        shield_color_str = ":".join(["#000000", shield_color_hex, "#000000"])
+                    else:
+                        shield_color_str = "#000000"
                     dot.attr(
                         "edge",
-                        color=":".join(["#000000", shield_color_hex, "#000000"])
-                        if isinstance(cable.shield, str)
-                        else "#000000",
+                        color=shield_color_str,
                     )
                 if connection.from_pin is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
@@ -345,10 +280,10 @@ class Harness:
                         from_string = ":".join(from_info)
                     else:
                         from_string = ""
-                    html = [
-                        row.replace(f"<!-- {connection.via_port}_in -->", from_string)
-                        for row in html
-                    ]
+                    # html = [
+                    #     row.replace(f"<!-- {connection.via_port}_in -->", from_string)
+                    #     for row in html
+                    # ]
                 if connection.to_pin is not None:  # connect to right
                     to_connector = self.connectors[connection.to_name]
                     to_pin_index = to_connector.pins.index(connection.to_pin)
@@ -367,24 +302,24 @@ class Harness:
                         to_string = ":".join(to_info)
                     else:
                         to_string = ""
-                    html = [
-                        row.replace(f"<!-- {connection.via_port}_out -->", to_string)
-                        for row in html
-                    ]
+                    # html = [
+                    #     row.replace(f"<!-- {connection.via_port}_out -->", to_string)
+                    #     for row in html
+                    # ]
 
             style, bgcolor = (
                 ("filled,dashed", self.options.bgcolor_bundle)
                 if cable.category == "bundle"
                 else ("filled", self.options.bgcolor_cable)
             )
-            html = "\n".join(html)
-            dot.node(
-                cable.name,
-                label=f"<\n{html}\n>",
-                shape="box",
-                style=style,
-                fillcolor=translate_color(bgcolor, "HEX"),
-            )
+            # html = "\n".join(html)
+            # dot.node(
+            #     cable.name,
+            #     label=f"<\n{html}\n>",
+            #     shape="box",
+            #     style=style,
+            #     fillcolor=translate_color(bgcolor, "HEX"),
+            # )
 
         apply_dot_tweaks(dot, self.tweak)
 
