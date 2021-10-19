@@ -6,13 +6,10 @@ from typing import Any, List, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.DataClasses import (
-    Arrow,
     ArrowDirection,
     ArrowWeight,
     Cable,
-    Color,
     Component,
-    Connection,
     Connector,
     MateComponent,
     MatePin,
@@ -470,7 +467,7 @@ def image_and_caption_cells(component: Component) -> (Td, Td):
 
 def html_size_attr_dict(image):
     # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
-    from wireviz.DataClasses import Image
+    pass
 
     attr_dict = {}
     if image:
