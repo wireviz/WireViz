@@ -86,16 +86,22 @@ def gv_node_component(
         line_notes,
     ]
 
-    if component.bgcolor:
-        tbl_bgcolor = translate_color(component.bgcolor, "HEX")
-    elif isinstance(component, Connector) and harness_options.bgcolor_connector:
-        tbl_bgcolor = translate_color(harness_options.bgcolor_connector, "HEX")
-    elif isinstance(component, Cable) and harness_options.bgcolor_cable:
-        tbl_bgcolor = translate_color(harness_options.bgcolor_cable, "HEX")
-
     tbl = nested_table(lines)
-    tbl.update_attribs(bgcolor=tbl_bgcolor)
+
     return tbl
+
+
+def calculate_node_bgcolor(component, harness_options):
+    # assign component node bgcolor at the GraphViz node level
+    # instead of at the HTML table level for better rendering of node outline
+    if component.bgcolor:
+        return translate_color(component.bgcolor, "HEX")
+    elif isinstance(component, Connector) and harness_options.bgcolor_connector:
+        return translate_color(harness_options.bgcolor_connector, "HEX")
+    elif isinstance(component, Cable) and component.category == "bundle" and harness_options.bgcolor_bundle:
+        return translate_color(harness_options.bgcolor_bundle, "HEX")
+    elif isinstance(component, Cable) and harness_options.bgcolor_cable:
+        return translate_color(harness_options.bgcolor_cable, "HEX")
 
 
 def make_list_of_cells(inp) -> List[Td]:
@@ -135,7 +141,7 @@ def nested_table(lines: List[Td]) -> Table:
         else:
             # nest cell content inside a table
             inner_table = Table(
-                Tr(cells), border=0, cellspacing=0, cellpadding=3, cellborder=1
+                Tr(cells), border=0, cellborder=1, cellpadding=3, cellspacing=0
             )
         rows.append(Tr(Td(inner_table)))
 
@@ -158,7 +164,7 @@ def gv_pin_table(component) -> Table:
             pin_rows.append(
                 gv_pin_row(pinindex, pinname, pinlabel, pincolor, component)
             )
-    tbl = Table(pin_rows, border=0, cellspacing=0, cellpadding=3, cellborder=1)
+    tbl = Table(pin_rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
     return tbl
 
 
@@ -237,7 +243,7 @@ def gv_conductor_table(cable, harness_options) -> Table:
         # wire_pn_stuff() see below
 
     rows.append(Tr(Td("&nbsp;")))  # spacer row on bottom
-    tbl = Table(rows, border=0, cellspacing=0, cellborder=0)
+    tbl = Table(rows, border=0, cellborder=0, cellspacing=0)
     return tbl
 
 
@@ -250,20 +256,21 @@ def gv_wire_cell(wire: Union[WireClass, ShieldClass], padding) -> Td:
     wire_inner_rows = []
     for j, bgcolor in enumerate(color_list[::-1]):
         wire_inner_cell_attribs = {
-            "colspan": 3,
-            "cellpadding": 0,
-            "height": 2,
-            "border": 0,
             "bgcolor": bgcolor if bgcolor != "" else "BK",
+            "border": 0,
+            "cellpadding": 0,
+            "colspan": 3,
+            "height": 2,
         }
         wire_inner_rows.append(Tr(Td("", **wire_inner_cell_attribs)))
-    wire_inner_table = Table(wire_inner_rows, cellspacing=0, cellborder=0, border=0)
+    wire_inner_table = Table(wire_inner_rows, border=0, cellborder=0, cellspacing=0)
     wire_outer_cell_attribs = {
-        "colspan": 3,
         "border": 0,
         "cellspacing": 0,
-        "port": f"w{wire.index+1}",
+        "cellpadding": 0,
+        "colspan": 3,
         "height": 2 * len(color_list),
+        "port": f"w{wire.index+1}",
     }
     # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
     wire_outer_cell = Td(wire_inner_table, **wire_outer_cell_attribs)
@@ -386,7 +393,7 @@ def image_and_caption_cells(component: Component) -> (Td, Td):
         # further nest the image in a table with width/height/fixedsize parameters, and place that table in a cell
         image_cell_inner.update_attribs(**html_size_attr_dict(component.image))
         image_cell = Td(
-            Table(Tr(image_cell_inner), border=0, cellspacing=0, cellborder=0, id="!")
+            Table(Tr(image_cell_inner), border=0, cellborder=0, cellspacing=0, id="!")
         )
     else:
         image_cell = image_cell_inner
