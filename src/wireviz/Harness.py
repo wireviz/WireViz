@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from dataclasses import dataclass
-from itertools import zip_longest
 from pathlib import Path
 
 from graphviz import Graph
 
-from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import (
     Arrow,
-    ArrowDirection,
     ArrowWeight,
     Cable,
     Connector,
@@ -22,16 +19,9 @@ from wireviz.DataClasses import (
 )
 from wireviz.svgembed import embed_svg_images_file
 from wireviz.wv_bom import (
-    HEADER_MPN,
-    HEADER_PN,
-    HEADER_SPN,
     bom_list,
-    component_table_entry,
     generate_bom,
-    get_additional_component_table,
-    pn_info_string,
 )
-from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
     apply_dot_tweaks,
     calculate_node_bgcolor,
@@ -39,15 +29,10 @@ from wireviz.wv_gv_html import (
     gv_edge_mate,
     gv_edge_wire,
     gv_node_component,
-    html_line_breaks,
     parse_arrow_str,
-    remove_links,
     set_dot_basics,
 )
 from wireviz.wv_helper import (
-    flatten2d,
-    is_arrow,
-    open_file_read,
     open_file_write,
     tuplelist2tsv,
 )
