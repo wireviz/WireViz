@@ -140,7 +140,18 @@ class Harness:
                 )  # list index starts at 0, wire IDs start at 1
 
         # perform the actual connection
-        self.cables[via_name].connect(from_name, from_pin, via_wire, to_name, to_pin)
+        if from_name is not None:
+            from_con = self.connectors[from_name]
+            from_pin_obj = from_con.get_pin_by_id(from_pin)
+        else:
+            from_pin_obj = None
+        if to_name is not None:
+            to_con = self.connectors[to_name]
+            to_pin_obj = to_con.get_pin_by_id(to_pin)
+        else:
+            to_pin_obj = None
+
+        self.cables[via_name].connect(from_pin_obj, via_wire, to_pin_obj)
         if from_name in self.connectors:
             self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
         if to_name in self.connectors:
