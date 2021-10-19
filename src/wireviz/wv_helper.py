@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 awg_equiv_table = {
     "0.09": "28",

@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re
-from collections import Counter
 from dataclasses import dataclass
 from itertools import zip_longest
 from pathlib import Path
-from typing import Any, List, Union
 
 from graphviz import Graph
 

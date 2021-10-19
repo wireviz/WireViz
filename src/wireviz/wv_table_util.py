@@ -2,7 +2,7 @@
 
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Dict
 
 indent_count = 1
 
