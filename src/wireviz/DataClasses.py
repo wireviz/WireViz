@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from dataclasses import InitVar, dataclass, field
-from enum import Enum, auto
+from dataclasses import dataclass, field
+from enum import Enum
 from itertools import zip_longest
-from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 from wireviz.wv_colors import COLOR_CODES, Color, ColorMode, Colors, ColorScheme

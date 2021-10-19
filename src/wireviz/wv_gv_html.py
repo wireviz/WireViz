@@ -2,7 +2,7 @@
 
 import re
 from itertools import zip_longest
-from typing import Any, List, Optional, Union
+from typing import Any, List, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.DataClasses import (
