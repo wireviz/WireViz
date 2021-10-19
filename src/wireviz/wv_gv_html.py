@@ -5,7 +5,16 @@ from itertools import zip_longest
 from typing import Any, List, Optional, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
-from wireviz.DataClasses import Cable, Color, Component, Connector, Options
+from wireviz.DataClasses import (
+    Cable,
+    Color,
+    Component,
+    Connection,
+    Connector,
+    Options,
+    ShieldClass,
+    WireClass,
+)
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_helper import pn_info_string, remove_links
 from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
@@ -154,6 +163,7 @@ def gv_pin_table(component) -> Table:
 
 
 def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector) -> Tr:
+    # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
     cell_pin_left = Td(pin_name, port=f"p{pin_index+1}l")
     cell_pin_label = Td(pin_label, delete_if_empty=True)
     cell_pin_right = Td(pin_name, port=f"p{pin_index+1}r")
@@ -187,61 +197,56 @@ def gv_conductor_table(cable, harness_options) -> Table:
     rows = []
     rows.append(Tr(Td("&nbsp;")))  # spacer row on top
 
-    for i, (connection_color, wirelabel) in enumerate(
-        zip_longest(cable.colors, cable.wirelabels), 1
-    ):
+    inserted_break_inbetween = False
+    for wire in cable.wire_objects:
+
+        # insert blank space between wires and shields
+        if isinstance(wire, ShieldClass) and not inserted_break_inbetween:
+            rows.append(Tr(Td("&nbsp;")))  # spacer row between wires and shields
+            inserted_break_inbetween = True
 
         # row above the wire
         wireinfo = []
-        if cable.show_wirenumbers:
-            wireinfo.append(str(i))
-        colorstr = translate_color(connection_color, harness_options.color_mode)
-        if colorstr:
-            wireinfo.append(colorstr)
-        if cable.wirelabels:
-            wireinfo.append(wirelabel if wirelabel is not None else "")
+        if cable.show_wirenumbers and not isinstance(wire, ShieldClass):
+            wireinfo.append(str(wire.id))
+        wireinfo.append(translate_color(wire.color, harness_options.color_mode))
+        wireinfo.append(wire.label)
+
+        ins, outs = [], []
+        for conn in cable.connections:
+            if conn.via.id == wire.id:
+                if conn.from_ is not None:
+                    from_label = f":{conn.from_.label}" if conn.from_.label else ""
+                    ins.append(f"{conn.from_.parent}:{conn.from_.id}{from_label}")
+                if conn.to is not None:
+                    to_label = f":{conn.to.label}" if conn.to.label else ""
+                    outs.append(f"{conn.to.parent}:{conn.to.id}{to_label}")
 
         cells_above = [
-            Td(f"<!-- {i}_in -->"),
-            Td(":".join(wireinfo)),
-            Td(f"<!-- {i}_out -->"),
+            Td(", ".join(ins)),
+            Td(":".join([wi for wi in wireinfo if wi is not None])),
+            Td(", ".join(outs)),
         ]
         rows.append(Tr(cells_above))
 
         # the wire itself
-        color_list = (
-            ["#000000"]
-            + get_color_hex(connection_color, pad=harness_options._pad)
-            + ["#000000"]
-        )
-        rows.append(Tr(gv_wire_cell(i, color_list)))
+        rows.append(Tr(gv_wire_cell(wire, padding=harness_options._pad)))
 
         # row below the wire
         # TODO: PN stuff for bundles
         # wire_pn_stuff() see below
-
-    if cable.shield:
-        rows.append(Tr(Td("&nbsp;")))  # spacer between wires and shield
-        # row above the shield
-        cells_above = [
-            Td("<!-- s_in -->"),
-            Td("Shield"),
-            Td("<!-- s_out -->"),
-        ]
-        rows.append(Tr(cells_above))
-        # thw shield itself
-        if isinstance(cable.shield, str):
-            color_list = ["#000000"] + get_color_hex(cable.shield) + ["#000000"]
-        else:
-            color_list = ["#000000"]
-        rows.append(Tr(gv_wire_cell("s", color_list)))
 
     rows.append(Tr(Td("&nbsp;")))  # spacer row on bottom
     tbl = Table(rows, border=0, cellspacing=0, cellborder=0)
     return tbl
 
 
-def gv_wire_cell(index, color_list) -> Td:
+def gv_wire_cell(wire: Union[WireClass, ShieldClass], padding) -> Td:
+    if wire.color:
+        color_list = ["#000000"] + get_color_hex(wire.color, pad=padding) + ["#000000"]
+    else:
+        color_list = ["#000000"]
+
     wire_inner_rows = []
     for j, bgcolor in enumerate(color_list[::-1]):
         wire_inner_cell_attribs = {
@@ -257,9 +262,10 @@ def gv_wire_cell(index, color_list) -> Td:
         "colspan": 3,
         "border": 0,
         "cellspacing": 0,
-        "port": f"w{index}",
+        "port": f"w{wire.index+1}",
         "height": 2 * len(color_list),
     }
+    # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
     wire_outer_cell = Td(wire_inner_table, **wire_outer_cell_attribs)
 
     return wire_outer_cell
@@ -308,69 +314,39 @@ def wire_pn_stuff():
 
 
 def gv_edge_wire(harness, cable, connection) -> (str, str, str):
-    if isinstance(connection.via_port, int):
+    if connection.via.color:
         # check if it's an actual wire and not a shield
-        wire_color = get_color_hex(
-            cable.colors[connection.via_port - 1], pad=harness.options._pad
-        )
+        wire_color = get_color_hex(connection.via.color, pad=harness.options._pad)
         color = ":".join(["#000000"] + wire_color + ["#000000"])
     else:  # it's a shield connection
         # shield is shown with specified color and black borders, or as a thin black wire otherwise
-        if isinstance(cable.shield, str):
-            shield_color_hex = get_color_hex(cable.shield)[0]
+        if connection.via.color:
+            shield_color_hex = get_color_hex(connection.via.color)[0]
             shield_color_str = ":".join(["#000000", shield_color_hex, "#000000"])
         else:
             shield_color_str = "#000000"
         color = shield_color_str
-    if connection.from_pin is not None:  # connect to left
-        from_connector = harness.connectors[connection.from_name]
-        from_pin_index = from_connector.pins.index(connection.from_pin)
-        from_port_str = (
-            f":p{from_pin_index+1}r" if from_connector.style != "simple" else ""
-        )
-        code_left_1 = f"{connection.from_name}{from_port_str}:e"
-        code_left_2 = f"{cable.name}:w{connection.via_port}:w"
-        # dot.edge(code_left_1, code_left_2)
-        if from_connector.show_name:
-            from_info = [
-                str(connection.from_name),
-                str(connection.from_pin),
-            ]
-            if from_connector.pinlabels:
-                pinlabel = from_connector.pinlabels[from_pin_index]
-                if pinlabel != "":
-                    from_info.append(pinlabel)
-            from_string = ":".join(from_info)
 
-        else:
-            from_string = ""
-        # html = [
-        #     row.replace(f"<!-- {connection.via_port}_in -->", from_string)
-        #     for row in html
-        # ]
+    if connection.from_ is not None:  # connect to left
+        from_port_str = (
+            f":p{connection.from_.index+1}r"
+            if harness.connectors[connection.from_.parent].style != "simple"
+            else ""
+        )
+        code_left_1 = f"{connection.from_.parent}{from_port_str}:e"
+        code_left_2 = f"{connection.via.parent}:w{connection.via.index+1}:w"
+        # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
     else:
         code_left_1, code_left_2 = None, None
 
-    if connection.to_pin is not None:  # connect to right
-        to_connector = harness.connectors[connection.to_name]
-        to_pin_index = to_connector.pins.index(connection.to_pin)
-        to_port_str = f":p{to_pin_index+1}l" if to_connector.style != "simple" else ""
-        code_right_1 = f"{cable.name}:w{connection.via_port}:e"
-        code_right_2 = f"{connection.to_name}{to_port_str}:w"
-        # dot.edge(code_right_1, code_right_2)
-        if to_connector.show_name:
-            to_info = [str(connection.to_name), str(connection.to_pin)]
-            if to_connector.pinlabels:
-                pinlabel = to_connector.pinlabels[to_pin_index]
-                if pinlabel != "":
-                    to_info.append(pinlabel)
-            to_string = ":".join(to_info)
-        else:
-            to_string = ""
-        # html = [
-        #     row.replace(f"<!-- {connection.via_port}_out -->", to_string)
-        #     for row in html
-        # ]
+    if connection.to is not None:  # connect to right
+        to_port_str = (
+            f":p{connection.to.index+1}l"
+            if harness.connectors[connection.from_.parent].style != "simple"
+            else ""
+        )
+        code_right_1 = f"{connection.via.parent}:w{connection.via.index+1}:e"
+        code_right_2 = f"{connection.to.parent}{to_port_str}:w"
     else:
         code_right_1, code_right_2 = None, None
 
