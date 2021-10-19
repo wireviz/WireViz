@@ -6,7 +6,7 @@ from itertools import zip_longest
 from typing import Dict, List, Optional, Tuple, Union
 
 from wireviz.wv_colors import COLOR_CODES, Color, ColorMode, Colors, ColorScheme
-from wireviz.wv_helper import aspect_ratio, awg_equiv, int2tuple, mm2_equiv
+from wireviz.wv_helper import aspect_ratio, awg_equiv, mm2_equiv
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
 PlainText = str  # Text not containing HTML tags nor newlines
