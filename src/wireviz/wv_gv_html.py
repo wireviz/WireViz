@@ -49,10 +49,7 @@ def gv_node_component(
 
     if isinstance(component, Connector):
         line_info = [
-            Td(
-                html_line_breaks(component.type),
-                port="p1l" if is_simple_connector else None,
-            ),
+            html_line_breaks(component.type),
             html_line_breaks(component.subtype),
             f"{component.pincount}-pin" if component.show_pincount else None,
             translate_color(component.color, harness_options.color_mode),
@@ -96,7 +93,14 @@ def gv_node_component(
     ]
 
     tbl = nested_table(lines)
-    tbl.update_attribs(port="p1r" if is_simple_connector else None)
+    if is_simple_connector:
+        # Simple connectors have no pin table, and therefore, no ports to attach wires to.
+        # Manually assign left and right ports here if required.
+        # Use table itself for right port, and the first cell for left port.
+        # Even if the table only has one cell, two separate ports can still be assigned.
+        tbl.update_attribs(port="p1r")
+        first_cell_in_tbl = tbl.contents[0].contents
+        first_cell_in_tbl.update_attribs(port="p1l")
 
     return tbl
 

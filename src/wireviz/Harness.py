@@ -18,10 +18,7 @@ from wireviz.DataClasses import (
     Tweak,
 )
 from wireviz.svgembed import embed_svg_images_file
-from wireviz.wv_bom import (
-    bom_list,
-    generate_bom,
-)
+from wireviz.wv_bom import bom_list, generate_bom
 from wireviz.wv_gv_html import (
     apply_dot_tweaks,
     calculate_node_bgcolor,
@@ -32,10 +29,7 @@ from wireviz.wv_gv_html import (
     parse_arrow_str,
     set_dot_basics,
 )
-from wireviz.wv_helper import (
-    open_file_write,
-    tuplelist2tsv,
-)
+from wireviz.wv_helper import open_file_write, tuplelist2tsv
 from wireviz.wv_html import generate_html_output
 
 
