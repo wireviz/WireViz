@@ -79,17 +79,16 @@ def gv_node_component(
 
     tbl = nested_table(lines)
 
-    if component.bgcolor:
-        tbl.attribs["bgcolor"] = translate_color(component.bgcolor, "HEX")
-    else:
-        if isinstance(component, Connector) and harness_options.bgcolor_connector:
-            tbl.attribs["bgcolor"] = translate_color(
-                harness_options.bgcolor_connector, "HEX"
-            )
-        elif isinstance(component, Cable) and harness_options.bgcolor_cable:
-            tbl.attribs["bgcolor"] = translate_color(
-                harness_options.bgcolor_cable, "HEX"
-            )
+    tbl.update_attribs(bgcolor=translate_color(component.bgcolor, "HEX"))
+
+    if isinstance(component, Connector) and harness_options.bgcolor_connector:
+        tbl.update_attribs(
+            bgcolor=translate_color(harness_options.bgcolor_connector, "HEX")
+        )
+    elif isinstance(component, Cable) and harness_options.bgcolor_cable:
+        tbl.update_attribs(
+            bgcolor=translate_color(harness_options.bgcolor_cable, "HEX")
+        )
 
     return tbl
 
@@ -129,22 +128,13 @@ def nested_table(lines: List[Td]) -> Table:
             inner_table = cells[0].contents
         else:
             # nest cell content inside a table
-            inner_table_attribs = {
-                "border": 0,
-                "cellspacing": 0,
-                "cellpadding": 3,
-                "cellborder": 1,
-            }
-            inner_table = Table(Tr(cells), attribs=inner_table_attribs)
+            inner_table = Table(
+                Tr(cells), border=0, cellspacing=0, cellpadding=3, cellborder=1
+            )
         rows.append(Tr(Td(inner_table)))
     if len(rows) == 0:  # create dummy row to avoid GraphViz errors due to empty <table>
         rows = Tr(Td(""))
-    outer_table_attribs = {
-        "border": 0,
-        "cellspacing": 0,
-        "cellpadding": 0,
-    }
-    tbl = Table(rows, attribs=outer_table_attribs)
+    tbl = Table(rows, border=0, cellspacing=0, cellpadding=0)
 
     return tbl
 
@@ -163,20 +153,13 @@ def gv_pin_table(component) -> Table:
                 gv_pin_row(pinindex, pinname, pinlabel, pincolor, component)
             )
 
-    table_attribs = {
-        "border": 0,
-        "cellspacing": 0,
-        "cellpadding": 3,
-        "cellborder": 1,
-    }
-
-    return Table(pin_rows, attribs=table_attribs)
+    return Table(pin_rows, border=0, cellspacing=0, cellpadding=3, cellborder=1)
 
 
 def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector) -> Tr:
-    cell_pin_left = Td(pin_name, attribs={"port": f"p{pin_index+1}l"})
-    cell_pin_label = Td(pin_label, empty_is_none=True)
-    cell_pin_right = Td(pin_name, attribs={"port": f"p{pin_index+1}r"})
+    cell_pin_left = Td(pin_name, port=f"p{pin_index+1}l")
+    cell_pin_label = Td(pin_label, delete_if_empty=True)
+    cell_pin_right = Td(pin_name, port=f"p{pin_index+1}r")
 
     cells = [
         cell_pin_left if connector.ports_left else None,
@@ -234,12 +217,7 @@ def gv_conductor_table(cable, harness_options) -> Table:
 
     rows.append(Tr(Td("&nbsp;")))
 
-    table_attribs = {
-        "border": 0,
-        "cellspacing": 0,
-        "cellborder": 0,
-    }
-    tbl = Table(rows, attribs=table_attribs)
+    tbl = Table(rows, border=0, cellspacing=0, cellborder=0)
 
     return tbl
 
@@ -255,9 +233,8 @@ def gv_wire_cell(index, color, pad) -> Td:
             "border": 0,
             "bgcolor": bgcolor if bgcolor != "" else "BK",
         }
-        wire_inner_rows.append(Tr(Td("", attribs=wire_inner_cell_attribs)))
-    wire_inner_table_attribs = {"cellspacing": 0, "cellborder": 0, "border": 0}
-    wire_inner_table = Table(wire_inner_rows, wire_inner_table_attribs)
+        wire_inner_rows.append(Tr(Td("", **wire_inner_cell_attribs)))
+    wire_inner_table = Table(wire_inner_rows, cellspacing=0, cellborder=0, border=0)
     wire_outer_cell_attribs = {
         "colspan": 3,
         "border": 0,
@@ -265,17 +242,13 @@ def gv_wire_cell(index, color, pad) -> Td:
         "port": f"w{index}",
         "height": 2 * len(bgcolors),
     }
-    wire_outer_cell = Td(wire_inner_table, attribs=wire_outer_cell_attribs)
+    wire_outer_cell = Td(wire_inner_table, **wire_outer_cell_attribs)
 
     return wire_outer_cell
 
 
 def colored_cell(contents, bgcolor) -> Td:
-    if bgcolor:
-        attribs = {"bgcolor": translate_color(bgcolor, "HEX")}
-    else:
-        attribs = {}
-    return Td(contents, attribs=attribs)
+    return Td(contents, bgcolor=translate_color(bgcolor, "HEX"))
 
 
 def part_number_str_list(component: Component) -> List[str]:
@@ -292,11 +265,7 @@ def part_number_str_list(component: Component) -> List[str]:
 
 def colorbar_cell(color) -> Td:
     if color:
-        colorbar_attribs = {
-            "bgcolor": translate_color(color, "HEX"),
-            "width": 4,
-        }
-        return Td("", attribs=colorbar_attribs)
+        return Td("", bgcolor=translate_color(color, "HEX"), width=4)
     else:
         return None
 
@@ -305,35 +274,26 @@ def image_and_caption_cells(component: Component) -> (Td, Td):
     if not component.image:
         return (None, None)
 
-    image_tag = Img(
-        attribs={"scale": component.image.scale, "src": component.image.src}
-    )
+    image_tag = Img(scale=component.image.scale, src=component.image.src)
     image_cell_inner = Td(image_tag, flat=True)
     if component.image.fixedsize:
         # further nest the image in a table with width/height/fixedsize parameters, and place that table in a cell
-        inner_cell_attribs = html_size_attr_dict(component.image)
-        image_cell_inner.attribs = Attribs(inner_cell_attribs)
+        image_cell_inner.update_attribs(**html_size_attr_dict(component.image))
         image_cell = Td(
-            Table(
-                Tr(image_cell_inner),
-                attribs={"border": 0, "cellspacing": 0, "cellborder": 0, "id": "!"},
-            )
+            Table(Tr(image_cell_inner), border=0, cellspacing=0, cellborder=0, id="!")
         )
     else:
         image_cell = image_cell_inner
 
-    outer_cell_attribs = {}
-    outer_cell_attribs["balign"] = "left"
-    if component.image.bgcolor:
-        outer_cell_attribs["bgcolor"] = translate_color(component.image.bgcolor, "HEX")
-    if component.image.caption:
-        outer_cell_attribs["sides"] = "TLR"
-    image_cell.attribs = Attribs(outer_cell_attribs)
+    image_cell.update_attribs(
+        balign="left",
+        bgcolor=translate_color(component.image.bgcolor, "HEX"),
+        sides="TLR" if component.image.caption else None,
+    )
 
     if component.image.caption:
         caption_cell = Td(
-            f"{html_line_breaks(component.image.caption)}",
-            attribs={"balign": "left", "sides": "BLR", "id": "td_caption"},
+            f"{html_line_breaks(component.image.caption)}", balign="left", sides="BLR"
         )
     else:
         caption_cell = None
