@@ -77,19 +77,15 @@ def gv_node_component(
         line_notes,
     ]
 
-    tbl = nested_table(lines)
-
-    tbl.update_attribs(bgcolor=translate_color(component.bgcolor, "HEX"))
-
-    if isinstance(component, Connector) and harness_options.bgcolor_connector:
-        tbl.update_attribs(
-            bgcolor=translate_color(harness_options.bgcolor_connector, "HEX")
-        )
+    if component.bgcolor:
+        tbl_bgcolor = translate_color(component.bgcolor, "HEX")
+    elif isinstance(component, Connector) and harness_options.bgcolor_connector:
+        tbl_bgcolor = translate_color(harness_options.bgcolor_connector, "HEX")
     elif isinstance(component, Cable) and harness_options.bgcolor_cable:
-        tbl.update_attribs(
-            bgcolor=translate_color(harness_options.bgcolor_cable, "HEX")
-        )
+        tbl_bgcolor = translate_color(harness_options.bgcolor_cable, "HEX")
 
+    tbl = nested_table(lines)
+    tbl.update_attribs(bgcolor=tbl_bgcolor)
     return tbl
 
 
@@ -111,6 +107,7 @@ def make_list_of_cells(inp) -> List[Td]:
 def nested_table(lines: List[Td]) -> Table:
     cell_lists = [make_list_of_cells(line) for line in lines]
     rows = []
+
     for lst in cell_lists:
         if len(lst) == 0:
             continue  # no cells in list
@@ -132,10 +129,10 @@ def nested_table(lines: List[Td]) -> Table:
                 Tr(cells), border=0, cellspacing=0, cellpadding=3, cellborder=1
             )
         rows.append(Tr(Td(inner_table)))
+
     if len(rows) == 0:  # create dummy row to avoid GraphViz errors due to empty <table>
         rows = Tr(Td(""))
     tbl = Table(rows, border=0, cellspacing=0, cellpadding=0)
-
     return tbl
 
 
@@ -152,8 +149,8 @@ def gv_pin_table(component) -> Table:
             pin_rows.append(
                 gv_pin_row(pinindex, pinname, pinlabel, pincolor, component)
             )
-
-    return Table(pin_rows, border=0, cellspacing=0, cellpadding=3, cellborder=1)
+    tbl = Table(pin_rows, border=0, cellspacing=0, cellpadding=3, cellborder=1)
+    return tbl
 
 
 def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector) -> Tr:
@@ -187,9 +184,8 @@ def gv_connector_loops(connector: Connector) -> List:
 
 
 def gv_conductor_table(cable, harness_options) -> Table:
-
     rows = []
-    rows.append(Tr(Td("&nbsp;")))
+    rows.append(Tr(Td("&nbsp;")))  # spacer row on top
 
     for i, (connection_color, wirelabel) in enumerate(
         zip_longest(cable.colors, cable.wirelabels), 1
@@ -215,10 +211,11 @@ def gv_conductor_table(cable, harness_options) -> Table:
         # the wire itself
         rows.append(Tr(gv_wire_cell(i, connection_color, harness_options._pad)))
 
-    rows.append(Tr(Td("&nbsp;")))
+        # row below the wire
+        # TODO: PN stuff for bundles
 
+    rows.append(Tr(Td("&nbsp;")))  # spacer row on bottom
     tbl = Table(rows, border=0, cellspacing=0, cellborder=0)
-
     return tbl
 
 
