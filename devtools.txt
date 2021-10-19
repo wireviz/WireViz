@@ -3,9 +3,9 @@
 # pip install -r devtools.txt
 
 # Code formatting
-black
-isort
+black  # black src/wireviz/*.py
+isort  # isort src/wireviz/*py
 
 # Development aids
-pudb  # visual python debugger
-autoflake  # to be tested
+pudb       # import pudb; pudb.set_trace()
+autoflake  # autoflake -i --remove-all-unused-imports src/wireviz/*.py
