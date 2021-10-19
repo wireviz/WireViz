@@ -39,6 +39,7 @@ from wireviz.wv_gv_html import (
     gv_node_component,
     html_line_breaks,
     remove_links,
+    calculate_node_bgcolor,
     set_dot_basics,
 )
 from wireviz.wv_helper import (
@@ -164,8 +165,9 @@ class Harness:
         for connector in self.connectors.values():
             # generate connector node
             gv_html = gv_node_component(connector, self.options)
+            bgcolor = calculate_node_bgcolor(connector, self.options)
             dot.node(
-                connector.name, label=f"<\n{gv_html}\n>", shape="box", style="filled"
+                connector.name, label=f"<\n{gv_html}\n>", bgcolor=bgcolor, shape="box", style="filled"
             )
             # generate edges for connector loops
             if len(connector.loops) > 0:
@@ -188,10 +190,9 @@ class Harness:
             # generate cable node
             # TODO: PN info for bundles (per wire)
             gv_html = gv_node_component(cable, self.options)
-            dot.node(cable.name, label=f"<\n{gv_html}\n>", shape="box")
-            # style=style,
-            # fillcolor=translate_color(bgcolor, "HEX"),
-            # generate edges for wires in cable
+            bgcolor = calculate_node_bgcolor(cable, self.options)
+            style = "filled,dashed" if cable.category == "bundle" else "filled"
+            dot.node(cable.name, label=f"<\n{gv_html}\n>", bgcolor=bgcolor, shape="box", style=style)
             for connection in cable.connections:
                 color, l1, l2, r1, r2 = gv_edge_wire(self, cable, connection)
                 dot.attr("edge", color=color)
@@ -200,11 +201,6 @@ class Harness:
                 if not (r1, r2) == (None, None):
                     dot.edge(r1, r2)
 
-            style, bgcolor = (
-                ("filled,dashed", self.options.bgcolor_bundle)
-                if cable.category == "bundle"
-                else ("filled", self.options.bgcolor_cable)
-            )
 
         apply_dot_tweaks(dot, self.tweak)
 
