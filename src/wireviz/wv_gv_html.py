@@ -6,11 +6,16 @@ from typing import Any, List, Optional, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.DataClasses import (
+    Arrow,
+    ArrowDirection,
+    ArrowWeight,
     Cable,
     Color,
     Component,
     Connection,
     Connector,
+    MateComponent,
+    MatePin,
     Options,
     ShieldClass,
     WireClass,
@@ -41,9 +46,16 @@ def gv_node_component(
 
     line_pn = part_number_str_list(component)
 
+    is_simple_connector = (
+        isinstance(component, Connector) and component.style == "simple"
+    )
+
     if isinstance(component, Connector):
         line_info = [
-            html_line_breaks(component.type),
+            Td(
+                html_line_breaks(component.type),
+                port="p1l" if is_simple_connector else None,
+            ),
             html_line_breaks(component.subtype),
             f"{component.pincount}-pin" if component.show_pincount else None,
             translate_color(component.color, harness_options.color_mode),
@@ -87,6 +99,7 @@ def gv_node_component(
     ]
 
     tbl = nested_table(lines)
+    tbl.update_attribs(port="p1r" if is_simple_connector else None)
 
     return tbl
 
@@ -98,7 +111,11 @@ def calculate_node_bgcolor(component, harness_options):
         return translate_color(component.bgcolor, "HEX")
     elif isinstance(component, Connector) and harness_options.bgcolor_connector:
         return translate_color(harness_options.bgcolor_connector, "HEX")
-    elif isinstance(component, Cable) and component.category == "bundle" and harness_options.bgcolor_bundle:
+    elif (
+        isinstance(component, Cable)
+        and component.category == "bundle"
+        and harness_options.bgcolor_bundle
+    ):
         return translate_color(harness_options.bgcolor_bundle, "HEX")
     elif isinstance(component, Cable) and harness_options.bgcolor_cable:
         return translate_color(harness_options.bgcolor_cable, "HEX")
@@ -222,16 +239,14 @@ def gv_conductor_table(cable, harness_options) -> Table:
         for conn in cable.connections:
             if conn.via.id == wire.id:
                 if conn.from_ is not None:
-                    from_label = f":{conn.from_.label}" if conn.from_.label else ""
-                    ins.append(f"{conn.from_.parent}:{conn.from_.id}{from_label}")
+                    ins.append(str(conn.from_))
                 if conn.to is not None:
-                    to_label = f":{conn.to.label}" if conn.to.label else ""
-                    outs.append(f"{conn.to.parent}:{conn.to.id}{to_label}")
+                    outs.append(str(conn.to))
 
         cells_above = [
-            Td(", ".join(ins)),
-            Td(":".join([wi for wi in wireinfo if wi is not None])),
-            Td(", ".join(outs)),
+            Td(", ".join(ins), align="left"),
+            Td(":".join([wi for wi in wireinfo if wi is not None and wi != ""])),
+            Td(", ".join(outs), align="right"),
         ]
         rows.append(Tr(cells_above))
 
@@ -349,7 +364,7 @@ def gv_edge_wire(harness, cable, connection) -> (str, str, str):
     if connection.to is not None:  # connect to right
         to_port_str = (
             f":p{connection.to.index+1}l"
-            if harness.connectors[connection.from_.parent].style != "simple"
+            if harness.connectors[connection.to.parent].style != "simple"
             else ""
         )
         code_right_1 = f"{connection.via.parent}:w{connection.via.index+1}:e"
@@ -358,6 +373,46 @@ def gv_edge_wire(harness, cable, connection) -> (str, str, str):
         code_right_1, code_right_2 = None, None
 
     return color, code_left_1, code_left_2, code_right_1, code_right_2
+
+
+def parse_arrow_str(inp: str) -> ArrowDirection:
+    if inp[0] == "<" and inp[-1] == ">":
+        return ArrowDirection.BOTH
+    elif inp[0] == "<":
+        return ArrowDirection.BACK
+    elif inp[-1] == ">":
+        return ArrowDirection.FORWARD
+    else:
+        return ArrowDirection.NONE
+
+
+def gv_edge_mate(mate) -> (str, str, str, str):
+    if mate.arrow.weight == ArrowWeight.SINGLE:
+        color = "#000000"
+    elif mate.arrow.weight == ArrowWeight.DOUBLE:
+        color = "#000000:#000000"
+
+    dir = mate.arrow.direction.name.lower()
+
+    if isinstance(mate, MatePin):
+        from_pin_index = mate.from_.index
+        from_port_str = f":p{from_pin_index+1}r"
+        from_designator = mate.from_.parent
+        to_pin_index = mate.to.index
+        to_port_str = f":p{to_pin_index+1}l"
+        to_designator = mate.to.parent
+    elif isinstance(mate, MateComponent):
+        from_designator = mate.from_
+        from_port_str = ""
+        to_designator = mate.to
+        to_port_str = ""
+    else:
+        raise Exception(f"Unknown type of mate:\n{mate}")
+
+    code_from = f"{from_designator}{from_port_str}:e"
+    code_to = f"{to_designator}{to_port_str}:w"
+
+    return color, dir, code_from, code_to
 
 
 def colored_cell(contents, bgcolor) -> Td:

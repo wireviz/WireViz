@@ -11,6 +11,9 @@ from graphviz import Graph
 
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import (
+    Arrow,
+    ArrowDirection,
+    ArrowWeight,
     Cable,
     Connector,
     MateComponent,
@@ -34,12 +37,14 @@ from wireviz.wv_bom import (
 from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
     apply_dot_tweaks,
+    calculate_node_bgcolor,
     gv_connector_loops,
+    gv_edge_mate,
     gv_edge_wire,
     gv_node_component,
     html_line_breaks,
+    parse_arrow_str,
     remove_links,
-    calculate_node_bgcolor,
     set_dot_basics,
 )
 from wireviz.wv_helper import (
@@ -71,13 +76,20 @@ class Harness:
     def add_cable(self, name: str, *args, **kwargs) -> None:
         self.cables[name] = Cable(name, *args, **kwargs)
 
-    def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
-        self.mates.append(MatePin(from_name, from_pin, to_name, to_pin, arrow_type))
+    def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_str) -> None:
+        from_con = self.connectors[from_name]
+        from_pin_obj = from_con.get_pin_by_id(from_pin)
+        to_con = self.connectors[to_name]
+        to_pin_obj = to_con.get_pin_by_id(to_pin)
+        arrow = Arrow(direction=parse_arrow_str(arrow_str), weight=ArrowWeight.SINGLE)
+
+        self.mates.append(MatePin(from_pin_obj, to_pin_obj, arrow))
         self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
         self.connectors[to_name].activate_pin(to_pin, Side.LEFT)
 
-    def add_mate_component(self, from_name, to_name, arrow_type) -> None:
-        self.mates.append(MateComponent(from_name, to_name, arrow_type))
+    def add_mate_component(self, from_name, to_name, arrow_str) -> None:
+        arrow = Arrow(direction=parse_arrow_str(arrow_str), weight=ArrowWeight.SINGLE)
+        self.mates.append(MateComponent(from_name, to_name, arrow))
 
     def add_bom_item(self, item: dict) -> None:
         self.additional_bom_items.append(item)
@@ -167,7 +179,11 @@ class Harness:
             gv_html = gv_node_component(connector, self.options)
             bgcolor = calculate_node_bgcolor(connector, self.options)
             dot.node(
-                connector.name, label=f"<\n{gv_html}\n>", bgcolor=bgcolor, shape="box", style="filled"
+                connector.name,
+                label=f"<\n{gv_html}\n>",
+                bgcolor=bgcolor,
+                shape="box",
+                style="filled",
             )
             # generate edges for connector loops
             if len(connector.loops) > 0:
@@ -192,7 +208,15 @@ class Harness:
             gv_html = gv_node_component(cable, self.options)
             bgcolor = calculate_node_bgcolor(cable, self.options)
             style = "filled,dashed" if cable.category == "bundle" else "filled"
-            dot.node(cable.name, label=f"<\n{gv_html}\n>", bgcolor=bgcolor, shape="box", style=style)
+            dot.node(
+                cable.name,
+                label=f"<\n{gv_html}\n>",
+                bgcolor=bgcolor,
+                shape="box",
+                style=style,
+            )
+
+            # generate wire edges between component nodes and cable nodes
             for connection in cable.connections:
                 color, l1, l2, r1, r2 = gv_edge_wire(self, cable, connection)
                 dot.attr("edge", color=color)
@@ -201,53 +225,10 @@ class Harness:
                 if not (r1, r2) == (None, None):
                     dot.edge(r1, r2)
 
-
         apply_dot_tweaks(dot, self.tweak)
 
         for mate in self.mates:
-            if mate.shape[0] == "<" and mate.shape[-1] == ">":
-                dir = "both"
-            elif mate.shape[0] == "<":
-                dir = "back"
-            elif mate.shape[-1] == ">":
-                dir = "forward"
-            else:
-                dir = "none"
-
-            if isinstance(mate, MatePin):
-                color = "#000000"
-            elif isinstance(mate, MateComponent):
-                color = "#000000:#000000"
-            else:
-                raise Exception(f"{mate} is an unknown mate")
-
-            from_connector = self.connectors[mate.from_name]
-            if (
-                isinstance(mate, MatePin)
-                and self.connectors[mate.from_name].style != "simple"
-            ):
-                from_pin_index = from_connector.pins.index(mate.from_pin)
-                from_port_str = f":p{from_pin_index+1}r"
-            else:  # MateComponent or style == 'simple'
-                from_port_str = ""
-
-            to_connector = self.connectors[mate.to_name]
-            if (
-                isinstance(mate, MatePin)
-                and self.connectors[mate.to_name].style != "simple"
-            ):
-                to_pin_index = to_connector.pins.index(mate.to_pin)
-                to_port_str = (
-                    f":p{to_pin_index+1}l"
-                    if isinstance(mate, MatePin)
-                    and self.connectors[mate.to_name].style != "simple"
-                    else ""
-                )
-            else:  # MateComponent or style == 'simple'
-                to_port_str = ""
-            code_from = f"{mate.from_name}{from_port_str}:e"
-            to_connector = self.connectors[mate.to_name]
-            code_to = f"{mate.to_name}{to_port_str}:w"
+            color, dir, code_from, code_to = gv_edge_mate(mate)
 
             dot.attr("edge", color=color, style="dashed", dir=dir)
             dot.edge(code_from, code_to)
