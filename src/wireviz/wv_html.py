@@ -79,7 +79,7 @@ def generate_html_output(
     replacements = {
         "<!-- %generator% -->": f"{APP_NAME} {__version__} - {APP_URL}",
         "<!-- %fontname% -->": options.fontname,
-        "<!-- %bgcolor% -->": wv_colors.translate_color(options.bgcolor, "hex"),
+        "<!-- %bgcolor% -->": options.bgcolor.html,
         "<!-- %diagram% -->": svgdata,
         "<!-- %bom% -->": bom_html,
         "<!-- %bom_reversed% -->": bom_html_reversed,

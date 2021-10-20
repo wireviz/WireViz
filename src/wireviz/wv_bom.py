@@ -4,8 +4,7 @@ from dataclasses import asdict
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from wireviz.DataClasses import AdditionalComponent, Cable, Color, Connector
-from wireviz.wv_colors import translate_color
+from wireviz.DataClasses import AdditionalComponent, Cable, Connector
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import clean_whitespace, pn_info_string
 
@@ -99,7 +98,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                 + (f", {connector.subtype}" if connector.subtype else "")
                 + (f", {connector.pincount} pins" if connector.show_pincount else "")
                 + (
-                    f", {translate_color(connector.color, harness.options.color_mode)}"
+                    f", xxx"  # {translate_color(connector.color, harness.options.color_mode)}
                     if connector.color
                     else ""
                 )
@@ -132,7 +131,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                     )
                     + (" shielded" if cable.shield else "")
                     + (
-                        f", {translate_color(cable.color, harness.options.color_mode)}"
+                        f", xxx"  # {translate_color(cable.color, harness.options.color_mode)}
                         if cable.color
                         else ""
                     )
@@ -154,7 +153,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
                         + (f", {cable.type}" if cable.type else "")
                         + (f", {cable.gauge} {cable.gauge_unit}" if cable.gauge else "")
                         + (
-                            f", {translate_color(color, harness.options.color_mode)}"
+                            f", xxx"  # {translate_color(color, harness.options.color_mode)}
                             if color
                             else ""
                         )
@@ -236,7 +235,7 @@ def component_table_entry(
     type: str,
     qty: Union[int, float],
     unit: Optional[str] = None,
-    bgcolor: Optional[Color] = None,
+    bgcolor: Optional[str] = None,
     pn: Optional[str] = None,
     manufacturer: Optional[str] = None,
     mpn: Optional[str] = None,
