@@ -24,7 +24,7 @@ known_colors = {  #                   v--------v--------- for future use
     "OG": KnownColor("#ff8000", "or", "orange", "orange"),
     "YE": KnownColor("#ffff00", "ge", "yellow", "gelb"),
     "OL": KnownColor("#708000", "ol", "olive green", "olivgrün"),
-    "GN": KnownColor("#00ff00", "gn", "green", "grün"),
+    "GN": KnownColor("#00aa00", "gn", "green", "grün"),
     "TQ": KnownColor("#00ffff", "tk", "turquoise", "türkis"),
     "LB": KnownColor("#a0dfff", "hb", "light blue", "hellblau"),
     "BU": KnownColor("#0066ff", "bl", "blue", "blau"),
