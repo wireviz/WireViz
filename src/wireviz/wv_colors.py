@@ -5,11 +5,15 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
 
-KnownColor = namedtuple("KnownColor", "html code_de full_en full_de")
+padding_amount = 1
 
 ColorOutputMode = Enum(
     "ColorOutputMode", "EN_LOWER EN_UPPER DE_LOWER DE_UPPER HTML_LOWER HTML_UPPER"
 )
+
+color_output_mode = ColorOutputMode.EN_UPPER
+
+KnownColor = namedtuple("KnownColor", "html code_de full_en full_de")
 
 known_colors = {  #                   v--------v--------- for future use
     "BK": KnownColor("#000000", "sw", "black", "schwarz"),
@@ -35,10 +39,6 @@ known_colors = {  #                   v--------v--------- for future use
     "GD": KnownColor("#ffcf80", "au", "gold", "Gold"),
 }
 
-color_output_mode = ColorOutputMode.EN_UPPER
-
-padding_amount = 1
-
 
 def convert_case(inp):
     if "_LOWER" in color_output_mode.name:
@@ -53,13 +53,6 @@ def get_color_by_colorcode_index(color_code: str, index: int) -> str:
     num_colors_in_code = len(COLOR_CODES[color_code])
     actual_index = index % num_colors_in_code  # wrap around if index is out of bounds
     return COLOR_CODES[color_code][actual_index]
-
-    # # make color code loop around if more wires than colors
-    # if self.wirecount > len(self.colors):
-    #     m = self.wirecount // len(self.colors) + 1
-    #     self.colors = self.colors * int(m)
-    # # cut off excess after looping
-    # self.colors = self.colors[: self.wirecount]
 
 
 @dataclass
@@ -85,9 +78,8 @@ class SingleColor:
 
     @property
     def known(self):
-        return (
-            self.code_en.upper() in known_colors.keys() if self._code_en else True
-        )  # ?
+        # treat None as a known color
+        return self.code_en.upper() in known_colors.keys() if self._code_en else True
 
     def __init__(self, inp):
         if inp is None:
@@ -101,7 +93,7 @@ class SingleColor:
             inp_upper = inp.upper()
             self._code_en = inp_upper
             self._html = known_colors[inp_upper].html
-        else:  # assume valid HTML color
+        else:  # assume it's a valid HTML color name
             self._html = inp
             self._code_en = inp
 
@@ -152,9 +144,9 @@ class MultiColor:
                     known = [item.upper() in known_colors.keys() for item in items]
                     if all(known):
                         self.colors = [SingleColor(item) for item in items]
-                    else:  # assume it's a HTML color name
+                    else:  # assume it's a valud HTML color name
                         self.colors = [SingleColor(inp)]
-                else:  # assume it's a HTML color name
+                else:  # assume it's a valid HTML color name
                     self.colors = [SingleColor(inp)]
 
     def __len__(self):
