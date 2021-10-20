@@ -5,6 +5,7 @@ from pathlib import Path
 
 from graphviz import Graph
 
+import wireviz.wv_colors
 from wireviz.DataClasses import (
     Arrow,
     ArrowWeight,
@@ -152,7 +153,7 @@ class Harness:
 
         for connector in self.connectors.values():
             # generate connector node
-            gv_html = gv_node_component(connector, self.options)
+            gv_html = gv_node_component(connector)
             bgcolor = calculate_node_bgcolor(connector, self.options)
             dot.node(
                 connector.name,
@@ -163,25 +164,27 @@ class Harness:
             )
             # generate edges for connector loops
             if len(connector.loops) > 0:
-                dot.attr("edge", color="#000000:#ffffff:#000000")
+                dot.attr("edge", color="#000000")
                 loops = gv_connector_loops(connector)
                 for head, tail in loops:
                     dot.edge(head, tail)
 
         # determine if there are double- or triple-colored wires in the harness;
         # if so, pad single-color wires to make all wires of equal thickness
-        pad = any(
-            len(colorstr) > 2
+        multicolor_wires = [
+            len(wire.color) > 1
             for cable in self.cables.values()
-            for colorstr in cable.colors
-        )
-
-        self.options._pad = pad
+            for wire in cable.wire_objects
+        ]
+        if any(multicolor_wires):
+            wireviz.wv_colors.padding_amount = 3
+        else:
+            wireviz.wv_colors.padding_amount = 1
 
         for cable in self.cables.values():
             # generate cable node
             # TODO: PN info for bundles (per wire)
-            gv_html = gv_node_component(cable, self.options)
+            gv_html = gv_node_component(cable)
             bgcolor = calculate_node_bgcolor(cable, self.options)
             style = "filled,dashed" if cable.category == "bundle" else "filled"
             dot.node(

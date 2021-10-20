@@ -17,7 +17,6 @@ from wireviz.DataClasses import (
     ShieldClass,
     WireClass,
 )
-from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_helper import pn_info_string, remove_links
 from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
 
@@ -26,9 +25,7 @@ HEADER_MPN = "MPN"
 HEADER_SPN = "SPN"
 
 
-def gv_node_component(
-    component: Component, harness_options: Options, pad=None
-) -> Table:
+def gv_node_component(component: Component) -> Table:
     # If no wires connected (except maybe loop wires)?
     if isinstance(component, Connector):
         if not (component.ports_left or component.ports_right):
@@ -52,8 +49,8 @@ def gv_node_component(
             html_line_breaks(component.type),
             html_line_breaks(component.subtype),
             f"{component.pincount}-pin" if component.show_pincount else None,
-            translate_color(component.color, harness_options.color_mode),
-            colorbar_cell(component.color),
+            str(component.color) if component.color else None,
+            colorbar_cell(component.color) if component.color else None,
         ]
     elif isinstance(component, Cable):
         line_info = [
@@ -64,9 +61,11 @@ def gv_node_component(
             f"{component.length} {component.length_unit}"
             if component.length > 0
             else None,
-            translate_color(component.color, harness_options.color_mode),
-            colorbar_cell(component.color),
+            str(component.color) if component.color else None,
+            colorbar_cell(component.color) if component.color else None,
         ]
+
+    x = colorbar_cell(component.color) if component.color else None
 
     line_image, line_image_caption = image_and_caption_cells(component)
     # line_additional_component_table = get_additional_component_table(self, connector)
@@ -79,7 +78,7 @@ def gv_node_component(
         else:
             line_ports = None
     elif isinstance(component, Cable):
-        line_ports = gv_conductor_table(component, harness_options)
+        line_ports = gv_conductor_table(component)
 
     lines = [
         line_name,
@@ -109,17 +108,17 @@ def calculate_node_bgcolor(component, harness_options):
     # assign component node bgcolor at the GraphViz node level
     # instead of at the HTML table level for better rendering of node outline
     if component.bgcolor:
-        return translate_color(component.bgcolor, "HEX")
+        return component.bgcolor.html
     elif isinstance(component, Connector) and harness_options.bgcolor_connector:
-        return translate_color(harness_options.bgcolor_connector, "HEX")
+        return harness_options.bgcolor_connector.html
     elif (
         isinstance(component, Cable)
         and component.category == "bundle"
         and harness_options.bgcolor_bundle
     ):
-        return translate_color(harness_options.bgcolor_bundle, "HEX")
+        return harness_options.bgcolor_bundle.html
     elif isinstance(component, Cable) and harness_options.bgcolor_cable:
-        return translate_color(harness_options.bgcolor_cable, "HEX")
+        return harness_options.bgcolor_cable.html
 
 
 def make_list_of_cells(inp) -> List[Td]:
@@ -170,31 +169,25 @@ def nested_table(lines: List[Td]) -> Table:
 
 
 def gv_pin_table(component) -> Table:
-    pin_tuples = zip_longest(
-        component.pins,
-        component.pinlabels,
-        component.pincolors,
-    )
-
     pin_rows = []
-    for pinindex, (pinname, pinlabel, pincolor) in enumerate(pin_tuples):
-        if component.should_show_pin(pinname):
-            pin_rows.append(
-                gv_pin_row(pinindex, pinname, pinlabel, pincolor, component)
-            )
+    for pin in component.pin_objects:
+        if component.should_show_pin(pin.id):  # TODO remove True
+            pin_rows.append(gv_pin_row(pin, component))
     tbl = Table(pin_rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
     return tbl
 
 
-def gv_pin_row(pin_index, pin_name, pin_label, pin_color, connector) -> Tr:
+def gv_pin_row(pin, connector) -> Tr:
     # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
-    cell_pin_left = Td(pin_name, port=f"p{pin_index+1}l")
-    cell_pin_label = Td(pin_label, delete_if_empty=True)
-    cell_pin_right = Td(pin_name, port=f"p{pin_index+1}r")
+    cell_pin_left = Td(pin.id, port=f"p{pin.index+1}l")
+    cell_pin_label = Td(pin.label, delete_if_empty=True)
+    cell_pin_color = Td(str(pin.color), delete_if_empty=True)
+    cell_pin_right = Td(pin.id, port=f"p{pin.index+1}r")
 
     cells = [
         cell_pin_left if connector.ports_left else None,
         cell_pin_label,
+        cell_pin_color,  # TODO: generate proper color mini-table too
         cell_pin_right if connector.ports_right else None,
     ]
     return Tr(cells)
@@ -217,7 +210,7 @@ def gv_connector_loops(connector: Connector) -> List:
     return loop_edges
 
 
-def gv_conductor_table(cable, harness_options) -> Table:
+def gv_conductor_table(cable) -> Table:
     rows = []
     rows.append(Tr(Td("&nbsp;")))  # spacer row on top
 
@@ -233,7 +226,7 @@ def gv_conductor_table(cable, harness_options) -> Table:
         wireinfo = []
         if cable.show_wirenumbers and not isinstance(wire, ShieldClass):
             wireinfo.append(str(wire.id))
-        wireinfo.append(translate_color(wire.color, harness_options.color_mode))
+        wireinfo.append(str(wire.color))
         wireinfo.append(wire.label)
 
         ins, outs = [], []
@@ -252,7 +245,7 @@ def gv_conductor_table(cable, harness_options) -> Table:
         rows.append(Tr(cells_above))
 
         # the wire itself
-        rows.append(Tr(gv_wire_cell(wire, padding=harness_options._pad)))
+        rows.append(Tr(gv_wire_cell(wire)))
 
         # row below the wire
         # TODO: PN stuff for bundles
@@ -263,16 +256,17 @@ def gv_conductor_table(cable, harness_options) -> Table:
     return tbl
 
 
-def gv_wire_cell(wire: Union[WireClass, ShieldClass], padding) -> Td:
+def gv_wire_cell(wire: Union[WireClass, ShieldClass]) -> Td:
+    # import pudb; pudb.set_trace()
     if wire.color:
-        color_list = ["#000000"] + get_color_hex(wire.color, pad=padding) + ["#000000"]
+        color_list = ["#000000"] + wire.color.html_padded_list + ["#000000"]
     else:
         color_list = ["#000000"]
 
     wire_inner_rows = []
     for j, bgcolor in enumerate(color_list[::-1]):
         wire_inner_cell_attribs = {
-            "bgcolor": bgcolor if bgcolor != "" else "BK",
+            "bgcolor": bgcolor if bgcolor != "" else "#000000",
             "border": 0,
             "cellpadding": 0,
             "colspan": 3,
@@ -339,16 +333,9 @@ def wire_pn_stuff():
 def gv_edge_wire(harness, cable, connection) -> (str, str, str):
     if connection.via.color:
         # check if it's an actual wire and not a shield
-        wire_color = get_color_hex(connection.via.color, pad=harness.options._pad)
-        color = ":".join(["#000000"] + wire_color + ["#000000"])
+        color = f"#000000:{connection.via.color.html_padded}:#000000"
     else:  # it's a shield connection
-        # shield is shown with specified color and black borders, or as a thin black wire otherwise
-        if connection.via.color:
-            shield_color_hex = get_color_hex(connection.via.color)[0]
-            shield_color_str = ":".join(["#000000", shield_color_hex, "#000000"])
-        else:
-            shield_color_str = "#000000"
-        color = shield_color_str
+        color = "#000000"
 
     if connection.from_ is not None:  # connect to left
         from_port_str = (
@@ -417,7 +404,7 @@ def gv_edge_mate(mate) -> (str, str, str, str):
 
 
 def colored_cell(contents, bgcolor) -> Td:
-    return Td(contents, bgcolor=translate_color(bgcolor, "HEX"))
+    return Td(contents, bgcolor=bgcolor.html)
 
 
 def part_number_str_list(component: Component) -> List[str]:
@@ -433,10 +420,7 @@ def part_number_str_list(component: Component) -> List[str]:
 
 
 def colorbar_cell(color) -> Td:
-    if color:
-        return Td("", bgcolor=translate_color(color, "HEX"), width=4)
-    else:
-        return None
+    return Td("", bgcolor=color.html, width=4)
 
 
 def image_and_caption_cells(component: Component) -> (Td, Td):
@@ -456,7 +440,7 @@ def image_and_caption_cells(component: Component) -> (Td, Td):
 
     image_cell.update_attribs(
         balign="left",
-        bgcolor=translate_color(component.image.bgcolor, "HEX"),
+        bgcolor=component.image.bgcolor.html,
         sides="TLR" if component.image.caption else None,
     )
 
@@ -495,7 +479,7 @@ def set_dot_basics(dot, options):
         "graph",
         rankdir="LR",
         ranksep="2",
-        bgcolor=translate_color(options.bgcolor, "HEX"),
+        bgcolor=options.bgcolor.html,
         nodesep="0.33",
         fontname=options.fontname,
     )
@@ -506,7 +490,7 @@ def set_dot_basics(dot, options):
         height="0",
         margin="0",  # Actual size of the node is entirely determined by the label.
         style="filled",
-        fillcolor=translate_color(options.bgcolor_node, "HEX"),
+        fillcolor=options.bgcolor_node.html,
         fontname=options.fontname,
     )
     dot.attr("edge", style="bold", fontname=options.fontname)
