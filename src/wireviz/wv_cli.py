@@ -23,9 +23,11 @@ format_codes = {
     "t": "tsv",
 }
 
-epilog = "The -f or --format option accepts a string containing one or more of the "
-epilog += "following characters to specify which file types to output:\n"
-epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
+epilog = (
+    "The -f or --format option accepts a string containing one or more of the "
+    "following characters to specify which file types to output:\n"
+    f", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
+)
 
 
 @click.command(epilog=epilog, no_args_is_help=True)
@@ -74,7 +76,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
-    print()
+    print()  # blank line before execution
     print(f"{APP_NAME} {__version__}")
     if version:
         return  # print version number only and exit
@@ -145,7 +147,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             image_paths=list(image_paths),
         )
 
-    print()
+    print()  # blank line after execution
 
 
 if __name__ == "__main__":
