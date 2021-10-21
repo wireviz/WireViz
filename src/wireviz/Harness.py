@@ -88,9 +88,11 @@ class Harness:
                 if pin in connector.pins and pin in connector.pinlabels:
                     if connector.pins.index(pin) != connector.pinlabels.index(pin):
                         raise Exception(
-                            f"{name}:{pin} is defined both in pinlabels and pins, for different pins."
+                            f"{name}:{pin} is defined both in pinlabels and pins, "
+                            "for different pins."
                         )
-                    # TODO: Maybe issue a warning if present in both lists but referencing the same pin?
+                    # TODO: Maybe issue a warning if present in both lists
+                    # but referencing the same pin?
                 if pin in connector.pinlabels:
                     if connector.pinlabels.count(pin) > 1:
                         raise Exception(f"{name}:{pin} is defined more than once.")
@@ -110,9 +112,11 @@ class Harness:
             if via_wire in cable.colors and via_wire in cable.wirelabels:
                 if cable.colors.index(via_wire) != cable.wirelabels.index(via_wire):
                     raise Exception(
-                        f"{via_name}:{via_wire} is defined both in colors and wirelabels, for different wires."
+                        f"{via_name}:{via_wire} is defined both in colors and wirelabels, "
+                        "for different wires."
                     )
-                # TODO: Maybe issue a warning if present in both lists but referencing the same wire?
+                # TODO: Maybe issue a warning if present in both lists
+                # but referencing the same wire?
             if via_wire in cable.colors:
                 if cable.colors.count(via_wire) > 1:
                     raise Exception(

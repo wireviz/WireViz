@@ -14,7 +14,8 @@ from wireviz.wv_colors import (
 )
 from wireviz.wv_helper import aspect_ratio, awg_equiv, mm2_equiv
 
-# Each type alias have their legal values described in comments - validation might be implemented in the future
+# Each type alias have their legal values described in comments
+# - validation might be implemented in the future
 PlainText = str  # Text not containing HTML tags nor newlines
 Hypertext = str  # Text possibly including HTML hyperlinks that are removed in all outputs except HTML output
 MultilineHypertext = (
@@ -280,7 +281,8 @@ class Connector(Component):
             )
             if not self.pincount:
                 raise Exception(
-                    "You need to specify at least one, pincount, pins, pinlabels, or pincolors"
+                    "You need to specify at least one: "
+                    "pincount, pins, pinlabels, or pincolors"
                 )
 
         # create default list for pins (sequential) if not specified
@@ -318,7 +320,8 @@ class Connector(Component):
 
         for loop in self.loops:
             # TODO: check that pins to connect actually exist
-            # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
+            # TODO: allow using pin labels in addition to pin numbers,
+            #       just like when defining regular connections
             # TODO: include properties of wire used to create the loop
             if len(loop) != 2:
                 raise Exception("Loops must be between exactly two pins!")
@@ -427,13 +430,15 @@ class Cable(Component):
                 g, u = self.gauge.split(" ")
             except Exception:
                 raise Exception(
-                    f"Cable {self.name} gauge={self.gauge} - Gauge must be a number, or number and unit separated by a space"
+                    f"Cable {self.name} gauge={self.gauge} - "
+                    "Gauge must be a number, or number and unit separated by a space"
                 )
             self.gauge = g
 
             if self.gauge_unit is not None:
                 print(
-                    f"Warning: Cable {self.name} gauge_unit={self.gauge_unit} is ignored because its gauge contains {u}"
+                    f"Warning: Cable {self.name} gauge_unit={self.gauge_unit} "
+                    f"is ignored because its gauge contains {u}"
                 )
             if u.upper() == "AWG":
                 self.gauge_unit = u.upper()
@@ -452,12 +457,14 @@ class Cable(Component):
                 L = float(L)
             except Exception:
                 raise Exception(
-                    f"Cable {self.name} length={self.length} - Length must be a number, or number and unit separated by a space"
+                    f"Cable {self.name} length={self.length} - "
+                    "Length must be a number, or number and unit separated by a space"
                 )
             self.length = L
             if self.length_unit is not None:
                 print(
-                    f"Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}"
+                    f"Warning: Cable {self.name} length_unit={self.length_unit} is ignored "
+                    f"because its length contains {u}"
                 )
             self.length_unit = u
         elif not any(isinstance(self.length, t) for t in [int, float]):
@@ -484,7 +491,8 @@ class Cable(Component):
         else:  # wirecount implicit in length of color list
             if not self.colors:
                 raise Exception(
-                    "Unknown number of wires. Must specify wirecount or colors (implicit length)"
+                    "Unknown number of wires. "
+                    "Must specify wirecount or colors (implicit length)"
                 )
             self.wirecount = len(self.colors)
 
@@ -494,7 +502,8 @@ class Cable(Component):
                     '"s" may not be used as a wire label for a shielded cable.'
                 )
 
-        # if lists of part numbers are provided check this is a bundle and that it matches the wirecount.
+        # if lists of part numbers are provided,
+        # check this is a bundle and that it matches the wirecount.
         for idfield in [self.manufacturer, self.mpn, self.supplier, self.spn, self.pn]:
             if isinstance(idfield, list):
                 if self.category == "bundle":
