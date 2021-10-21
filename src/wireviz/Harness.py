@@ -54,11 +54,15 @@ class Harness:
         conn = Connector(designator=designator, *args, **kwargs)
         self.connectors[designator] = conn
         self._add_to_internal_bom(conn)
+        for addcom in conn.additional_components:
+            self._add_to_internal_bom(addcom)
 
     def add_cable(self, designator: str, *args, **kwargs) -> None:
         cbl = Cable(designator=designator, *args, **kwargs)
         self.cables[designator] = cbl
         self._add_to_internal_bom(cbl)
+        for addcom in cbl.additional_components:
+            self._add_to_internal_bom(addcom)
 
     def add_additional_bom_item(self, item: dict) -> None:
         new_item = AdditionalComponent(**item)
