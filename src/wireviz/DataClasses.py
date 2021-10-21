@@ -253,7 +253,7 @@ class Component:
 class AdditionalComponent(Component):
     qty: float = 1
     unit: Optional[str] = None
-    qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
+    qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = 1
     designators: Optional[str] = None  # used for components definedi in the
     #                                    additional_bom_items section within another component
     bgcolor: SingleColor = None  #       ^ same here
@@ -261,6 +261,10 @@ class AdditionalComponent(Component):
     def __post_init__(self):
         super().fill_partnumbers()
         self.bgcolor = SingleColor(self.bgcolor)
+
+    @property
+    def qty_final(self):
+        return 999
 
     @property
     def description(self) -> str:
@@ -424,6 +428,7 @@ class Connector(TopLevelGraphicalComponent):
             self.ports_right = True
 
     def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
+        # TODO!!! how and when to compute final qty for additional components???
         if not qty_multiplier:
             return 1
         elif qty_multiplier == "pincount":

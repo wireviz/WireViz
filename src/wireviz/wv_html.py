@@ -6,9 +6,9 @@ from typing import Dict, List, Union
 
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import Metadata, Options
-from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import (
     flatten2d,
+    html_line_breaks,
     open_file_read,
     open_file_write,
     smart_file_resolve,

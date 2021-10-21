@@ -55,17 +55,17 @@ class Harness:
     def add_connector(self, designator: str, *args, **kwargs) -> None:
         conn = Connector(designator=designator, *args, **kwargs)
         self.connectors[designator] = conn
-        self._add_to_internal_bom(conn)
+        # self._add_to_internal_bom(conn)
 
     def add_cable(self, designator: str, *args, **kwargs) -> None:
         cbl = Cable(designator=designator, *args, **kwargs)
         self.cables[designator] = cbl
-        self._add_to_internal_bom(cbl)
+        # self._add_to_internal_bom(cbl)
 
     def add_additional_bom_item(self, item: dict) -> None:
         new_item = AdditionalComponent(**item)
         self.additional_bom_items.append(new_item)
-        self._add_to_internal_bom(new_item)
+        # self._add_to_internal_bom(new_item)
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_str) -> None:
         from_con = self.connectors[from_name]
@@ -115,7 +115,7 @@ class Harness:
                 _add(
                     comp.bom_hash,
                     designator=item.designator,
-                    qty=comp.qty,
+                    qty=comp.qty_final,
                     category="connector/additional",
                 )
         elif isinstance(item, Cable):
@@ -123,28 +123,46 @@ class Harness:
             if item.category == "bundle":
                 _cat = "wire"
                 for wire in item.wire_objects:
-                    _add(None, qty=item.length+.001, designator=item.designator, category="wire DUMMY")
+                    _add(
+                        None,
+                        qty=item.length + 0.001,
+                        designator=item.designator,
+                        category="wire DUMMY",
+                    )
             else:
                 _cat = "cable"
-                _add(item.bom_hash, qty=item.length, designator=item.designator, category="cable")
+                _add(
+                    item.bom_hash,
+                    qty=item.length,
+                    designator=item.designator,
+                    category="cable",
+                )
             for comp in item.additional_components:
                 if comp.ignore_in_bom:
                     continue
                 _add(
                     comp.bom_hash,
                     designator=item.designator,
-                    qty=comp.qty,
+                    qty=comp.qty_final,
                     category=f"{_cat}/additional",
                 )
         elif isinstance(item, AdditionalComponent):  # additional component
             _add(
                 item.bom_hash,
                 designator=item.designators,
-                qty=item.qty,
+                qty=item.qty_final,
                 category="additional",
             )
         else:
             raise Exception(f"Unknown type of item:\n{item}")
+
+    def populate_bom(self):
+        pass
+        # raise Exception(
+        #     "Implement BOM population after all connections have been made, "
+        #     " so that additional component qty's can be computed correctly "
+        #     "(factoring in number of connected pins/wires/...)"
+        #     )
 
     def connect(
         self,

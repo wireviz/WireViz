@@ -100,6 +100,10 @@ def tuplelist2tsv(inp, header=None):
     return output
 
 
+def html_line_breaks(inp):
+    return remove_links(inp).replace("\n", "<br />") if isinstance(inp, str) else inp
+
+
 def remove_links(inp):
     return (
         re.sub(r"<[aA] [^>]*>([^<]*)</[aA]>", r"\1", inp)
