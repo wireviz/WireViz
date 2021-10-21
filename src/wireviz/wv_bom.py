@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Union
 
-from wireviz.wv_helper import html_line_breaks
+from wireviz.wv_utils import html_line_breaks
 
 BOM_HASH_FIELDS = "description unit partnumbers"
 BomHash = namedtuple("BomHash", BOM_HASH_FIELDS)

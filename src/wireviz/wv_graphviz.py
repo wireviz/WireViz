@@ -5,7 +5,8 @@ from itertools import zip_longest
 from typing import Any, List, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
-from wireviz.DataClasses import (
+from wireviz.wv_bom import partnumbers_to_list
+from wireviz.wv_dataclasses import (
     ArrowDirection,
     ArrowWeight,
     Cable,
@@ -18,9 +19,8 @@ from wireviz.DataClasses import (
     ShieldClass,
     WireClass,
 )
-from wireviz.wv_bom import partnumbers_to_list
-from wireviz.wv_helper import html_line_breaks, remove_links
-from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
+from wireviz.wv_html import Img, Table, Td, Tr
+from wireviz.wv_utils import html_line_breaks, remove_links
 
 
 def gv_node_component(component: Component) -> Table:

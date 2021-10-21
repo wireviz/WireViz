@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
 import wireviz.wireviz as wv
 from wireviz import APP_NAME, __version__
-from wireviz.wv_helper import open_file_read
+from wireviz.wv_utils import open_file_read
 
 format_codes = {
     "c": "csv",
@@ -23,10 +23,11 @@ format_codes = {
     "t": "tsv",
 }
 
+
 epilog = (
     "The -f or --format option accepts a string containing one or more of the "
     "following characters to specify which file types to output:\n"
-    f", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
+    + f", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
 )
 
 
