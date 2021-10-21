@@ -252,10 +252,6 @@ class Harness:
     ) -> None:
         # graphical output
         graph = self.graph
-        svg_already_exists = Path(
-            f"{filename}.svg"
-        ).exists()  # if SVG already exists, do not delete later
-        # graphical output
         for f in fmt:
             if f in ("png", "svg", "html"):
                 if f == "html":  # if HTML format is specified,
