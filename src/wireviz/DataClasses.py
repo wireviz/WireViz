@@ -14,7 +14,7 @@ from wireviz.wv_colors import (
     SingleColor,
     get_color_by_colorcode_index,
 )
-from wireviz.wv_helper import aspect_ratio, awg_equiv, mm2_equiv
+from wireviz.wv_helper import aspect_ratio, awg_equiv, mm2_equiv, remove_links
 
 # Each type alias have their legal values described in comments
 # - validation might be implemented in the future
@@ -213,9 +213,10 @@ class Component:
     bom_id: Optional[str] = None  # to be filled after harness is built
 
     def fill_partnumbers(self):
-        self.partnumbers = PartNumberInfo(
-            self.pn, self.manufacturer, self.mpn, self.supplier, self.spn
-        )
+        partnos = [self.pn, self.manufacturer, self.mpn, self.supplier, self.spn]
+        partnos = [remove_links(entry) for entry in partnos]
+        partnos = tuple(partnos)
+        self.partnumbers = PartNumberInfo(*partnos)
 
     @property
     def bom_hash(self) -> BomHash:
@@ -263,8 +264,8 @@ class AdditionalComponent(Component):
 
     @property
     def description(self) -> str:
-        s = self.type.rstrip() + f", {self.subtype.rstrip()}" if self.subtype else ""
-        return s
+        substrs = [self.type, self.subtype if self.subtype else ""]
+        return ", ".join(substrs)
 
 
 @dataclass
@@ -313,7 +314,7 @@ class Connector(TopLevelGraphicalComponent):
             "Connector",
             self.type,
             self.subtype,
-            self.pincount if self.show_pincount else None,
+            f"{self.pincount} pins" if self.show_pincount else None,
             str(self.color) if self.color else None,
         ]
         return ", ".join([str(s) for s in substrs if s is not None and s != ""])
