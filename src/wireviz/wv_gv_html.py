@@ -19,7 +19,7 @@ from wireviz.DataClasses import (
     WireClass,
 )
 from wireviz.wv_bom import partnumbers_to_list
-from wireviz.wv_helper import remove_links
+from wireviz.wv_helper import html_line_breaks, remove_links
 from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
 
 
@@ -452,10 +452,6 @@ def html_size_attr_dict(image):
         if image.fixedsize:
             attr_dict["fixedsize"] = "true"
     return attr_dict
-
-
-def html_line_breaks(inp):
-    return remove_links(inp).replace("\n", "<br />") if isinstance(inp, str) else inp
 
 
 def set_dot_basics(dot, options):

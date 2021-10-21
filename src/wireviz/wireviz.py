@@ -370,6 +370,8 @@ def parse(
         for line in yaml_data["additional_bom_items"]:
             harness.add_additional_bom_item(line)
 
+    harness.populate_bom()
+
     if output_formats:
         harness.output(filename=output_file, fmt=output_formats, view=False)
 
