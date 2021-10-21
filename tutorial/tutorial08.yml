@@ -75,7 +75,7 @@ connections:
 
 additional_bom_items:
   - # define an additional item to add to the bill of materials (does not appear in graph)
-    description: Label, pinout information
+    type: Label, pinout information
     qty: 2
     designators:
       - X2
