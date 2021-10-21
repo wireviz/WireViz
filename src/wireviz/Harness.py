@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import List
 
 from graphviz import Graph
 
 import wireviz.wv_colors
 from wireviz.DataClasses import (
+    AdditionalComponent,
     Arrow,
     ArrowWeight,
     Cable,
@@ -19,7 +22,6 @@ from wireviz.DataClasses import (
     Tweak,
 )
 from wireviz.svgembed import embed_svg_images_file
-from wireviz.wv_bom import bom_list, generate_bom
 from wireviz.wv_gv_html import (
     apply_dot_tweaks,
     calculate_node_bgcolor,
@@ -39,19 +41,29 @@ class Harness:
     metadata: Metadata
     options: Options
     tweak: Tweak
+    additional_bom_items: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self):
         self.connectors = {}
         self.cables = {}
         self.mates = []
-        self._bom = []  # Internal Cache for generated bom
+        self._bom = defaultdict(dict)
         self.additional_bom_items = []
 
-    def add_connector(self, name: str, *args, **kwargs) -> None:
-        self.connectors[name] = Connector(name, *args, **kwargs)
+    def add_connector(self, designator: str, *args, **kwargs) -> None:
+        conn = Connector(designator=designator, *args, **kwargs)
+        self.connectors[designator] = conn
+        self._add_to_internal_bom(conn)
 
-    def add_cable(self, name: str, *args, **kwargs) -> None:
-        self.cables[name] = Cable(name, *args, **kwargs)
+    def add_cable(self, designator: str, *args, **kwargs) -> None:
+        cbl = Cable(designator=designator, *args, **kwargs)
+        self.cables[designator] = cbl
+        self._add_to_internal_bom(cbl)
+
+    def add_additional_bom_item(self, item: dict) -> None:
+        new_item = AdditionalComponent(**item)
+        self.additional_bom_items.append(new_item)
+        self._add_to_internal_bom(new_item)
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_str) -> None:
         from_con = self.connectors[from_name]
@@ -68,8 +80,65 @@ class Harness:
         arrow = Arrow(direction=parse_arrow_str(arrow_str), weight=ArrowWeight.SINGLE)
         self.mates.append(MateComponent(from_name, to_name, arrow))
 
-    def add_bom_item(self, item: dict) -> None:
-        self.additional_bom_items.append(item)
+    def _add_to_internal_bom(self, item):
+        if item.ignore_in_bom:
+            return
+
+        def _add(hash, designator=None, qty=1, category=None):
+            # generate entry
+            bom_entry = self._bom[hash]
+            # initialize missing fields
+            if not "qty" in bom_entry:
+                bom_entry["qty"] = 0
+            if not "designators" in bom_entry:
+                bom_entry["designators"] = set()
+            # update fields
+            bom_entry["qty"] += qty
+            if designator:
+                if isinstance(designator, str):
+                    bom_entry["designators"].add(designator)
+                else:
+                    bom_entry["designators"].update(designator)
+            bom_entry["category"] = category
+
+        if isinstance(item, Connector):
+            _add(item.bom_hash, designator=item.designator, category="connector")
+            for comp in item.additional_components:
+                if comp.ignore_in_bom:
+                    continue
+                _add(
+                    comp.bom_hash,
+                    designator=item.designator,
+                    qty=comp.qty,
+                    category="connector/additional",
+                )
+        elif isinstance(item, Cable):
+            _bom_hash = item.bom_hash
+            if isinstance(_bom_hash, list):
+                _cat = "bundle"
+                for subhash in _bom_hash:
+                    _add(subhash, designator=item.designator, category=_cat)
+            else:
+                _cat = "cable"
+                _add(item.bom_hash, designator=item.designator, category=_cat)
+            for comp in item.additional_components:
+                if comp.ignore_in_bom:
+                    continue
+                _add(
+                    comp.bom_hash,
+                    designator=item.designator,
+                    qty=comp.qty,
+                    category=f"{_cat}/additional",
+                )
+        elif isinstance(item, AdditionalComponent):  # additional component
+            _add(
+                item.bom_hash,
+                designator=item.designators,
+                qty=item.qty,
+                category="additional",
+            )
+        else:
+            raise Exception(f"Unknown type of item:\n{item}")
 
     def connect(
         self,
@@ -145,7 +214,7 @@ class Harness:
         else:
             to_pin_obj = None
 
-        self.cables[via_name].connect(from_pin_obj, via_wire, to_pin_obj)
+        self.cables[via_name]._connect(from_pin_obj, via_wire, to_pin_obj)
         if from_name in self.connectors:
             self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
         if to_name in self.connectors:
@@ -160,7 +229,7 @@ class Harness:
             gv_html = gv_node_component(connector)
             bgcolor = calculate_node_bgcolor(connector, self.options)
             dot.node(
-                connector.name,
+                connector.designator,
                 label=f"<\n{gv_html}\n>",
                 bgcolor=bgcolor,
                 shape="box",
@@ -192,7 +261,7 @@ class Harness:
             bgcolor = calculate_node_bgcolor(cable, self.options)
             style = "filled,dashed" if cable.category == "bundle" else "filled"
             dot.node(
-                cable.name,
+                cable.designator,
                 label=f"<\n{gv_html}\n>",
                 bgcolor=bgcolor,
                 shape="box",
@@ -200,7 +269,7 @@ class Harness:
             )
 
             # generate wire edges between component nodes and cable nodes
-            for connection in cable.connections:
+            for connection in cable._connections:
                 color, l1, l2, r1, r2 = gv_edge_wire(self, cable, connection)
                 dot.attr("edge", color=color)
                 if not (l1, l2) == (None, None):
@@ -268,7 +337,8 @@ class Harness:
         if "gv" in fmt:
             graph.save(filename=f"{filename}.gv")
         # BOM output
-        bomlist = bom_list(self.bom())
+        # bomlist = bom_list(self.bom())
+        bomlist = [[]]
         if "tsv" in fmt:
             open_file_write(f"{filename}.bom.tsv").write(tuplelist2tsv(bomlist))
         if "csv" in fmt:
@@ -288,7 +358,7 @@ class Harness:
         elif "svg" in fmt:
             Path(f"{filename}.tmp.svg").replace(f"{filename}.svg")
 
-    def bom(self):
-        if not self._bom:
-            self._bom = generate_bom(self)
-        return self._bom
+    # def bom(self):
+    #     if not self._bom:
+    #         self._bom = generate_bom(self)
+    #     return self._bom
