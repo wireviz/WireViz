@@ -58,7 +58,10 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     "--output-name",
     default=None,
     type=str,
-    help="File name (without extension) to use for output files, if different from input file name.",
+    help=(
+        "File name (without extension) to use for output files, "
+        "if different from input file name."
+    ),
 )
 @click.option(
     "-V",
