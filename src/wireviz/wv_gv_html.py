@@ -14,15 +14,13 @@ from wireviz.DataClasses import (
     MateComponent,
     MatePin,
     Options,
+    PartNumberInfo,
     ShieldClass,
     WireClass,
 )
-from wireviz.wv_helper import pn_info_string, remove_links
+from wireviz.wv_bom import partnumbers_to_list
+from wireviz.wv_helper import remove_links
 from wireviz.wv_table_util import *  # TODO: explicitly import each needed tag later
-
-HEADER_PN = "P/N"
-HEADER_MPN = "MPN"
-HEADER_SPN = "SPN"
 
 
 def gv_node_component(component: Component) -> Table:
@@ -33,12 +31,12 @@ def gv_node_component(component: Component) -> Table:
 
     # generate all rows to be shown in the node
     if component.show_name:
-        str_name = f"{remove_links(component.name)}"
+        str_name = f"{remove_links(component.designator)}"
         line_name = colored_cell(str_name, component.bgcolor_title)
     else:
         line_name = None
 
-    line_pn = part_number_str_list(component)
+    line_pn = partnumbers_to_list(component.partnumbers)
 
     is_simple_connector = (
         isinstance(component, Connector) and component.style == "simple"
@@ -204,8 +202,8 @@ def gv_connector_loops(connector: Connector) -> List:
     else:
         raise Exception("No side for loops")
     for loop in connector.loops:
-        head = f"{connector.name}:p{loop[0]}{loop_side}:{loop_dir}"
-        tail = f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}"
+        head = f"{connector.designator}:p{loop[0]}{loop_side}:{loop_dir}"
+        tail = f"{connector.designator}:p{loop[1]}{loop_side}:{loop_dir}"
         loop_edges.append((head, tail))
     return loop_edges
 
@@ -230,7 +228,7 @@ def gv_conductor_table(cable) -> Table:
         wireinfo.append(wire.label)
 
         ins, outs = [], []
-        for conn in cable.connections:
+        for conn in cable._connections:
             if conn.via.id == wire.id:
                 if conn.from_ is not None:
                     ins.append(str(conn.from_))
@@ -405,18 +403,6 @@ def gv_edge_mate(mate) -> (str, str, str, str):
 
 def colored_cell(contents, bgcolor) -> Td:
     return Td(contents, bgcolor=bgcolor.html)
-
-
-def part_number_str_list(component: Component) -> List[str]:
-    cell_contents = [
-        pn_info_string(HEADER_PN, None, component.pn),
-        pn_info_string(HEADER_MPN, component.manufacturer, component.mpn),
-        pn_info_string(HEADER_SPN, component.supplier, component.spn),
-    ]
-    if any(cell_contents):
-        return [html_line_breaks(cell) for cell in cell_contents]
-    else:
-        return None
 
 
 def colorbar_cell(color) -> Td:
