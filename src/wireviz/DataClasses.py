@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from collections import namedtuple
 from dataclasses import dataclass, field
 from enum import Enum
 from itertools import zip_longest
 from typing import Dict, List, Optional, Tuple, Union
 
+from wireviz.wv_bom import BomHash, BomHashList, PartNumberInfo
 from wireviz.wv_colors import (
     COLOR_CODES,
     ColorOutputMode,
@@ -146,34 +148,6 @@ class Image:
 
 
 @dataclass
-class AdditionalComponent:
-    type: MultilineHypertext
-    subtype: Optional[MultilineHypertext] = None
-    manufacturer: Optional[MultilineHypertext] = None
-    mpn: Optional[MultilineHypertext] = None
-    supplier: Optional[MultilineHypertext] = None
-    spn: Optional[MultilineHypertext] = None
-    pn: Optional[Hypertext] = None
-    qty: float = 1
-    unit: Optional[str] = None
-    qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
-    bgcolor: SingleColor = None
-
-    def __post_init__(self):
-        self.bgcolor = SingleColor(self.bgcolor)
-
-    @property
-    def description(self) -> str:
-        s = self.type.rstrip() + f", {self.subtype.rstrip()}" if self.subtype else ""
-        return s
-
-
-@dataclass
-class Component:
-    pass
-
-
-@dataclass
 class PinClass:
     index: int
     id: str
@@ -220,42 +194,143 @@ class Connection:
 
 
 @dataclass
-class Connector(Component):
-    name: Designator
-    bgcolor: SingleColor = None
-    bgcolor_title: SingleColor = None
-    manufacturer: Optional[MultilineHypertext] = None
-    mpn: Optional[MultilineHypertext] = None
-    supplier: Optional[MultilineHypertext] = None
-    spn: Optional[MultilineHypertext] = None
-    pn: Optional[Hypertext] = None
+class Component:
+    category: Optional[str] = None  # currently only used by cables, to define bundles
+    type: Union[MultilineHypertext, List[MultilineHypertext]] = None
+    subtype: Union[MultilineHypertext, List[MultilineHypertext]] = None
+
+    # part number
+    partnumbers: PartNumberInfo = None  # filled by fill_partnumbers()
+    # the following are provided for user convenience and should not be accessed later.
+    # their contents are loaded into partnumbers during the child class __post_init__()
+    pn: str = None
+    manufacturer: str = None
+    mpn: str = None
+    supplier: str = None
+    spn: str = None
+
+    ignore_in_bom: bool = False
+    bom_id: Optional[str] = None  # to be filled after harness is built
+
+    def fill_partnumbers(self):
+        self.partnumbers = PartNumberInfo(
+            self.pn, self.manufacturer, self.mpn, self.supplier, self.spn
+        )
+
+    @property
+    def bom_hash(self) -> BomHash:
+        def _force_list(inp):
+            if isinstance(inp, list):
+                return inp
+            else:
+                return [inp for i in range(len(self.colors))]
+
+        if self.category == "bundle":
+            # create a temporary single item that includes the necessary fields,
+            # which may or may not be lists
+            _hash_list = BomHashList(
+                self.description,
+                self.unit,
+                self.partnumbers,
+            )
+            # convert elements that are not lists, into lists
+            _hash_matrix = list(map(_force_list, [elem for elem in _hash_list]))
+            # transpose list of lists, convert to tuple for next step
+            _hash_matrix = list(map(tuple, zip(*_hash_matrix)))
+            # generate list of BomHashes
+            hash_list = [BomHash(*item) for item in _hash_matrix]
+            return hash_list
+        else:
+            return BomHash(
+                self.description,
+                self.unit,
+                self.partnumbers,
+            )
+
+
+@dataclass
+class AdditionalComponent(Component):
+    qty: float = 1
+    unit: Optional[str] = None
+    qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
+    designators: Optional[str] = None  # used for components definedi in the
+    #                                    additional_bom_items section within another component
+    bgcolor: SingleColor = None  #       ^ same here
+
+    def __post_init__(self):
+        super().fill_partnumbers()
+        self.bgcolor = SingleColor(self.bgcolor)
+
+    @property
+    def description(self) -> str:
+        s = self.type.rstrip() + f", {self.subtype.rstrip()}" if self.subtype else ""
+        return s
+
+
+@dataclass
+class GraphicalComponent(Component):  # abstract class, for future use
+    bgcolor: Optional[SingleColor] = None
+
+
+@dataclass
+class TopLevelGraphicalComponent(GraphicalComponent):  # abstract class
+    # component properties
+    designator: Designator = None
+    color: Optional[SingleColor] = None
+    image: Optional[Image] = None
+    additional_components: List[AdditionalComponent] = field(default_factory=list)
+    notes: Optional[MultilineHypertext] = None
+    # rendering options
+    bgcolor_title: Optional[SingleColor] = None
+    show_name: Optional[bool] = None
+
+
+@dataclass
+class Connector(TopLevelGraphicalComponent):
+    # connector-specific properties
     style: Optional[str] = None
     category: Optional[str] = None
-    type: Optional[MultilineHypertext] = None
-    subtype: Optional[MultilineHypertext] = None
+    loops: List[List[Pin]] = field(default_factory=list)
+    # pin information in particular
     pincount: Optional[int] = None
-    image: Optional[Image] = None
-    notes: Optional[MultilineHypertext] = None
-    pins: List[Pin] = field(default_factory=list)
-    pinlabels: List[Pin] = field(default_factory=list)
-    pincolors: List[str] = field(default_factory=list)
-    color: MultiColor = None
-    show_name: Optional[bool] = None
+    pins: List[Pin] = field(default_factory=list)  # legacy
+    pinlabels: List[Pin] = field(default_factory=list)  # legacy
+    pincolors: List[str] = field(default_factory=list)  # legacy
+    pin_objects: List[PinClass] = field(
+        default_factory=list
+    )  # new, to replace the lists above
+    # rendering option
     show_pincount: Optional[bool] = None
     hide_disconnected_pins: bool = False
-    loops: List[List[Pin]] = field(default_factory=list)
-    ignore_in_bom: bool = False
-    additional_components: List[AdditionalComponent] = field(default_factory=list)
-    pin_objects: List[PinClass] = field(default_factory=list)
 
     @property
     def is_autogenerated(self):
-        return self.name.startswith(AUTOGENERATED_PREFIX)
+        import pudb
+
+        pudb.set_trace()
+        return self.designator.startswith(AUTOGENERATED_PREFIX)
+
+    @property
+    def description(self) -> str:
+        substrs = [
+            "Connector",
+            self.type,
+            self.subtype,
+            self.pincount if self.show_pincount else None,
+            str(self.color) if self.color else None,
+        ]
+        return ", ".join([str(s) for s in substrs if s is not None and s != ""])
 
     def should_show_pin(self, pin_name):
         return not self.hide_disconnected_pins or self.visible_pins.get(pin_name, False)
 
+    @property
+    def unit(self):  # for compatibility with BOM hashing
+        return None  # connectors do not support units.
+
     def __post_init__(self) -> None:
+
+        super().fill_partnumbers()
 
         self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
@@ -305,7 +380,7 @@ class Connector(Component):
                     id=pin_id,
                     label=pin_label,
                     color=MultiColor(pin_color),
-                    parent=self.name,
+                    parent=self.designator,
                     _anonymous=self.is_autogenerated,
                     _simple=self.style == "simple",
                 )
@@ -333,9 +408,9 @@ class Connector(Component):
     def _check_if_unique_id(self, id):
         results = [pin for pin in self.pin_objects if pin.id == id]
         if len(results) == 0:
-            raise Exception(f"Pin ID {id} not found in {self.name}")
+            raise Exception(f"Pin ID {id} not found in {self.designator}")
         if len(results) > 1:
-            raise Exception(f"Pin ID {id} found more than once in {self.name}")
+            raise Exception(f"Pin ID {id} found more than once in {self.designator}")
         return True
 
     def get_pin_by_id(self, id):
@@ -364,41 +439,36 @@ class Connector(Component):
 
 
 @dataclass
-class Cable(Component):
-    name: Designator
-    bgcolor: SingleColor = None
-    bgcolor_title: SingleColor = None
-    manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    spn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
-    pn: Union[Hypertext, List[Hypertext], None] = None
-    category: Optional[str] = None
-    type: Optional[MultilineHypertext] = None
+class Cable(TopLevelGraphicalComponent):
+    # cable-specific properties
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
-    show_equiv: bool = False
     length: float = 0
     length_unit: Optional[str] = None
-    color: MultiColor = None
+    color_code: Optional[str] = None
+    # wire information in particular
     wirecount: Optional[int] = None
     shield: Union[bool, MultiColor] = False
-    image: Optional[Image] = None
-    notes: Optional[MultilineHypertext] = None
-    colors: List[str] = field(default_factory=list)
-    wirelabels: List[Wire] = field(default_factory=list)
-    color_code: Optional[str] = None
+    colors: List[str] = field(default_factory=list)  # legacy
+    wirelabels: List[Wire] = field(default_factory=list)  # legacy
+    wire_objects: List[WireClass] = field(
+        default_factory=list
+    )  # new, to replace the lists above
+    # internal
+    _connections: List[Connection] = field(default_factory=list)
+    # rendering options
     show_name: Optional[bool] = None
+    show_equiv: bool = False
     show_wirecount: bool = True
     show_wirenumbers: Optional[bool] = None
-    ignore_in_bom: bool = False
-    additional_components: List[AdditionalComponent] = field(default_factory=list)
-    connections: List[Connection] = field(default_factory=list)
-    wire_objects: List[WireClass] = field(default_factory=list)
 
     @property
     def is_autogenerated(self):
-        return self.name.startswith(AUTOGENERATED_PREFIX)
+        return self.designator.startswith(AUTOGENERATED_PREFIX)
+
+    @property
+    def unit(self):  # for compatibility with parent class
+        return self.length_unit
 
     @property
     def gauge_str(self):
@@ -416,7 +486,42 @@ class Cable(Component):
                 equivalent_gauge = f" ({mm2_equiv(self.gauge)} mm\u00B2)"
         return f"{actual_gauge}{equivalent_gauge}"
 
+    @property
+    def description(self) -> str:
+        if self.category == "bundle":
+            desc_list = []
+            for index, color in enumerate(self.colors):
+                substrs = [
+                    "Wire",
+                    self.type,
+                    self.subtype,
+                    f"{self.gauge} {self.gauge_unit}" if self.gauge else None,
+                    str(self.color)
+                    if self.color
+                    else None,  # translate_color(self.color, harness.options.color_mode)] <- get harness.color_mode!
+                ]
+                desc_list.append(
+                    ", ".join([s for s in substrs if s is not None and s != ""])
+                )
+            return desc_list
+        else:
+            substrs = [
+                ("", "Cable"),
+                (", ", self.type),
+                (", ", self.subtype),
+                (", ", self.wirecount),
+                (" ", f"x {self.gauge} {self.gauge_unit}" if self.gauge else " wires"),
+                (" ", "shielded" if self.shield else None),
+                (", ", str(self.color) if self.color else None),
+            ]
+            desc = "".join(
+                [f"{s[0]}{s[1]}" for s in substrs if s[1] is not None and s[1] != ""]
+            )
+            return desc
+
     def __post_init__(self) -> None:
+
+        super().fill_partnumbers()
 
         self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
@@ -430,14 +535,14 @@ class Cable(Component):
                 g, u = self.gauge.split(" ")
             except Exception:
                 raise Exception(
-                    f"Cable {self.name} gauge={self.gauge} - "
+                    f"Cable {self.designator} gauge={self.gauge} - "
                     "Gauge must be a number, or number and unit separated by a space"
                 )
             self.gauge = g
 
             if self.gauge_unit is not None:
                 print(
-                    f"Warning: Cable {self.name} gauge_unit={self.gauge_unit} "
+                    f"Warning: Cable {self.designator} gauge_unit={self.gauge_unit} "
                     f"is ignored because its gauge contains {u}"
                 )
             if u.upper() == "AWG":
@@ -457,18 +562,18 @@ class Cable(Component):
                 L = float(L)
             except Exception:
                 raise Exception(
-                    f"Cable {self.name} length={self.length} - "
+                    f"Cable {self.designator} length={self.length} - "
                     "Length must be a number, or number and unit separated by a space"
                 )
             self.length = L
             if self.length_unit is not None:
                 print(
-                    f"Warning: Cable {self.name} length_unit={self.length_unit} is ignored "
+                    f"Warning: Cable {self.designator} length_unit={self.length_unit} is ignored "
                     f"because its length contains {u}"
                 )
             self.length_unit = u
         elif not any(isinstance(self.length, t) for t in [int, float]):
-            raise Exception(f"Cable {self.name} length has a non-numeric value")
+            raise Exception(f"Cable {self.designator} length has a non-numeric value")
         elif self.length_unit is None:
             self.length_unit = "m"
 
@@ -526,7 +631,7 @@ class Cable(Component):
                     id=wire_index + 1,  # TODO: wire_id
                     label=wire_label,
                     color=MultiColor(wire_color),
-                    parent=self.name,
+                    parent=self.designator,
                 )
             )
 
@@ -541,7 +646,7 @@ class Cable(Component):
                     color=MultiColor(self.shield)
                     if isinstance(self.shield, str)
                     else MultiColor(None),
-                    parent=self.name,
+                    parent=self.designator,
                 )
             )
 
@@ -559,16 +664,19 @@ class Cable(Component):
     def get_wire_by_id(self, id):
         wire = [wire for wire in self.wire_objects if wire.id == id]
         if len(wire) == 0:
-            raise Exception(f"Wire ID {id} not found in {self.name}")
+            raise Exception(f"Wire ID {id} not found in {self.designator}")
         if len(wire) > 1:
-            raise Exception(f"Wire ID {id} found more than once in {self.name}")
+            raise Exception(f"Wire ID {id} found more than once in {self.designator}")
         return wire[0]
 
-    def connect(
-        self, from_pin_obj: [PinClass], via_wire_id: str, to_pin_obj: [PinClass]
+    def _connect(
+        self,
+        from_pin_obj: [PinClass],
+        via_wire_id: str,
+        to_pin_obj: [PinClass],
     ) -> None:
         via_wire_obj = self.get_wire_by_id(via_wire_id)
-        self.connections.append(Connection(from_pin_obj, via_wire_obj, to_pin_obj))
+        self._connections.append(Connection(from_pin_obj, via_wire_obj, to_pin_obj))
 
     def get_qty_multiplier(self, qty_multiplier: Optional[CableMultiplier]) -> float:
         if not qty_multiplier:
