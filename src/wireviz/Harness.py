@@ -208,13 +208,13 @@ class Harness:
                 if not (r1, r2) == (None, None):
                     dot.edge(r1, r2)
 
-        apply_dot_tweaks(dot, self.tweak)
-
         for mate in self.mates:
             color, dir, code_from, code_to = gv_edge_mate(mate)
 
             dot.attr("edge", color=color, style="dashed", dir=dir)
             dot.edge(code_from, code_to)
+
+        apply_dot_tweaks(dot, self.tweak)
 
         return dot
 
