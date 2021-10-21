@@ -22,7 +22,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install .
     - name: Create Examples
-      run: PYTHONPATH=$(pwd)/src:$PYTHONPATH cd src/wireviz/ && python build_examples.py
+      run: PYTHONPATH=$(pwd)/src:$PYTHONPATH && python src/wireviz/tools/build_examples.py
     - name: Upload examples, demos, and tutorials
       uses: actions/upload-artifact@v2
       with:

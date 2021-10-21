@@ -14,7 +14,7 @@ from wireviz.wv_colors import (
     SingleColor,
     get_color_by_colorcode_index,
 )
-from wireviz.wv_helper import aspect_ratio, awg_equiv, mm2_equiv, remove_links
+from wireviz.wv_utils import aspect_ratio, awg_equiv, mm2_equiv, remove_links
 
 # Each type alias have their legal values described in comments
 # - validation might be implemented in the future

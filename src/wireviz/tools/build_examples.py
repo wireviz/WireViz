@@ -7,13 +7,12 @@ import sys
 from pathlib import Path
 
 script_path = Path(__file__).absolute()
-
-sys.path.insert(0, str(script_path.parent.parent))  # to find wireviz module
-from wv_helper import open_file_append, open_file_read, open_file_write
+sys.path.insert(0, str(script_path.parent.parent.parent))  # to find wireviz module
 
 from wireviz import APP_NAME, __version__, wireviz
+from wireviz.wv_utils import open_file_append, open_file_read, open_file_write
 
-dir = script_path.parent.parent.parent
+dir = script_path.parent.parent.parent.parent
 readme = "readme.md"
 groups = {
     "examples": {
