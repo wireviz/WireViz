@@ -175,12 +175,12 @@ class Harness:
 
         # determine if there are double- or triple-colored wires in the harness;
         # if so, pad single-color wires to make all wires of equal thickness
-        multicolor_wires = [
+        wire_is_multicolor = [
             len(wire.color) > 1
             for cable in self.cables.values()
             for wire in cable.wire_objects
         ]
-        if any(multicolor_wires):
+        if any(wire_is_multicolor):
             wireviz.wv_colors.padding_amount = 3
         else:
             wireviz.wv_colors.padding_amount = 1
