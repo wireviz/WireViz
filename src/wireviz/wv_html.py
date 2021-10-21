@@ -25,7 +25,8 @@ def generate_html_output(
     # load HTML template
     templatename = metadata.get("template", {}).get("name")
     if templatename:
-        # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
+        # if relative path to template was provided,
+        # check directory of YAML file first, fall back to built-in template directory
         templatefile = smart_file_resolve(
             f"{templatename}.html",
             [Path(filename).parent, Path(__file__).parent / "templates"],

@@ -430,7 +430,8 @@ def image_and_caption_cells(component: Component) -> (Td, Td):
     image_tag = Img(scale=component.image.scale, src=component.image.src)
     image_cell_inner = Td(image_tag, flat=True)
     if component.image.fixedsize:
-        # further nest the image in a table with width/height/fixedsize parameters, and place that table in a cell
+        # further nest the image in a table with width/height/fixedsize parameters,
+        # and place that table in a cell
         image_cell_inner.update_attribs(**html_size_attr_dict(component.image))
         image_cell = Td(
             Table(Tr(image_cell_inner), border=0, cellborder=0, cellspacing=0, id="!")
@@ -500,7 +501,8 @@ def apply_dot_tweaks(dot, tweak):
     def typecheck(name: str, value: Any, expect: type) -> None:
         if not isinstance(value, expect):
             raise Exception(
-                f"Unexpected value type of {name}: Expected {expect}, got {type(value)}\n{value}"
+                f"Unexpected value type of {name}: "
+                f"Expected {expect}, got {type(value)}\n{value}"
             )
 
     # TODO?: Differ between override attributes and HTML?
@@ -530,11 +532,13 @@ def apply_dot_tweaks(dot, tweak):
                     )
                     if n_subs < 1:
                         print(
-                            f"Harness.create_graph() warning: {attr} not found in {keyword}!"
+                            "Harness.create_graph() warning: "
+                            f"{attr} not found in {keyword}!"
                         )
                     elif n_subs > 1:
                         print(
-                            f"Harness.create_graph() warning: {attr} removed {n_subs} times in {keyword}!"
+                            "Harness.create_graph() warning: "
+                            f"{attr} removed {n_subs} times in {keyword}!"
                         )
                     continue
 
@@ -549,7 +553,8 @@ def apply_dot_tweaks(dot, tweak):
                     entry = re.sub(r"\]$", f" {attr}={value}]", entry)
                 elif n_subs > 1:
                     print(
-                        f"Harness.create_graph() warning: {attr} overridden {n_subs} times in {keyword}!"
+                        "Harness.create_graph() warning: "
+                        f"{attr} overridden {n_subs} times in {keyword}!"
                     )
 
             dot.body[i] = entry
