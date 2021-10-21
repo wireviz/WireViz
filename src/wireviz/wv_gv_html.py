@@ -255,7 +255,6 @@ def gv_conductor_table(cable) -> Table:
 
 
 def gv_wire_cell(wire: Union[WireClass, ShieldClass]) -> Td:
-    # import pudb; pudb.set_trace()
     if wire.color:
         color_list = ["#000000"] + wire.color.html_padded_list + ["#000000"]
     else:
