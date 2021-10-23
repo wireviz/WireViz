@@ -34,7 +34,7 @@ def parse(
     and outputs the result as one or more files and/or as a function return value
 
     Accepted inputs:
-        * A path to a YAML source file to parse
+        * A Path object or a path-like string pointing to a YAML source file to parse
         * A string containing the YAML data to parse
         * A Python Dict containing the pre-parsed YAML data
 
