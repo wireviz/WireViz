@@ -1,4 +1,5 @@
 .DS_Store
+.idea/
 .eggs
 __pycache__
 .*.swp
@@ -8,6 +9,7 @@ build
 data
 dist
 venv/
+.venv/
 desktop.ini
 thumbs.db
 temp/
