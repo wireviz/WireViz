@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from dataclasses import asdict
 import os
 from pathlib import Path
 import sys
@@ -13,7 +14,7 @@ if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from wireviz import __version__
-from wireviz.DataClasses import Metadata, Options, Tweak
+from wireviz.DataClasses import DEFAULT_LOOK, Metadata, Options, Tweak
 from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read
 
@@ -37,7 +38,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
     harness = Harness(
         metadata = Metadata(**yaml_data.get('metadata', {})),
-        options = Options(**yaml_data.get('options', {})),
+        options = Options(**asdict(DEFAULT_LOOK), **yaml_data.get('options', {})),
         tweak = Tweak(**yaml_data.get('tweak', {})),
     )
     if 'title' not in harness.metadata:

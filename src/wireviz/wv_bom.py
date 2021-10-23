@@ -4,9 +4,9 @@ from dataclasses import asdict
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from wireviz.DataClasses import AdditionalComponent, Cable, Color, Connector
-from wireviz.wv_colors import translate_color
-from wireviz.wv_gv_html import html_bgcolor_attr, html_line_breaks
+from wireviz.DataClasses import AdditionalComponent, Cable, Connector, Look
+from wireviz.wv_colors import Color, translate_color
+from wireviz.wv_gv_html import font_tag, html_line_breaks, table_attr
 from wireviz.wv_helper import clean_whitespace
 
 BOM_COLUMNS_ALWAYS = ('id', 'description', 'qty', 'unit', 'designators')
@@ -35,7 +35,7 @@ def get_additional_component_table(harness: "Harness", component: Union[Connecto
             common_args = {
                 'qty': part.qty * component.get_qty_multiplier(part.qty_multiplier),
                 'unit': part.unit,
-                'bgcolor': part.bgcolor,
+                'box': part.box,
             }
             if harness.options.mini_bom_mode:
                 id = get_bom_index(harness.bom(), bom_entry_key({**asdict(part), 'description': part.description}))
@@ -158,7 +158,7 @@ def component_table_entry(
         type: str,
         qty: Union[int, float],
         unit: Optional[str] = None,
-        bgcolor: Optional[Color] = None,
+        box: Optional[Look] = None,
         pn: Optional[str] = None,
         manufacturer: Optional[str] = None,
         mpn: Optional[str] = None,
@@ -178,8 +178,8 @@ def component_table_entry(
               + (', '.join([pn for pn in part_number_list if pn])))
     # format the above output as left aligned text in a single visible cell
     # indent is set to two to match the indent in the generated html table
-    return f'''<table border="0" cellspacing="0" cellpadding="3" cellborder="1"{html_bgcolor_attr(bgcolor)}><tr>
-   <td align="left" balign="left">{html_line_breaks(output)}</td>
+    return f'''<table border="0" cellspacing="0" cellpadding="3" cellborder="1"{table_attr(box)}><tr>
+   <td align="left" balign="left">{font_tag(box, html_line_breaks(output))}</td>
   </tr></table>'''
 
 def pn_info_string(header: str, name: Optional[str], number: Optional[str]) -> Optional[str]:

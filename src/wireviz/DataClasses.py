@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from typing import Dict, List, Optional, Tuple, Union
-from dataclasses import dataclass, field, InitVar
+from dataclasses import asdict, dataclass, field, InitVar
 from pathlib import Path
 
 from wireviz.wv_helper import int2tuple, aspect_ratio
-from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES
+from wireviz.wv_colors import Color, Colors, ColorMode, ColorScheme, COLOR_CODES, translate_color
 
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
@@ -13,6 +13,7 @@ PlainText = str # Text not containing HTML tags nor newlines
 Hypertext = str # Text possibly including HTML hyperlinks that are removed in all outputs except HTML output
 MultilineHypertext = str # Hypertext possibly also including newlines to break lines in diagram output
 Designator = PlainText # Case insensitive unique name of connector or cable
+Points = float  # Size in points = 1/72 inch
 
 # Literal type aliases below are commented to avoid requiring python 3.8
 ConnectorMultiplier = PlainText # = Literal['pincount', 'populated']
@@ -33,25 +34,68 @@ class Metadata(dict):
 
 
 @dataclass
-class Options:
-    fontname: PlainText = 'arial'
-    bgcolor: Color = 'WH'
-    bgcolor_node: Optional[Color] = 'WH'
-    bgcolor_connector: Optional[Color] = None
-    bgcolor_cable: Optional[Color] = None
-    bgcolor_bundle: Optional[Color] = None
+class Look:
+    """Colors and font that defines how an element should look like."""
+    bordercolor: Optional[Color] = None
+    bgcolor: Optional[Color] = None
+    fontcolor: Optional[Color] = None
+    fontname: Optional[PlainText] = None
+    fontsize: Optional[Points] = None
+
+    def lookdict(self) -> dict:
+        """Return Look attributes as dict."""
+        return {k:v for k,v in asdict(self).items() if k in asdict(DEFAULT_LOOK).keys()}
+
+    def _2dict(self) -> dict:
+        """Return dict of non-None strings with color values translated to hex."""
+        return {
+            k:translate_color(v, "hex") if 'color' in k else str(v)
+            for k,v in self.lookdict().items() if v is not None
+        }
+
+    def graph_args(self) -> dict:
+        """Return dict with arguments to a dot graph."""
+        return {k:v for k,v in self._2dict().items() if k != 'bordercolor'}
+
+    def node_args(self) -> dict:
+        """Return dict with arguments to a dot node with filled style."""
+        return {k.replace('border', '').replace('bg', 'fill'):v for k,v in self._2dict().items()}
+
+    def html_style(self, color_prefix: Optional[str] = None, include_all: bool = True) -> str:
+        """Return HTML style value containing all non-empty option values."""
+        translated = Look(**self._2dict())
+        return ' '.join(value for value in (
+            f'{color_prefix} {translated.bordercolor};' if self.bordercolor and color_prefix else None,
+            f'background-color: {translated.bgcolor};' if self.bgcolor and include_all else None,
+            f'color: {translated.fontcolor};' if self.fontcolor and include_all else None,
+            f'font-family: {self.fontname};' if self.fontname and include_all else None,
+            f'font-size: {self.fontsize}pt;' if self.fontsize and include_all else None,
+        ) if value)
+
+DEFAULT_LOOK = Look(
+    bordercolor = 'BK',
+    bgcolor = 'WH',
+    fontcolor = 'BK',
+    fontname = 'arial',
+    fontsize = 14,
+)
+
+
+@dataclass
+class Options(Look):
+    node: Look = field(default_factory=dict)
+    connector: Look = field(default_factory=dict)
+    cable: Look = field(default_factory=dict)
+    bundle: Look = field(default_factory=dict)
     color_mode: ColorMode = 'SHORT'
     mini_bom_mode: bool = True
 
     def __post_init__(self):
-        if not self.bgcolor_node:
-            self.bgcolor_node = self.bgcolor
-        if not self.bgcolor_connector:
-            self.bgcolor_connector = self.bgcolor_node
-        if not self.bgcolor_cable:
-            self.bgcolor_cable = self.bgcolor_node
-        if not self.bgcolor_bundle:
-            self.bgcolor_bundle = self.bgcolor_cable
+        # Build initialization dicts with default values followed by dict entries from YAML input.
+        self.node = Look(**{**self.lookdict(), **self.node})
+        self.connector = Look(**{**asdict(self.node), **self.connector})
+        self.cable = Look(**{**asdict(self.node), **self.cable})
+        self.bundle = Look(**{**asdict(self.cable), **self.bundle})
 
 
 @dataclass
@@ -67,15 +111,18 @@ class Image:
     src: str
     scale: Optional[ImageScale] = None
     # Attributes of the image cell <td> containing the image:
-    width: Optional[int] = None
-    height: Optional[int] = None
+    width: Optional[Points] = None
+    height: Optional[Points] = None
     fixedsize: Optional[bool] = None
-    bgcolor: Optional[Color] = None
+    box: Optional[Look] = None
     # Contents of the text cell <td> just below the image cell:
     caption: Optional[MultilineHypertext] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
     def __post_init__(self, gv_dir):
+
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
 
         if self.fixedsize is None:
             # Default True if any dimension specified unless self.scale also is specified.
@@ -109,7 +156,11 @@ class AdditionalComponent:
     qty: float = 1
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
-    bgcolor: Optional[Color] = None
+    box: Optional[Look] = None
+
+    def __post_init__(self) -> None:
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
 
     @property
     def description(self) -> str:
@@ -119,8 +170,8 @@ class AdditionalComponent:
 @dataclass
 class Connector:
     name: Designator
-    bgcolor: Optional[Color] = None
-    bgcolor_title: Optional[Color] = None
+    box: Optional[Look] = None
+    title: Optional[Look] = None
     manufacturer: Optional[MultilineHypertext] = None
     mpn: Optional[MultilineHypertext] = None
     supplier: Optional[MultilineHypertext] = None
@@ -147,6 +198,10 @@ class Connector:
 
     def __post_init__(self) -> None:
 
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
+        if isinstance(self.title, dict):
+            self.title = Look(**self.title)
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
@@ -205,8 +260,8 @@ class Connector:
 @dataclass
 class Cable:
     name: Designator
-    bgcolor: Optional[Color] = None
-    bgcolor_title: Optional[Color] = None
+    box: Optional[Look] = None
+    title: Optional[Look] = None
     manufacturer: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     mpn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     supplier: Union[MultilineHypertext, List[MultilineHypertext], None] = None
@@ -235,6 +290,10 @@ class Cable:
 
     def __post_init__(self) -> None:
 
+        if isinstance(self.box, dict):
+            self.box = Look(**self.box)
+        if isinstance(self.title, dict):
+            self.title = Look(**self.title)
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
