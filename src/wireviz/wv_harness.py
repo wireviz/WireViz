@@ -67,14 +67,16 @@ class Harness:
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_str) -> None:
         from_con = self.connectors[from_name]
-        from_pin_obj = from_con.get_pin_by_id(from_pin)
+        from_pin_obj = from_con.pin_objects[from_pin]
         to_con = self.connectors[to_name]
-        to_pin_obj = to_con.get_pin_by_id(to_pin)
+        to_pin_obj = to_con.pin_objects[to_pin]
         arrow = Arrow(direction=parse_arrow_str(arrow_str), weight=ArrowWeight.SINGLE)
 
         self.mates.append(MatePin(from_pin_obj, to_pin_obj, arrow))
-        self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
-        self.connectors[to_name].activate_pin(to_pin, Side.LEFT)
+        self.connectors[from_name].activate_pin(
+            from_pin, Side.RIGHT, is_connection=False
+        )
+        self.connectors[to_name].activate_pin(to_pin, Side.LEFT, is_connection=False)
 
     def add_mate_component(self, from_name, to_name, arrow_str) -> None:
         arrow = Arrow(direction=parse_arrow_str(arrow_str), weight=ArrowWeight.SINGLE)
@@ -126,7 +128,7 @@ class Harness:
                 cat = ""
 
             if item.category == "bundle":
-                for subitem in item.wire_objects:
+                for subitem in item.wire_objects.values():
                     _add(
                         hash=subitem.bom_hash,
                         qty=item.bom_qty,  # should be 1
@@ -225,12 +227,12 @@ class Harness:
         # perform the actual connection
         if from_name is not None:
             from_con = self.connectors[from_name]
-            from_pin_obj = from_con.get_pin_by_id(from_pin)
+            from_pin_obj = from_con.pin_objects[from_pin]
         else:
             from_pin_obj = None
         if to_name is not None:
             to_con = self.connectors[to_name]
-            to_pin_obj = to_con.get_pin_by_id(to_pin)
+            to_pin_obj = to_con.pin_objects[to_pin]
         else:
             to_pin_obj = None
 
@@ -267,7 +269,7 @@ class Harness:
         wire_is_multicolor = [
             len(wire.color) > 1
             for cable in self.cables.values()
-            for wire in cable.wire_objects
+            for wire in cable.wire_objects.values()
         ]
         if any(wire_is_multicolor):
             wireviz.wv_colors.padding_amount = 3
