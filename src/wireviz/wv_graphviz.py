@@ -64,8 +64,7 @@ def gv_node_component(component: Component) -> Table:
     x = colorbar_cell(component.color) if component.color else None
 
     line_image, line_image_caption = image_and_caption_cells(component)
-    # line_additional_component_table = get_additional_component_table(self, connector)
-    line_additional_component_table = None
+    line_additional_component_table = gv_additional_component_table(component)
     line_notes = [html_line_breaks(component.notes)]
 
     if isinstance(component, Connector):
@@ -98,6 +97,25 @@ def gv_node_component(component: Component) -> Table:
         first_cell_in_tbl.update_attribs(port="p1l")
 
     return tbl
+
+
+def gv_additional_component_table(component):
+    if not component.additional_components:
+        return None
+
+    rows = []
+    for subitem in component.additional_components:
+        rows.append(
+            Tr(
+                [
+                    Td(f"{subitem.bom_qty}"),
+                    Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}"),
+                    Td(f"{subitem.description}"),
+                ]
+            )
+        )
+
+    return Table(rows)
 
 
 def calculate_node_bgcolor(component, harness_options):

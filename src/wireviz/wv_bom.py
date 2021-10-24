@@ -22,10 +22,10 @@ BomCategory = Enum(
     "BomEntry", "CONNECTOR CABLE WIRE ADDITIONAL_INSIDE ADDITIONAL_OUTSIDE"
 )
 QtyMultiplierConnector = Enum(
-    "QtyMultiplierConnector", "ONE PINCOUNT POPULATED CONNECTIONS"
+    "QtyMultiplierConnector", "PINCOUNT POPULATED CONNECTIONS"
 )
 QtyMultiplierCable = Enum(
-    "QtyMultiplierCable", "ONE WIRECOUNT TERMINATION LENGTH TOTAL_LENGTH"
+    "QtyMultiplierCable", "WIRECOUNT TERMINATION LENGTH TOTAL_LENGTH"
 )
 
 PART_NUMBER_HEADERS = PartNumberInfo(

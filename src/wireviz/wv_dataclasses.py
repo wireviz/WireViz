@@ -262,7 +262,7 @@ class Component:
 @dataclass
 class AdditionalComponent(Component):
     qty_multiplier: Union[QtyMultiplierConnector, QtyMultiplierCable, int] = 1
-    qty_multipliers_computed: Dict = field(default_factory=list)
+    _qty_multiplier_computed: Union[int, float] = 1
     designators: Optional[str] = None  # used for components definedi in the
     #                                    additional_bom_items section within another component
     bgcolor: SingleColor = None  #       ^ same here
@@ -288,12 +288,11 @@ class AdditionalComponent(Component):
 
     @property
     def bom_qty(self):
-        return 999
+        return self.qty.number * self._qty_multiplier_computed
 
     @property
     def description(self) -> str:
-        substrs = [self.type, self.subtype if self.subtype else ""]
-        return ", ".join(substrs)
+        return f"{self.type}{', ' + self.subtype if self.subtype else ''}"
 
 
 @dataclass
@@ -448,32 +447,26 @@ class Connector(TopLevelGraphicalComponent):
             self.ports_right = True
 
     def compute_qty_multipliers(self):
+        # do not run before all connections in harness have been made!
+        num_populated_pins = len(
+            [pin for pin in self.pin_objects.values() if pin._num_connections > 0]
+        )
+        num_connections = sum(
+            [pin._num_connections for pin in self.pin_objects.values()]
+        )
+        qty_multipliers_computed = {
+            "PINCOUNT": self.pincount,
+            "POPULATED": num_populated_pins,
+            "CONNECTIONS": num_connections,
+        }
         for subitem in self.additional_components:
-            populated_pins = []
-            subitem.qty_multipliers_computed["ONE"] = 1
-            subitem.qty_multipliers_computed["PINCOUNT"] = self.pincount
-            subitem.qty_multipliers_computed["POPULATED"] = 999
-            subitem.qty_multipliers_computed["CONNECTIONS"] = 999
-
-        # QtyMultiplierConnector = Enum(
-        #     "QtyMultiplierConnector", "ONE PINCOUNT POPULATED CONNECTIONS"
-        # )
-        # QtyMultiplierCable = Enum(
-        #     "QtyMultiplierCable", "ONE WIRECOUNT TERMINATION LENGTH TOTAL_LENGTH"
-        # )
-
-    # def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
-    #     # TODO!!! how and when to compute final qty for additional components???
-    #     if not qty_multiplier:
-    #         return 1
-    #     elif qty_multiplier == "pincount":
-    #         return self.pincount
-    #     elif qty_multiplier == "populated":
-    #         return sum(self.visible_pins.values())
-    #     else:
-    #         raise ValueError(
-    #             f"invalid qty multiplier parameter for connector {qty_multiplier}"
-    #         )
+            if isinstance(subitem.qty_multiplier, QtyMultiplierConnector):
+                computed_factor = qty_multipliers_computed[subitem.qty_multiplier.name]
+            elif isinstance(subitem.qty_multiplier, QtyMultiplierCable):
+                raise Exception("Used a cable multiplier in a connector!")
+            else:  # int or float
+                computed_factor = subitem.qty_multiplier
+            subitem._qty_multiplier_computed = computed_factor
 
 
 @dataclass
@@ -742,21 +735,37 @@ class Cable(TopLevelGraphicalComponent):
         via_wire_obj = self.wire_objects[via_wire_id]
         self._connections.append(Connection(from_pin_obj, via_wire_obj, to_pin_obj))
 
-    # def get_qty_multiplier(self, qty_multiplier: Optional[CableMultiplier]) -> float:
-    #     if not qty_multiplier:
-    #         return 1
-    #     elif qty_multiplier == "wirecount":
-    #         return self.wirecount
-    #     elif qty_multiplier == "terminations":
-    #         return len(self.connections)
-    #     elif qty_multiplier == "length":
-    #         return self.length
-    #     elif qty_multiplier == "total_length":
-    #         return self.length * self.wirecount
-    #     else:
-    #         raise ValueError(
-    #             f"invalid qty multiplier parameter for cable {qty_multiplier}"
-    #         )
+    def compute_qty_multipliers(self):
+        # do not run before all connections in harness have been made!
+        total_length = sum(
+            [
+                wire.length.number if wire.length else 0
+                for wire in self.wire_objects.values()
+            ]
+        )
+        qty_multipliers_computed = {
+            "WIRECOUNT": len(self.wire_objects),
+            "TERMINATIONS": 999,  # TODO
+            "LENGTH": self.length.number if self.length else 0,
+            "TOTAL_LENGTH": total_length,
+        }
+        for subitem in self.additional_components:
+            if isinstance(subitem.qty_multiplier, QtyMultiplierCable):
+                computed_factor = qty_multipliers_computed[subitem.qty_multiplier.name]
+                # inherit component's length unit if appropriate
+                if subitem.qty_multiplier.name in ["LENGTH", "TOTAL_LENGTH"]:
+                    if subitem.qty.unit is not None:
+                        raise Exception(
+                            f"No unit may be specified when using"
+                            f"{subitem.qty_multiplier} as a multiplier"
+                        )
+                    subitem.qty = NumberAndUnit(subitem.qty.number, self.length.unit)
+
+            elif isinstance(subitem.qty_multiplier, QtyMultiplierConnector):
+                raise Exception("Used a connector multiplier in a cable!")
+            else:  # int or float
+                computed_factor = subitem.qty_multiplier
+            subitem._qty_multiplier_computed = computed_factor
 
 
 @dataclass

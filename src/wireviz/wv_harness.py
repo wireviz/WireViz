@@ -142,6 +142,10 @@ class Harness:
                     designator=item.designator,
                     category=cat,
                 )
+            if item.additional_components:
+                if item.category == "bundle":
+                    pass  # TODO
+                item.compute_qty_multipliers()
             for comp in item.additional_components:
                 if comp.ignore_in_bom:
                     continue
