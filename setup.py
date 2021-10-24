@@ -19,9 +19,10 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=[
         "click",
-        "pyyaml",
-        "pillow",
         "graphviz",
+        "pillow",
+        "pyyaml",
+        "tabulate",
     ],
     license="GPLv3",
     keywords="cable connector hardware harness wiring wiring-diagram wiring-harness",
