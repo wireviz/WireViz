@@ -54,11 +54,9 @@ def gv_node_component(component: Component) -> Table:
         line_info = [
             html_line_breaks(component.type),
             f"{component.wirecount}x" if component.show_wirecount else None,
-            f"{component.gauge_str}" if component.gauge else None,
+            component.gauge_str_with_equiv,
             "+ S" if component.shield else None,
-            f"{component.length} {component.length_unit}"
-            if component.length > 0
-            else None,
+            component.length_str,
             str(component.color) if component.color else None,
             colorbar_cell(component.color) if component.color else None,
         ]
