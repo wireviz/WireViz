@@ -5,31 +5,32 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional, Union
 
+import tabulate as tabulate_module
+
 from wireviz.wv_utils import html_line_breaks
 
-BOM_HASH_FIELDS = "description unit partnumbers"
+BOM_HASH_FIELDS = "description qty_unit amount partnumbers"
+
+
+BomEntry = namedtuple("BomEntry", "category qty designators")
 BomHash = namedtuple("BomHash", BOM_HASH_FIELDS)
 BomHashList = namedtuple("BomHashList", BOM_HASH_FIELDS)
+PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn")
+
 
 BomCategory = Enum(
     "BomEntry", "CONNECTOR CABLE WIRE ADDITIONAL_INSIDE ADDITIONAL_OUTSIDE"
 )
-
-PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn")
+QtyMultiplierConnector = Enum(
+    "QtyMultiplierConnector", "ONE PINCOUNT POPULATED CONNECTIONS"
+)
+QtyMultiplierCable = Enum(
+    "QtyMultiplierCable", "ONE WIRECOUNT TERMINATION LENGTH TOTAL_LENGTH"
+)
 
 PART_NUMBER_HEADERS = PartNumberInfo(
     pn="P/N", manufacturer=None, mpn="MPN", supplier=None, spn="SPN"
 )
-
-
-@dataclass
-class BomEntry:
-    hash: BomHash  # includes description, part number info,
-    description: str
-    qty: Union[int, float]
-    unit: str
-    designators: List[str]
-    _category: BomCategory  # for sorting
 
 
 def partnumbers_to_list(partnumbers: PartNumberInfo) -> List[str]:
@@ -55,3 +56,35 @@ def pn_info_string(
         return f'{name if name else header}{": " + number if number else ""}'
     else:
         return None
+
+
+def print_bom_debug(bom):
+    headers = "# qty unit description amount unit designators category".split(" ")
+    rows = []
+    rows.append(headers)
+    # fill rows
+    for hash, entry in bom.items():
+        cells = [
+            0,
+            entry["qty"],
+            hash.qty_unit,
+            hash.description,
+            hash.amount.number if hash.amount else None,
+            hash.amount.unit if hash.amount else None,
+            ", ".join(sorted(entry["designators"])),
+            entry["category"],
+        ]
+        rows.append(cells)
+    # remove empty columns
+    transposed = list(map(list, zip(*rows)))
+    transposed = [
+        column
+        for column in transposed
+        if any([cell is not None for cell in column[1:]])
+        #                                           ^ ignore header cell in check
+    ]
+    rows = list(map(list, zip(*transposed)))
+    # output
+    print()
+    print(tabulate_module.tabulate(rows, headers="firstrow"))
+    print()
