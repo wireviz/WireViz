@@ -166,8 +166,8 @@ def nested_table(lines: List[Td]) -> Table:
 
 def gv_pin_table(component) -> Table:
     pin_rows = []
-    for pin in component.pin_objects:
-        if component.should_show_pin(pin.id):  # TODO remove True
+    for pin in component.pin_objects.values():
+        if component.should_show_pin(pin.id):
             pin_rows.append(gv_pin_row(pin, component))
     tbl = Table(pin_rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
     return tbl
@@ -211,7 +211,7 @@ def gv_conductor_table(cable) -> Table:
     rows.append(Tr(Td("&nbsp;")))  # spacer row on top
 
     inserted_break_inbetween = False
-    for wire in cable.wire_objects:
+    for wire in cable.wire_objects.values():
 
         # insert blank space between wires and shields
         if isinstance(wire, ShieldClass) and not inserted_break_inbetween:
