@@ -2,7 +2,7 @@
 
 from collections import namedtuple
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, IntEnum
 from typing import List, Optional, Union
 
 import tabulate as tabulate_module
@@ -18,7 +18,7 @@ BomHashList = namedtuple("BomHashList", BOM_HASH_FIELDS)
 PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn")
 
 
-BomCategory = Enum(
+BomCategory = IntEnum(  # to enforce ordering in BOM
     "BomEntry", "CONNECTOR CABLE WIRE ADDITIONAL_INSIDE ADDITIONAL_OUTSIDE"
 )
 QtyMultiplierConnector = Enum(
@@ -65,14 +65,14 @@ def print_bom_debug(bom):
     # fill rows
     for hash, entry in bom.items():
         cells = [
-            0,
+            entry["id"],
             entry["qty"],
             hash.qty_unit,
             hash.description,
             hash.amount.number if hash.amount else None,
             hash.amount.unit if hash.amount else None,
             ", ".join(sorted(entry["designators"])),
-            entry["category"],
+            f"{entry['category']} ({entry['category'].name})",
         ]
         rows.append(cells)
     # remove empty columns

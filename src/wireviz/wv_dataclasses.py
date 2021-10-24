@@ -499,7 +499,7 @@ class WireClass:
         else:
             _hash = BomHash(
                 description=self.description,
-                qty_unit=1,
+                qty_unit=None,
                 amount=self.length,
                 partnumbers=self.partnumbers,
             )
