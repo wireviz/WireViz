@@ -77,7 +77,7 @@ class Options:
     bgcolor_connector: SingleColor = None
     bgcolor_cable: SingleColor = None
     bgcolor_bundle: SingleColor = None
-    color_mode: ColorOutputMode = ColorOutputMode.EN_UPPER
+    color_output_mode: ColorOutputMode = ColorOutputMode.EN_UPPER
     mini_bom_mode: bool = True
     template_separator: str = "."
     _pad: int = 0
