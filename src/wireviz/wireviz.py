@@ -364,11 +364,11 @@ def parse(
                         # mate two connectors as a whole
                         harness.add_mate_component(from_name, to_name, designator)
 
-    # harness population completed =============================================
-
     if "additional_bom_items" in yaml_data:
         for line in yaml_data["additional_bom_items"]:
             harness.add_additional_bom_item(line)
+
+    # harness population completed =============================================
 
     harness.populate_bom()
 
