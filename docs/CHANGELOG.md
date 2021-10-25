@@ -28,7 +28,7 @@
 - Add optional tweaking of the .gv output ([#215](https://github.com/formatc1702/WireViz/pull/215)) (experimental)
 
 
-## Misc. fixes
+### Misc. fixes
 
 - Remove case-sensitivity issues with pin names and labels ([#160](https://github.com/formatc1702/WireViz/issues/160), [#229](https://github.com/formatc1702/WireViz/pull/229))
 - Improve type hinting ([#156](https://github.com/formatc1702/WireViz/issues/156), [#163](https://github.com/formatc1702/WireViz/pull/163))
@@ -36,7 +36,7 @@
 - Simplify BOM code ([#197](https://github.com/formatc1702/WireViz/pull/197))
 - Bug fixes ([#218](https://github.com/formatc1702/WireViz/pull/218), [#221](https://github.com/formatc1702/WireViz/pull/221))
 
-## Known issues
+### Known issues
 
 - Including images in the harness may lead to issues in the following cases: ([#189](https://github.com/formatc1702/WireViz/pull/189), [#220](https://github.com/formatc1702/WireViz/issues/220))
   - When using the `-o`/`--output_file` CLI option, specifying an output path in a different directory from the input file
