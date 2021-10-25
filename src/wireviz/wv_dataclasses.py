@@ -477,11 +477,14 @@ class WireClass:
     id: str
     label: str
     color: MultiColor
+    # ...
+    bom_id: Optional[str] = None  # to be filled after harness is built
     # inheritable from parent cable
     type: Union[MultilineHypertext, List[MultilineHypertext]] = None
     subtype: Union[MultilineHypertext, List[MultilineHypertext]] = None
     gauge: Optional[NumberAndUnit] = None
     length: Optional[NumberAndUnit] = None
+    ignore_in_bom: Optional[bool] = False
     sum_amounts_in_bom: bool = True
     partnumbers: PartNumberInfo = None
 
@@ -698,6 +701,7 @@ class Cable(TopLevelGraphicalComponent):
                 gauge=self.gauge,
                 length=self.length,
                 sum_amounts_in_bom=self.sum_amounts_in_bom,
+                ignore_in_bom=self.ignore_in_bom
                 # TODO partnumbers
             )
 

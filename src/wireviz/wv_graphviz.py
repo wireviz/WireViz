@@ -44,6 +44,7 @@ def gv_node_component(component: Component) -> Table:
 
     if isinstance(component, Connector):
         line_info = [
+            bom_bubble(component.bom_id),
             html_line_breaks(component.type),
             html_line_breaks(component.subtype),
             f"{component.pincount}-pin" if component.show_pincount else None,
@@ -52,6 +53,7 @@ def gv_node_component(component: Component) -> Table:
         ]
     elif isinstance(component, Cable):
         line_info = [
+            bom_bubble(component.bom_id) if component.category != "bundle" else None,
             html_line_breaks(component.type),
             f"{component.wirecount}x" if component.show_wirecount else None,
             component.gauge_str_with_equiv,
@@ -133,6 +135,15 @@ def calculate_node_bgcolor(component, harness_options):
         return harness_options.bgcolor_bundle.html
     elif isinstance(component, Cable) and harness_options.bgcolor_cable:
         return harness_options.bgcolor_cable.html
+
+
+def bom_bubble(id) -> Table:
+    if id is None:
+        return None
+    else:
+        return Table(
+            Tr(Td(f" {id} ", border=0, cellpadding=0)), border=1, style="rounded"
+        )
 
 
 def make_list_of_cells(inp) -> List[Td]:
@@ -252,14 +263,17 @@ def gv_conductor_table(cable) -> Table:
                     outs.append(str(conn.to))
 
         cells_above = [
-            Td(", ".join(ins), align="left"),
+            Td(" " + ", ".join(ins), align="left"),
+            # Td(":-)"),
+            Td(bom_bubble(wire.bom_id)) if cable.category == "bundle" else None,
             Td(":".join([wi for wi in wireinfo if wi is not None and wi != ""])),
-            Td(", ".join(outs), align="right"),
+            Td(", ".join(outs) + " ", align="right"),
         ]
+        cells_above = [cell for cell in cells_above if cell is not None]
         rows.append(Tr(cells_above))
 
         # the wire itself
-        rows.append(Tr(gv_wire_cell(wire)))
+        rows.append(Tr(gv_wire_cell(wire, len(cells_above))))
 
         # row below the wire
         # TODO: PN stuff for bundles
@@ -270,7 +284,7 @@ def gv_conductor_table(cable) -> Table:
     return tbl
 
 
-def gv_wire_cell(wire: Union[WireClass, ShieldClass]) -> Td:
+def gv_wire_cell(wire: Union[WireClass, ShieldClass], colspan: int) -> Td:
     if wire.color:
         color_list = ["#000000"] + wire.color.html_padded_list + ["#000000"]
     else:
@@ -282,7 +296,7 @@ def gv_wire_cell(wire: Union[WireClass, ShieldClass]) -> Td:
             "bgcolor": bgcolor if bgcolor != "" else "#000000",
             "border": 0,
             "cellpadding": 0,
-            "colspan": 3,
+            "colspan": colspan,
             "height": 2,
         }
         wire_inner_rows.append(Tr(Td("", **wire_inner_cell_attribs)))
@@ -291,7 +305,7 @@ def gv_wire_cell(wire: Union[WireClass, ShieldClass]) -> Td:
         "border": 0,
         "cellspacing": 0,
         "cellpadding": 0,
-        "colspan": 3,
+        "colspan": colspan,
         "height": 2 * len(color_list),
         "port": f"w{wire.index+1}",
     }
