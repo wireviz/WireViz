@@ -142,8 +142,24 @@ def bom_bubble(id) -> Table:
     if id is None:
         return None
     else:
+        # size and style of BOM bubble is optimized to be a rounded square,
+        # big enough to hold any two-digit ID without GraphViz warnings
+        text = id
+        # text = f'<FONT COLOR="#FFFFFF">{id}</FONT>'
         return Table(
-            Tr(Td(f" {id} ", border=0, cellpadding=0)), border=1, style="rounded"
+            Tr(
+                Td(
+                    text,
+                    border=1,
+                    cellpadding=0,
+                    fixedsize="true",
+                    style="rounded",
+                    height=20,
+                    width=20,
+                    # bgcolor="#000000",
+                )
+            ),
+            border=0,
         )
 
 
