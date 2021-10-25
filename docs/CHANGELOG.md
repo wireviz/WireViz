@@ -3,6 +3,12 @@
 ## [0.4](https://github.com/formatc1702/WireViz/tree/v0.4) (20XX-XX-XX)
 
 
+## [0.3.1](https://github.com/formatc1702/WireViz/tree/v0.3.1) (2021-10-25)
+
+### Hotfix
+
+- Assign generic harness title when using WireViz as a module and not specifying an output file name ([#253](https://github.com/formatc1702/WireViz/issues/253), [#254](https://github.com/formatc1702/WireViz/pull/254))
+
 
 ## [0.3](https://github.com/formatc1702/WireViz/tree/v0.3) (2021-10-11)
 
