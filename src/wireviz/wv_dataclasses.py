@@ -588,9 +588,9 @@ class Cable(TopLevelGraphicalComponent):
         if self.show_equiv:
             # convert unit if known
             if self.gauge.unit == "mm2":
-                equivalent_gauge = f" ({awg_equiv(self.gauge)} AWG)"
+                equivalent_gauge = f" ({awg_equiv(self.gauge.number)} AWG)"
             elif self.gauge.unit.upper() == "AWG":
-                equivalent_gauge = f" ({mm2_equiv(self.gauge)} mm2)"
+                equivalent_gauge = f" ({mm2_equiv(self.gauge.number)} mm2)"
         out = f"{actual_gauge}{equivalent_gauge}"
         out = out.replace("mm2", "mm\u00B2")
         return out
