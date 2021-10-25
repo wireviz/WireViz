@@ -110,6 +110,7 @@ def gv_additional_component_table(component):
         rows.append(
             Tr(
                 [
+                    Td(bom_bubble(subitem.bom_id)),
                     Td(f"{subitem.bom_qty}"),
                     Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}"),
                     Td(f"{subitem.description}"),
@@ -117,7 +118,7 @@ def gv_additional_component_table(component):
             )
         )
 
-    return Table(rows)
+    return Table(rows, border=0)
 
 
 def calculate_node_bgcolor(component, harness_options):
