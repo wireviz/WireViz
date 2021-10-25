@@ -288,7 +288,8 @@ class AdditionalComponent(Component):
 
     @property
     def additional_components(self):
-        return []  # an additional component may not have further nested additional comonents
+        # an additional component may not have further nested additional comonents
+        return []
 
     @property
     def bom_qty(self):
