@@ -287,6 +287,10 @@ class AdditionalComponent(Component):
                 raise Exception(f"Unknown qty multiplier: {self.qty_multiplier}")
 
     @property
+    def additional_components(self):
+        return []  # an additional component may not have further nested additional comonents
+
+    @property
     def bom_qty(self):
         return self.qty.number * self._qty_multiplier_computed
 
