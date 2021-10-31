@@ -4,11 +4,11 @@ connectors:
     pincount: 4
     pincolors: [WHBK, BKWH, GNYE, GNWHRD]
   X2:
-    color: 0xFFFFFF
+    color: 0xCCCCCC:0x333333
     pincount: 4
     pincolors: [0xFF8000:0x80FF00, 0x00FF80, 0x8000FF]
   X3:
-    color: red
+    color: red:yellow
     pincount: 4
     pincolors: [deeppink, tomato, salmon, indianred]
   F:
@@ -18,6 +18,7 @@ connectors:
 cables:
   C1:
     wirecount: 4
+    color: GDSR
     colors: [RDYE, YEGN, GNBU, BURD]
   C2:
     wirecount: 4
