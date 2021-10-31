@@ -1,0 +1,32 @@
+connectors:
+  X1:  # shorthand color codes
+    color: BK
+    pincount: 4
+    pincolors: [RD, YE, GN, BU]
+  X2:  # HTML color codes
+    color: 0xFFFFFF
+    pincount: 4
+    pincolors: [0xFF8000, 0x00FF80, 0x8000FF]  # no color for last pin
+  X3:  # HTML color names
+    color: red
+    pincount: 4
+    pincolors: [deeppink, tomato, salmon, indianred]
+  F:
+    style: simple
+    color: BN
+
+cables:
+  C1:
+    wirecount: 4
+    color: GY
+    colors: [OG, OL, LB, PK]
+
+connections:
+  -
+    - X1: [1-4]
+    - C1: [1-4]
+    - X2: [1-4]
+    - <--
+    - X3: [1-4]
+    - --
+    - F.
