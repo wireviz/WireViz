@@ -446,7 +446,7 @@ def gv_edge_mate(mate) -> (str, str, str, str):
 
 def colorbar_cells(color, mini=False) -> List[Td]:
     cells = []
-    mini = {height: 8, width: 8, fixedsize: "true"} if mini else {}
+    mini = {"height": 8, "width": 8, "fixedsize": "true"} if mini else {}
     for index, subcolor in enumerate(color.colors):
         sides_l = "L" if index == 0 else ""
         sides_r = "R" if index == len(color.colors) - 1 else ""
@@ -459,7 +459,7 @@ def color_minitable(color: Optional[MultiColor]) -> Union[Table, str]:
     if color is None or len(color) == 0:
         return ""
 
-    cells = colorbar_cells(color)
+    cells = colorbar_cells(color, mini=True)
 
     return Table(
         Tr(cells),
@@ -467,7 +467,7 @@ def color_minitable(color: Optional[MultiColor]) -> Union[Table, str]:
         cellborder=1,
         cellspacing=0,
         height=8,
-        width=8 * len(cells) + 2,
+        width=8 * len(cells),
         fixedsize="true",
     )
 
