@@ -2,10 +2,11 @@
 
 import re
 from itertools import zip_longest
-from typing import Any, List, Union
+from typing import Any, List, Optional, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.wv_bom import partnumbers_to_list
+from wireviz.wv_colors import MultiColor
 from wireviz.wv_dataclasses import (
     ArrowDirection,
     ArrowWeight,
@@ -221,16 +222,13 @@ def gv_pin_table(component) -> Table:
 
 def gv_pin_row(pin, connector) -> Tr:
     # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
-    cell_pin_left = Td(pin.id, port=f"p{pin.index+1}l")
-    cell_pin_label = Td(pin.label, delete_if_empty=True)
-    cell_pin_color = Td(str(pin.color), delete_if_empty=True)
-    cell_pin_right = Td(pin.id, port=f"p{pin.index+1}r")
-
+    has_pincolors = any([_pin.color for _pin in connector.pin_objects.values()])
     cells = [
-        cell_pin_left if connector.ports_left else None,
-        cell_pin_label,
-        cell_pin_color,  # TODO: generate proper color mini-table too
-        cell_pin_right if connector.ports_right else None,
+        Td(pin.id, port=f"p{pin.index+1}l") if connector.ports_left else None,
+        Td(pin.label, delete_if_empty=True),
+        Td(str(pin.color) if pin.color else "", sides="TBL") if has_pincolors else None,
+        Td(color_minitable(pin.color), sides="TBR") if has_pincolors else None,
+        Td(pin.id, port=f"p{pin.index+1}r") if connector.ports_right else None,
     ]
     return Tr(cells)
 
@@ -453,6 +451,30 @@ def colored_cell(contents, bgcolor) -> Td:
 
 def colorbar_cell(color) -> Td:
     return Td("", bgcolor=color.html, width=4)
+
+
+def color_minitable(color: Optional[MultiColor]) -> Union[Table, str]:
+    if color is None or len(color) == 0:
+        return ""
+    cells = [
+        Td(
+            "",
+            bgcolor=subcolor.html,
+            height=8,
+            width=8,
+            fixedsize="true",
+        )
+        for subcolor in color.colors
+    ]
+    return Table(
+        Tr(cells),
+        border=1,
+        cellborder=0,
+        cellspacing=0,
+        height=8,
+        width=8 * len(cells) + 2,
+        fixedsize="true",
+    )
 
 
 def image_and_caption_cells(component: Component) -> (Td, Td):
