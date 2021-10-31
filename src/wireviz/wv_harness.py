@@ -295,11 +295,10 @@ class Harness:
         for connector in self.connectors.values():
             # generate connector node
             gv_html = gv_node_component(connector)
-            bgcolor = calculate_node_bgcolor(connector, self.options)
+            gv_html.update_attribs(bgcolor=calculate_node_bgcolor(connector, self.options))
             dot.node(
                 connector.designator,
                 label=f"<\n{gv_html}\n>",
-                bgcolor=bgcolor,
                 shape="box",
                 style="filled",
             )
@@ -326,12 +325,11 @@ class Harness:
             # generate cable node
             # TODO: PN info for bundles (per wire)
             gv_html = gv_node_component(cable)
-            bgcolor = calculate_node_bgcolor(cable, self.options)
+            gv_html.update_attribs(bgcolor=calculate_node_bgcolor(cable, self.options))
             style = "filled,dashed" if cable.category == "bundle" else "filled"
             dot.node(
                 cable.designator,
                 label=f"<\n{gv_html}\n>",
-                bgcolor=bgcolor,
                 shape="box",
                 style=style,
             )
