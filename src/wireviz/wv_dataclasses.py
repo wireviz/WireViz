@@ -309,7 +309,7 @@ class GraphicalComponent(Component):  # abstract class, for future use
 class TopLevelGraphicalComponent(GraphicalComponent):  # abstract class
     # component properties
     designator: Designator = None
-    color: Optional[SingleColor] = None
+    color: Optional[MultiColor] = None
     image: Optional[Image] = None
     additional_components: List[AdditionalComponent] = field(default_factory=list)
     notes: Optional[MultilineHypertext] = None
@@ -367,7 +367,7 @@ class Connector(TopLevelGraphicalComponent):
 
         self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
-        self.color = SingleColor(self.color)
+        self.color = MultiColor(self.color)
 
         # connectors do not support custom qty or amount
         self.qty = NumberAndUnit(1, None)
@@ -635,7 +635,7 @@ class Cable(TopLevelGraphicalComponent):
 
         self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
-        self.color = SingleColor(self.color)
+        self.color = MultiColor(self.color)
 
         if isinstance(self.image, dict):
             self.image = Image(**self.image)

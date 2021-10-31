@@ -450,7 +450,16 @@ def colored_cell(contents, bgcolor) -> Td:
 
 
 def colorbar_cell(color) -> Td:
-    return Td("", bgcolor=color.html, width=4)
+    # return Td("", bgcolor=color.html, width=4)
+    cells = [
+        Td(
+            "",
+            bgcolor=subcolor.html,
+            width=8,
+        )
+        for subcolor in color.colors
+    ]
+    return Td(Table(Tr(cells), border=0, cellspacing=0), cellspacing=0, cellpadding=0)
 
 
 def color_minitable(color: Optional[MultiColor]) -> Union[Table, str]:
