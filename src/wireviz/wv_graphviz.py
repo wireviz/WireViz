@@ -33,7 +33,7 @@ def gv_node_component(component: Component) -> Table:
     # generate all rows to be shown in the node
     if component.show_name:
         str_name = f"{remove_links(component.designator)}"
-        line_name = colored_cell(str_name, component.bgcolor_title)
+        line_name = Td(str_name, bgcolor=component.bgcolor_title.html)
     else:
         line_name = None
 
@@ -50,7 +50,6 @@ def gv_node_component(component: Component) -> Table:
             html_line_breaks(component.subtype),
             f"{component.pincount}-pin" if component.show_pincount else None,
             str(component.color) if component.color else None,
-            colorbar_cell(component.color) if component.color else None,
         ]
     elif isinstance(component, Cable):
         line_info = [
@@ -61,10 +60,10 @@ def gv_node_component(component: Component) -> Table:
             "+ S" if component.shield else None,
             component.length_str,
             str(component.color) if component.color else None,
-            colorbar_cell(component.color) if component.color else None,
         ]
 
-    x = colorbar_cell(component.color) if component.color else None
+    if component.color:
+        line_info.extend(colorbar_cells(component.color))
 
     line_image, line_image_caption = image_and_caption_cells(component)
     line_additional_component_table = gv_additional_component_table(component)
@@ -445,40 +444,27 @@ def gv_edge_mate(mate) -> (str, str, str, str):
     return color, dir, code_from, code_to
 
 
-def colored_cell(contents, bgcolor) -> Td:
-    return Td(contents, bgcolor=bgcolor.html)
-
-
-def colorbar_cell(color) -> Td:
-    # return Td("", bgcolor=color.html, width=4)
-    cells = [
-        Td(
-            "",
-            bgcolor=subcolor.html,
-            width=8,
-        )
-        for subcolor in color.colors
-    ]
-    return Td(Table(Tr(cells), border=0, cellspacing=0), cellspacing=0, cellpadding=0)
+def colorbar_cells(color, mini=False) -> List[Td]:
+    cells = []
+    mini = {height: 8, width: 8, fixedsize: "true"} if mini else {}
+    for index, subcolor in enumerate(color.colors):
+        sides_l = "L" if index == 0 else ""
+        sides_r = "R" if index == len(color.colors) - 1 else ""
+        sides = "TB" + sides_l + sides_r
+        cells.append(Td("", bgcolor=subcolor.html, sides=sides, **mini))
+    return cells
 
 
 def color_minitable(color: Optional[MultiColor]) -> Union[Table, str]:
     if color is None or len(color) == 0:
         return ""
-    cells = [
-        Td(
-            "",
-            bgcolor=subcolor.html,
-            height=8,
-            width=8,
-            fixedsize="true",
-        )
-        for subcolor in color.colors
-    ]
+
+    cells = colorbar_cells(color)
+
     return Table(
         Tr(cells),
-        border=1,
-        cellborder=0,
+        border=0,
+        cellborder=1,
         cellspacing=0,
         height=8,
         width=8 * len(cells) + 2,
