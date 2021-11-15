@@ -215,6 +215,9 @@ def gv_pin_table(component) -> Table:
     for pin in component.pin_objects.values():
         if component.should_show_pin(pin.id):
             pin_rows.append(gv_pin_row(pin, component))
+    if len(pin_rows) == 0:
+        # TODO: write test for empty pin tables, and for unconnected connectors that hide disconnected pins
+        pass
     tbl = Table(pin_rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
     return tbl
 
