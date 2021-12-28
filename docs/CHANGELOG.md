@@ -17,7 +17,7 @@
 ### Misc. fixes
 - Use `isort` and `black` for cleaner code and easier merging ([#248](https://github.com/wireviz/WireViz/pull/248))
 - Code improvements ([#246](https://github.com/wireviz/WireViz/pull/246), [#250](https://github.com/wireviz/WireViz/pull/250))
-- Bug fix ([#318](https://github.com/wireviz/WireViz/pull/318))
+- Bug fixes ([#264](https://github.com/wireviz/WireViz/pull/264), [#318](https://github.com/wireviz/WireViz/pull/318))
 
 
 ## [0.3.2](https://github.com/formatc1702/WireViz/tree/v0.3.2) (2021-11-27)

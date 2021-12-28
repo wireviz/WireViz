@@ -204,11 +204,16 @@ class Connector:
             self.show_pincount = self.style != "simple"
 
         for loop in self.loops:
-            # TODO: check that pins to connect actually exist
             # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
             # TODO: include properties of wire used to create the loop
             if len(loop) != 2:
                 raise Exception("Loops must be between exactly two pins!")
+            for pin in loop:
+                if pin not in self.pins:
+                    raise Exception(f'Unknown loop pin "{pin}" for connector "{self.name}"!')
+                # Resolve https://github.com/formatc1702/WireViz/issues/263
+                # Make sure loop connected pins are not hidden.
+                self.activate_pin(pin)
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
