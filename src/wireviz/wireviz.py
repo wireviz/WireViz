@@ -254,6 +254,8 @@ def main():
 
     if ".png" in args.input_file:
         yaml_input = read_yaml_from_png(args.input_file.replace('.png',''))
+        with open(args.input_file.replace('.png','_out.yaml'),'w') as fh:
+            fh.write(yaml_input) # Extract yaml to separate file
     else:
         with open_file_read(args.input_file) as fh:
             yaml_input = fh.read()
