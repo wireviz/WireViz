@@ -8,6 +8,8 @@ import sys
 from typing import Any, Tuple
 
 import yaml
+from PIL import Image
+from PIL.PngImagePlugin import PngInfo
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -188,6 +190,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
     if file_out is not None:
         harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
+        save_yaml_to_png(file_out,yaml_input)
 
     if return_types is not None:
         returns = []
@@ -230,6 +233,16 @@ def parse_cmdline():
     parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
     return parser.parse_args()
 
+def save_yaml_to_png(file_out,yaml_input):
+    with Image.open(fp=f'{file_out}.png') as im:
+        txt = PngInfo()
+        txt.add_itxt('yaml',yaml_input,zip=True)
+        im.save(fp=f'{file_out}.png',pnginfo=txt)
+
+def read_yaml_from_png(file_in):
+    with Image.open(fp=f'{file_in}.png') as im:
+        im.load()
+        return im.text['yaml']
 
 def main():
 
@@ -239,16 +252,19 @@ def main():
         print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
-    with open_file_read(args.input_file) as fh:
-        yaml_input = fh.read()
+    if ".png" in args.input_file:
+        yaml_input = read_yaml_from_png(args.input_file.replace('.png',''))
+    else:
+        with open_file_read(args.input_file) as fh:
+            yaml_input = fh.read()
 
-    if args.prepend_file:
-        if not os.path.exists(args.prepend_file):
-            print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
-            sys.exit(1)
-        with open_file_read(args.prepend_file) as fh:
-            prepend = fh.read()
-            yaml_input = prepend + yaml_input
+        if args.prepend_file:
+            if not os.path.exists(args.prepend_file):
+                print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
+                sys.exit(1)
+            with open_file_read(args.prepend_file) as fh:
+                prepend = fh.read()
+                yaml_input = prepend + yaml_input
 
     if not args.output_file:
         file_out = args.input_file
