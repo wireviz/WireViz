@@ -5,7 +5,7 @@ import argparse
 import os
 from pathlib import Path
 import sys
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional, Union
 
 import yaml
 from PIL import Image
@@ -17,10 +17,10 @@ if __name__ == '__main__':
 from wireviz import __version__
 from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, open_file_read
+from wireviz.wv_helper import expand, open_file_read, open_file_write
 
 
-def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
+def parse(yaml_input: str, file_out: Union[str, Path] = None, return_types: Optional[Union[str, Tuple[str]]] = None) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
@@ -210,7 +210,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
+def parse_file(yaml_file: str, file_out: Union[str, Path] = None) -> None:
     with open_file_read(yaml_file) as file:
         yaml_input = file.read()
 
@@ -227,56 +227,50 @@ def parse_cmdline():
         description='Generate cable and wiring harness documentation from YAML descriptions',
     )
     parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
-    parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
-    parser.add_argument('-o', '--output_file', action='store', type=str, metavar='OUTPUT')
+    parser.add_argument('input_file', action='store', type=Path, metavar='YAML_FILE')
+    parser.add_argument('-o', '--output_file', action='store', type=Path, metavar='OUTPUT')
     # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
-    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
+    parser.add_argument('--prepend-file', action='store', type=Path, metavar='YAML_FILE')
     return parser.parse_args()
 
-def save_yaml_to_png(file_out,yaml_input):
-    with Image.open(fp=f'{file_out}.png') as im:
+def save_yaml_to_png(file_out:Path, yaml_input):
+    file_out = file_out.with_suffix('.png')
+    with Image.open(fp=file_out) as im:
         txt = PngInfo()
-        txt.add_itxt('yaml',yaml_input,zip=True)
-        im.save(fp=f'{file_out}.png',pnginfo=txt)
+        txt.add_itxt('yaml', yaml_input,zip=True)
+        im.save(fp=file_out, pnginfo=txt)
 
-def read_yaml_from_png(file_in):
-    with Image.open(fp=f'{file_in}.png') as im:
+def read_yaml_from_png(file_in:Path):
+    with Image.open(fp=file_in.with_suffix('.png')) as im:
         im.load()
         return im.text['yaml']
 
 def main():
 
     args = parse_cmdline()
-
-    if not os.path.exists(args.input_file):
+    input_file_base = args.input_file.parent / args.input_file.stem
+    if not args.input_file.is_file():
         print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
-    if ".png" in args.input_file:
-        yaml_input = read_yaml_from_png(args.input_file.replace('.png',''))
-        with open(args.input_file.replace('.png','_out.yaml'),'w') as fh:
+    if ".png" == args.input_file.suffix:
+        yaml_input = read_yaml_from_png(input_file_base)
+        with open_file_write(input_file_base.parent / (input_file_base.stem + '_out.yaml')) as fh:
             fh.write(yaml_input) # Extract yaml to separate file
     else:
         with open_file_read(args.input_file) as fh:
             yaml_input = fh.read()
 
         if args.prepend_file:
-            if not os.path.exists(args.prepend_file):
+            if not args.prepend_file.is_file():
                 print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
                 sys.exit(1)
             with open_file_read(args.prepend_file) as fh:
                 prepend = fh.read()
                 yaml_input = prepend + yaml_input
 
-    if not args.output_file:
-        file_out = args.input_file
-        pre, _ = os.path.splitext(file_out)
-        file_out = pre  # extension will be added by graphviz output function
-    else:
-        file_out = args.output_file
-    file_out = os.path.abspath(file_out)
-
-    parse(yaml_input, file_out=file_out)
+    file_out = args.output_file if args.output_file else input_file_base
+    parse(yaml_input, file_out=file_out.resolve())
 
 
 if __name__ == '__main__':
