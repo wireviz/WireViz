@@ -142,6 +142,8 @@ def bom_bubble(id) -> Table:
     if id is None:
         return None
     else:
+        # TODO: activate BOM bubbles
+        return None
         # size and style of BOM bubble is optimized to be a rounded square,
         # big enough to hold any two-digit ID without GraphViz warnings
         text = id
