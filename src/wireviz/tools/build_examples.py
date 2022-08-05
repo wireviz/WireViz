@@ -97,7 +97,7 @@ def clean_generated(groupkeys):
         for filename in collect_filenames("Cleaning", key, generated_extensions):
             if filename.is_file():
                 print(f'  rm "{filename}"')
-                Path(filename).unlink()
+                filename.unlink()
 
 
 def compare_generated(groupkeys, branch="", include_graphviz_output=False):

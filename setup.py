@@ -15,7 +15,7 @@ setup(
     author="Daniel Rojas",
     # author_email='',
     description="Easily document cables and wiring harnesses",
-    long_description=open(README_PATH).read(),
+    long_description=README_PATH.read_text(),
     long_description_content_type="text/markdown",
     install_requires=[
         "click",
