@@ -70,9 +70,10 @@ def expand(yaml_data):
 
 
 def get_single_key_and_value(d: dict):
-    k = list(d.keys())[0]
-    v = d[k]
-    return (k, v)
+    # used for defining a line in a harness' connection set
+    # E.g. for the YAML input `- X1: 1`
+    # this function returns a tuple in the form ("X1", "1")
+    return next(iter(d.items()))
 
 
 def int2tuple(inp):
