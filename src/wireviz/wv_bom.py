@@ -17,13 +17,14 @@ BomHash = namedtuple("BomHash", BOM_HASH_FIELDS)
 BomHashList = namedtuple("BomHashList", BOM_HASH_FIELDS)
 PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn")
 
-BomMode
-"normal"  # no bubbles, full PN info in GV node
-"bubbles"  # = "full" -> maximum info in GV node
-"hide PN info"
-"PN crossref" = "PN bubbles" + "hide PN info"
-"additionally: BOM table in GV graph label (#227)"
-"title block in GV graph label"
+# TODO: different BOM modes
+# BomMode
+# "normal"  # no bubbles, full PN info in GV node
+# "bubbles"  # = "full" -> maximum info in GV node
+# "hide PN info"
+# "PN crossref" = "PN bubbles" + "hide PN info"
+# "additionally: BOM table in GV graph label (#227)"
+# "title block in GV graph label"
 
 
 BomCategory = IntEnum(  # to enforce ordering in BOM
