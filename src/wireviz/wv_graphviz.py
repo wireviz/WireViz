@@ -111,9 +111,9 @@ def gv_additional_component_table(component):
             Tr(
                 [
                     Td(bom_bubble(subitem.bom_id)),
-                    Td(f"{subitem.bom_qty}"),
-                    Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}"),
-                    Td(f"{subitem.description}"),
+                    Td(f"{subitem.bom_qty}", align="right"),
+                    Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"),
+                    Td(f"{subitem.description}", align="left"),
                 ]
             )
         )
