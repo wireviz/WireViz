@@ -90,12 +90,12 @@ def flatten2d(inp):
     ]
 
 
-def tuplelist2tsv(inp, header=None):
+def bom2tsv(inp, header=None):
     output = ""
     if header is not None:
         inp.insert(0, header)
-    inp = flatten2d(inp)
     for row in inp:
+        row = [item if item is not None else "" for item in row]
         output = output + "\t".join(str(remove_links(item)) for item in row) + "\n"
     return output
 
