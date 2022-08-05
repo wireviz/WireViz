@@ -5,7 +5,7 @@ from itertools import zip_longest
 from typing import Any, List, Optional, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
-from wireviz.wv_bom import partnumbers_to_list
+from wireviz.wv_bom import partnumbers2list
 from wireviz.wv_colors import MultiColor
 from wireviz.wv_dataclasses import (
     ArrowDirection,
@@ -37,7 +37,7 @@ def gv_node_component(component: Component) -> Table:
     else:
         line_name = None
 
-    line_pn = partnumbers_to_list(component.partnumbers)
+    line_pn = partnumbers2list(component.partnumbers)
 
     is_simple_connector = (
         isinstance(component, Connector) and component.style == "simple"
@@ -283,7 +283,6 @@ def gv_conductor_table(cable) -> Table:
 
         cells_above = [
             Td(" " + ", ".join(ins), align="left"),
-            # Td(":-)"),
             Td(bom_bubble(wire.bom_id)) if cable.category == "bundle" else None,
             Td(":".join([wi for wi in wireinfo if wi is not None and wi != ""])),
             Td(", ".join(outs) + " ", align="right"),
@@ -295,8 +294,20 @@ def gv_conductor_table(cable) -> Table:
         rows.append(Tr(gv_wire_cell(wire, len(cells_above))))
 
         # row below the wire
-        # TODO: PN stuff for bundles
-        # wire_pn_stuff() see below
+        if wire.partnumbers:
+            cells_below = partnumbers2list(
+                wire.partnumbers, parent_partnumbers=cable.partnumbers
+            )
+            if cells_below is not None and len(cells_below) > 0:
+                table_below = (
+                    Table(
+                        Tr([Td(cell) for cell in cells_below]),
+                        border=0,
+                        cellborder=0,
+                        cellspacing=0,
+                    ),
+                )
+                rows.append(Tr(Td(table_below, colspan=len(cells_above))))
 
     rows.append(Tr(Td("&nbsp;")))  # spacer row on bottom
     tbl = Table(rows, border=0, cellborder=0, cellspacing=0)
@@ -332,48 +343,6 @@ def gv_wire_cell(wire: Union[WireClass, ShieldClass], colspan: int) -> Td:
     wire_outer_cell = Td(wire_inner_table, **wire_outer_cell_attribs)
 
     return wire_outer_cell
-
-
-def wire_pn_stuff():
-    # # for bundles, individual wires can have part information
-    # if cable.category == "bundle":
-    #     # create a list of wire parameters
-    #     wireidentification = []
-    #     if isinstance(cable.pn, list):
-    #         wireidentification.append(
-    #             pn_info_string(
-    #                 HEADER_PN, None, remove_links(cable.pn[i - 1])
-    #             )
-    #         )
-    #     manufacturer_info = pn_info_string(
-    #         HEADER_MPN,
-    #         cable.manufacturer[i - 1]
-    #         if isinstance(cable.manufacturer, list)
-    #         else None,
-    #         cable.mpn[i - 1] if isinstance(cable.mpn, list) else None,
-    #     )
-    #     supplier_info = pn_info_string(
-    #         HEADER_SPN,
-    #         cable.supplier[i - 1]
-    #         if isinstance(cable.supplier, list)
-    #         else None,
-    #         cable.spn[i - 1] if isinstance(cable.spn, list) else None,
-    #     )
-    #     if manufacturer_info:
-    #         wireidentification.append(html_line_breaks(manufacturer_info))
-    #     if supplier_info:
-    #         wireidentification.append(html_line_breaks(supplier_info))
-    #     # print parameters into a table row under the wire
-    #     if len(wireidentification) > 0:
-    #         # fmt: off
-    #         wirehtml.append('   <tr><td colspan="3">')
-    #         wirehtml.append('    <table border="0" cellspacing="0" cellborder="0"><tr>')
-    #         for attrib in wireidentification:
-    #             wirehtml.append(f"     <td>{attrib}</td>")
-    #         wirehtml.append("    </tr></table>")
-    #         wirehtml.append("   </td></tr>")
-    #         # fmt: on
-    pass
 
 
 def gv_edge_wire(harness, cable, connection) -> (str, str, str):
