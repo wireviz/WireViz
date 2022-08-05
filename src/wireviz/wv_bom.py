@@ -68,7 +68,7 @@ def pn_info_string(
 
 
 def print_bom_debug(bom):
-    headers = "# qty unit description amount unit designators category".split(" ")
+    headers = "# qty unit description amount unit designators category pn manufacturer mpn supplier spn".split(" ")
     rows = []
     rows.append(headers)
     # fill rows
@@ -83,6 +83,16 @@ def print_bom_debug(bom):
             ", ".join(sorted(entry["designators"])),
             f"{entry['category']} ({entry['category'].name})",
         ]
+        if hash.partnumbers:
+            cells.extend([
+                hash.partnumbers.pn,
+                hash.partnumbers.manufacturer,
+                hash.partnumbers.mpn,
+                hash.partnumbers.supplier,
+                hash.partnumbers.spn,
+            ])
+        else:
+            cells.extend([None,None,None,None,None])
         rows.append(cells)
     # remove empty columns
     transposed = list(map(list, zip(*rows)))
