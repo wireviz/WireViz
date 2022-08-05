@@ -131,7 +131,7 @@ class Harness:
                 continue
             item.bom_id = self.bom[item.bom_hash]["id"]
 
-        print_bom_table(self.bom)
+        # print_bom_table(self.bom)  # for debugging
 
     def _add_to_internal_bom(self, item: Component):
         if item.ignore_in_bom:
