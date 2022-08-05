@@ -690,6 +690,17 @@ class Cable(TopLevelGraphicalComponent):
 
         # if lists of part numbers are provided,
         # check this is a bundle and that it matches the wirecount.
+
+        # TODO:
+        # if it is a bundle, each wire will show up as separate BOM entry.
+        # therefore, for any bundle, pn info should be inherited into the wire objects.
+        # if a field is a list, then assign each wire its corresponding entry from that list, by index.
+        # if a field is not a list, assign all wires in the cable the same field value, assumed to be valid for all wires.
+        # then, checking whether bundle or not is the only check required to decide how to handle bom info.
+
+        # TODO:
+        # allow gauge, length, and other fields to be lists too, and assign them the same way to bundles.
+
         for idfield in [self.manufacturer, self.mpn, self.supplier, self.spn, self.pn]:
             if isinstance(idfield, list):
                 if self.category == "bundle":
