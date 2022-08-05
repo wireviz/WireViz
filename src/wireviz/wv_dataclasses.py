@@ -629,6 +629,20 @@ class Cable(TopLevelGraphicalComponent):
             )
             return desc
 
+    def _get_wire_partnumber(self, idx) -> PartNumberInfo:
+        # TODO: possibly make more robust/elegant
+        if self.category == "bundle":
+            if isinstance(self.partnumbers.pn, List):
+                return PartNumberInfo(
+                    self.partnumbers.pn[idx],
+                    self.partnumbers.manufacturer[idx],
+                    self.partnumbers.mpn[idx],
+                    self.partnumbers.supplier[idx],
+                    self.partnumbers.spn[idx],
+                )
+            else:
+                return None
+
     def __post_init__(self) -> None:
 
         super().fill_partnumbers()
@@ -706,8 +720,8 @@ class Cable(TopLevelGraphicalComponent):
                 gauge=self.gauge,
                 length=self.length,
                 sum_amounts_in_bom=self.sum_amounts_in_bom,
-                ignore_in_bom=self.ignore_in_bom
-                # TODO partnumbers
+                ignore_in_bom=self.ignore_in_bom,
+                partnumbers=self._get_wire_partnumber(wire_index),
             )
 
         if self.shield:
