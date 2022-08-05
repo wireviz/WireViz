@@ -9,7 +9,6 @@ import wireviz  # for doing wireviz.__file__
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.wv_dataclasses import Metadata, Options
 from wireviz.wv_utils import (
-    flatten2d,
     html_line_breaks,
     open_file_read,
     open_file_write,
@@ -65,7 +64,7 @@ def embed_svg_images_file(
 
 def generate_html_output(
     filename: Union[str, Path],
-    bom_list: List[List[str]],
+    bom: List[List[str]],
     metadata: Metadata,
     options: Options,
 ):
@@ -95,8 +94,6 @@ def generate_html_output(
         )
 
     # generate BOM table
-    bom = flatten2d(bom_list)
-
     # generate BOM header (may be at the top or bottom of the table)
     bom_header_html = "  <tr>\n"
     for item in bom[0]:
@@ -110,7 +107,7 @@ def generate_html_output(
         row_html = "  <tr>\n"
         for i, item in enumerate(row):
             td_class = f"bom_col_{bom[0][i].lower()}"
-            row_html = f'{row_html}    <td class="{td_class}">{item}</td>\n'
+            row_html = f'{row_html}    <td class="{td_class}">{item if item is not None else ""}</td>\n'
         row_html = f"{row_html}  </tr>\n"
         bom_contents.append(row_html)
 

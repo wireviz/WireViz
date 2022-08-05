@@ -67,8 +67,11 @@ def pn_info_string(
         return None
 
 
-def print_bom_debug(bom):
-    headers = "# qty unit description amount unit designators category pn manufacturer mpn supplier spn".split(" ")
+def bom_list(bom):
+    headers = (
+        "# Qty Unit Description Amount Unit Designators "
+        "P/N Manufacturer MPN Supplier SPN Category".split(" ")
+    )
     rows = []
     rows.append(headers)
     # fill rows
@@ -81,18 +84,20 @@ def print_bom_debug(bom):
             hash.amount.number if hash.amount else None,
             hash.amount.unit if hash.amount else None,
             ", ".join(sorted(entry["designators"])),
-            f"{entry['category']} ({entry['category'].name})",
         ]
         if hash.partnumbers:
-            cells.extend([
-                hash.partnumbers.pn,
-                hash.partnumbers.manufacturer,
-                hash.partnumbers.mpn,
-                hash.partnumbers.supplier,
-                hash.partnumbers.spn,
-            ])
+            cells.extend(
+                [
+                    hash.partnumbers.pn,
+                    hash.partnumbers.manufacturer,
+                    hash.partnumbers.mpn,
+                    hash.partnumbers.supplier,
+                    hash.partnumbers.spn,
+                ]
+            )
         else:
-            cells.extend([None,None,None,None,None])
+            cells.extend([None, None, None, None, None])
+        # cells.extend([f"{entry['category']} ({entry['category'].name})"])  # for debugging
         rows.append(cells)
     # remove empty columns
     transposed = list(map(list, zip(*rows)))
@@ -103,7 +108,10 @@ def print_bom_debug(bom):
         #                                           ^ ignore header cell in check
     ]
     rows = list(map(list, zip(*transposed)))
-    # output
+    return rows
+
+
+def print_bom_table(bom):
     print()
-    print(tabulate_module.tabulate(rows, headers="firstrow"))
+    print(tabulate_module.tabulate(bom_list(bom), headers="firstrow"))
     print()
