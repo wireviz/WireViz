@@ -42,14 +42,42 @@ PART_NUMBER_HEADERS = PartNumberInfo(
 )
 
 
-def partnumbers_to_list(partnumbers: PartNumberInfo) -> List[str]:
-    cell_contents = [
-        pn_info_string(PART_NUMBER_HEADERS.pn, None, partnumbers.pn),
-        pn_info_string(
+def partnumbers2list(
+    partnumbers: PartNumberInfo, parent_partnumbers: PartNumberInfo = None
+) -> List[str]:
+    if parent_partnumbers is None:
+        _is_toplevel = True
+        parent_partnumbers = partnumbers
+    else:
+        _is_toplevel = False
+
+    # Note: != operator used as XOR in the following section (https://stackoverflow.com/a/433161)
+
+    if _is_toplevel != isinstance(parent_partnumbers.pn, List):
+        # top level and not a list, or wire level and list
+        cell_pn = pn_info_string(PART_NUMBER_HEADERS.pn, None, partnumbers.pn)
+    else:
+        # top level and list -> do per wire later
+        # wire level and not list -> already done at top level
+        cell_pn = None
+
+    if _is_toplevel != isinstance(parent_partnumbers.mpn, List):
+        # TODO: edge case: different manufacturers, but same MPN?
+        cell_mpn = pn_info_string(
             PART_NUMBER_HEADERS.mpn, partnumbers.manufacturer, partnumbers.mpn
-        ),
-        pn_info_string(PART_NUMBER_HEADERS.spn, partnumbers.supplier, partnumbers.spn),
-    ]
+        )
+    else:
+        cell_mpn = None
+
+    if _is_toplevel != isinstance(parent_partnumbers.spn, List):
+        # TODO: edge case: different suppliers, but same SPN?
+        cell_spn = pn_info_string(
+            PART_NUMBER_HEADERS.spn, partnumbers.supplier, partnumbers.spn
+        )
+    else:
+        cell_spn = None
+
+    cell_contents = [cell_pn, cell_mpn, cell_spn]
     if any(cell_contents):
         return [html_line_breaks(cell) for cell in cell_contents]
     else:
