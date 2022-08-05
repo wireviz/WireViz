@@ -105,6 +105,7 @@ class Harness:
             ]
             + all_subitems
         )
+
         # add items to BOM
         for item in all_toplevel_items:
             self._add_to_internal_bom(item)  # nested subitems are also handled
