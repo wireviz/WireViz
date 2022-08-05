@@ -111,6 +111,8 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             prepend_file = Path(prepend_file)
             if not prepend_file.exists():
                 raise Exception(f"File does not exist:\n{prepend_file}")
+            if not prepend_file.is_file():
+                raise Exception(f"Path is not a file:\n{prepend_file}")
             print("Prepend file:", prepend_file)
 
             prepend_input += open_file_read(prepend_file).read() + "\n"
@@ -122,6 +124,8 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
         file = Path(file)
         if not file.exists():
             raise Exception(f"File does not exist:\n{file}")
+        if not file.is_file():
+            raise Exception(f"Path is not a file:\n{file}")
 
         # file_out = file.with_suffix("") if not output_file else output_file
         _output_dir = file.parent if not output_dir else output_dir
