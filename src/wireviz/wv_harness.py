@@ -130,8 +130,6 @@ class Harness:
                 continue
             item.bom_id = self.bom[item.bom_hash]["id"]
 
-        # import pudb; pudb.set_trace()
-
         print_bom_debug(self.bom)
 
     def _add_to_internal_bom(self, item: Component):
@@ -403,7 +401,8 @@ class Harness:
         if "gv" in fmt:
             graph.save(filename=f"{filename}.gv")
         # BOM output
-        # bomlist = bom_list(self.bom())
+        # bommy = self.bom
+        # bomlist = bom_list(bommy)
         bomlist = [[]]
         if "tsv" in fmt:
             open_file_write(f"{filename}.tsv").write(tuplelist2tsv(bomlist))
