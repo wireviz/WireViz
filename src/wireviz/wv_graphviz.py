@@ -283,8 +283,10 @@ def gv_conductor_table(cable) -> Table:
 
         cells_above = [
             Td(" " + ", ".join(ins), align="left"),
+            Td(" "),  # increase cell spacing here
             Td(bom_bubble(wire.bom_id)) if cable.category == "bundle" else None,
             Td(":".join([wi for wi in wireinfo if wi is not None and wi != ""])),
+            Td(" "),  # increase cell spacing here
             Td(", ".join(outs) + " ", align="right"),
         ]
         cells_above = [cell for cell in cells_above if cell is not None]
