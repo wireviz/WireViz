@@ -630,18 +630,20 @@ class Cable(TopLevelGraphicalComponent):
             return desc
 
     def _get_wire_partnumber(self, idx) -> PartNumberInfo:
+        def _get_correct_element(inp, idx):
+            return inp[idx] if isinstance(inp, List) else inp
+
         # TODO: possibly make more robust/elegant
         if self.category == "bundle":
-            if isinstance(self.partnumbers.pn, List):
-                return PartNumberInfo(
-                    self.partnumbers.pn[idx],
-                    self.partnumbers.manufacturer[idx],
-                    self.partnumbers.mpn[idx],
-                    self.partnumbers.supplier[idx],
-                    self.partnumbers.spn[idx],
-                )
-            else:
-                return None
+            return PartNumberInfo(
+                _get_correct_element(self.partnumbers.pn, idx),
+                _get_correct_element(self.partnumbers.manufacturer, idx),
+                _get_correct_element(self.partnumbers.mpn, idx),
+                _get_correct_element(self.partnumbers.supplier, idx),
+                _get_correct_element(self.partnumbers.spn, idx),
+            )
+        else:
+            return None  # non-bundles do not support lists of part data
 
     def __post_init__(self) -> None:
 
@@ -653,6 +655,10 @@ class Cable(TopLevelGraphicalComponent):
 
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
+
+        # TODO:
+        # allow gauge, length, and other fields to be lists too (like part numbers),
+        # and assign them the same way to bundles.
 
         self.gauge = self.parse_number_and_unit(self.gauge, "mm2")
         self.length = self.parse_number_and_unit(self.length, "m")
@@ -690,17 +696,6 @@ class Cable(TopLevelGraphicalComponent):
 
         # if lists of part numbers are provided,
         # check this is a bundle and that it matches the wirecount.
-
-        # TODO:
-        # if it is a bundle, each wire will show up as separate BOM entry.
-        # therefore, for any bundle, pn info should be inherited into the wire objects.
-        # if a field is a list, then assign each wire its corresponding entry from that list, by index.
-        # if a field is not a list, assign all wires in the cable the same field value, assumed to be valid for all wires.
-        # then, checking whether bundle or not is the only check required to decide how to handle bom info.
-
-        # TODO:
-        # allow gauge, length, and other fields to be lists too, and assign them the same way to bundles.
-
         for idfield in [self.manufacturer, self.mpn, self.supplier, self.spn, self.pn]:
             if isinstance(idfield, list):
                 if self.category == "bundle":
