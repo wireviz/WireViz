@@ -85,6 +85,8 @@ tweak:  # optional tweaking of .gv output
   # loops
   loops: <List>  # every list item is itself a list of exactly two pins
                  # on the connector that are to be shorted
+                 # Accepts pin numbers or names
+  loop_color: <color> # Color for loop wiring
 
   # auto-generation
   autogenerate: <bool>  # optional; defaults to false; see below
