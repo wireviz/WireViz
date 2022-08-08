@@ -178,7 +178,8 @@ class Harness:
                      fillcolor=translate_color(self.options.bgcolor_connector, "HEX"))
 
             if len(connector.loops) > 0:
-                dot.attr('edge', color='#000000:#ffffff:#000000')
+                loop_color_hex = translate_color(connector.loop_color, "hex")
+                dot.attr('edge', color=f'#000000:{loop_color_hex}:#000000')
                 if connector.ports_left:
                     loop_side = 'l'
                     loop_dir = 'w'
@@ -188,8 +189,14 @@ class Harness:
                 else:
                     raise Exception('No side for loops')
                 for loop in connector.loops:
-                    dot.edge(f'{connector.name}:p{loop[0]}{loop_side}:{loop_dir}',
-                             f'{connector.name}:p{loop[1]}{loop_side}:{loop_dir}')
+                    if type(loop[0]) == str:
+                        i_loop_0 = connector.pins.index(loop[0])
+                        i_loop_1 = connector.pins.index(loop[1])
+                    else:
+                        i_loop_0 = loop[0]
+                        i_loop_1 = loop[1]
+                    dot.edge(f'{connector.name}:p{i_loop_0}{loop_side}:{loop_dir}',
+                             f'{connector.name}:p{i_loop_1}{loop_side}:{loop_dir}')
 
 
         # determine if there are double- or triple-colored wires in the harness;

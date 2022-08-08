@@ -142,6 +142,7 @@ class Connector:
     hide_disconnected_pins: bool = False
     autogenerate: bool = False
     loops: List[List[Pin]] = field(default_factory=list)
+    loop_color: Optional[Color] = "WH"
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
