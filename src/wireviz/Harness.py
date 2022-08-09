@@ -189,10 +189,16 @@ class Harness:
                 else:
                     raise Exception('No side for loops')
                 for loop in connector.loops:
-                        i_loop_0 = connector.pins.index(loop[0])+1
-                        i_loop_1 = connector.pins.index(loop[1])+1
-                        dot.edge(f'{connector.name}:p{i_loop_0}{loop_side}:{loop_dir}',
-                             f'{connector.name}:p{i_loop_1}{loop_side}:{loop_dir}')
+                    loop_pins = []
+                    for pin in loop:
+                        if connector.pins.count(pin) == 1:
+                            loop_pins.append(connector.pins.index(pin)+1)
+                        elif connector.pinlabels.count(pin) == 1:
+                            loop_pins.append(connector.pinlabels.index(pin)+1)
+                        else:
+                            raise Exception(f"Didn't find exactly one {connector.name}:{pin} to loop into")                
+                    dot.edge(f'{connector.name}:p{loop_pins[0]}{loop_side}:{loop_dir}',
+                            f'{connector.name}:p{loop_pins[1]}{loop_side}:{loop_dir}')
 
 
         # determine if there are double- or triple-colored wires in the harness;
