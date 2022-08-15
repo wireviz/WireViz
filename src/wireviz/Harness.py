@@ -178,8 +178,6 @@ class Harness:
                      fillcolor=translate_color(self.options.bgcolor_connector, "HEX"))
 
             if len(connector.loops) > 0:
-                loop_color_hex = translate_color(connector.loop_color, "hex")
-                dot.attr('edge', color=f'#000000:{loop_color_hex}:#000000')
                 if connector.ports_left:
                     loop_side = 'l'
                     loop_dir = 'w'
@@ -187,18 +185,34 @@ class Harness:
                     loop_side = 'r'
                     loop_dir = 'e'
                 else:
-                    raise Exception('No side for loops')
+                    raise Exception('No side for loops')        
+        
+                color_iter = iter(wv_colors.COLOR_CODES["DIN"])
                 for loop in connector.loops:
+                    if type(loop) == dict:
+                        color = list(loop.keys())[0]
+                        loop = loop[color]
+                    else:
+                        color = next(color_iter)
+                    loop_color_hex = translate_color(color, "hex")
+                    dot.attr('edge', color=f'#000000:{loop_color_hex}:#000000')
                     loop_pins = []
                     for pin in loop:
-                        if connector.pins.count(pin) == 1:
+                        if pin in connector.pins:
                             loop_pins.append(connector.pins.index(pin)+1)
-                        elif connector.pinlabels.count(pin) == 1:
+                        elif pin in connector.pinlabels:
                             loop_pins.append(connector.pinlabels.index(pin)+1)
                         else:
-                            raise Exception(f"Didn't find exactly one {connector.name}:{pin} to loop into")                
-                    dot.edge(f'{connector.name}:p{loop_pins[0]}{loop_side}:{loop_dir}',
-                            f'{connector.name}:p{loop_pins[1]}{loop_side}:{loop_dir}')
+                            raise Exception(f"Didn't find exactly one {connector.name}:{pin} to loop into")
+                    first = True
+                    for found in loop_pins:
+                        if first:
+                            first = False
+                            prev = found
+                        else:
+                            dot.edge(f'{connector.name}:p{prev}{loop_side}:{loop_dir}',
+                                    f'{connector.name}:p{found}{loop_side}:{loop_dir}')
+                            prev = found
 
 
         # determine if there are double- or triple-colored wires in the harness;
