@@ -122,6 +122,21 @@ class Harness:
             # If no wires connected (except maybe loop wires)?
             if not (connector.ports_left or connector.ports_right):
                 connector.ports_left = True  # Use left side pins.
+                loop_side = 'l'
+
+            # Make sure loop direction has connectors :)
+            if connector.loop_side:
+                if connector.loop_side.lower() in ["l", "left"]:
+                    loop_side = 'l'
+                    connector.ports_left = True
+                elif connector.loop_side.lower() in ["r", "right"]:
+                    loop_side = 'r'
+                    connector.ports_right = True
+                else:
+                    raise Exception("Invalid loop direction!")
+            # if not specified, default to direction of other connections
+            else:
+                loop_side = "l" if connector.ports_left else "r"
 
             html = []
 
@@ -178,15 +193,11 @@ class Harness:
                      fillcolor=translate_color(self.options.bgcolor_connector, "HEX"))
 
             if len(connector.loops) > 0:
-                if connector.ports_left:
-                    loop_side = 'l'
+                if loop_side == 'l':
                     loop_dir = 'w'
-                elif connector.ports_right:
-                    loop_side = 'r'
+                elif loop_side == 'r':
                     loop_dir = 'e'
-                else:
-                    raise Exception('No side for loops')        
-        
+
                 color_iter = iter(wv_colors.COLOR_CODES["DIN"])
                 for loop in connector.loops:
                     if type(loop) == dict:
