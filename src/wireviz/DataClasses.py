@@ -182,7 +182,7 @@ class Connector:
             if type(loop) == dict:
                 loop = list(loop.values())[0]
             for pin in loop:
-                if not ((self.pins.count(pin) == 1) or (self.pinlabels.count == 1)):
+                if not ((self.pins.count(pin) == 1) or (self.pinlabels.count(pin) == 1)):
                     raise Exception(f"Didn't find exactly one {self.name}:{pin} to loop into")
                 self.activate_pin(pin)
 
