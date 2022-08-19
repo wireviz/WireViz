@@ -135,6 +135,8 @@ class Connector:
     notes: Optional[MultilineHypertext] = None
     pins: List[Pin] = field(default_factory=list)
     pinlabels: List[Pin] = field(default_factory=list)
+    reverse_pins: bool = False
+    shell: bool = False
     pincolors: List[Color] = field(default_factory=list)
     color: Optional[Color] = None
     show_name: Optional[bool] = None

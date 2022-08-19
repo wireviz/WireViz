@@ -161,7 +161,12 @@ class Harness:
                 pinhtml = []
                 pinhtml.append('<table border="0" cellspacing="0" cellpadding="3" cellborder="1">')
 
-                for pinindex, (pinname, pinlabel, pincolor) in enumerate(zip_longest(connector.pins, connector.pinlabels, connector.pincolors)):
+                pin_index_list = enumerate(zip_longest(connector.pins, connector.pinlabels, connector.pincolors))
+
+                if connector.reverse_pins:
+                    pin_index_list = reversed(list(pin_index_list))
+
+                for pinindex, (pinname, pinlabel, pincolor) in pin_index_list:
                     if connector.hide_disconnected_pins and not connector.visible_pins.get(pinname, False):
                         continue
                     pinhtml.append('   <tr>')
