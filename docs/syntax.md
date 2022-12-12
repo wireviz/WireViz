@@ -408,6 +408,7 @@ Parts can be added to a connector or cable in the section `<additional-component
                   # when used in a connector:
                   # pincount         number of pins of connector
                   # populated        number of populated positions in a connector
+                  # unpopulated      number of unpopulated positions
                   # when used in a cable:
                   # wirecount        number of wires of cable/bundle
                   # terminations     number of terminations on a cable/bundle
