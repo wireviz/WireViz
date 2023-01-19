@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
@@ -366,7 +367,11 @@ def parse(
 
     if "additional_bom_items" in yaml_data:
         for line in yaml_data["additional_bom_items"]:
-            harness.add_additional_bom_item(line)
+            try:
+                harness.add_additional_bom_item(line)
+            except TypeError as e:
+                logging.error(f"Failed to add line {line} as an additional bom item")
+                raise
 
     # harness population completed =============================================
 
