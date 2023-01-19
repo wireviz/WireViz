@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 from wireviz.wv_bom import (
     BomHash,
-    BomHashList,
     PartNumberInfo,
     QtyMultiplierCable,
     QtyMultiplierConnector,
