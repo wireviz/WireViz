@@ -1,54 +1,125 @@
 # -*- coding: utf-8 -*-
 
-from pathlib import Path
-from typing import List, Union
-import re
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from typing import Dict
 
-from wireviz import __version__, APP_NAME, APP_URL, wv_colors
-from wireviz.DataClasses import Metadata, Options
-from wireviz.wv_helper import flatten2d, open_file_read, open_file_write
+indent_count = 1
 
-def generate_html_output(filename: Union[str, Path], bom_list: List[List[str]], metadata: Metadata, options: Options):
-    with open_file_write(f'{filename}.html') as file:
-        file.write('<!DOCTYPE html>\n')
-        file.write('<html lang="en"><head>\n')
-        file.write(' <meta charset="UTF-8">\n')
-        file.write(f' <meta name="generator" content="{APP_NAME} {__version__} - {APP_URL}">\n')
-        file.write(f' <title>{metadata["title"]}</title>\n')
-        file.write(f'</head><body style="font-family:{options.fontname};background-color:'
-                   f'{wv_colors.translate_color(options.bgcolor, "HEX")}">\n')
 
-        file.write(f'<h1>{metadata["title"]}</h1>\n')
-        description = metadata.get('description')
-        if description:
-            file.write(f'<p>{description}</p>\n')
-        file.write('<h2>Diagram</h2>\n')
-        with open_file_read(f'{filename}.svg') as svg:
-            file.write(re.sub(
-                '^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>',
-                '<!-- XML and DOCTYPE declarations from SVG file removed -->',
-                svg.read(1024), 1))
-            for svgdata in svg:
-                file.write(svgdata)
+class Attribs(Dict):
+    def __repr__(self):
+        if len(self) == 0:
+            return ""
 
-        file.write('<h2>Bill of Materials</h2>\n')
-        listy = flatten2d(bom_list)
-        file.write('<table style="border:1px solid #000000; font-size: 14pt; border-spacing: 0px">\n')
-        file.write(' <tr>\n')
-        for item in listy[0]:
-            file.write(f'  <th style="text-align:left; border:1px solid #000000; padding: 8px">{item}</th>\n')
-        file.write(' </tr>\n')
-        for row in listy[1:]:
-            file.write(' <tr>\n')
-            for i, item in enumerate(row):
-                item_str = item.replace('\u00b2', '&sup2;')
-                align = '; text-align:right' if listy[0][i] == 'Qty' else ''
-                file.write(f'  <td style="border:1px solid #000000; padding: 4px{align}">{item_str}</td>\n')
-            file.write(' </tr>\n')
-        file.write('</table>\n')
+        html = []
+        for k, v in self.items():
+            if v is not None:
+                html.append(f' {k}="{v}"')
+            # else:
+            #     html.append(f" {k}")
+        return "".join(html)
 
-        notes = metadata.get('notes')
-        if notes:
-            file.write(f'<h2>Notes</h2>\n<p>{notes}</p>\n')
 
-        file.write('</body></html>\n')
+@dataclass
+class Tag:
+    contents = None
+    attribs: Attribs = field(default_factory=Attribs)
+    flat: bool = None
+    delete_if_empty: bool = False
+
+    def __init__(self, contents, flat=None, delete_if_empty=False, **kwargs):
+        self.contents = contents
+        self.flat = flat
+        self.delete_if_empty = delete_if_empty
+        self.attribs = Attribs({**kwargs})
+
+    def update_attribs(self, **kwargs):
+        for k, v in kwargs.items():
+            self.attribs[k] = v
+
+    @property
+    def tagname(self):
+        return type(self).__name__.lower()
+
+    @property
+    def auto_flat(self):
+        if self.flat is not None:  # user specified
+            return self.flat
+        if not _is_iterable_not_str(self.contents):  # catch str, int, float, ...
+            if not isinstance(self.contents, Tag):  # avoid recursion
+                return not "\n" in str(self.contents)  # flatten if single line
+
+    @property
+    def is_empty(self):
+        return self.get_contents(force_flat=True) == ""
+
+    def indent_lines(self, lines, force_flat=False):
+        if self.auto_flat or force_flat:
+            return lines
+        else:
+            indenter = " " * indent_count
+            return "\n".join(f"{indenter}{line}" for line in lines.split("\n"))
+
+    def get_contents(self, force_flat=False):
+        separator = "" if self.auto_flat or force_flat else "\n"
+        if _is_iterable_not_str(self.contents):
+            return separator.join(
+                [
+                    self.indent_lines(str(c), force_flat)
+                    for c in self.contents
+                    if c is not None
+                ]
+            )
+        elif self.contents is None:
+            return ""
+        else:  # str, int, float, etc.
+            return self.indent_lines(str(self.contents), force_flat)
+
+    def __repr__(self):
+        separator = "" if self.auto_flat else "\n"
+        if self.delete_if_empty and self.is_empty:
+            return ""
+        else:
+            html = [
+                f"<{self.tagname}{str(self.attribs)}>",
+                f"{self.get_contents()}",
+                f"</{self.tagname}>",
+            ]
+            html_joined = separator.join(html)
+            return html_joined
+
+
+@dataclass
+class TagSingleton(Tag):
+    def __init__(self, **kwargs):
+        self.attribs = Attribs({**kwargs})
+
+    def __repr__(self):
+        return f"<{self.tagname}{str(self.attribs)} />"
+
+
+def _is_iterable_not_str(inp):
+    # str is iterable, but should be treated as not iterable
+    return isinstance(inp, Iterable) and not isinstance(inp, str)
+
+
+@dataclass
+class Br(TagSingleton):
+    pass
+
+
+class Img(TagSingleton):
+    pass
+
+
+class Td(Tag):
+    pass
+
+
+class Tr(Tag):
+    pass
+
+
+class Table(Tag):
+    pass

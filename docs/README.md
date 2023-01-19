@@ -4,6 +4,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/wireviz.svg?colorB=blue)](https://pypi.org/project/wireviz/)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/wireviz.svg?)](https://pypi.org/project/wireviz/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/wireviz)](https://pypi.org/project/wireviz/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Summary
 
@@ -81,10 +82,11 @@ Output file:
 
 [Source](../examples/demo02.yml) - [Bill of Materials](../examples/demo02.bom.tsv)
 
-### Tutorial and example gallery
+### Syntax, tutorial and example gallery
 
-See the [tutorial page](../tutorial/readme.md) for sample code,
-as well as the [example gallery](../examples/readme.md) to see more of what WireViz can do.
+Read the [syntax description](syntax.md) to learn about WireViz' features and how to use them.
+
+See the [tutorial page](../tutorial/readme.md) for sample code, as well as the [example gallery](../examples/readme.md) to see more of what WireViz can do.
 
 
 ## Usage
@@ -125,7 +127,7 @@ If you would like to contribute to this project, make sure you read the [contrib
 $ wireviz ~/path/to/file/mywire.yml
 ```
 
-This will output the following files
+Depending on the options specified, this will output some or all of the following files:
 
 ```
 mywire.gv         GraphViz output
@@ -135,17 +137,16 @@ mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 
-#### Command line options
+Wildcars in the file path are also supported to process multiple files at once, e.g.:
+```
+$ wireviz ~/path/to/files/*.yml
+```
 
-- `--prepend-file <FILE>` to prepend an additional YAML file. Useful for part libraries and templates shared among multiple cables/harnesses.
-- `-o <OUTPUT>` or `--output_file <OUTPUT>` to generate output files with a name different from the input file.
-- `-V` or `--version` to display the WireViz version.
-- `-h` or `--help` to see a summary of the usage help text.
+To see how to specify the output formats, as well as additional options, run:
 
-
-### Syntax description
-
-A description of the WireViz YAML input syntax can be found [here](syntax.md).
+```
+$ wireviz --help
+```
 
 
 ### (Re-)Building the example projects
