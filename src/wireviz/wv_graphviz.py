@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import re
-from itertools import zip_longest
 from typing import Any, List, Optional, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
@@ -15,8 +14,6 @@ from wireviz.wv_dataclasses import (
     Connector,
     MateComponent,
     MatePin,
-    Options,
-    PartNumberInfo,
     ShieldClass,
     WireClass,
 )
@@ -112,7 +109,9 @@ def gv_additional_component_table(component):
                 [
                     Td(bom_bubble(subitem.bom_id)),
                     Td(f"{subitem.bom_qty}", align="right"),
-                    Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"),
+                    Td(
+                        f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"
+                    ),
                     Td(f"{subitem.description}", align="left"),
                 ]
             )

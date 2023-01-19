@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from collections import namedtuple
-from dataclasses import dataclass
 from enum import Enum, IntEnum
-from typing import List, Optional, Union
+from typing import List, Optional
 
 import tabulate as tabulate_module
 
