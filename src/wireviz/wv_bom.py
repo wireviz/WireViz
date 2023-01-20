@@ -10,6 +10,8 @@ from wireviz.wv_utils import html_line_breaks
 
 BOM_HASH_FIELDS = "description qty_unit amount partnumbers"
 
+MAX_DESIGNATORS = 2
+MAX_DESCRIPTION = 40
 
 BomEntry = namedtuple("BomEntry", "category qty designators")
 BomHash = namedtuple("BomHash", BOM_HASH_FIELDS)
@@ -103,14 +105,23 @@ def bom_list(bom):
     rows.append(headers)
     # fill rows
     for hash, entry in bom.items():
+        description = hash.description
+        if len(description) > MAX_DESCRIPTION:
+            description = f"{description[:MAX_DESCRIPTION]} (...)"
+
+        all_designators = sorted(entry["designators"])
+        if len(all_designators) > MAX_DESIGNATORS:
+            all_designators = all_designators[:MAX_DESIGNATORS] + ['...']
+
+
         cells = [
             entry["id"],
             entry["qty"],
             hash.qty_unit,
-            hash.description,
+            description,
             hash.amount.number if hash.amount else None,
             hash.amount.unit if hash.amount else None,
-            ", ".join(sorted(entry["designators"])),
+            ", ".join(all_designators),
         ]
         if hash.partnumbers:
             cells.extend(
@@ -118,8 +129,8 @@ def bom_list(bom):
                     hash.partnumbers.pn,
                     hash.partnumbers.manufacturer,
                     hash.partnumbers.mpn,
-                    hash.partnumbers.supplier,
-                    hash.partnumbers.spn,
+                    None, #hash.partnumbers.supplier,
+                    None, #hash.partnumbers.spn,
                 ]
             )
         else:
