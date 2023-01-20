@@ -119,6 +119,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     else:
         prepend_input = ""
 
+    sheet_current = 1
     # run WireVIz on each input file
     for file in filepaths:
         file = Path(file)
@@ -126,6 +127,13 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             raise Exception(f"File does not exist:\n{file}")
         if not file.is_file():
             raise Exception(f"Path is not a file:\n{file}")
+
+        extra_metadata = {}
+        extra_metadata['name'] = file.stem
+        extra_metadata['sheet_total'] = len(filepaths)
+        extra_metadata['sheet_current'] = sheet_current
+        sheet_current +=1
+
 
         # file_out = file.with_suffix("") if not output_file else output_file
         _output_dir = file.parent if not output_dir else output_dir
@@ -150,6 +158,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             output_dir=_output_dir,
             output_name=_output_name,
             image_paths=list(image_paths),
+            extra_metadata=extra_metadata,
         )
 
     print()  # blank line after execution

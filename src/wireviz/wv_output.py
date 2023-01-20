@@ -121,6 +121,13 @@ def generate_html_output(
         + "</table>\n"
     )
 
+    if metadata:
+        sheet_current = metadata['sheet_current']
+        sheet_total = metadata['sheet_total']
+    else:
+        sheet_current = 1
+        sheet_total = 1
+
     # prepare simple replacements
     replacements = {
         "<!-- %generator% -->": f"{APP_NAME} {__version__} - {APP_URL}",
@@ -129,8 +136,8 @@ def generate_html_output(
         "<!-- %diagram% -->": svgdata,
         "<!-- %bom% -->": bom_html,
         "<!-- %bom_reversed% -->": bom_html_reversed,
-        "<!-- %sheet_current% -->": "1",  # TODO: handle multi-page documents
-        "<!-- %sheet_total% -->": "1",  # TODO: handle multi-page documents
+        "<!-- %sheet_current% -->": sheet_current,
+        "<!-- %sheet_total% -->": sheet_total,
     }
 
     # prepare metadata replacements
