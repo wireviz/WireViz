@@ -29,6 +29,7 @@ def parse(
     output_dir: Union[str, Path] = None,
     output_name: Union[None, str] = None,
     image_paths: Union[Path, str, List] = [],
+    extra_metadata: Dict = {},
 ) -> Any:
     """
     This function takes an input, parses it as a WireViz Harness file,
@@ -73,6 +74,9 @@ def parse(
             Paths to use when resolving any image paths included in the data.
             Note: If inp is a path to a YAML file,
             its parent directory will automatically be included in the list.
+        extra_metadata (Dict, optional):
+            Any metadata to add to the template.
+            Normally, this should contain programmatic metadata
 
     Returns:
         Depending on the return_types parameter, may return:
@@ -107,7 +111,7 @@ def parse(
     connection_sets = []
     # actual harness
     harness = Harness(
-        metadata=Metadata(**yaml_data.get("metadata", {})),
+        metadata=Metadata(**yaml_data.get("metadata", {}), **extra_metadata),
         options=Options(**yaml_data.get("options", {})),
         tweak=Tweak(**yaml_data.get("tweak", {})),
     )
