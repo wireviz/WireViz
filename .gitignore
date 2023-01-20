@@ -18,3 +18,10 @@ dist/
 # Other temporary files
 __pycache__
 .*.swp
+
+# Built examples
+examples/*
+tutorial/*
+!examples/*.yml
+!tutorial/*.yml
+!tutorial/*.md
