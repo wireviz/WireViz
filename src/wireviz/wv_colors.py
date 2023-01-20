@@ -164,6 +164,12 @@ class MultiColor:
             joiner = "???"
         return joiner.join([str(color) for color in self.colors])
 
+    def __getitem__(self, idx):
+        if not self:
+            return None
+        else:
+            return self.colors[idx % len(self)]
+
     @property
     def all_known(self):
         return all([color.known for color in self.colors])
