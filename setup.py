@@ -32,7 +32,7 @@ setup(
     include_package_data=True,
     entry_points={
         "console_scripts": [
-            "wireviz=wireviz.wv_cli:wireviz",
+            "wireviz=wireviz.wv_cli:cli",
         ],
     },
     classifiers=[

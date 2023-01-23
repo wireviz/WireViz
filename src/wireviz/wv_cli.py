@@ -73,7 +73,7 @@ epilog = (
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def wireviz(file, format, prepend, output_dir, output_name, version):
+def cli(file, format, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
@@ -165,4 +165,4 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
 
 
 if __name__ == "__main__":
-    wireviz()
+    cli()
