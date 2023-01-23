@@ -1,78 +1,67 @@
- <table>
+<div id="titleblock">
+  <!-- REVISION TABLE --!>
+  <table class=revisions style="float:left" >
+    {% for revision in revisions %}
+      <tr>
+        {% for key in ['rev', 'changelog', 'date', 'name'] %}
+          <td class={{ key }}> {{ revision.get(key, '') }} </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    <tr>
+      <td class={{ rev }}><b>Rev</td>
+      <td class={{ changelog }}><b>Date</td>
+      <td class={{ date }}><b>Name</td>
+      <td class={{ name }}><b>Changelog</td>
+    </tr>
+  </table>
+
+  <!-- AUTHOR INFO + LOGO TABLE --!>
+  <table class=author_info style="float:left" >
    <tr>
-     <td class="revno"> {{ revisions_8 }}</td>
-     <td class="changelog"> {{ revisions_8_changelog }}</td>
-     <td class="date"> {{ revisions_8_date }}</td>
-     <td class="name"> {{ revisions_8_name }}</td>
      <td class="process"></td>
-     <td class="date">Date</td>
-     <td class="name">Name</td>
-     <td class="title" colspan="3" rowspan="5"> {{ title }}</td>
+     <td class="date"><b>Date</b></td>
+     <td class="name"><b>Name</b></td>
    </tr>
+   {% for author in authors %}
    <tr>
-     <td class="revno"> {{ revisions_7 }}</td>
-     <td> {{ revisions_7_changelog }}</td>
-     <td> {{ revisions_7_date }}</td>
-     <td> {{ revisions_7_name }}</td>
-     <td> {{ authors_1 }}</td>
-     <td> {{ authors_1_date }}</td>
-     <td> {{ authors_1_name }}</td>
+     <td><b>{{ author['row'] }}</b></td>
+     <td> {{ author['date'] }}</td>
+     <td> {{ author['name'] }}</td>
    </tr>
+   {% endfor %}
    <tr>
-     <td class="revno"> {{ revisions_6 }}</td>
-     <td> {{ revisions_6_changelog }}</td>
-     <td> {{ revisions_6_date }}</td>
-     <td> {{ revisions_6_name }}</td>
-     <td> {{ authors_2 }}</td>
-     <td> {{ authors_2_date }}</td>
-     <td> {{ authors_2_name }}</td>
+     <td class="logo" colspan="3" rowspan="4" >
+      <img src={{ logo }} alt="" style="height:auto; width:150px;display:block;margin-left:auto;margin-right:auto" />
+     </td>
    </tr>
+   <tr></tr>
+   <tr></tr>
+   <tr></tr>
+  </table>
+
+  <!-- HARNESS INFO TABLE --!>
+  <table class=harness_info>
    <tr>
-     <td class="revno"> {{ revisions_5 }}</td>
-     <td> {{ revisions_5_changelog }}</td>
-     <td> {{ revisions_5_date }}</td>
-     <td> {{ revisions_5_name }}</td>
-     <td> {{ authors_3 }}</td>
-     <td> {{ authors_3_date }}</td>
-     <td> {{ authors_3_name }}</td>
+   <td class="company" colspan="4" rowspan="2"><b> {{ company }}</b></td>
    </tr>
+   <tr></tr>
    <tr>
-     <td class="revno"> {{ revisions_4 }}</td>
-     <td> {{ revisions_4_changelog }}</td>
-     <td> {{ revisions_4_date }}</td>
-     <td> {{ revisions_4_name }}</td>
-     <td colspan="2"></td>
-     <td></td>
+     <td class="company" colspan="4" rowspan="2"> {{ address }}</td>
    </tr>
+   <tr></tr>
    <tr>
-     <td class="revno"> {{ revisions_3 }}</td>
-     <td> {{ revisions_3_changelog }}</td>
-     <td> {{ revisions_3_date }}</td>
-     <td> {{ revisions_3_name }}</td>
-     <td class="company" colspan="3" rowspan="3"> {{ company }}</td>
-     <td class="partno" colspan="2" rowspan="3"> {{ pn }}</td>
-     <td class="sheetno" rowspan="2">Sheet<br /> {{ sheet_current }}</td>
+     <td class="title" colspan="4" rowspan="2"> {{ title }}</td>
    </tr>
+   <tr></tr>
    <tr>
-     <td class="revno"> {{ revisions_2 }}</td>
-     <td> {{ revisions_2_changelog }}</td>
-     <td> {{ revisions_2_date }}</td>
-     <td> {{ revisions_2_name }}</td>
+     <td class="partno" colspan="3" rowspan="3"> {{ pn }}</td>
+     <td class="revision" colspan="1" rowspan="2"> {{ revision }}</td>
    </tr>
+   <tr></tr>
    <tr>
-     <td class="revno"> {{ revisions_1 }}</td>
-     <td> {{ revisions_1_changelog }}</td>
-     <td> {{ revisions_1_date }}</td>
-     <td> {{ revisions_1_name }}</td>
-     <td class="sheetno">of  {{ sheet_total }}</td>
+     <td class="sheetno" colspan="1">Sheet {{ sheet_current }} of {{ sheet_total }}</td>
    </tr>
-   <tr>
-     <td>Rev</td>
-     <td>Changelog</td>
-     <td>Date</td>
-     <td>Name</td>
-     <td colspan="3"></td>
-     <td></td>
-     <td colspan="2"></td>
-   </tr>
- </table>
+  </table>
+</div> <!--/titleblock --!>
+

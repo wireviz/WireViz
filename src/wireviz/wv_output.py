@@ -123,7 +123,6 @@ def generate_html_output(
         sheet_total = 1
 
     replacements = {
-        "title": "pizza",
         "generator": f"{APP_NAME} {__version__} - {APP_URL}",
         "fontname": options.fontname,
         "bgcolor": options.bgcolor.html,
@@ -132,26 +131,56 @@ def generate_html_output(
         "bom_reversed": bom_html_reversed,
         "sheet_current": sheet_current,
         "sheet_total": sheet_total,
+        "titleblock_rows": 9
     }
 
     # prepare metadata replacements
+    added_metadata = {
+        'revisions': [],
+        'authors': [],
+    }
     if metadata:
         for item, contents in metadata.items():
-            if isinstance(contents, (str, int, float)):
-                replacements[str(item)] = html_line_breaks(str(contents))
-            elif isinstance(contents, Dict):  # useful for authors, revisions
-                for index, (category, entry) in enumerate(contents.items()):
-                    if isinstance(entry, Dict):
-                        replacements[f"{item}_{index+1}"] = str(category)
-                        for entry_key, entry_value in entry.items():
-                            replacements[
-                                f"{item}_{index+1}_{entry_key}"
-                            ] = html_line_breaks(str(entry_value))
+            if item == 'revisions':
+                added_metadata['revisions'] = [{'rev': rev, **v} for rev, v in contents.items()]
+                continue
+            if item == 'authors':
+                added_metadata['authors'] = [{'row': row, **v} for row, v in contents.items()]
+                continue
+            if item == 'pn':
+                added_metadata[item] = f'{contents}-{metadata.get("sheet_name")}'
+                continue
+
+            added_metadata[item] = contents
+            #if isinstance(contents, (str, int, float)):
+            #    replacements[str(item)] = html_line_breaks(str(contents))
+            #elif isinstance(contents, Dict):  # useful for authors, revisions
+            #    for index, (category, entry) in enumerate(contents.items()):
+            #        if isinstance(entry, Dict):
+            #            replacements[f"{item}_{index+1}"] = str(category)
+            #            for entry_key, entry_value in entry.items():
+            #                replacements[
+            #                    f"{item}_{index+1}_{entry_key}"
+            #                ] = html_line_breaks(str(entry_value))
+
 
         replacements[
             "sheetsize_default"
         ] = f'{metadata.get("template", {}).get("sheetsize", "sheetsize_default")}'
         # include quotes so no replacement happens within <style> definition
+
+    for i in range(replacements["titleblock_rows"]-len(added_metadata['revisions'])-1):
+        added_metadata['revisions'].append({})
+    added_metadata['revisions'].reverse()
+    for i in range(4-len(added_metadata['authors'])):
+        added_metadata['authors'].append({})
+    replacements = {**replacements, **added_metadata}
+
+    # Add logo
+    #if 'logo' in replacements:
+    #    #import pdb;pdb.set_trace()
+    #    replacements['logo'] = f'<img class=logo src={logo_path} alt="Company Logo"/>'
+
 
     # prepare titleblock
     titleblock_template = get_template_html("titleblock")

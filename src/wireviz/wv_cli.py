@@ -129,7 +129,7 @@ def cli(file, format, prepend, output_dir, output_name, version):
             raise Exception(f"Path is not a file:\n{file}")
 
         extra_metadata = {}
-        extra_metadata["name"] = file.stem
+        extra_metadata["sheet_name"] = file.stem
         extra_metadata["sheet_total"] = len(filepaths)
         extra_metadata["sheet_current"] = sheet_current
         sheet_current += 1
