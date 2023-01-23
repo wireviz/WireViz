@@ -4,3 +4,4 @@ pillow
 pyyaml
 setuptools
 tabulate
+jinja2

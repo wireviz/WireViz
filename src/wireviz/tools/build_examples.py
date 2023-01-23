@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from click.testing import CliRunner
 import os
 import sys
 from pathlib import Path
@@ -9,26 +10,27 @@ from pathlib import Path
 script_path = Path(__file__).absolute()
 sys.path.insert(0, str(script_path.parent.parent.parent))  # to find wireviz module
 
-from wireviz import APP_NAME, __version__, wireviz
+from wireviz import APP_NAME, __version__
+from wireviz.wv_cli import cli
 from wireviz.wv_utils import open_file_append, open_file_read, open_file_write
 
-dir = script_path.parent.parent.parent.parent
+base_dir = script_path.parent.parent.parent.parent
 readme = "readme.md"
 groups = {
     "examples": {
-        "path": dir / "examples",
+        "path": base_dir / "examples",
         "prefix": "ex",
         readme: [],  # Include no files
         "title": "Example Gallery",
     },
     "tutorial": {
-        "path": dir / "tutorial",
+        "path": base_dir / "tutorial",
         "prefix": "tutorial",
         readme: ["md", "yml"],  # Include .md and .yml files
         "title": f"{APP_NAME} Tutorial",
     },
     "demos": {
-        "path": dir / "examples",
+        "path": base_dir / "examples",
         "prefix": "demo",
     },
 }
@@ -51,6 +53,7 @@ def collect_filenames(description, groupkey, ext_list):
 
 
 def build_generated(groupkeys):
+    runner = CliRunner()
     for key in groupkeys:
         # preparation
         path = groups[key]["path"]
@@ -62,9 +65,13 @@ def build_generated(groupkeys):
                 out.write(f'# {groups[key]["title"]}\n\n')
         # collect and iterate input YAML files
         for yaml_file in collect_filenames("Building", key, input_extensions):
-            print(f'  "{yaml_file}"')
-            wireviz.parse(yaml_file, output_formats=("gv", "html", "png", "svg", "tsv"))
+            res = runner.invoke(cli, args=[
+                '--format', 'ghpst',
+                str(yaml_file)
+            ])
+            if res.exit_code != 0:
 
+                raise RuntimeError(f'Cli failed for {yaml_file} with result: {res}') from res.exception
             if build_readme:
                 i = "".join(filter(str.isdigit, yaml_file.stem))
 

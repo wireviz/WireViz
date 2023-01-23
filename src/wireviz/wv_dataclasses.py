@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from collections import namedtuple
 from dataclasses import dataclass, field
 from enum import Enum
 from itertools import zip_longest
-import logging
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from wireviz.wv_bom import (
@@ -576,7 +576,9 @@ class Cable(TopLevelGraphicalComponent):
     def gauge_str(self):
         if not self.gauge:
             return None
-        number = int(self.gauge.number) if self.gauge.unit == 'AWG' else self.gauge.number
+        number = (
+            int(self.gauge.number) if self.gauge.unit == "AWG" else self.gauge.number
+        )
         actual_gauge = f"{number} {self.gauge.unit}"
         actual_gauge = actual_gauge.replace("mm2", "mm\u00B2")
         return actual_gauge
@@ -631,59 +633,60 @@ class Cable(TopLevelGraphicalComponent):
             return desc
 
     belden_color = {
-        'BN': '001',
-        'RD': '002',
-        'OG': '003',
-        'YE': '004',
-        'GN': '005',
-        'TQ': '006', # (For Belden: light blue. For WireViz: turquoise)
-        'VT': '007',
-        'GY': '008',
-        'WH': '009',
-        'BK': '010',
-        'BG': '011',
-        'PK': '012',
-        'BU': '013',
-        'BKRD':'015', # (for Belden: white/red)
-        'BKGN':'016', # (for Belden: white/green)
-        'BKYE':'017', # (for Belden: white/yellow)
-        'BKBU':'018', # (for Belden: white/blue)
-        'BKBN':'019', # (for Belden: white/brown)
-        'BKOG':'020', # (for Belden: white/orange)
-        'BKGY':'021', # (for Belden: white/gray)
-        'BKVT':'022', # (for Belden: white/purple)
+        "BN": "001",
+        "RD": "002",
+        "OG": "003",
+        "YE": "004",
+        "GN": "005",
+        "TQ": "006",  # (For Belden: light blue. For WireViz: turquoise)
+        "VT": "007",
+        "GY": "008",
+        "WH": "009",
+        "BK": "010",
+        "BG": "011",
+        "PK": "012",
+        "BU": "013",
+        "BKRD": "015",  # (for Belden: white/red)
+        "BKGN": "016",  # (for Belden: white/green)
+        "BKYE": "017",  # (for Belden: white/yellow)
+        "BKBU": "018",  # (for Belden: white/blue)
+        "BKBN": "019",  # (for Belden: white/brown)
+        "BKOG": "020",  # (for Belden: white/orange)
+        "BKGY": "021",  # (for Belden: white/gray)
+        "BKVT": "022",  # (for Belden: white/purple)
         # (1) Why use BKRD instead of WHRD, since Belden only sells white/red?
         #    - WHRD is impractical to use in Wireviz (white wire sides on white background does not help with identification)
         #    - BKRD is clearly distinguishable, and comes handy to use in Wireviz, as the representation of a GND rail associated (even twisted, if applicable) with a specific RD signal wire.
         # (2) For all wire colors see:
         # https://www.belden.com/dfsmedia/f1e38517e0cd4caa8b1acb6619890f5e/7806-source/options/view/cabling-solutions-for-industrial-applications-catalog-belden-09-2020#page=153
-
     }
     belden_tfe_base_mpn = {
         # Leftmost in list is the prefered MPN
         # NOTE (lal 2022-12-20):  this prefered MPN is arbitrary ATM
-        '16 AWG': ['83030', '83010'],
-        '18 AWG': ['83029', '83009'],
-        '20 AWG': ['83028', '83027', '83007', '83008'],
-        '22 AWG': ['83025', '83026', '83005', '83006', '83049', '83050'],
-        '24 AWG': ['83023', '83003', '83004', '83047', '83048'],
-        '26 AWG': ['83002', '83046'],
-        '28 AWG': ['83001', '83045'],
-        '30 AWG': ['83000', '83043'],
-        '32 AWG': ['83041'],
+        "16 AWG": ["83030", "83010"],
+        "18 AWG": ["83029", "83009"],
+        "20 AWG": ["83028", "83027", "83007", "83008"],
+        "22 AWG": ["83025", "83026", "83005", "83006", "83049", "83050"],
+        "24 AWG": ["83023", "83003", "83004", "83047", "83048"],
+        "26 AWG": ["83002", "83046"],
+        "28 AWG": ["83001", "83045"],
+        "30 AWG": ["83000", "83043"],
+        "32 AWG": ["83041"],
         # see: https://www.belden.com/dfsmedia/f1e38517e0cd4caa8b1acb6619890f5e/7806-source/options/view/cabling-solutions-for-industrial-applications-catalog-belden-09-2020#page=136
     }
 
     @property
     def is_belden(self):
-        if 'belden' in self.manufacturer.lower():
+        if "belden" in self.manufacturer.lower():
             return True
         return False
 
     def get_belden_color(self, color):
         if color not in self.belden_color:
-            logging.warn(f'No color found in belden colors {list(self.belden_color.keys())} matching {self.color}, defaulting to BK')
-            return self.belden_color['BK']
+            logging.warn(
+                f"No color found in belden colors {list(self.belden_color.keys())} matching {self.color}, defaulting to BK"
+            )
+            return self.belden_color["BK"]
         return self.belden_color[color]
 
     def gen_belden_cable_with_alternate(self, color):
@@ -691,16 +694,18 @@ class Cable(TopLevelGraphicalComponent):
         try:
             parts = self.belden_tfe_base_mpn[self.gauge_str]
         except KeyError:
-            raise ValueError(f'Couldn\'t find a belden TFE wire for wire of {self.gauge_str}')
+            raise ValueError(
+                f"Couldn't find a belden TFE wire for wire of {self.gauge_str}"
+            )
 
         color = self.get_belden_color(color)
 
         if not color:
-            raise ValueError(f'Failed to find a color for property: {self.description}')
+            raise ValueError(f"Failed to find a color for property: {self.description}")
 
         # Create the list of mpn
         roll_length = 100
-        mpn_list = [f'{mpn} {color}{roll_length}' for mpn in parts]
+        mpn_list = [f"{mpn} {color}{roll_length}" for mpn in parts]
 
         main_part = mpn_list[0]
         alternates = mpn_list[1:] if len(mpn_list) > 1 else []
@@ -712,11 +717,15 @@ class Cable(TopLevelGraphicalComponent):
                 main_part, alternates = self.gen_belden_cable_with_alternate(color)
                 return main_part
                 if alternates:
-                    logging.info(f'Alternate part{"s" if len(alternates) > 1 else ""} available for {self.gauge_str}, color {self.color}: {alternates}')
+                    logging.info(
+                        f'Alternate part{"s" if len(alternates) > 1 else ""} available for {self.gauge_str}, color {self.color}: {alternates}'
+                    )
             else:
-                logging.info(f'Not updating part for manufacturer {self.manufacturer}, only "belden" supported')
+                logging.info(
+                    f'Not updating part for manufacturer {self.manufacturer}, only "belden" supported'
+                )
         else:
-            logging.info(f'Not updating part, no manufacturer provided')
+            logging.info(f"Not updating part, no manufacturer provided")
         return mpn
 
     def _get_wire_partnumber(self, idx, color) -> PartNumberInfo:
@@ -725,8 +734,8 @@ class Cable(TopLevelGraphicalComponent):
 
         # TODO: possibly make more robust/elegant
         if self.category == "bundle":
-            manufacturer =  _get_correct_element(self.partnumbers.manufacturer, idx),
-            mpn = _get_correct_element(self.partnumbers.mpn, idx),
+            manufacturer = (_get_correct_element(self.partnumbers.manufacturer, idx),)
+            mpn = (_get_correct_element(self.partnumbers.mpn, idx),)
             if color is not None:
                 mpn = self.get_mpn_if_belden(manufacturer, mpn, color.code_en)
 

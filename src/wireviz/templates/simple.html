@@ -2,7 +2,7 @@
 <html lang="en"><head>
   <meta charset="UTF-8">
   <meta name="generator" content="<!-- %generator% -->">
-  <title><!-- %title% --></title>
+  <title>{{ title }}</title>
   <style>
 
     #bom table, th, td {
@@ -20,26 +20,26 @@
     }
 
   </style>
-</head><body style="font-family:<!-- %fontname% -->;background-color:<!-- %bgcolor% -->">
-<h1><!-- %title% --></h1>
+  </head><body style="font-family:{{ fontname }};background-color:{{ bgcolor }}">
+<h1>{{ title }}</h1>
 <h2>Diagram</h2>
 
 <div id="description">
-  <!-- %description% -->
+  {{ description }}
 </div>
 
 <div id="diagram">
-  <!-- %diagram% -->
+  {{ diagram }}
 </div>
 
 <div id="notes">
-  <!-- %notes% -->
+  {{ notes }}
 </div>
 
 <h2>Bill of Materials</h2>
 
 <div id="bom">
-  <!-- %bom% -->
+  {{ bom }}
 </div>
 
 </body></html>

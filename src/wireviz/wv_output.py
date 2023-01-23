@@ -5,15 +5,12 @@ import re
 from pathlib import Path
 from typing import Dict, List, Union
 
+import jinja2
+
 import wireviz  # for doing wireviz.__file__
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.wv_dataclasses import Metadata, Options
-from wireviz.wv_utils import (
-    html_line_breaks,
-    open_file_read,
-    open_file_write,
-    smart_file_resolve,
-)
+from wireviz.wv_utils import html_line_breaks, open_file_read, open_file_write
 
 mime_subtype_replacements = {"jpg": "jpeg", "tif": "tiff"}
 
@@ -62,27 +59,24 @@ def embed_svg_images_file(
         filename_out.replace(filename_in)
 
 
+def get_template_html(template_name):
+    template_file_path = jinja2.FileSystemLoader(
+        Path(wireviz.__file__).parent / "templates"
+    )
+    jinja_env = jinja2.Environment(loader=template_file_path)
+
+    return jinja_env.get_template(template_name + ".html")
+
+
 def generate_html_output(
     filename: Union[str, Path],
     bom: List[List[str]],
     metadata: Metadata,
     options: Options,
 ):
-
-    # load HTML template
-    templatename = metadata.get("template", {}).get("name")
-    if templatename:
-        # if relative path to template was provided,
-        # check directory of YAML file first, fall back to built-in template directory
-        templatefile = smart_file_resolve(
-            f"{templatename}.html",
-            [Path(filename).parent, Path(__file__).parent / "templates"],
-        )
-    else:
-        # fall back to built-in simple template if no template was provided
-        templatefile = Path(wireviz.__file__).parent / "templates/simple.html"
-
-    html = open_file_read(templatefile).read()
+    print("Generating html output")
+    template_name = metadata.get("template", {}).get("name", "simple")
+    page_template = get_template_html(template_name)
 
     # embed SVG diagram
     with open_file_read(f"{filename}.tmp.svg") as file:
@@ -122,51 +116,46 @@ def generate_html_output(
     )
 
     if metadata:
-        sheet_current = metadata['sheet_current']
-        sheet_total = metadata['sheet_total']
+        sheet_current = metadata["sheet_current"]
+        sheet_total = metadata["sheet_total"]
     else:
         sheet_current = 1
         sheet_total = 1
 
-    # prepare simple replacements
     replacements = {
-        "<!-- %generator% -->": f"{APP_NAME} {__version__} - {APP_URL}",
-        "<!-- %fontname% -->": options.fontname,
-        "<!-- %bgcolor% -->": options.bgcolor.html,
-        "<!-- %diagram% -->": svgdata,
-        "<!-- %bom% -->": bom_html,
-        "<!-- %bom_reversed% -->": bom_html_reversed,
-        "<!-- %sheet_current% -->": sheet_current,
-        "<!-- %sheet_total% -->": sheet_total,
+        "title": "pizza",
+        "generator": f"{APP_NAME} {__version__} - {APP_URL}",
+        "fontname": options.fontname,
+        "bgcolor": options.bgcolor.html,
+        "diagram": svgdata,
+        "bom": bom_html,
+        "bom_reversed": bom_html_reversed,
+        "sheet_current": sheet_current,
+        "sheet_total": sheet_total,
     }
 
     # prepare metadata replacements
     if metadata:
         for item, contents in metadata.items():
             if isinstance(contents, (str, int, float)):
-                replacements[f"<!-- %{item}% -->"] = html_line_breaks(str(contents))
+                replacements[str(item)] = html_line_breaks(str(contents))
             elif isinstance(contents, Dict):  # useful for authors, revisions
                 for index, (category, entry) in enumerate(contents.items()):
                     if isinstance(entry, Dict):
-                        replacements[f"<!-- %{item}_{index+1}% -->"] = str(category)
+                        replacements[f"{item}_{index+1}"] = str(category)
                         for entry_key, entry_value in entry.items():
                             replacements[
-                                f"<!-- %{item}_{index+1}_{entry_key}% -->"
+                                f"{item}_{index+1}_{entry_key}"
                             ] = html_line_breaks(str(entry_value))
 
-        replacements['"sheetsize_default"'] = '"{}"'.format(
-            metadata.get("template", {}).get("sheetsize", "")
-        )
+        replacements[
+            "sheetsize_default"
+        ] = f'{metadata.get("template", {}).get("sheetsize", "sheetsize_default")}'
         # include quotes so no replacement happens within <style> definition
 
-    # perform replacements
-    # regex replacement adapted from:
-    # https://gist.github.com/bgusach/a967e0587d6e01e889fd1d776c5f3729
+    # prepare titleblock
+    titleblock_template = get_template_html("titleblock")
+    replacements["titleblock"] = titleblock_template.render(replacements)
 
-    # longer replacements first, just in case
-    replacements_sorted = sorted(replacements, key=len, reverse=True)
-    replacements_escaped = map(re.escape, replacements_sorted)
-    pattern = re.compile("|".join(replacements_escaped))
-    html = pattern.sub(lambda match: replacements[match.group(0)], html)
-
-    open_file_write(f"{filename}.html").write(html)
+    page_rendered = page_template.render(replacements)
+    open_file_write(f"{filename}.html").write(page_rendered)

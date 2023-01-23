@@ -111,8 +111,7 @@ def bom_list(bom):
 
         all_designators = sorted(entry["designators"])
         if len(all_designators) > MAX_DESIGNATORS:
-            all_designators = all_designators[:MAX_DESIGNATORS] + ['...']
-
+            all_designators = all_designators[:MAX_DESIGNATORS] + ["..."]
 
         cells = [
             entry["id"],
@@ -129,8 +128,8 @@ def bom_list(bom):
                     hash.partnumbers.pn,
                     hash.partnumbers.manufacturer,
                     hash.partnumbers.mpn,
-                    None, #hash.partnumbers.supplier,
-                    None, #hash.partnumbers.spn,
+                    None,  # hash.partnumbers.supplier,
+                    None,  # hash.partnumbers.spn,
                 ]
             )
         else:
