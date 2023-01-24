@@ -15,7 +15,6 @@ MAX_DESCRIPTION = 40
 
 BomEntry = namedtuple("BomEntry", "category qty designators")
 BomHash = namedtuple("BomHash", BOM_HASH_FIELDS)
-BomHashList = namedtuple("BomHashList", BOM_HASH_FIELDS)
 PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn")
 
 # TODO: different BOM modes

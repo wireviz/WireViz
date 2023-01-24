@@ -30,6 +30,7 @@ def parse(
     output_name: Union[None, str] = None,
     image_paths: Union[Path, str, List] = [],
     extra_metadata: Dict = {},
+    shared_bom: Dict = {},
 ) -> Any:
     """
     This function takes an input, parses it as a WireViz Harness file,
@@ -114,6 +115,7 @@ def parse(
         metadata=Metadata(**yaml_data.get("metadata", {}), **extra_metadata),
         options=Options(**yaml_data.get("options", {})),
         tweak=Tweak(**yaml_data.get("tweak", {})),
+        shared_bom=shared_bom,
     )
     # others
     # store mapping of components to their respective template

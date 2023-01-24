@@ -3,7 +3,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from graphviz import Graph
 
@@ -45,6 +45,7 @@ class Harness:
     options: Options
     tweak: Tweak
     additional_bom_items: List[AdditionalComponent] = field(default_factory=list)
+    shared_bom: Dict = field(default_factory=dict)
 
     def __post_init__(self):
         self.connectors = {}
@@ -119,9 +120,21 @@ class Harness:
                 ),  # x[0] = key, x[1] = value
             )
         )
-        # assign BOM IDs
-        for id, key in enumerate(self.bom.keys(), 1):
-            self.bom[key]["id"] = id
+
+        next_id = len(self.shared_bom) + 1
+        # TODO: for each harness, track a (harness_name, qty) pair
+        for key, values in self.bom.items():
+            if key in self.shared_bom:
+                self.shared_bom[key]["qty"] += values["qty"]
+                values["id"] = self.shared_bom[key]["id"]
+                continue
+            self.shared_bom[key] = values
+            self.shared_bom[key]["id"] = next_id
+            values["id"] = next_id
+            next_id += 1
+
+        # print(f'bom length: {len(self.bom)}, shared_bom length: {len(self.shared_bom)}') # for debugging
+
         # set BOM IDs within components (for BOM bubbles)
         for item in all_bom_relevant_items:
             if item.ignore_in_bom:
@@ -131,6 +144,12 @@ class Harness:
                 continue
             item.bom_id = self.bom[item.bom_hash]["id"]
 
+        self.bom = dict(
+            sorted(
+                self.bom.items(),
+                key=lambda x: (x[1]["id"],),
+            )
+        )
         # print_bom_table(self.bom)  # for debugging
 
     def _add_to_internal_bom(self, item: Component):
@@ -412,6 +431,11 @@ class Harness:
         if "csv" in fmt:
             # TODO: implement CSV output (preferrably using CSV library)
             print("CSV output is not yet supported")
+        if "shared_bom" in fmt:
+            shared_bomlist = bom_list(self.shared_bom)
+            shared_bom_tsv = bom2tsv(shared_bomlist)
+            open_file_write(f"{filename}.tsv").write(shared_bom_tsv)
+
         # HTML output
         if "html" in fmt:
             generate_html_output(filename, bomlist, self.metadata, self.options)

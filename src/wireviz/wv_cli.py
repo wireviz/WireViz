@@ -21,6 +21,7 @@ format_codes = {
     "P": "pdf",
     "s": "svg",
     "t": "tsv",
+    "b": "shared_bom",
 }
 
 
@@ -119,6 +120,8 @@ def cli(file, format, prepend, output_dir, output_name, version):
     else:
         prepend_input = ""
 
+    harness = None
+    shared_bom = {}
     sheet_current = 1
     # run WireVIz on each input file
     for file in filepaths:
@@ -151,14 +154,20 @@ def cli(file, format, prepend, output_dir, output_name, version):
         for p in prepend:
             image_paths.add(Path(p).parent)
 
-        wv.parse(
+        harness = wv.parse(
             yaml_input,
-            output_formats=output_formats,
+            return_types=("harness"),
+            output_formats=[f for f in output_formats if f != "shared_bom"],
             output_dir=_output_dir,
             output_name=_output_name,
             image_paths=list(image_paths),
             extra_metadata=extra_metadata,
+            shared_bom=shared_bom,
         )
+    if "shared_bom" in output_formats:
+        _output_dir = file.parent if not output_dir else output_dir
+        harness.output(str(Path(_output_dir) / "shared_bom"), fmt="shared_bom")
+        shared_bom = harness.shared_bom
 
     print()  # blank line after execution
 
