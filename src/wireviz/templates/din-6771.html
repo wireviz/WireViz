@@ -73,98 +73,6 @@
       transform: translateY(-50%);
     }
 
-    #titleblock {
-      position: absolute;
-      bottom: 0mm;
-      right: -0mm;
-    }
-
-    #titleblock {
-      width: 180mm;
-      height: 38.25mm;
-    }
-
-    #titleblock tr, #bom tr {
-      height: 4.25mm;
-    }
-
-    .A4 #bom { /* BOM on top of title block */
-      position: absolute;
-      bottom: 38.25mm;
-      right: 0;
-    }
-
-    .A3 #bom, .A2 #bom { /* BOM to the left of title block */
-      position: absolute;
-      bottom: 0mm;
-      left: 0mm;
-    }
-
-    #bom table {
-      width:180mm;
-    }
-
-    #bom tr:nth-child(odd) {
-      background-color: #EEEEEE
-    }
-
-    #bom th, td {
-      text-align: left;
-    }
-
-    #bom .bom_col_id {
-      text-align: center;
-    }
-
-    #bom .bom_col_qty {
-      text-align: right;
-    }
-
-    .name {
-      width: 16mm;
-    }
-
-    .date {
-      width: 10mm;
-    }
-
-    .revno {
-      text-align: center;
-      width: 6mm;
-    }
-
-    .changelog {
-      width: 22mm;
-    }
-
-    .process {
-      width: 18mm;
-    }
-
-    .title {
-      width: 82mm;
-      font-size: 5.6mm;
-      text-align: center;
-      white-space: normal;
-    }
-
-    .company {
-      font-size: 3mm;
-      text-align: center;
-      white-space: normal;
-    }
-
-    .partno {
-      font-size: 4mm;
-      text-align: center;
-      white-space: normal;
-    }
-
-    .sheetno {
-      width: 12.75mm;
-      text-align: center;
-    }
-
   </style>
   <style type="text/css" media="print">
 
@@ -183,7 +91,7 @@
 </head>
 <body>
   <div id="page">
-    <div id="frame" class={{ sheetsize_default }}>
+    <div id="frame" class={{ sheetsize }}>
 
       <div id="diagram">
 
@@ -199,10 +107,7 @@
 
       </div>
 
-      <div id="bom">
-        {{ bom_reversed }}
-      </div>
-
+      {{ bom }}
       {{ titleblock }}
     </div> <!-- /frame -->
   </div> <!-- /page -->
