@@ -1,13 +1,80 @@
+<style>
+  #titleblock {
+    position: absolute;
+    bottom: 0mm;
+    right: -0mm;
+  }
+
+  #titleblock {
+    width: 180mm;
+    height: 38.25mm;
+  }
+
+  #titleblock table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+
+  #titleblock tr {
+    height: 4.25mm;
+  }
+
+  #titleblock .name {
+    width: 16mm;
+  }
+
+  #titleblock .date {
+    width: 10mm;
+  }
+
+  #titleblock .revno {
+    text-align: center;
+    width: 6mm;
+  }
+
+  #titleblock .changelog {
+    width: 22mm;
+  }
+
+  #titleblock .process {
+    width: 18mm;
+  }
+
+  #titleblock .title {
+    width: 82mm;
+    font-size: 5.6mm;
+    text-align: center;
+    white-space: normal;
+  }
+
+  #titleblock .company {
+    font-size: 3mm;
+    text-align: center;
+    white-space: normal;
+  }
+
+  #titleblock .partno {
+    font-size: 4mm;
+    text-align: center;
+    white-space: normal;
+  }
+
+  #titleblock .sheetno {
+    width: 12.75mm;
+    text-align: center;
+  }
+</style>
 
 <!-- REVISION GENERATION MACRO --!>
 {% macro revision(row) -%}
+    {% set index = 8 - row %}
     {% if row == 9 %}
       <td class={{ rev }}><b>Rev</td>
       <td class={{ changelog }}><b>Date</td>
       <td class={{ date }}><b>Name</td>
       <td class={{ name }}><b>Changelog</td>
-    {% elif revisions|length >= row %}
-      {% set revision = revisions[row-1] %}
+    {% elif revisions|length > index %}
+      {% set revision = revisions[index] %}
       <td class=rev> {{ revision.rev }} </td>
       <td class=date> {{ revision.date }} </td>
       <td class=name> {{ revision.name }} </td>
@@ -38,7 +105,6 @@
     <td></td>
   {% endif %}
 {%- endmacro %}
-
 
 <!-- START OF TEMPLATE --!>
 <div id="titleblock">
