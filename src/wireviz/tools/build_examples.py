@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-from click.testing import CliRunner
+import click
 import os
 import sys
 from pathlib import Path
@@ -53,7 +53,6 @@ def collect_filenames(description, groupkey, ext_list):
 
 
 def build_generated(groupkeys):
-    runner = CliRunner()
     for key in groupkeys:
         # preparation
         path = groups[key]["path"]
@@ -65,13 +64,12 @@ def build_generated(groupkeys):
                 out.write(f'# {groups[key]["title"]}\n\n')
         # collect and iterate input YAML files
         for yaml_file in collect_filenames("Building", key, input_extensions):
-            res = runner.invoke(cli, args=[
-                '--format', 'ghpst',
-                str(yaml_file)
-            ])
-            if res.exit_code != 0:
+            try:
+                res = cli(['--format', 'ghpst', str(yaml_file)])
+            except BaseException as e:
+                if str(e) != '0' and not isinstance(e, (click.ClickException, SystemExit)):
+                    raise
 
-                raise RuntimeError(f'Cli failed for {yaml_file} with result: {res}') from res.exception
             if build_readme:
                 i = "".join(filter(str.isdigit, yaml_file.stem))
 
