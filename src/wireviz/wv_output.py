@@ -8,7 +8,6 @@ from typing import List, Union
 import jinja2
 
 import wireviz  # for doing wireviz.__file__
-from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.wv_dataclasses import Metadata, Options
 
 mime_subtype_replacements = {"jpg": "jpeg", "tif": "tiff"}
@@ -87,31 +86,14 @@ def generate_html_output(
 
     # generate BOM table
     # generate BOM header (may be at the top or bottom of the table)
-    bom_header_html = "  <tr>\n"
-    for item in bom[0]:
-        th_class = f"bom_col_{item.lower()}"
-        bom_header_html = f'{bom_header_html}    <th class="{th_class}">{item}</th>\n'
-    bom_header_html = f"{bom_header_html}  </tr>\n"
-
-    # generate BOM contents
-    bom_contents = []
-    for row in bom[1:]:
-        row_html = "  <tr>\n"
-        for i, item in enumerate(row):
-            td_class = f"bom_col_{bom[0][i].lower()}"
-            row_html = f'{row_html}    <td class="{td_class}">{item if item is not None else ""}</td>\n'
-        row_html = f"{row_html}  </tr>\n"
-        bom_contents.append(row_html)
-
-    bom_html = (
-        '<table class="bom">\n' + bom_header_html + "".join(bom_contents) + "</table>\n"
-    )
-    bom_html_reversed = (
-        '<table class="bom">\n'
-        + "".join(list(reversed(bom_contents)))
-        + bom_header_html
-        + "</table>\n"
-    )
+    bom_reversed = False if template_name == "simple" else True
+    bom_header = bom[0]
+    bom_columns = [
+        "bom_col_{}".format("id" if c == "#" else c.lower()) for c in bom_header
+    ]
+    bom_content = bom[1:]
+    if bom_reversed:
+        bom_content.reverse()
 
     if metadata:
         sheet_current = metadata["sheet_current"]
@@ -121,21 +103,23 @@ def generate_html_output(
         sheet_total = 1
 
     replacements = {
-        "generator": f"{APP_NAME} {__version__} - {APP_URL}",
+        "generator": f"{wireviz.APP_NAME} {wireviz.__version__} - {wireviz.APP_URL}",
         "fontname": options.fontname,
         "bgcolor": options.bgcolor.html,
         "diagram": svgdata,
-        "bom": bom_html,
-        "bom_reversed": bom_html_reversed,
         "sheet_current": sheet_current,
         "sheet_total": sheet_total,
-        "titleblock_rows": 9,
+        "bom_reversed": bom_reversed,
+        "bom_header": bom_header,
+        "bom_content": bom_content,
+        "bom_columns": bom_columns,
     }
 
     # prepare metadata replacements
     added_metadata = {
         "revisions": [],
         "authors": [],
+        "sheetsize": "sheetsize_default",
     }
     if metadata:
         for item, contents in metadata.items():
@@ -143,31 +127,24 @@ def generate_html_output(
                 added_metadata["revisions"] = [
                     {"rev": rev, **v} for rev, v in contents.items()
                 ]
-                continue
-            if item == "authors":
+            elif item == "authors":
                 added_metadata["authors"] = [
                     {"row": row, **v} for row, v in contents.items()
                 ]
-                continue
-            if item == "pn":
+            elif item == "pn":
                 added_metadata[item] = f'{contents}-{metadata.get("sheet_name")}'
-                continue
+            elif item == "template":
+                added_metadata["sheetsize"] = contents.get(
+                    "sheetsize", "sheetsize_default"
+                )
+            else:
+                added_metadata[item] = contents
 
-            added_metadata[item] = contents
-
-        replacements[
-            "sheetsize_default"
-        ] = f'{metadata.get("template", {}).get("sheetsize", "sheetsize_default")}'
-        # include quotes so no replacement happens within <style> definition
-
-    for i in range(
-        replacements["titleblock_rows"] - len(added_metadata["revisions"]) - 1
-    ):
-        added_metadata["revisions"].append({})
-    added_metadata["revisions"].reverse()
-    for i in range(4 - len(added_metadata["authors"])):
-        added_metadata["authors"].append({})
     replacements = {**replacements, **added_metadata}
+
+    # prepare BOM
+    bom_template = get_template_html("bom")
+    replacements["bom"] = bom_template.render(replacements)
 
     # prepare titleblock
     titleblock_template = get_template_html("titleblock")
