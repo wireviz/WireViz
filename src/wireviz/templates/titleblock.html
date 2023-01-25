@@ -1,67 +1,126 @@
-<div id="titleblock">
-  <!-- REVISION TABLE --!>
-  <table class=revisions style="float:left" >
-    {% for revision in revisions %}
-      <tr>
-        {% for key in ['rev', 'changelog', 'date', 'name'] %}
-          <td class={{ key }}> {{ revision.get(key, '') }} </td>
-        {% endfor %}
-      </tr>
-    {% endfor %}
-    <tr>
+
+<!-- REVISION GENERATION MACRO --!>
+{% macro revision(row) -%}
+    {% if row == 9 %}
       <td class={{ rev }}><b>Rev</td>
       <td class={{ changelog }}><b>Date</td>
       <td class={{ date }}><b>Name</td>
       <td class={{ name }}><b>Changelog</td>
+    {% elif revisions|length >= row %}
+      {% set revision = revisions[row-1] %}
+      <td class=rev> {{ revision.rev }} </td>
+      <td class=date> {{ revision.date }} </td>
+      <td class=name> {{ revision.name }} </td>
+      <td class=changelog> {{ revision.changelog }} </td>
+    {% else %}
+      <td class=rev> </td>
+      <td class=date> </td>
+      <td class=name> </td>
+      <td class=changelog> </td>
+    {% endif %}
+{%- endmacro %}
+
+<!-- AUTHOR GENERATION MACRO --!>
+{% macro author(row) -%}
+  {% set index = row - 2 %}
+  {% if row == 1 %}
+    <td class="process"></td>
+    <td class="date"><b>Date</b></td>
+    <td class="name"><b>Name</b></td>
+  {% elif authors|length > index %}
+    {% set author = authors[index] %}
+    <td><b> {{ author['row'] }} </b></td>
+    <td>    {{ author['date'] }}</td>
+    <td>    {{ author['name'] }}</td>
+  {% else %}
+    <td></td>
+    <td></td>
+    <td></td>
+  {% endif %}
+{%- endmacro %}
+
+
+<!-- START OF TEMPLATE --!>
+<div id="titleblock">
+  <table>
+    <tr> <!-- ROW 1 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(1) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      {{ author(1) }}
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+      <td class="company" colspan="4" rowspan="2"><b> {{ company }}</b></td>
     </tr>
-  </table>
 
-  <!-- AUTHOR INFO + LOGO TABLE --!>
-  <table class=author_info style="float:left" >
-   <tr>
-     <td class="process"></td>
-     <td class="date"><b>Date</b></td>
-     <td class="name"><b>Name</b></td>
-   </tr>
-   {% for author in authors %}
-   <tr>
-     <td><b>{{ author['row'] }}</b></td>
-     <td> {{ author['date'] }}</td>
-     <td> {{ author['name'] }}</td>
-   </tr>
-   {% endfor %}
-   <tr>
-     <td class="logo" colspan="3" rowspan="4" >
-      <img src={{ logo }} alt="" style="height:auto; width:150px;display:block;margin-left:auto;margin-right:auto" />
-     </td>
-   </tr>
-   <tr></tr>
-   <tr></tr>
-   <tr></tr>
-  </table>
+    <tr> <!-- ROW 2 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(2) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      {{ author(2) }}
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+    </tr>
 
-  <!-- HARNESS INFO TABLE --!>
-  <table class=harness_info>
-   <tr>
-   <td class="company" colspan="4" rowspan="2"><b> {{ company }}</b></td>
-   </tr>
-   <tr></tr>
-   <tr>
-     <td class="company" colspan="4" rowspan="2"> {{ address }}</td>
-   </tr>
-   <tr></tr>
-   <tr>
-     <td class="title" colspan="4" rowspan="2"> {{ title }}</td>
-   </tr>
-   <tr></tr>
-   <tr>
-     <td class="partno" colspan="3" rowspan="3"> {{ pn }}</td>
-     <td class="revision" colspan="1" rowspan="2"> {{ revision }}</td>
-   </tr>
-   <tr></tr>
-   <tr>
-     <td class="sheetno" colspan="1">Sheet {{ sheet_current }} of {{ sheet_total }}</td>
-   </tr>
-  </table>
-</div> <!--/titleblock --!>
+    <tr> <!-- ROW 3 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(3) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      {{ author(3) }}
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+      <td class="address" colspan="4" rowspan="2"><small> {{ address }}</small></td>
+    </tr>
 
+    <tr> <!-- ROW 4 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(4) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      {{ author(4) }}
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+    </tr>
+
+    <tr> <!-- ROW 5 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(5) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      {{ author(5) }}
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+      <td class="title" colspan="4" rowspan="2"> {{ title }}</td>
+    </tr>
+
+    <tr> <!-- ROW 6 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(6) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      <td class="logo" colspan="3" rowspan="4" >
+       {% if logo %}
+         <img src={{ logo }} alt="" style="height:auto; width:150px;display:block;margin-left:auto;margin-right:auto" />
+       {% endif %}
+      </td>
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+    </tr>
+
+    <tr> <!-- ROW 7 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(7) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+      <td class="partno" colspan="3" rowspan="3"> {{ pn }}</td>
+      <td class="revision" colspan="1" rowspan="2"> {{ revision }}</td>
+    </tr>
+
+    <tr> <!-- ROW 8 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(8) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+    </tr>
+
+    <tr> <!-- ROW 9 --!>
+      <!-- REVISIONS            Column 1 to 4 --!>
+      {{ revision(9) }}
+      <!-- AUTHOR INFO + LOGO   Column 5 to 7 --!>
+      <!-- HARNESS INFO         Column 8 to 10 --!>
+      <td class="sheetno" colspan="1">Sheet {{ sheet_current }} of {{ sheet_total }}</td>
+    </tr>
+
+  </table>
+</div>  <!-- /titleblock --!>
