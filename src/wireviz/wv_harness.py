@@ -36,7 +36,7 @@ from wireviz.wv_graphviz import (
     set_dot_basics,
 )
 from wireviz.wv_output import embed_svg_images_file, generate_html_output
-from wireviz.wv_utils import bom2tsv, open_file_write
+from wireviz.wv_utils import bom2tsv
 
 
 @dataclass
@@ -407,35 +407,32 @@ class Harness:
     ) -> None:
         # graphical output
         graph = self.graph
+
+        rendered = set()
         for f in fmt:
             if f in ("png", "svg", "html"):
                 if f == "html":  # if HTML format is specified,
                     f = "svg"  # generate SVG for embedding into HTML
                 # SVG file will be renamed/deleted later
-                _filename = f"{filename}.tmp" if f == "svg" else filename
-                # TODO: prevent rendering SVG twice when both SVG and HTML are specified
+                if f in rendered:
+                    continue
                 graph.format = f
-                graph.render(filename=_filename, view=view, cleanup=cleanup)
+                graph.render(filename=filename, view=view, cleanup=cleanup)
+                rendered.add(f)
         # embed images into SVG output
         if "svg" in fmt or "html" in fmt:
-            embed_svg_images_file(f"{filename}.tmp.svg")
+            embed_svg_images_file(filename.with_suffix(".svg"))
         # GraphViz output
         if "gv" in fmt:
-            graph.save(filename=f"{filename}.gv")
+            graph.save(filename=filename.with_suffix(".gv"))
         # BOM output
         bomlist = bom_list(self.bom)
-        # bomlist = [[]]
         if "tsv" in fmt:
-            tsv = bom2tsv(bomlist)
-            open_file_write(f"{filename}.tsv").write(tsv)
+            bom_tsv = bom2tsv(bomlist)
+            filename.with_suffix(".tsv").open("w").write(bom_tsv)
         if "csv" in fmt:
             # TODO: implement CSV output (preferrably using CSV library)
             print("CSV output is not yet supported")
-        if "shared_bom" in fmt:
-            shared_bomlist = bom_list(self.shared_bom)
-            shared_bom_tsv = bom2tsv(shared_bomlist)
-            open_file_write(f"{filename}.tsv").write(shared_bom_tsv)
-
         # HTML output
         if "html" in fmt:
             generate_html_output(filename, bomlist, self.metadata, self.options)
@@ -446,6 +443,4 @@ class Harness:
         # delete SVG if not needed
         if "html" in fmt and not "svg" in fmt:
             # SVG file was just needed to generate HTML
-            Path(f"{filename}.tmp.svg").unlink()
-        elif "svg" in fmt:
-            Path(f"{filename}.tmp.svg").replace(f"{filename}.svg")
+            filename.with_suffix(".svg").unlink()

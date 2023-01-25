@@ -10,7 +10,6 @@ import jinja2
 import wireviz  # for doing wireviz.__file__
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.wv_dataclasses import Metadata, Options
-from wireviz.wv_utils import open_file_read, open_file_write
 
 mime_subtype_replacements = {"jpg": "jpeg", "tif": "tiff"}
 
@@ -69,21 +68,20 @@ def get_template_html(template_name):
 
 
 def generate_html_output(
-    filename: Union[str, Path],
+    filename: Path,
     bom: List[List[str]],
     metadata: Metadata,
     options: Options,
 ):
     print("Generating html output")
     template_name = metadata.get("template", {}).get("name", "simple")
-    page_template = get_template_html(template_name)
 
     # embed SVG diagram
-    with open_file_read(f"{filename}.tmp.svg") as file:
+    with filename.with_suffix(".svg").open("r") as f:
         svgdata = re.sub(
             "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
             "<!-- XML and DOCTYPE declarations from SVG file removed -->",
-            file.read(),
+            f.read(),
             1,
         )
 
@@ -175,5 +173,9 @@ def generate_html_output(
     titleblock_template = get_template_html("titleblock")
     replacements["titleblock"] = titleblock_template.render(replacements)
 
+    # generate page template
+    page_template = get_template_html(template_name)
     page_rendered = page_template.render(replacements)
-    open_file_write(f"{filename}.html").write(page_rendered)
+
+    # save generated file
+    filename.with_suffix(".html").open("w").write(page_rendered)

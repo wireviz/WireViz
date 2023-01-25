@@ -11,7 +11,8 @@ if __name__ == "__main__":
 
 import wireviz.wireviz as wv
 from wireviz import APP_NAME, __version__
-from wireviz.wv_utils import open_file_read
+from wireviz.wv_bom import bom_list
+from wireviz.wv_utils import bom2tsv
 
 format_codes = {
     "c": "csv",
@@ -24,19 +25,28 @@ format_codes = {
     "b": "shared_bom",
 }
 
-
 epilog = (
-    "The -f or --format option accepts a string containing one or more of the "
+    "The -f or --formats option accepts a string containing one or more of the "
     "following characters to specify which file types to output:\n"
     + f", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
 )
 
 
 @click.command(epilog=epilog, no_args_is_help=True)
-@click.argument("file", nargs=-1)
+@click.argument(
+    "files",
+    type=click.Path(
+        exists=True,
+        readable=True,
+        dir_okay=False,
+        path_type=Path,
+    ),
+    nargs=-1,
+    required=True,
+)
 @click.option(
     "-f",
-    "--format",
+    "--formats",
     default="hpst",
     type=str,
     show_default=True,
@@ -47,14 +57,25 @@ epilog = (
     "--prepend",
     default=[],
     multiple=True,
-    type=Path,
+    type=click.Path(
+        exists=True,
+        readable=True,
+        file_okay=True,
+        path_type=Path,
+    ),
     help="YAML file to prepend to the input file (optional).",
 )
 @click.option(
     "-o",
     "--output-dir",
     default=None,
-    type=Path,
+    type=click.Path(
+        exists=True,
+        readable=True,
+        file_okay=False,
+        dir_okay=True,
+        path_type=Path,
+    ),
     help="Directory to use for output files, if different from input file directory.",
 )
 @click.option(
@@ -74,100 +95,55 @@ epilog = (
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def cli(file, format, prepend, output_dir, output_name, version):
+def cli(files, formats, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
-    print()  # blank line before execution
-    print(f"{APP_NAME} {__version__}")
     if version:
+        print(f"{APP_NAME} {__version__}")
         return  # print version number only and exit
 
-    # get list of files
-    try:
-        _ = iter(file)
-    except TypeError:
-        filepaths = [file]
-    else:
-        filepaths = list(file)
+    _output_dir = files[0].parent if not output_dir else output_dir
 
     # determine output formats
-    output_formats = []
-    for code in format:
-        if code in format_codes:
-            output_formats.append(format_codes[code])
-        else:
-            raise Exception(f"Unknown output format: {code}")
-    output_formats = tuple(sorted(set(output_formats)))
-    output_formats_str = (
-        f'[{"|".join(output_formats)}]'
-        if len(output_formats) > 1
-        else output_formats[0]
-    )
-
-    # check prepend file
-    if len(prepend) > 0:
-        prepend_input = ""
-        for prepend_file in prepend:
-            prepend_file = Path(prepend_file)
-            if not prepend_file.exists():
-                raise Exception(f"File does not exist:\n{prepend_file}")
-            if not prepend_file.is_file():
-                raise Exception(f"Path is not a file:\n{prepend_file}")
-            print("Prepend file:", prepend_file)
-
-            prepend_input += open_file_read(prepend_file).read() + "\n"
-    else:
-        prepend_input = ""
+    output_formats = {format_codes[f] for f in formats if f in format_codes}
 
     harness = None
     shared_bom = {}
     sheet_current = 1
     # run WireVIz on each input file
-    for file in filepaths:
-        file = Path(file)
-        if not file.exists():
-            raise Exception(f"File does not exist:\n{file}")
-        if not file.is_file():
-            raise Exception(f"Path is not a file:\n{file}")
+    for _file in files:
+        _output_name = _file.stem if not output_name else output_name
+
+        print("Input file:  ", _file)
+        print(
+            "Output file: ",
+            f"{_output_dir / _output_name}.[{'|'.join(output_formats)}]",
+        )
 
         extra_metadata = {}
-        extra_metadata["sheet_name"] = file.stem
-        extra_metadata["sheet_total"] = len(filepaths)
+        extra_metadata["sheet_name"] = _output_name.upper()
+        extra_metadata["sheet_total"] = len(files)
         extra_metadata["sheet_current"] = sheet_current
         sheet_current += 1
 
-        # file_out = file.with_suffix("") if not output_file else output_file
-        _output_dir = file.parent if not output_dir else output_dir
-        _output_name = file.stem if not output_name else output_name
+        file_dir = _file.parent
 
-        print("Input file:  ", file)
-        print(
-            "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
-        )
-
-        yaml_input = open_file_read(file).read()
-        file_dir = file.parent
-
-        yaml_input = prepend_input + yaml_input
-        image_paths = {file_dir}
-        for p in prepend:
-            image_paths.add(Path(p).parent)
-
-        harness = wv.parse(
-            yaml_input,
-            return_types=("harness"),
-            output_formats=[f for f in output_formats if f != "shared_bom"],
+        ret = wv.parse(
+            prepend + (_file,),
+            return_types=("shared_bom"),
+            output_formats=output_formats,
             output_dir=_output_dir,
             output_name=_output_name,
-            image_paths=list(image_paths),
             extra_metadata=extra_metadata,
             shared_bom=shared_bom,
         )
+        shared_bom = ret["shared_bom"]
+
     if "shared_bom" in output_formats:
-        _output_dir = file.parent if not output_dir else output_dir
-        harness.output(str(Path(_output_dir) / "shared_bom"), fmt="shared_bom")
-        shared_bom = harness.shared_bom
+        shared_bomlist = bom_list(shared_bom)
+        shared_bom_tsv = bom2tsv(shared_bomlist)
+        (_output_dir / "shared_bom").with_suffix(".tsv").open("w").write(shared_bom_tsv)
 
     print()  # blank line after execution
 

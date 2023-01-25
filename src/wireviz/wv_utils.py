@@ -117,19 +117,6 @@ def clean_whitespace(inp):
     return " ".join(inp.split()).replace(" ,", ",") if isinstance(inp, str) else inp
 
 
-def open_file_read(filename):
-    # TODO: Intelligently determine encoding
-    return open(filename, "r", encoding="UTF-8")
-
-
-def open_file_write(filename):
-    return open(filename, "w", encoding="UTF-8")
-
-
-def open_file_append(filename):
-    return open(filename, "a", encoding="UTF-8")
-
-
 def is_arrow(inp):
     """
     Matches strings of one or multiple `-` or `=` (but not mixed)
@@ -159,25 +146,20 @@ def aspect_ratio(image_src):
     return 1  # Assume 1:1 when unable to read actual image size
 
 
-def smart_file_resolve(filename: str, possible_paths: (str, List[str])) -> Path:
-    if not isinstance(possible_paths, List):
+def smart_file_resolve(filename: Path, possible_paths: (Path, List[Path])) -> Path:
+    if isinstance(possible_paths, Path) or isinstance(possible_paths, str):
         possible_paths = [possible_paths]
-    filename = Path(filename)
     if filename.is_absolute():
         if filename.exists():
             return filename
         else:
             raise Exception(f"{filename} does not exist.")
     else:  # search all possible paths in decreasing order of precedence
-        possible_paths = [
-            Path(path).resolve() for path in possible_paths if path is not None
-        ]
-        for possible_path in possible_paths:
-            resolved_path = (possible_path / filename).resolve()
-            if resolved_path.exists():
-                return resolved_path
-        else:
-            raise Exception(
-                f"{filename} was not found in any of the following locations: \n"
-                + "\n".join([str(x) for x in possible_paths])
-            )
+        for path in possible_paths:
+            combined_path = (path / filename).resolve()
+            if combined_path.exists():
+                return combined_path
+        raise Exception(
+            f"{filename} was not found in any of the following locations: \n"
+            + "\n".join(str(p) for p in possible_paths)
+        )

@@ -2,17 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import click
 import os
 import sys
 from pathlib import Path
+
+import click
 
 script_path = Path(__file__).absolute()
 sys.path.insert(0, str(script_path.parent.parent.parent))  # to find wireviz module
 
 from wireviz import APP_NAME, __version__
 from wireviz.wv_cli import cli
-from wireviz.wv_utils import open_file_append, open_file_read, open_file_write
 
 base_dir = script_path.parent.parent.parent.parent
 readme = "readme.md"
@@ -60,22 +60,24 @@ def build_generated(groupkeys):
         if build_readme:
             include_readme = "md" in groups[key][readme]
             include_source = "yml" in groups[key][readme]
-            with open_file_write(path / readme) as out:
+            with (path / readme).open("w") as out:
                 out.write(f'# {groups[key]["title"]}\n\n')
         # collect and iterate input YAML files
         for yaml_file in collect_filenames("Building", key, input_extensions):
             try:
-                res = cli(['--format', 'ghpst', str(yaml_file)])
+                res = cli(["--formats", "ghpst", str(yaml_file)])
             except BaseException as e:
-                if str(e) != '0' and not isinstance(e, (click.ClickException, SystemExit)):
+                if str(e) != "0" and not isinstance(
+                    e, (click.ClickException, SystemExit)
+                ):
                     raise
 
             if build_readme:
                 i = "".join(filter(str.isdigit, yaml_file.stem))
 
-                with open_file_append(path / readme) as out:
+                with (path / readme).open("a") as out:
                     if include_readme:
-                        with open_file_read(yaml_file.with_suffix(".md")) as info:
+                        with yaml_file.with_suffix(".md").open("r") as info:
                             for line in info:
                                 out.write(line.replace("## ", f"## {i} - "))
                             out.write("\n\n")
@@ -83,7 +85,7 @@ def build_generated(groupkeys):
                         out.write(f"## Example {i}\n")
 
                     if include_source:
-                        with open_file_read(yaml_file) as src:
+                        with yaml_file.open("r") as src:
                             out.write("```yaml\n")
                             for line in src:
                                 out.write(line)
