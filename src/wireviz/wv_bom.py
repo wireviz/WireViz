@@ -1,21 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from collections import namedtuple
-from enum import Enum, IntEnum
-from typing import List, Optional
+from typing import List
 
 import tabulate as tabulate_module
 
-from wireviz.wv_utils import html_line_breaks
-
-BOM_HASH_FIELDS = "description qty_unit amount partnumbers"
-
-MAX_DESIGNATORS = 2
-MAX_DESCRIPTION = 40
-
-BomEntry = namedtuple("BomEntry", "category qty designators")
-BomHash = namedtuple("BomHash", BOM_HASH_FIELDS)
-PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn")
+from wireviz.wv_dataclasses import PartNumberInfo
 
 # TODO: different BOM modes
 # BomMode
@@ -27,124 +16,43 @@ PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn"
 # "title block in GV graph label"
 
 
-BomCategory = IntEnum(  # to enforce ordering in BOM
-    "BomEntry", "CONNECTOR CABLE WIRE ADDITIONAL_INSIDE ADDITIONAL_OUTSIDE"
-)
-QtyMultiplierConnector = Enum(
-    "QtyMultiplierConnector", "PINCOUNT POPULATED CONNECTIONS"
-)
-QtyMultiplierCable = Enum(
-    "QtyMultiplierCable", "WIRECOUNT TERMINATION LENGTH TOTAL_LENGTH"
-)
-
-PART_NUMBER_HEADERS = PartNumberInfo(
-    pn="P/N", manufacturer=None, mpn="MPN", supplier=None, spn="SPN"
-)
-
-
 def partnumbers2list(
     partnumbers: PartNumberInfo, parent_partnumbers: PartNumberInfo = None
 ) -> List[str]:
-    if parent_partnumbers is None:
-        _is_toplevel = True
-        parent_partnumbers = partnumbers
+    if not isinstance(partnumbers, list):
+        return partnumbers.str_list
+
+    pn = None
+    for p in partnumbers:
+        if pn is None:
+            pn = p.copy()
+        pn = pn.keep_only_eq(p)
+
+    if pn.str_list is None and parent_partnumbers is not None:
+        return parent_partnumbers.str_list
     else:
-        _is_toplevel = False
-
-    # Note: != operator used as XOR in the following section (https://stackoverflow.com/a/433161)
-
-    if _is_toplevel != isinstance(parent_partnumbers.pn, List):
-        # top level and not a list, or wire level and list
-        cell_pn = pn_info_string(PART_NUMBER_HEADERS.pn, None, partnumbers.pn)
-    else:
-        # top level and list -> do per wire later
-        # wire level and not list -> already done at top level
-        cell_pn = None
-
-    if _is_toplevel != isinstance(parent_partnumbers.mpn, List):
-        # TODO: edge case: different manufacturers, but same MPN?
-        cell_mpn = pn_info_string(
-            PART_NUMBER_HEADERS.mpn, partnumbers.manufacturer, partnumbers.mpn
-        )
-    else:
-        cell_mpn = None
-
-    if _is_toplevel != isinstance(parent_partnumbers.spn, List):
-        # TODO: edge case: different suppliers, but same SPN?
-        cell_spn = pn_info_string(
-            PART_NUMBER_HEADERS.spn, partnumbers.supplier, partnumbers.spn
-        )
-    else:
-        cell_spn = None
-
-    cell_contents = [cell_pn, cell_mpn, cell_spn]
-    if any(cell_contents):
-        return [html_line_breaks(cell) for cell in cell_contents]
-    else:
-        return None
-
-
-def pn_info_string(
-    header: str, name: Optional[str], number: Optional[str]
-) -> Optional[str]:
-    """Return the company name and/or the part number in one single string or None otherwise."""
-    number = str(number).strip() if number is not None else ""
-    if name or number:
-        return f'{name if name else header}{": " + number if number else ""}'
-    else:
-        return None
+        return pn.str_list
 
 
 def bom_list(bom):
-    headers = (
-        "# Qty Unit Description Amount Unit Designators "
-        "P/N Manufacturer MPN Supplier SPN Category".split(" ")
-    )
-    rows = []
-    rows.append(headers)
-    # fill rows
-    for hash, entry in bom.items():
-        description = hash.description
-        if len(description) > MAX_DESCRIPTION:
-            description = f"{description[:MAX_DESCRIPTION]} (...)"
+    entries_as_dict = []
+    has_content = set()
+    # First pass, get all bom dict and identify filled columns
+    for entry in bom.values():
+        has_content = has_content.union(entry.bom_defined)
+        entries_as_dict.append(entry.bom_dict)
 
-        all_designators = sorted(entry["designators"])
-        if len(all_designators) > MAX_DESIGNATORS:
-            all_designators = all_designators[:MAX_DESIGNATORS] + ["..."]
+    first_entry = list(bom.values())[0]  # Used for column manipulation
+    keys_with_content = [k for k in first_entry.bom_keys if k in has_content]
+    headers = [first_entry.bom_column(k) for k in keys_with_content]
 
-        cells = [
-            entry["id"],
-            entry["qty"],
-            hash.qty_unit,
-            description,
-            hash.amount.number if hash.amount else None,
-            hash.amount.unit if hash.amount else None,
-            ", ".join(all_designators),
-        ]
-        if hash.partnumbers:
-            cells.extend(
-                [
-                    hash.partnumbers.pn,
-                    hash.partnumbers.manufacturer,
-                    hash.partnumbers.mpn,
-                    None,  # hash.partnumbers.supplier,
-                    None,  # hash.partnumbers.spn,
-                ]
-            )
-        else:
-            cells.extend([None, None, None, None, None])
-        # cells.extend([f"{entry['category']} ({entry['category'].name})"])  # for debugging
-        rows.append(cells)
-    # remove empty columns
-    transposed = list(map(list, zip(*rows)))
-    transposed = [
-        column
-        for column in transposed
-        if any([cell is not None for cell in column[1:]])
-        #                                           ^ ignore header cell in check
-    ]
-    rows = list(map(list, zip(*transposed)))
-    return rows
+    entries_as_list = []
+    for entry in entries_as_dict:
+        entries_as_list.append([v for k, v in entry.items() if k in keys_with_content])
+
+    table = [headers] + entries_as_list
+
+    return table
 
 
 def print_bom_table(bom):
