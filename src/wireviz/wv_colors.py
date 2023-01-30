@@ -101,6 +101,9 @@ class SingleColor:
     def html_padded(self):
         return ":".join([self.html] * padding_amount)
 
+    def __len__(self):
+        return 1
+
     def __bool__(self):
         return self._code_en is not None
 
@@ -166,7 +169,7 @@ class MultiColor:
 
     def __getitem__(self, idx):
         if not self:
-            return None
+            return SingleColor(None)
         else:
             return self.colors[idx % len(self)]
 
