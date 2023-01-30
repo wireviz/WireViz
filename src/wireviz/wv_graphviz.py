@@ -5,7 +5,7 @@ from typing import Any, List, Optional, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.wv_bom import partnumbers2list
-from wireviz.wv_colors import MultiColor
+from wireviz.wv_colors import MultiColor, SingleColor
 from wireviz.wv_dataclasses import (
     ArrowDirection,
     ArrowWeight,
@@ -42,7 +42,7 @@ def gv_node_component(component: Component) -> Table:
 
     if isinstance(component, Connector):
         line_info = [
-            bom_bubble(component.bom_id),
+            bom_bubble(component.id),
             html_line_breaks(component.type),
             html_line_breaks(component.subtype),
             f"{component.pincount}-pin" if component.show_pincount else None,
@@ -50,7 +50,7 @@ def gv_node_component(component: Component) -> Table:
         ]
     elif isinstance(component, Cable):
         line_info = [
-            bom_bubble(component.bom_id) if component.category != "bundle" else None,
+            bom_bubble(component.id) if component.category != "bundle" else None,
             html_line_breaks(component.type),
             f"{component.wirecount}x" if component.show_wirecount else None,
             component.gauge_str_with_equiv,
@@ -103,16 +103,19 @@ def gv_additional_component_table(component):
         return None
 
     rows = []
+    # TODO: support recursive management of additional components
     for subitem in component.additional_components:
+        bom_entry = subitem.bom_entry
         rows.append(
             Tr(
                 [
-                    Td(bom_bubble(subitem.bom_id)),
-                    Td(f"{subitem.bom_qty}", align="right"),
+                    Td(bom_bubble(subitem.id)),
+                    Td(f"{bom_entry.qty.number}", align="right"),
                     Td(
-                        f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"
+                        f"{bom_entry.qty.unit if bom_entry.qty.unit else 'x'}",
+                        align="left",
                     ),
-                    Td(f"{subitem.description}", align="left"),
+                    Td(f"{bom_entry.description}", align="left"),
                 ]
             )
         )
@@ -267,7 +270,7 @@ def gv_conductor_table(cable) -> Table:
 
         # row above the wire
         wireinfo = []
-        if cable.show_wirenumbers and not isinstance(wire, ShieldClass):
+        if not cable.is_bundle and not isinstance(wire, ShieldClass):
             wireinfo.append(str(wire.id))
         wireinfo.append(str(wire.color))
         wireinfo.append(wire.label)
@@ -283,7 +286,7 @@ def gv_conductor_table(cable) -> Table:
         cells_above = [
             Td(" " + ", ".join(ins), align="left"),
             Td(" "),  # increase cell spacing here
-            Td(bom_bubble(wire.bom_id)) if cable.category == "bundle" else None,
+            Td(bom_bubble(wire.id)) if cable.category == "bundle" else None,
             Td(":".join([wi for wi in wireinfo if wi is not None and wi != ""])),
             Td(" "),  # increase cell spacing here
             Td(", ".join(outs) + " ", align="right"),
@@ -317,7 +320,11 @@ def gv_conductor_table(cable) -> Table:
 
 def gv_wire_cell(wire: Union[WireClass, ShieldClass], colspan: int) -> Td:
     if wire.color:
-        color_list = ["#000000"] + wire.color.html_padded_list + ["#000000"]
+        if isinstance(wire.color, SingleColor):
+            color_list = [wire.color.html_padded]
+        else:
+            color_list = wire.color.html_padded_list
+        color_list = ["#000000"] + color_list + ["#000000"]
     else:
         color_list = ["#000000"]
 
@@ -356,11 +363,11 @@ def gv_edge_wire(harness, cable, connection) -> (str, str, str):
     if connection.from_ is not None:  # connect to left
         from_port_str = (
             f":p{connection.from_.index+1}r"
-            if harness.connectors[connection.from_.parent].style != "simple"
+            if harness.connectors[str(connection.from_.parent)].style != "simple"
             else ""
         )
-        code_left_1 = f"{connection.from_.parent}{from_port_str}:e"
-        code_left_2 = f"{connection.via.parent}:w{connection.via.index+1}:w"
+        code_left_1 = f"{str(connection.from_.parent)}{from_port_str}:e"
+        code_left_2 = f"{str(connection.via.parent)}:w{connection.via.index+1}:w"
         # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
     else:
         code_left_1, code_left_2 = None, None
@@ -368,11 +375,11 @@ def gv_edge_wire(harness, cable, connection) -> (str, str, str):
     if connection.to is not None:  # connect to right
         to_port_str = (
             f":p{connection.to.index+1}l"
-            if harness.connectors[connection.to.parent].style != "simple"
+            if harness.connectors[str(connection.to.parent)].style != "simple"
             else ""
         )
-        code_right_1 = f"{connection.via.parent}:w{connection.via.index+1}:e"
-        code_right_2 = f"{connection.to.parent}{to_port_str}:w"
+        code_right_1 = f"{str(connection.via.parent)}:w{connection.via.index+1}:e"
+        code_right_2 = f"{str(connection.to.parent)}{to_port_str}:w"
     else:
         code_right_1, code_right_2 = None, None
 
@@ -401,10 +408,10 @@ def gv_edge_mate(mate) -> (str, str, str, str):
     if isinstance(mate, MatePin):
         from_pin_index = mate.from_.index
         from_port_str = f":p{from_pin_index+1}r"
-        from_designator = mate.from_.parent
+        from_designator = str(mate.from_.parent)
         to_pin_index = mate.to.index
         to_port_str = f":p{to_pin_index+1}l"
-        to_designator = mate.to.parent
+        to_designator = str(mate.to.parent)
     elif isinstance(mate, MateComponent):
         from_designator = mate.from_
         from_port_str = ""
