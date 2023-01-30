@@ -20,10 +20,8 @@ from wireviz.wv_dataclasses import (
     Metadata,
     Options,
     Side,
-    Tweak,
 )
 from wireviz.wv_graphviz import (
-    apply_dot_tweaks,
     calculate_node_bgcolor,
     gv_connector_loops,
     gv_edge_mate,
@@ -40,7 +38,6 @@ from wireviz.wv_utils import bom2tsv
 class Harness:
     metadata: Metadata
     options: Options
-    tweak: Tweak
     additional_bom_items: List[Component] = field(default_factory=list)
     shared_bom: Dict = field(default_factory=dict)
 
@@ -326,8 +323,6 @@ class Harness:
 
             dot.attr("edge", color=color, style="dashed", dir=dir)
             dot.edge(code_from, code_to)
-
-        apply_dot_tweaks(dot, self.tweak)
 
         return dot
 

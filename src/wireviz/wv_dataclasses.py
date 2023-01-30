@@ -412,12 +412,6 @@ class Options:
 
 
 @dataclass
-class Tweak:
-    override: Optional[Dict[Designator, Dict[str, Optional[str]]]] = None
-    append: Union[str, List[str], None] = None
-
-
-@dataclass
 class Image:
     # Attributes of the image object <img>:
     src: str

@@ -145,7 +145,7 @@ def bom_bubble(id) -> Table:
         return None
     else:
         # TODO: activate BOM bubbles
-        return None
+        #return None
         # size and style of BOM bubble is optimized to be a rounded square,
         # big enough to hold any two-digit ID without GraphViz warnings
         text = id
@@ -522,75 +522,3 @@ def set_dot_basics(dot, options):
         fontname=options.fontname,
     )
     dot.attr("edge", style="bold", fontname=options.fontname)
-
-
-def apply_dot_tweaks(dot, tweak):
-    def typecheck(name: str, value: Any, expect: type) -> None:
-        if not isinstance(value, expect):
-            raise Exception(
-                f"Unexpected value type of {name}: "
-                f"Expected {expect}, got {type(value)}\n{value}"
-            )
-
-    # TODO?: Differ between override attributes and HTML?
-    if tweak.override is not None:
-        typecheck("tweak.override", tweak.override, dict)
-        for k, d in tweak.override.items():
-            typecheck(f"tweak.override.{k} key", k, str)
-            typecheck(f"tweak.override.{k} value", d, dict)
-            for a, v in d.items():
-                typecheck(f"tweak.override.{k}.{a} key", a, str)
-                typecheck(f"tweak.override.{k}.{a} value", v, (str, type(None)))
-
-        # Override generated attributes of selected entries matching tweak.override.
-        for i, entry in enumerate(dot.body):
-            if not isinstance(entry, str):
-                continue
-            # Find a possibly quoted keyword after leading TAB(s) and followed by [ ].
-            match = re.match(r'^\t*(")?((?(1)[^"]|[^ "])+)(?(1)") \[.*\]$', entry, re.S)
-            keyword = match and match[2]
-            if not keyword in tweak.override.keys():
-                continue
-
-            for attr, value in tweak.override[keyword].items():
-                if value is None:
-                    entry, n_subs = re.subn(
-                        f'( +)?{attr}=("[^"]*"|[^] ]*)(?(1)| *)', "", entry
-                    )
-                    if n_subs < 1:
-                        print(
-                            "Harness.create_graph() warning: "
-                            f"{attr} not found in {keyword}!"
-                        )
-                    elif n_subs > 1:
-                        print(
-                            "Harness.create_graph() warning: "
-                            f"{attr} removed {n_subs} times in {keyword}!"
-                        )
-                    continue
-
-                if len(value) == 0 or " " in value:
-                    value = value.replace('"', r"\"")
-                    value = f'"{value}"'
-                entry, n_subs = re.subn(
-                    f'{attr}=("[^"]*"|[^] ]*)', f"{attr}={value}", entry
-                )
-                if n_subs < 1:
-                    # If attr not found, then append it
-                    entry = re.sub(r"\]$", f" {attr}={value}]", entry)
-                elif n_subs > 1:
-                    print(
-                        "Harness.create_graph() warning: "
-                        f"{attr} overridden {n_subs} times in {keyword}!"
-                    )
-
-            dot.body[i] = entry
-
-    if tweak.append is not None:
-        if isinstance(tweak.append, list):
-            for i, element in enumerate(tweak.append, 1):
-                typecheck(f"tweak.append[{i}]", element, str)
-            dot.body.extend(tweak.append)
-        else:
-            typecheck("tweak.append", tweak.append, str)
-            dot.body.append(tweak.append)
