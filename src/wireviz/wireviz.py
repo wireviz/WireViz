@@ -91,7 +91,11 @@ def parse(
     connection_sets = []
     # actual harness
     harness = Harness(
-        metadata=Metadata(**yaml_data.get("metadata", {}), **extra_metadata),
+        metadata=Metadata(
+            **yaml_data.get("metadata", {}),
+            **extra_metadata,
+            **{"output_name": output_name},
+        ),
         options=Options(**yaml_data.get("options", {})),
         tweak=Tweak(**yaml_data.get("tweak", {})),
         shared_bom=shared_bom,
