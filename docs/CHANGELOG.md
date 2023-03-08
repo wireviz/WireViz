@@ -1,5 +1,17 @@
 # Change Log
 
+## [0.3.2](https://github.com/formatc1702/WireViz/tree/v0.3.2) (2021-11-27)
+
+### Hotfix
+
+- Adjust GraphViz generation code for compatibility with v0.18 of the `graphviz` Python package ([#258](https://github.com/formatc1702/WireViz/issues/258), [#262](https://github.com/formatc1702/WireViz/pull/261))
+
+## [0.3.1](https://github.com/formatc1702/WireViz/tree/v0.3.1) (2021-10-25)
+
+### Hotfix
+
+- Assign generic harness title when using WireViz as a module and not specifying an output file name ([#253](https://github.com/formatc1702/WireViz/issues/253), [#254](https://github.com/formatc1702/WireViz/pull/254))
+
 ## [0.3](https://github.com/formatc1702/WireViz/tree/v0.3) (2021-10-11)
 
 ### New features
