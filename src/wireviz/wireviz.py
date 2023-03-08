@@ -40,8 +40,13 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         options = Options(**yaml_data.get('options', {})),
         tweak = Tweak(**yaml_data.get('tweak', {})),
     )
+
+    # When title is not given, either deduce it from filename, or use default text.
     if 'title' not in harness.metadata:
-        harness.metadata['title'] = Path(file_out).stem
+        if file_out is None:
+            harness.metadata['title'] = "WireViz diagram and BOM"
+        else:
+            harness.metadata['title'] = Path(file_out).stem
 
     # add items
     sections = ['connectors', 'cables', 'connections']
