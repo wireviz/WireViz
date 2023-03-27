@@ -207,7 +207,6 @@ def parse(
         expected_type = alternating_types[1 - alternating_types.index(expected_type)]
 
     for connection_set in connection_sets:
-
         # figure out number of parallel connections within this set
         connectioncount = []
         for entry in connection_set:

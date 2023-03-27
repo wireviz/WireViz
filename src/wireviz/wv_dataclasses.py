@@ -86,7 +86,6 @@ class Options:
     _image_paths: List = field(default_factory=list)
 
     def __post_init__(self):
-
         self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_node = SingleColor(self.bgcolor_node)
         self.bgcolor_connector = SingleColor(self.bgcolor_connector)
@@ -124,7 +123,6 @@ class Image:
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
     def __post_init__(self):
-
         self.bgcolor = SingleColor(self.bgcolor)
 
         if self.fixedsize is None:
@@ -258,7 +256,7 @@ class Component:
         else:
             return self.amount
 
-    @property    
+    @property
     def has_pn_info(self) -> bool:
         return any([self.pn, self.manufacturer, self.mpn, self.supplier, self.spn])
 
@@ -368,7 +366,6 @@ class Connector(TopLevelGraphicalComponent):
         return None  # connectors do not support units.
 
     def __post_init__(self) -> None:
-
         super().fill_partnumbers()
 
         self.bgcolor = SingleColor(self.bgcolor)
@@ -654,7 +651,6 @@ class Cable(TopLevelGraphicalComponent):
             return None  # non-bundles do not support lists of part data
 
     def __post_init__(self) -> None:
-
         super().fill_partnumbers()
 
         self.bgcolor = SingleColor(self.bgcolor)

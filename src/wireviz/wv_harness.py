@@ -35,7 +35,11 @@ from wireviz.wv_graphviz import (
     parse_arrow_str,
     set_dot_basics,
 )
-from wireviz.wv_output import embed_svg_images, embed_svg_images_file, generate_html_output
+from wireviz.wv_output import (
+    embed_svg_images,
+    embed_svg_images_file,
+    generate_html_output,
+)
 from wireviz.wv_utils import bom2tsv, open_file_write
 
 
@@ -217,7 +221,7 @@ class Harness:
         to_pin: Union[int, str],
     ) -> None:
         # check from and to connectors
-        for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):
+        for name, pin in zip([from_name, to_name], [from_pin, to_pin]):
             if name is not None and name in self.connectors:
                 connector = self.connectors[name]
                 # check if provided name is ambiguous

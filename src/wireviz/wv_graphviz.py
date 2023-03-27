@@ -230,8 +230,15 @@ def nested_table(lines: List[Td]) -> Table:
 def nested_table_dict(d: dict) -> Table:
     rows = []
     for k, v in d.items():
-        rows.append(Tr([Td(k, align="left", balign="left", valign="top"), Td(html_line_breaks(v), align="left", balign="left")]))
-    return Table(rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)              
+        rows.append(
+            Tr(
+                [
+                    Td(k, align="left", balign="left", valign="top"),
+                    Td(html_line_breaks(v), align="left", balign="left"),
+                ]
+            )
+        )
+    return Table(rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
 
 
 def gv_pin_table(component) -> Table:
@@ -282,7 +289,6 @@ def gv_conductor_table(cable) -> Table:
 
     inserted_break_inbetween = False
     for wire in cable.wire_objects.values():
-
         # insert blank space between wires and shields
         if isinstance(wire, ShieldClass) and not inserted_break_inbetween:
             rows.append(Tr(Td("&nbsp;")))  # spacer row between wires and shields

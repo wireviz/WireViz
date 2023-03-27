@@ -68,7 +68,6 @@ def generate_html_output(
     metadata: Metadata,
     options: Options,
 ):
-
     # load HTML template
     templatename = metadata.get("template", {}).get("name")
     if templatename:
