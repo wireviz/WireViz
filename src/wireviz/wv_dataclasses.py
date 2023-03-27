@@ -62,12 +62,6 @@ QtyMultiplierCable = Enum(
 )
 
 
-@dataclass
-class Arrow:
-    direction: ArrowDirection
-    weight: ArrowWeight
-
-
 # TODO: standardize metadata to indicate which are supported...
 class Metadata(dict):
     pass
@@ -1168,6 +1162,12 @@ class Cable(WireClass):
             else:  # int or float
                 computed_factor = subitem.qty_multiplier
             subitem._qty_multiplier_computed = computed_factor
+
+
+@dataclass
+class Arrow:
+    direction: ArrowDirection
+    weight: ArrowWeight
 
 
 @dataclass
