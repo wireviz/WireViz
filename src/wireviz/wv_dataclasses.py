@@ -266,6 +266,7 @@ class AdditionalComponent(Component):
     designators: Optional[str] = None  # used for components definedi in the
     #                                    additional_bom_items section within another component
     bgcolor: SingleColor = None  #       ^ same here
+    note: str = None
 
     def __post_init__(self):
         super().fill_partnumbers()

@@ -72,7 +72,7 @@ def gv_node_component(component: Component) -> Table:
 
     line_image, line_image_caption = image_and_caption_cells(component)
     line_additional_component_table = gv_additional_component_table(component)
-    line_notes = [html_line_breaks(component.notes)]
+    line_notes = [Td(html_line_breaks(component.notes), balign="left")]
 
     if isinstance(component, Connector):
         if component.style != "simple":
@@ -120,6 +120,7 @@ def gv_additional_component_table(component):
                     Td(f"{subitem.bom_qty}", align="right"),
                     Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"),
                     Td(f"{subitem.description}", align="left"),
+                    Td(f"{subitem.note if subitem.note else ''}", align="left"),
                 ]
             )
         )
