@@ -258,6 +258,10 @@ class Component:
         else:
             return self.amount
 
+    @property    
+    def has_pn_info(self) -> bool:
+        return any([self.pn, self.manufacturer, self.mpn, self.supplier, self.spn])
+
 
 @dataclass
 class AdditionalComponent(Component):

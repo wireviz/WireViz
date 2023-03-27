@@ -113,17 +113,22 @@ def gv_additional_component_table(component):
 
     rows = []
     for subitem in component.additional_components:
-        rows.append(
-            Tr(
-                [
-                    Td(bom_bubble(subitem.bom_id)),
-                    Td(f"{subitem.bom_qty}", align="right"),
-                    Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"),
-                    Td(f"{subitem.description}", align="left"),
-                    Td(f"{subitem.note if subitem.note else ''}", align="left"),
-                ]
-            )
-        )
+        firstline = [
+            Td(bom_bubble(subitem.bom_id)),
+            Td(f"{subitem.bom_qty}", align="right"),
+            Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"),
+            Td(f"{subitem.description}", align="left"),
+            Td(f"{subitem.note if subitem.note else ''}", align="left"),
+        ]
+        rows.append(Tr(firstline))
+
+        if subitem.has_pn_info:
+            secondline = [
+                Td("", colspan=3),
+                Td(f"# TODO PN string", align="left"),  # TODO
+                Td(""),
+            ]
+            rows.append(Tr(secondline))
 
     return Table(rows, border=1, cellborder=0, cellpadding=3, cellspacing=0)
 
