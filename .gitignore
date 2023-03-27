@@ -5,6 +5,7 @@ Thumbs.db
 
 # Development aids
 .idea/
+.vscode/
 temp/
 venv/
 .venv/
