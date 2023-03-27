@@ -126,7 +126,7 @@ class Harness:
                 )
 
         # add items to BOM
-        for item in all_toplevel_items:
+        for item in all_bom_relevant_items:
             if item.ignore_in_bom:
                 continue
             add_to_bom(item.bom_entry)
