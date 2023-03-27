@@ -42,7 +42,6 @@ def gv_node_component(component: Component) -> Table:
 
     if isinstance(component, Connector):
         line_info = [
-            bom_bubble(component.id),
             html_line_breaks(component.type),
             html_line_breaks(component.subtype),
             f"{component.pincount}-pin" if component.show_pincount else None,
@@ -50,7 +49,6 @@ def gv_node_component(component: Component) -> Table:
         ]
     elif isinstance(component, Cable):
         line_info = [
-            bom_bubble(component.id) if component.category != "bundle" else None,
             html_line_breaks(component.type),
             f"{component.wirecount}x" if component.show_wirecount else None,
             component.gauge_str_with_equiv,
@@ -109,7 +107,6 @@ def gv_additional_component_table(component):
         rows.append(
             Tr(
                 [
-                    Td(bom_bubble(subitem.id)),
                     Td(f"{bom_entry.qty.number}", align="right"),
                     Td(
                         f"{bom_entry.qty.unit if bom_entry.qty.unit else 'x'}",
@@ -138,33 +135,6 @@ def calculate_node_bgcolor(component, harness_options):
         return harness_options.bgcolor_bundle.html
     elif isinstance(component, Cable) and harness_options.bgcolor_cable:
         return harness_options.bgcolor_cable.html
-
-
-def bom_bubble(id) -> Table:
-    if id is None:
-        return None
-    else:
-        # TODO: activate BOM bubbles
-        #return None
-        # size and style of BOM bubble is optimized to be a rounded square,
-        # big enough to hold any two-digit ID without GraphViz warnings
-        text = id
-        # text = f'<FONT COLOR="#FFFFFF">{id}</FONT>'
-        return Table(
-            Tr(
-                Td(
-                    text,
-                    border=1,
-                    cellpadding=0,
-                    fixedsize="true",
-                    style="rounded",
-                    height=20,
-                    width=20,
-                    # bgcolor="#000000",
-                )
-            ),
-            border=0,
-        )
 
 
 def make_list_of_cells(inp) -> List[Td]:
@@ -286,7 +256,6 @@ def gv_conductor_table(cable) -> Table:
         cells_above = [
             Td(" " + ", ".join(ins), align="left"),
             Td(" "),  # increase cell spacing here
-            Td(bom_bubble(wire.id)) if cable.category == "bundle" else None,
             Td(":".join([wi for wi in wireinfo if wi is not None and wi != ""])),
             Td(" "),  # increase cell spacing here
             Td(", ".join(outs) + " ", align="right"),
