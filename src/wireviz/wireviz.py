@@ -393,7 +393,7 @@ def parse(
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
+def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> Tuple[Dict, Path]:
     # determine whether inp is a file path, a YAML string, or a Dict
     if not isinstance(inp, Dict):  # received a str or a Path
         if isinstance(inp, Path) or (isinstance(inp, str) and not "\n" in inp):

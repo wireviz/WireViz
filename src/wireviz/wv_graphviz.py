@@ -2,7 +2,7 @@
 
 import re
 from itertools import zip_longest
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from wireviz import APP_NAME, APP_URL, __version__
 from wireviz.wv_bom import partnumbers2list
@@ -347,7 +347,7 @@ def gv_wire_cell(wire: Union[WireClass, ShieldClass], colspan: int) -> Td:
     return wire_outer_cell
 
 
-def gv_edge_wire(harness, cable, connection) -> (str, str, str):
+def gv_edge_wire(harness, cable, connection) -> Tuple[str, str, str, str, str]:
     if connection.via.color:
         # check if it's an actual wire and not a shield
         color = f"#000000:{connection.via.color.html_padded}:#000000"
@@ -391,7 +391,7 @@ def parse_arrow_str(inp: str) -> ArrowDirection:
         return ArrowDirection.NONE
 
 
-def gv_edge_mate(mate) -> (str, str, str, str):
+def gv_edge_mate(mate) -> Tuple[str, str, str, str]:
     if mate.arrow.weight == ArrowWeight.SINGLE:
         color = "#000000"
     elif mate.arrow.weight == ArrowWeight.DOUBLE:
@@ -448,7 +448,7 @@ def color_minitable(color: Optional[MultiColor]) -> Union[Table, str]:
     )
 
 
-def image_and_caption_cells(component: Component) -> (Td, Td):
+def image_and_caption_cells(component: Component) -> Tuple[Td, Td]:
     if not component.image:
         return (None, None)
 

@@ -3,7 +3,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List
+from typing import List, Union
 
 from graphviz import Graph
 
@@ -35,7 +35,7 @@ from wireviz.wv_graphviz import (
     parse_arrow_str,
     set_dot_basics,
 )
-from wireviz.wv_output import embed_svg_images_file, generate_html_output
+from wireviz.wv_output import embed_svg_images, embed_svg_images_file, generate_html_output
 from wireviz.wv_utils import bom2tsv, open_file_write
 
 
@@ -210,11 +210,11 @@ class Harness:
     def connect(
         self,
         from_name: str,
-        from_pin: (int, str),
+        from_pin: Union[int, str],
         via_name: str,
-        via_wire: (int, str),
+        via_wire: Union[int, str],
         to_name: str,
-        to_pin: (int, str),
+        to_pin: Union[int, str],
     ) -> None:
         # check from and to connectors
         for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):
@@ -381,7 +381,7 @@ class Harness:
 
     def output(
         self,
-        filename: (str, Path),
+        filename: Union[str, Path],
         view: bool = False,
         cleanup: bool = True,
         fmt: tuple = ("html", "png", "svg", "tsv"),

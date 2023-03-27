@@ -82,8 +82,8 @@ class Options:
     template_separator: str = "."
     _pad: int = 0
     # TODO: resolve template and image paths during rendering, not during YAML parsing
-    _template_paths: [List] = field(default_factory=list)
-    _image_paths: [List] = field(default_factory=list)
+    _template_paths: List = field(default_factory=list)
+    _image_paths: List = field(default_factory=list)
 
     def __post_init__(self):
 
@@ -759,9 +759,9 @@ class Cable(TopLevelGraphicalComponent):
 
     def _connect(
         self,
-        from_pin_obj: [PinClass],
+        from_pin_obj: List[PinClass],
         via_wire_id: str,
-        to_pin_obj: [PinClass],
+        to_pin_obj: List[PinClass],
     ) -> None:
         via_wire_obj = self.wire_objects[via_wire_id]
         self._connections.append(Connection(from_pin_obj, via_wire_obj, to_pin_obj))

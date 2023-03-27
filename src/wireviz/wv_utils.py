@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Union
 
 awg_equiv_table = {
     "0.09": "28",
@@ -159,7 +159,7 @@ def aspect_ratio(image_src):
     return 1  # Assume 1:1 when unable to read actual image size
 
 
-def smart_file_resolve(filename: str, possible_paths: (str, List[str])) -> Path:
+def smart_file_resolve(filename: str, possible_paths: Union[str, List[str]]) -> Path:
     if not isinstance(possible_paths, List):
         possible_paths = [possible_paths]
     filename = Path(filename)
