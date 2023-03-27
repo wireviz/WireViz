@@ -189,7 +189,7 @@ def nested_table(lines: List[Td]) -> Table:
             continue  # no cells in list
         cells = [item for item in lst if item.contents is not None]
         if len(cells) == 0:
-            continue  # no cells in list that are not None
+            continue  # no cells in list, or all cells are None
         if (
             len(cells) == 1
             and isinstance(cells[0].contents, Table)
@@ -207,7 +207,10 @@ def nested_table(lines: List[Td]) -> Table:
         rows.append(Tr(Td(inner_table)))
 
     if len(rows) == 0:  # create dummy row to avoid GraphViz errors due to empty <table>
-        rows = Tr(Td(""))
+        inner_table = Table(
+            Tr(Td("")), border=0, cellborder=1, cellpadding=3, cellspacing=0
+        )
+        rows = [Tr(Td(inner_table))]
     tbl = Table(rows, border=0, cellspacing=0, cellpadding=0)
     return tbl
 
