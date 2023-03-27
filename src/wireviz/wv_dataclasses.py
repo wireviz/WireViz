@@ -344,7 +344,9 @@ class BomEntry:
             ), f"Unexpected id type {self.amount}"
             self.qty *= self.amount
         if self.qty_multiplier is not None:
-            self.qty *= float(self.qty_multiplier)
+            if not isinstance(self.qty_multiplier, str):
+                self.qty *= float(self.qty_multiplier)
+
 
     @property
     def description_str(self):
@@ -563,8 +565,12 @@ class Component:
         if self.category is None:
             raise RuntimeError(f"category should be defined for {self}")
 
+    def compute_qty_multipliers(self):
+        pass
+
     @property
     def bom_entry(self):
+        self.compute_qty_multipliers()
         return BomEntry(
             qty=self.qty,
             partnumbers=self.partnumbers,
@@ -744,12 +750,16 @@ class Connector(GraphicalComponent):
             "CONNECTIONS": num_connections,
         }
         for subitem in self.additional_components:
-            if isinstance(subitem.qty_multiplier, QtyMultiplierConnector):
-                computed_factor = qty_multipliers_computed[subitem.qty_multiplier.name]
-            elif isinstance(subitem.qty_multiplier, QtyMultiplierCable):
-                raise Exception("Used a cable multiplier in a connector!")
-            else:  # int or float
+            if isinstance(subitem.qty_multiplier, str):
+                computed_factor = qty_multipliers_computed[subitem.qty_multiplier.upper()]
+            #if isinstance(subitem.qty_multiplier, QtyMultiplierConnector):
+            #    computed_factor = qty_multipliers_computed[subitem.qty_multiplier.name.upper()]
+            #elif isinstance(subitem.qty_multiplier, QtyMultiplierCable):
+            #    raise Exception("Used a cable multiplier in a connector!")
+            elif isinstance(subitem.qty_multiplier, int) or isinstance(subitem.qty_multiplier, float):
                 computed_factor = subitem.qty_multiplier
+            else:
+                raise ValueError(f'Unexpected qty multiplier "{subitem.qty_multiplier}"')
             subitem._qty_multiplier_computed = computed_factor
 
 
@@ -793,6 +803,7 @@ class WireClass(GraphicalComponent):
 
     @property
     def bom_entry(self):
+        self.compute_qty_multipliers()
         return BomEntry(
             qty=self.length,
             partnumbers=self.partnumbers,
@@ -1001,6 +1012,7 @@ class Cable(WireClass):
 
     @property
     def bom_entry(self):
+        self.compute_qty_multipliers()
         if self.is_bundle:
             return [w.bom_entry for w in self.wire_objects.values()]
         else:
@@ -1175,7 +1187,7 @@ class Cable(WireClass):
             if isinstance(subitem.qty_multiplier, QtyMultiplierCable):
                 computed_factor = qty_multipliers_computed[subitem.qty_multiplier.name]
                 # inherit component's length unit if appropriate
-                if subitem.qty_multiplier.name in ["LENGTH", "TOTAL_LENGTH"]:
+                if subitem.qty_multiplier.name.upper() in ["LENGTH", "TOTAL_LENGTH"]:
                     if subitem.qty.unit is not None:
                         raise Exception(
                             f"No unit may be specified when using"
