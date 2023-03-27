@@ -311,6 +311,7 @@ class TopLevelGraphicalComponent(GraphicalComponent):  # abstract class
     designator: Designator = None
     color: Optional[MultiColor] = None
     image: Optional[Image] = None
+    additional_parameters: Optional[Dict] = None
     additional_components: List[AdditionalComponent] = field(default_factory=list)
     notes: Optional[MultilineHypertext] = None
     # BOM options

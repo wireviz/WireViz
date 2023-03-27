@@ -62,6 +62,11 @@ def gv_node_component(component: Component) -> Table:
             str(component.color) if component.color else None,
         ]
 
+    if component.additional_parameters:
+        line_additional_parameters = nested_table_dict(component.additional_parameters)
+    else:
+        line_additional_parameters = []
+
     if component.color:
         line_info.extend(colorbar_cells(component.color))
 
@@ -81,6 +86,7 @@ def gv_node_component(component: Component) -> Table:
         line_name,
         line_pn,
         line_info,
+        line_additional_parameters,
         line_ports,
         line_image,
         line_image_caption,
@@ -213,6 +219,13 @@ def nested_table(lines: List[Td]) -> Table:
         rows = [Tr(Td(inner_table))]
     tbl = Table(rows, border=0, cellspacing=0, cellpadding=0)
     return tbl
+
+
+def nested_table_dict(d: dict) -> Table:
+    rows = []
+    for k, v in d.items():
+        rows.append(Tr([Td(k, align="left", balign="left", valign="top"), Td(html_line_breaks(v), align="left", balign="left")]))
+    return Table(rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)              
 
 
 def gv_pin_table(component) -> Table:
