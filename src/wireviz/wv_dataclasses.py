@@ -156,6 +156,9 @@ class PartNumberInfo:
         "spn": "SPN",
     }
 
+    def __bool__(self):
+        return bool(self.pn or self.manufacturer or self.mpn or self.supplier or self.spn)
+
     def __hash__(self):
         return hash((self.pn, self.manufacturer, self.mpn, self.supplier, self.spn))
 
@@ -217,21 +220,44 @@ class PartNumberInfo:
             spn=self.spn,
         )
 
-    def keep_only_eq(self, other):
+    def clear_per_field(self, op, other):
         part = self.copy()
 
         if other is None:
-            return None
+            if op == '==':
+                return part
+            elif op == '!=':
+                return None
+            else:
+                raise NotImplementedError(f'op {op} not supported')
 
         if isinstance(other, list):
             for item in other:
-                part = part.keep_only_eq(item)
+                part = part.clear_per_field(op, item)
         else:
             for k in ["pn", "manufacturer", "mpn", "supplier", "spn"]:
-                if part[k] != other[k]:
-                    part[k] = ""
+                if op == '==':
+                    if part[k] == other[k]:
+                        part[k] = ""
+                elif op == '!=':
+                    if part[k] != other[k]:
+                        part[k] = ""
+                else:
+                    raise NotImplementedError(f'op {op} not supported')
         return part
 
+    def keep_only_eq(self, other):
+        return self.clear_per_field('!=', other)
+
+    def remove_eq(self, other):
+        return self.clear_per_field('==', other)
+
+    @staticmethod
+    def list_keep_only_eq(partnumbers):
+        pn = partnumbers[0]
+        for p in partnumbers:
+            pn = pn.keep_only_eq(p)
+        return pn
 
 @dataclass
 class BomEntry:
