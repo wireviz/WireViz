@@ -20,18 +20,19 @@ def partnumbers2list(
     partnumbers: PartNumberInfo, parent_partnumbers: PartNumberInfo = None
 ) -> List[str]:
     if not isinstance(partnumbers, list):
-        return partnumbers.str_list
+        partnumbers = [partnumbers]
 
-    pn = None
-    for p in partnumbers:
-        if pn is None:
-            pn = p.copy()
-        pn = pn.keep_only_eq(p)
 
-    if pn.str_list is None and parent_partnumbers is not None:
-        return parent_partnumbers.str_list
-    else:
-        return pn.str_list
+    # if there's no parent, fold
+    if parent_partnumbers is None:
+        return PartNumberInfo.list_keep_only_eq(partnumbers).str_list
+
+    if isinstance(parent_partnumbers, list):
+        parent_partnumbers = PartNumberInfo.list_keep_only_eq(parent_partnumbers)
+
+    partnumbers = [p.remove_eq(parent_partnumbers) for p in partnumbers]
+
+    return [p.str_list for p in partnumbers if p]
 
 
 def bom_list(bom):
