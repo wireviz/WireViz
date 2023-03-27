@@ -125,7 +125,7 @@ def gv_additional_component_table(component):
             )
         )
 
-    return Table(rows, border=0)
+    return Table(rows, border=1, cellborder=0, cellpadding=3, cellspacing=0)
 
 
 def calculate_node_bgcolor(component, harness_options):
