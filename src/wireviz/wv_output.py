@@ -3,7 +3,7 @@
 import base64
 import re
 from pathlib import Path
-from typing import List, Union
+from typing import Dict, List, Union
 
 import wireviz  # for doing wireviz.__file__
 from wireviz.wv_dataclasses import Metadata, Options
@@ -56,6 +56,28 @@ def embed_svg_images_file(
         filename_out.replace(filename_in)
 
 
+def generate_pdf_output(
+    filename_list: List[Path],
+    options: Dict=None,
+):
+    #options = options if options is not None else {}
+    # TODO: pass intelligent options
+    options = {
+        'options': {
+            'page-size': 'A3',
+            'orientation': 'landscape',
+        }
+    }
+    if isinstance(filename_list, Path):
+        filename_list = [filename_list]
+        output_path = filename_list[0].with_suffix('.pdf')
+    else:
+        output_dir = filename_list[0].parent
+        output_path = (output_dir / output_dir.name).with_suffix('.pdf')
+
+    filepath_list = [f.with_suffix('.html') for f in filename_list]
+
+    print(f'Generating pdf output: {output_path}')
 
 def generate_html_output(
     filename: Path,

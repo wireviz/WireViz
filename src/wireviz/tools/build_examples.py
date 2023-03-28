@@ -37,7 +37,7 @@ groups = {
 
 input_extensions = [".yml"]
 extensions_not_containing_graphviz_output = [".gv", ".bom.tsv"]
-extensions_containing_graphviz_output = [".png", ".svg", ".html"]
+extensions_containing_graphviz_output = [".png", ".svg", ".html", ".pdf"]
 generated_extensions = (
     extensions_not_containing_graphviz_output + extensions_containing_graphviz_output
 )
@@ -68,7 +68,7 @@ def build_generated(groupkeys):
             try:
                 res = cli([
                     "--formats",
-                    "ghpst",
+                    "ghpstPb",
                     str(yaml_file),
                     "--prepend",
                     yaml_file.parent / "metadata.yml"
