@@ -22,6 +22,7 @@ __pycache__
 # Built examples
 examples/*
 tutorial/*
+outputs/*
 !examples/*.yml
 !tutorial/*.yml
 !tutorial/*.md
