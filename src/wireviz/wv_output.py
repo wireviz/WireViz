@@ -4,6 +4,9 @@ import base64
 import re
 from pathlib import Path
 from typing import Dict, List, Union
+import logging
+
+from weasyprint import HTML, CSS
 
 import wireviz  # for doing wireviz.__file__
 from wireviz.wv_dataclasses import Metadata, Options
@@ -72,12 +75,18 @@ def generate_pdf_output(
         filename_list = [filename_list]
         output_path = filename_list[0].with_suffix('.pdf')
     else:
+        logging.warn('Multiple file pdf conversion is not supported!')
+        return
         output_dir = filename_list[0].parent
         output_path = (output_dir / output_dir.name).with_suffix('.pdf')
 
     filepath_list = [f.with_suffix('.html') for f in filename_list]
 
     print(f'Generating pdf output: {output_path}')
+    html = HTML(filename=filepath_list[0])
+    #html.write_pdf(output_path)
+    css = CSS(string='@page { size: A3 landscape; margin: 1cm; }')
+    html.write_pdf(output_path, stylesheets=[css])
 
 def generate_html_output(
     filename: Path,
