@@ -175,9 +175,7 @@ class PartNumberInfo:
         empty_if_none = lambda x: "" if x is None else str(x)
 
         if isinstance(self.pn, list):
-            import pdb
-
-            pdb.set_trace()
+            raise ValueError(f'pn ({self.pn}) should not be a list')
         self.pn = empty_if_none(self.pn)
         self.manufacturer = empty_if_none(self.manufacturer)
         self.mpn = empty_if_none(self.mpn)
@@ -289,12 +287,7 @@ class BomEntry:
     }
 
     def __hash__(self):
-        try:
-            return hash((self.partnumbers, self.description))
-        except:
-            import pdb
-
-            pdb.set_trace()
+        return hash((self.partnumbers, self.description))
 
     def __eq__(self, other):
         return hash(self) == hash(other)
@@ -323,20 +316,15 @@ class BomEntry:
         setattr(self, key, value)
 
     def __post_init__(self):
-        try:
-            assert isinstance(
-                self.qty, NumberAndUnit
-            ), f"Unexpected qty type {self.qty}"
-            assert isinstance(
-                self.partnumbers, PartNumberInfo
-            ), f"Unexpected partnumbers type {self.partnumbers}"
-            assert self.id is None or isinstance(
-                self.id, str
-            ), f"Unexpected id type {self.id}"
-        except AssertionError as e:
-            import pdb
-
-            pdb.set_trace()
+        assert isinstance(
+            self.qty, NumberAndUnit
+        ), f"Unexpected qty type {self.qty}"
+        assert isinstance(
+            self.partnumbers, PartNumberInfo
+        ), f"Unexpected partnumbers type {self.partnumbers}"
+        assert self.id is None or isinstance(
+            self.id, str
+        ), f"Unexpected id type {self.id}"
 
         if self.amount is not None:
             assert isinstance(
@@ -546,9 +534,7 @@ class Component:
         self.qty = NumberAndUnit.to_number_and_unit(self.qty)
         self.amount = NumberAndUnit.to_number_and_unit(self.amount)
         if isinstance(self.pn, list):
-            import pdb
-
-            pdb.set_trace()
+            raise RuntimeError(f'PN ({self.pn}) should not be a list')
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, Component):
