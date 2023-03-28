@@ -158,7 +158,7 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
         )
         shared_bom = ret["shared_bom"]
 
-    if 'pdf' in output_formats and 'html' in output_formats:
+    if 'pdf' in output_formats and 'html' in output_formats and len(output_names) > 1:
         generate_pdf_output(output_names)
 
     # TODO: move shared bom generation to a method?
