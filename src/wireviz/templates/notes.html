@@ -1,17 +1,25 @@
 <style>
   .A4 #notes { /* NOTES on top of BOM */
     position: absolute;
+    {% if show_bom %}
     bottom: calc({{ titleblock_rows + bom_rows + 2 }} * 4.25mm);
+    {% else %}
+    bottom: calc({{ titleblock_rows + 1 }} * 4.25mm);
+    {% endif %}
     right: 0;
   }
 
   .A3 #notes, .A2 #notes { /* NOTES on top of title block */
     position: absolute;
-    {% if notes_to_right %}
+    {% if notes_on_right %}
     bottom: calc({{ titleblock_rows + 1 }} * 4.25mm);
     right: 0;
     {% else %}
+    {% if show_bom %}
     bottom: calc({{ bom_rows + 1 }} * 4.25mm);
+    {% else %}
+    bottom: 0;
+    {% endif %}
     left: 0;
     {% endif %}
   }
@@ -26,7 +34,7 @@
   }
 
   .A3 #notes, .A2 #notes {
-    width:80mm;
+    width: {{ notes_width }};
     word-wrap: break-word;
     white-space: normal;
   }

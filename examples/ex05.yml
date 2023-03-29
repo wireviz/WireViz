@@ -36,4 +36,4 @@ connections:
     - X3: [1-4]
 
 options:
-  notes_to_right: False
+  notes_on_right: False

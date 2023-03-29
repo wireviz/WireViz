@@ -23,12 +23,17 @@ metadata:
 
   notes: |
     <ol>
+      <li> <b> NO BOM by config! WOW! </b> </li>
       <li> Wire color is a recommendation</li>
       <li> Label harnesses with text given in diagram</li>
       <li> Label every connector to match the designation in the drawing</li>
       <li> Zip tie entire harness at 1ft increments where required.</li>
       <li> Cover all cables with 1/2" or 1/8" black sleeving as required. Make it very long for wrapping test</li>
     </ol>
+
+options:
+  show_bom: False
+  notes_on_right: False
 
 
 templates: # defining templates to be used later on
