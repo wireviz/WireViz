@@ -34,6 +34,7 @@ setup(
     entry_points={
         "console_scripts": [
             "wireviz=wireviz.wv_cli:cli",
+            "wireviz-qty=wireviz.wv_harness_quantity:qty_multipliers",
         ],
     },
     classifiers=[
