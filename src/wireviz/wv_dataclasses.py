@@ -268,8 +268,6 @@ class BomEntry:
     category: Optional[str] = None
     ignore_in_bom: Optional[bool] = False
 
-    scaled_per_harness = False
-
     # Used to add all occurence of a BomEntry
     designators: [List] = field(default_factory=list)
     per_harness: [Dict] = field(default_factory=dict)
@@ -277,6 +275,10 @@ class BomEntry:
     # Used to restrict printed lengths
     MAX_PRINTED_DESCRIPTION: int = 40
     MAX_PRINTED_DESIGNATORS: int = 2
+    restrict_printed_lengths: bool = True
+
+
+    scaled_per_harness = False
 
     # Map a bom key to the header
     BOM_KEY_TO_COLUMNS = {
@@ -289,7 +291,7 @@ class BomEntry:
     }
 
     def __repr__(self):
-        f'{id}: {self.partnumbers}, {self.qty}'
+        return f'{id}: {self.partnumbers}, {self.qty}'
 
     def __hash__(self):
         return hash((self.partnumbers, self.description))
@@ -344,7 +346,7 @@ class BomEntry:
     @property
     def description_str(self):
         description = self.description
-        if len(description) > self.MAX_PRINTED_DESCRIPTION:
+        if self.restrict_printed_lengths and len(description) > self.MAX_PRINTED_DESCRIPTION:
             description = f"{description[:self.MAX_PRINTED_DESCRIPTION]} (...)"
         return description
 
@@ -354,7 +356,7 @@ class BomEntry:
             return ""
 
         all_designators = sorted(self.designators)
-        if len(all_designators) > self.MAX_PRINTED_DESIGNATORS:
+        if self.restrict_printed_lengths and len(all_designators) > self.MAX_PRINTED_DESIGNATORS:
             all_designators = all_designators[: self.MAX_PRINTED_DESIGNATORS] + ["..."]
         return ", ".join(all_designators)
 

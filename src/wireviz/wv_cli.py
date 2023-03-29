@@ -155,6 +155,7 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
         )
         shared_bom = ret["shared_bom"]
 
+    # TODO: move shared bom generation to a method?
     if "shared_bom" in output_formats:
         shared_bom_file = (_output_dir / "shared_bom").with_suffix(".tsv")
         print(f'Generating shared bom at {shared_bom_file}')
@@ -166,7 +167,7 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
             for bom_item in shared_bom.values():
                 bom_item.scale_per_harness(qty_multipliers)
 
-        shared_bomlist = bom_list(shared_bom)
+        shared_bomlist = bom_list(shared_bom, False)
 
         shared_bom_tsv = bom2tsv(shared_bomlist)
         shared_bom_file.open("w").write(shared_bom_tsv)

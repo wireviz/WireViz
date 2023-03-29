@@ -35,11 +35,12 @@ def partnumbers2list(
     return [p.str_list for p in partnumbers if p]
 
 
-def bom_list(bom):
+def bom_list(bom, restrict_printed_lengths=True):
     entries_as_dict = []
     has_content = set()
     # First pass, get all bom dict and identify filled columns
     for entry in bom.values():
+        entry.restrict_printed_lengths = restrict_printed_lengths
         has_content = has_content.union(entry.bom_defined)
         entries_as_dict.append(entry.bom_dict)
 
