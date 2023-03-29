@@ -63,9 +63,16 @@ def build_generated(groupkeys):
             with (path / readme).open("w") as out:
                 out.write(f'# {groups[key]["title"]}\n\n')
         # collect and iterate input YAML files
+
         for yaml_file in collect_filenames("Building", key, input_extensions):
             try:
-                res = cli(["--formats", "ghpst", str(yaml_file)])
+                res = cli([
+                    "--formats",
+                    "ghpst",
+                    str(yaml_file),
+                    "--prepend",
+                    yaml_file.parent / "metadata.yml"
+                ])
             except BaseException as e:
                 if str(e) != "0" and not isinstance(
                     e, (click.ClickException, SystemExit)
