@@ -107,6 +107,7 @@ def generate_html_output(
         "generator": f"{wireviz.APP_NAME} {wireviz.__version__} - {wireviz.APP_URL}",
         "fontname": options.fontname,
         "bgcolor": options.bgcolor.html,
+        "notes_to_right": options.notes_to_right,
         "diagram": svgdata,
         "sheet_current": sheet_current,
         "sheet_total": sheet_total,
@@ -114,7 +115,7 @@ def generate_html_output(
         "bom_header": bom_header,
         "bom_content": bom_content,
         "bom_columns": bom_columns,
-        "bom_length": len(bom_content),
+        "bom_rows": len(bom_content),
         "titleblock_rows": 9,
     }
 
@@ -152,6 +153,12 @@ def generate_html_output(
     # prepare titleblock
     titleblock_template = get_template_html("titleblock")
     replacements["titleblock"] = titleblock_template.render(replacements)
+
+    # preparate Notes
+    if "notes" in replacements:
+        notes_template = get_template_html("notes")
+        replacements["notes"] = notes_template.render(replacements)
+
 
     # generate page template
     page_template = get_template_html(template_name)

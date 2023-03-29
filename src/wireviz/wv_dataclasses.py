@@ -422,6 +422,7 @@ class BomEntry:
 @dataclass
 class Options:
     fontname: PlainText = "arial"
+    notes_to_right: bool = True
     bgcolor: SingleColor = "WH"  # will be converted to SingleColor in __post_init__
     bgcolor_node: SingleColor = "WH"
     bgcolor_connector: SingleColor = None
