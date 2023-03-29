@@ -29,8 +29,8 @@ class HarnessQuantity():
 
     def check_all_multipliers_defined(self):
         for name in self.harness_names:
-            assert name in self.multipliers
-
+            assert name in self.multipliers, \
+                f"No multiplier defined for harness {name}, maybe delete the multiplier_file {self.qty_multipliers}"
 
     def get_qty_multipliers_from_user(self):
         for name in self.harness_names:
