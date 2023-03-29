@@ -52,7 +52,7 @@ class Harness:
     def name(self) -> str:
         pn = self.metadata.get("pn", "")
         output_name = self.metadata["output_name"]
-        if pn:
+        if pn and pn not in output_name:
             return f"{pn}-{output_name}"
         else:
             return output_name
