@@ -58,7 +58,11 @@
       top: 0;
       left: 0;
       max-width: 100%;
-      height: calc(100% - 13 * 4.25mm);
+      {% if sheetsize == 'A4' %}
+        height: calc(100% - {{ [bom_length, 13]|sum }}  * 4.25mm);
+      {% else %}
+        height: calc(100% - {{ [bom_length, 13]|max }}  * 4.25mm);
+      {% endif %}
       /* TODO: auto-adapt to height of title block + BOM table;
                BOM table might be above (A4) or to the left (A3 and larger) of the title block */
       text-align: center;

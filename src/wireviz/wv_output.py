@@ -95,6 +95,7 @@ def generate_html_output(
     if bom_reversed:
         bom_content.reverse()
 
+
     if metadata:
         sheet_current = metadata["sheet_current"]
         sheet_total = metadata["sheet_total"]
@@ -113,6 +114,8 @@ def generate_html_output(
         "bom_header": bom_header,
         "bom_content": bom_content,
         "bom_columns": bom_columns,
+        "bom_length": len(bom_content),
+        "titleblock_rows": 9,
     }
 
     # prepare metadata replacements

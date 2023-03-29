@@ -1,7 +1,7 @@
 <style>
   .A4 #bom { /* BOM on top of title block */
     position: absolute;
-    bottom: 38.25mm;
+    bottom: calc({{ titleblock_rows + 1 }} * 4.25mm);
     right: 0;
   }
 
@@ -52,7 +52,7 @@
 
 <!-- BOM TEMPLATE --!>
 <div id="bom">
-  <table id="bom">
+  <table>
   {% if not bom_reversed %}
     {{ bom_header_gen() }}
   {% endif %}
