@@ -162,6 +162,7 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
             harnesses = HarnessQuantity(files, multiplier_file_name, output_dir=_output_dir)
             harnesses.fetch_qty_multipliers_from_file()
             qty_multipliers = harnesses.multipliers
+            print(f'Using quantity multipliers: {qty_multipliers}')
             for bom_item in shared_bom.values():
                 bom_item.scale_per_harness(qty_multipliers)
 
