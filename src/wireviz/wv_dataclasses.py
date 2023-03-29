@@ -268,6 +268,8 @@ class BomEntry:
     category: Optional[str] = None
     ignore_in_bom: Optional[bool] = False
 
+    scaled_per_harness = False
+
     # Used to add all occurence of a BomEntry
     designators: [List] = field(default_factory=list)
     per_harness: [Dict] = field(default_factory=dict)
@@ -285,6 +287,9 @@ class BomEntry:
         "designators": "Designators",
         "per_harness": "Per Harness",
     }
+
+    def __repr__(self):
+        f'{id}: {self.partnumbers}, {self.qty}'
 
     def __hash__(self):
         return hash((self.partnumbers, self.description))
@@ -393,6 +398,23 @@ class BomEntry:
         if key in self.partnumbers.BOM_KEY_TO_COLUMNS:
             return self.partnumbers.BOM_KEY_TO_COLUMNS[key]
         raise ValueError(f"key '{key}' not found in bom keys")
+
+    def scale_per_harness(self, qty_multipliers):
+        if self.scaled_per_harness:
+            logging.warn('{self}: Already scaled')
+
+        qty = NumberAndUnit(0, self.qty.unit_str)
+        for name, info in self.per_harness.items():
+            multiplier_name = [k for k in qty_multipliers.keys() if name.endswith(k)]
+            if len(multiplier_name) == 0:
+                raise ValueError(f'No multiplier found for harness {name} in {qty_multipliers}')
+            if len(multiplier_name) > 1:
+                raise ValueError(f'Conflicting multipliers found ({multiplier_name}) for harness {name} in {qty_multipliers}')
+
+            info['qty'] *= qty_multipliers[multiplier_name[0]]
+            qty += info['qty']
+        self.qty = qty
+        self.scaled_per_harness = True
 
 
 @dataclass

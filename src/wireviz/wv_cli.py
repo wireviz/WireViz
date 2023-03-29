@@ -13,6 +13,7 @@ import wireviz.wireviz as wv
 from wireviz import APP_NAME, __version__
 from wireviz.wv_bom import bom_list
 from wireviz.wv_utils import bom2tsv
+from wireviz.wv_harness_quantity import HarnessQuantity
 
 format_codes = {
     "c": "csv",
@@ -95,7 +96,21 @@ epilog = (
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def cli(files, formats, prepend, output_dir, output_name, version):
+@click.option(
+    "-u",
+    "--use-qty-multipliers",
+    is_flag=True,
+    type=bool,
+    help="if set, the shared bom counts will be scaled with the qty-multipliers",
+)
+@click.option(
+    "-m",
+    "--multiplier-file-name",
+    default='quantity_multipliers.txt',
+    type=str,
+    help="name of file used to fetch the qty_multipliers",
+)
+def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multipliers, multiplier_file_name):
     """
     Parses the provided FILE and generates the specified outputs.
     """
@@ -141,9 +156,19 @@ def cli(files, formats, prepend, output_dir, output_name, version):
         shared_bom = ret["shared_bom"]
 
     if "shared_bom" in output_formats:
+        shared_bom_file = (_output_dir / "shared_bom").with_suffix(".tsv")
+        print(f'Generating shared bom at {shared_bom_file}')
+        if use_qty_multipliers:
+            harnesses = HarnessQuantity(files, multiplier_file_name, output_dir=_output_dir)
+            harnesses.fetch_qty_multipliers_from_file()
+            qty_multipliers = harnesses.multipliers
+            for bom_item in shared_bom.values():
+                bom_item.scale_per_harness(qty_multipliers)
+
         shared_bomlist = bom_list(shared_bom)
+
         shared_bom_tsv = bom2tsv(shared_bomlist)
-        (_output_dir / "shared_bom").with_suffix(".tsv").open("w").write(shared_bom_tsv)
+        shared_bom_file.open("w").write(shared_bom_tsv)
 
     print()  # blank line after execution
 

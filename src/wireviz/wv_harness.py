@@ -52,7 +52,10 @@ class Harness:
     def name(self) -> str:
         pn = self.metadata.get("pn", "")
         output_name = self.metadata["output_name"]
-        return pn + output_name
+        if pn:
+            return f"{pn}-{output_name}"
+        else:
+            return output_name
 
     def add_connector(self, designator: str, *args, **kwargs) -> None:
         conn = Connector(designator=designator, *args, **kwargs)
