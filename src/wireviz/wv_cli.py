@@ -123,6 +123,10 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
 
     # determine output formats
     output_formats = {format_codes[f] for f in formats if f in format_codes}
+    harness_output_formats = output_formats.copy()
+    # Only generate the global pdf if there's multiple files
+    if len(files) > 1 and 'pdf' in harness_output_formats:
+        harness_output_formats.remove('pdf')
 
     harness = None
     shared_bom = {}
@@ -150,7 +154,7 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
         ret = wv.parse(
             prepend + (_file,),
             return_types=("shared_bom"),
-            output_formats=output_formats,
+            output_formats=harness_output_formats,
             output_dir=_output_dir,
             output_name=_output_name,
             extra_metadata=extra_metadata,
