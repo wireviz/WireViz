@@ -20,7 +20,12 @@ from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read, open_file_write
 
 
-def parse(yaml_input: str, file_out: Union[str, Path] = None, return_types: Optional[Union[str, Tuple[str]]] = None) -> Any:
+def parse(
+    yaml_input: str,
+    file_out: Union[str, Path] = None,
+    return_types: Optional[Union[str, Tuple[str]]] = None,
+    conceal_input: Optional[bool] = None,
+) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
@@ -190,7 +195,7 @@ def parse(yaml_input: str, file_out: Union[str, Path] = None, return_types: Opti
 
     if file_out is not None:
         harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
-        save_yaml_to_png(file_out,yaml_input)
+        save_yaml_to_png(file_out, yaml_input, conceal_input)
 
     if return_types is not None:
         returns = []
@@ -231,9 +236,12 @@ def parse_cmdline():
     parser.add_argument('-o', '--output_file', action='store', type=Path, metavar='OUTPUT')
     # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
     parser.add_argument('--prepend-file', action='store', type=Path, metavar='YAML_FILE')
-    return parser.parse_args()
+    parser.add_argument('--conceal-input', action='store_false', metavar='PRESERVE_INPUT')
+    return parser.parse_cmd_args()
 
-def save_yaml_to_png(file_out:Path, yaml_input):
+def save_yaml_to_png(file_out:Path, yaml_input:str, conceal_input:bool):
+    if not conceal_input:
+        return
     file_out = file_out.with_suffix('.png')
     with Image.open(fp=file_out) as im:
         txt = PngInfo()
@@ -246,14 +254,13 @@ def read_yaml_from_png(file_in:Path):
         return im.text['yaml']
 
 def main():
-
     args = parse_cmdline()
     input_file_base = args.input_file.parent / args.input_file.stem
     if not args.input_file.is_file():
         print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
-    if ".png" == args.input_file.suffix:
+    if ".png" == args.input_file.suffix: # Extract from png containing yaml data
         yaml_input = read_yaml_from_png(input_file_base)
         with open_file_write(input_file_base.parent / (input_file_base.stem + '_out.yaml')) as fh:
             fh.write(yaml_input) # Extract yaml to separate file
@@ -267,10 +274,11 @@ def main():
                 sys.exit(1)
             with open_file_read(args.prepend_file) as fh:
                 prepend = fh.read()
-                yaml_input = prepend + yaml_input
+            yaml_input = prepend + yaml_input
+        
 
     file_out = args.output_file if args.output_file else input_file_base
-    parse(yaml_input, file_out=file_out.resolve())
+    parse(yaml_input, file_out=file_out.resolve(), conceal_input=args.conceal_input)
 
 
 if __name__ == '__main__':
