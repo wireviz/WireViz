@@ -7,7 +7,7 @@
 
   #titleblock {
     width: 180mm;
-    height: calc({{ titleblock_rows }} * 4.25mm));
+    height: {{ titleblock_rows * 4.25 }}mm;
   }
 
   #titleblock table, th, td {
@@ -108,7 +108,7 @@
 
 <!-- START OF TEMPLATE --!>
 <div id="titleblock">
-  <table id="titleblock">
+  <table>
     <tr> <!-- ROW 1 --!>
       <!-- REVISIONS            Column 1 to 4 --!>
       {{ revision(1) }}

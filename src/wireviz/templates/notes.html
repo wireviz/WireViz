@@ -2,9 +2,9 @@
   .A4 #notes { /* NOTES on top of BOM */
     position: absolute;
     {% if show_bom %}
-    bottom: calc({{ titleblock_rows + bom_rows + 2 }} * 4.25mm);
+    bottom: {{ (titleblock_rows + bom_rows + 2) * 4.25 }}mm;
     {% else %}
-    bottom: calc({{ titleblock_rows + 1 }} * 4.25mm);
+    bottom: {{ (titleblock_rows + 1) * 4.25 }}mm;
     {% endif %}
     right: 0;
   }
@@ -12,11 +12,11 @@
   .A3 #notes, .A2 #notes { /* NOTES on top of title block */
     position: absolute;
     {% if notes_on_right %}
-    bottom: calc({{ titleblock_rows + 1 }} * 4.25mm);
+    bottom: {{ (titleblock_rows + 1) * 4.25 }}mm;
     right: 0;
     {% else %}
     {% if show_bom %}
-    bottom: calc({{ bom_rows + 1 }} * 4.25mm);
+    bottom: {{ (bom_rows + 1) * 4.25 }}mm;
     {% else %}
     bottom: 0;
     {% endif %}

@@ -67,9 +67,16 @@
       top: 0;
       left: 0;
       max-width: 100%;
-      height: calc(100% - {{ bottom_rows }}  * 4.25mm);
       text-align: center;
       vertical-align: middle;
+    }
+
+    #diagram {
+      {% if sheetsize == A2 %}
+        height: {{ 400 - bottom_rows * 4.25 }}mm;
+      {% else %}
+        height: {{ 277 - bottom_rows * 4.25 }}mm;
+      {% endif %}
     }
 
     #diagram svg, #diagram img {
@@ -104,7 +111,7 @@
         {{ description }}
       </div>
 
-      <div id="diagram">
+      <div id="diagram" class={{ sheetsize }}>
         {{ diagram }}
       </div>
 
