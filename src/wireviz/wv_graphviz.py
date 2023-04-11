@@ -19,7 +19,117 @@ from wireviz.wv_dataclasses import (
 )
 from wireviz.wv_html import Img, Table, Td, Tr
 from wireviz.wv_utils import html_line_breaks, remove_links
+from wireviz.wv_templates import get_template
 
+
+def gv_pin_table(component) -> Table:
+    pin_rows = []
+    for pin in component.pin_objects.values():
+        if component.should_show_pin(pin.id):
+            pin_rows.append(gv_pin_row(pin, component))
+    if len(pin_rows) == 0:
+        # TODO: write test for empty pin tables, and for unconnected connectors that hide disconnected pins
+        pass
+    tbl = Table(pin_rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
+    return tbl
+
+
+def gv_pin_row(pin, connector) -> Tr:
+    # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
+    has_pincolors = any([_pin.color for _pin in connector.pin_objects.values()])
+    cells = [
+        Td(pin.id, port=f"p{pin.index+1}l") if connector.ports_left else None,
+        Td(pin.label, delete_if_empty=True),
+        Td(str(pin.color) if pin.color else "", sides="TBL") if has_pincolors else None,
+        Td(color_minitable(pin.color), sides="TBR") if has_pincolors else None,
+        Td(pin.id, port=f"p{pin.index+1}r") if connector.ports_right else None,
+    ]
+    return Tr(cells)
+
+def gv_node_connector(connector: Connector) -> Table:
+    pins = []
+    use_left = bool(connector.ports_left)
+    use_right = bool(connector.ports_right)
+    for pin in connector.pin_objects.values():
+        if not connector.should_show_pin(pin.id):
+            continue
+        pins.append({
+            'id': pin.id,
+            'index': pin.index,
+            'label': pin.label,
+            #'color': pin.color,
+            #TODO: support color minitable?
+        })
+    columns = 2 + (1 if use_left else 0) + (1 if use_right else 0)
+    params = {
+        'designator': f"{remove_links(connector.designator)}",
+        'use_left': use_left,
+        'use_right': use_right,
+        'pins': pins,
+        'columns': columns,
+        # TODO: support asdict(connector)
+        'type': html_line_breaks(connector.type),
+        'subtype': html_line_breaks(connector.subtype),
+        'pincount': connector.pincount,
+        'show_pincount': connector.show_pincount
+    }
+    return get_template("connector.html").render(params)
+    ## If no wires connected (except maybe loop wires)?
+    #if isinstance(connector, Connector):
+    #    if not (connector.ports_left or connector.ports_right):
+    #        connector.ports_left = True  # Use left side pins by default
+
+    ## generate all rows to be shown in the node
+    #if connector.show_name:
+    #    str_name = f"{remove_links(connector.designator)}"
+    #    line_name = Td(str_name, bgcolor=connector.bgcolor_title.html)
+    #else:
+    #    line_name = None
+
+    #line_pn = partnumbers2list(connector.partnumbers)
+
+    #is_simple_connector = connector.style == 'simple'
+    #line_info = [
+    #    html_line_breaks(connector.type),
+    #    html_line_breaks(connector.subtype),
+    #    f"{connector.pincount}-pin" if connector.show_pincount else None,
+    #    str(connector.color) if connector.color else None,
+    #]
+
+    #if connector.color:
+    #    line_info.extend(colorbar_cells(connector.color))
+
+    #line_image, line_image_caption = image_and_caption_cells(connector)
+    ##line_additional_connector_table = gv_additional_component_table(connector)
+    #line_notes = [html_line_breaks(connector.notes)]
+
+    #if connector.style != "simple":
+    #    line_ports = gv_pin_table(connector)
+    #else:
+    #    line_ports = None
+
+    #lines = [
+    #    line_name,
+    #    line_pn,
+    #    line_info,
+    #    line_ports,
+    #    line_image,
+    #    line_image_caption,
+    #    line_additional_connector_table,
+    #    line_notes,
+    #]
+
+    #tbl = nested_table(lines)
+    #if is_simple_connector:
+    #    # Simple connectors have no pin table, and therefore, no ports to attach wires to.
+    #    # Manually assign left and right ports here if required.
+    #    # Use table itself for right port, and the first cell for left port.
+    #    # Even if the table only has one cell, two separate ports can still be assigned.
+    #    tbl.update_attribs(port="p1r")
+    #    first_cell_in_tbl = tbl.contents[0].contents
+    #    first_cell_in_tbl.update_attribs(port="p1l")
+
+    return tbl
 
 def gv_node_component(component: Component) -> Table:
     # If no wires connected (except maybe loop wires)?
@@ -182,31 +292,6 @@ def nested_table(lines: List[Td]) -> Table:
         rows = Tr(Td(""))
     tbl = Table(rows, border=0, cellspacing=0, cellpadding=0)
     return tbl
-
-
-def gv_pin_table(component) -> Table:
-    pin_rows = []
-    for pin in component.pin_objects.values():
-        if component.should_show_pin(pin.id):
-            pin_rows.append(gv_pin_row(pin, component))
-    if len(pin_rows) == 0:
-        # TODO: write test for empty pin tables, and for unconnected connectors that hide disconnected pins
-        pass
-    tbl = Table(pin_rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
-    return tbl
-
-
-def gv_pin_row(pin, connector) -> Tr:
-    # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
-    has_pincolors = any([_pin.color for _pin in connector.pin_objects.values()])
-    cells = [
-        Td(pin.id, port=f"p{pin.index+1}l") if connector.ports_left else None,
-        Td(pin.label, delete_if_empty=True),
-        Td(str(pin.color) if pin.color else "", sides="TBL") if has_pincolors else None,
-        Td(color_minitable(pin.color), sides="TBR") if has_pincolors else None,
-        Td(pin.id, port=f"p{pin.index+1}r") if connector.ports_right else None,
-    ]
-    return Tr(cells)
 
 
 def gv_connector_loops(connector: Connector) -> List:

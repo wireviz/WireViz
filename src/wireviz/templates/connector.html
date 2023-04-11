@@ -1,0 +1,26 @@
+<!-- Connector definition Table !-->
+<!-- Has 3 columns !-->
+<table border="0" cellborder="1" cellspacing="0" cellpadding="3" bgcolor="#FFFFFF">
+
+  <!-- Header !-->
+  <tr>
+    <td colspan="{{ columns }}">
+      <b> {{ designator }} </b>
+    </td>
+  </tr>
+  <tr>
+    <td> {{ type }} </td>
+    <td> {{ subtype }} </td>
+    {% if show_pincount %} <td > {{ pincount }}-pin </td> {% endif %}
+  </tr>
+  <!-- Pins !-->
+  {% for pin in pins  %}
+    <tr>
+      {% if use_left %}  <td port="p{{ pin.index + 1 }}l"> {{ pin.id }} </td> {% endif %}
+      <td colspan="2"> {{ pin.label }} </td>
+      {% if use_right %} <td port="p{{ pin.index + 1 }}r"> {{ pin.id }} </td> {% endif %}
+    </tr>
+  {% endfor %}
+  <!-- Additional Components !-->
+</table>
+

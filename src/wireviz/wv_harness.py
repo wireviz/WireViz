@@ -6,6 +6,7 @@ from typing import Dict, List
 
 from graphviz import Graph
 
+from wireviz import APP_NAME, APP_URL, __version__
 import wireviz.wv_colors
 from wireviz.wv_bom import bom_list
 from wireviz.wv_dataclasses import (
@@ -26,6 +27,7 @@ from wireviz.wv_graphviz import (
     gv_connector_loops,
     gv_edge_mate,
     gv_edge_wire,
+    gv_node_connector,
     gv_node_component,
     parse_arrow_str,
     set_dot_basics,
@@ -36,6 +38,7 @@ from wireviz.wv_output import (
     generate_pdf_output,
 )
 from wireviz.wv_utils import bom2tsv
+from wireviz.wv_templates import get_template
 
 
 @dataclass
@@ -278,9 +281,12 @@ class Harness:
             gv_html.update_attribs(
                 bgcolor=calculate_node_bgcolor(connector, self.options)
             )
+            template_html = gv_node_connector(connector)
+            #print(gv_html)
+            #import pdb; pdb.set_trace()
             dot.node(
                 connector.designator,
-                label=f"<\n{gv_html}\n>",
+                label=f"<\n{template_html}\n>",
                 shape="box",
                 style="filled",
             )
