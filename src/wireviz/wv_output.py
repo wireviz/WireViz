@@ -63,14 +63,9 @@ def generate_pdf_output(
     filename_list: List[Path],
     options: Dict=None,
 ):
-    #options = options if options is not None else {}
-    # TODO: pass intelligent options
-    options = {
-        'options': {
-            'page-size': 'A3',
-            'orientation': 'landscape',
-        }
-    }
+    '''Generate a pdf output, options are ignored for now, expect the formatting
+       to be done within the html files
+    '''
     if isinstance(filename_list, Path):
         filename_list = [filename_list]
         output_path = filename_list[0].with_suffix('.pdf')
@@ -84,9 +79,8 @@ def generate_pdf_output(
 
     print(f'Generating pdf output: {output_path}')
     html = HTML(filename=filepath_list[0])
-    #html.write_pdf(output_path)
-    css = CSS(string='@page { size: A3 landscape; margin: 1cm; }')
-    html.write_pdf(output_path, stylesheets=[css])
+    html.write_pdf(output_path)
+
 
 def generate_html_output(
     filename: Path,
@@ -148,7 +142,8 @@ def generate_html_output(
     added_metadata = {
         "revisions": [],
         "authors": [],
-        "sheetsize": "sheetsize_default",
+        "sheetsize": "A4",
+        "orientation": "portrait",
     }
     if metadata:
         for item, contents in metadata.items():
@@ -163,9 +158,9 @@ def generate_html_output(
             elif item == "pn":
                 added_metadata[item] = f'{contents}-{metadata.get("sheet_name")}'
             elif item == "template":
-                added_metadata["sheetsize"] = contents.get(
-                    "sheetsize", "sheetsize_default"
-                )
+                added_metadata["sheetsize"] = contents.get("sheetsize", "A4")
+                if added_metadata["sheetsize"] in ["A2", "A3"]:
+                    added_metadata["orientation"] = "landscape"
             else:
                 added_metadata[item] = contents
 
