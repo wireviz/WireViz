@@ -5,10 +5,9 @@ import re
 from pathlib import Path
 from typing import List, Union
 
-import jinja2
-
 import wireviz  # for doing wireviz.__file__
 from wireviz.wv_dataclasses import Metadata, Options
+from wireviz.wv_templates import get_template
 
 mime_subtype_replacements = {"jpg": "jpeg", "tif": "tiff"}
 
@@ -56,14 +55,6 @@ def embed_svg_images_file(
     if overwrite:
         filename_out.replace(filename_in)
 
-
-def get_template_html(template_name):
-    template_file_path = jinja2.FileSystemLoader(
-        Path(wireviz.__file__).parent / "templates"
-    )
-    jinja_env = jinja2.Environment(loader=template_file_path)
-
-    return jinja_env.get_template(template_name + ".html")
 
 
 def generate_html_output(
@@ -150,22 +141,17 @@ def generate_html_output(
     replacements = {**replacements, **added_metadata}
 
     # prepare BOM
-    bom_template = get_template_html("bom")
-    replacements["bom"] = bom_template.render(replacements)
+    replacements["bom"] = get_template("bom.html").render(replacements)
 
     # prepare titleblock
-    titleblock_template = get_template_html("titleblock")
-    replacements["titleblock"] = titleblock_template.render(replacements)
+    replacements["titleblock"] = get_template("titleblock.html").render(replacements)
 
     # preparate Notes
     if "notes" in replacements:
-        notes_template = get_template_html("notes")
-        replacements["notes"] = notes_template.render(replacements)
-
+        replacements["notes"] = get_template("notes.html").render(replacements)
 
     # generate page template
-    page_template = get_template_html(template_name)
-    page_rendered = page_template.render(replacements)
+    page_rendered = get_template(template_name, ".html").render(replacements)
 
     # save generated file
     filename.with_suffix(".html").open("w").write(page_rendered)
