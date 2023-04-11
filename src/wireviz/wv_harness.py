@@ -30,7 +30,7 @@ from wireviz.wv_graphviz import (
     parse_arrow_str,
     set_dot_basics,
 )
-from wireviz.wv_output import embed_svg_images_file, generate_html_output
+from wireviz.wv_output import embed_svg_images_file, generate_html_output, generate_pdf_output
 from wireviz.wv_utils import bom2tsv
 
 
@@ -394,8 +394,7 @@ class Harness:
             generate_html_output(filename, bomlist, self.metadata, self.options)
         # PDF output
         if "pdf" in fmt:
-            # TODO: implement PDF output
-            print("PDF output is not yet supported")
+            generate_pdf_output(filename)
         # delete SVG if not needed
         if "html" in fmt and not "svg" in fmt:
             # SVG file was just needed to generate HTML

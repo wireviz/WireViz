@@ -38,7 +38,7 @@
       position: relative;
     }
 
-    .A4, .sheetsize_default { /* portrait */
+    .A4 { /* portrait */
       width: 180mm;
       height: 277mm;
     }
@@ -62,12 +62,19 @@
       {% set bottom_rows = [bom_rows, titleblock_rows]|max + 1 %}
     {% endif %}
 
+    .A4 #diagram, .A3 #diagram {
+        height: {{ 277 - bottom_rows * 4.25 }}mm;
+    }
+
+    .A2 #diagram {
+        height: {{ 400 - bottom_rows * 4.25 }}mm;
+    }
+
     #diagram {
       position: relative;
       top: 0;
       left: 0;
       max-width: 100%;
-      height: calc(100% - {{ bottom_rows }}  * 4.25mm);
       text-align: center;
       vertical-align: middle;
     }
@@ -85,14 +92,13 @@
   <style type="text/css" media="print">
 
     @page {
-      size: auto;
+      size: {{ sheetsize }} {{ orientation }};
       margin: 0;
     }
 
-    /* TODO: auto-adjust based on portrait (larger margin on left) or landscape (larger margin on top) */
     #page {
-      margin: 10mm;
-      margin-left: 20mm;
+      margin-top: 10mm;
+      margin-left: 15mm; /* TODO: maybe scale this value depending on sheetsize */
     }
 
   </style>

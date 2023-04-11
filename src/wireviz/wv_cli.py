@@ -14,6 +14,7 @@ from wireviz import APP_NAME, __version__
 from wireviz.wv_bom import bom_list
 from wireviz.wv_utils import bom2tsv
 from wireviz.wv_harness_quantity import HarnessQuantity
+from wireviz.wv_output import generate_pdf_output
 
 format_codes = {
     "c": "csv",
@@ -126,9 +127,11 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
     harness = None
     shared_bom = {}
     sheet_current = 1
+    output_names = []
     # run WireVIz on each input file
     for _file in files:
         _output_name = _file.stem if not output_name else output_name
+        output_names.append(_output_dir / _output_name)
 
         print("Input file:  ", _file)
         print(
@@ -154,6 +157,9 @@ def cli(files, formats, prepend, output_dir, output_name, version, use_qty_multi
             shared_bom=shared_bom,
         )
         shared_bom = ret["shared_bom"]
+
+    if 'pdf' in output_formats and 'html' in output_formats and len(output_names) > 1:
+        generate_pdf_output(output_names)
 
     # TODO: move shared bom generation to a method?
     if "shared_bom" in output_formats:
