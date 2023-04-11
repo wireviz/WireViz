@@ -38,7 +38,7 @@
       position: relative;
     }
 
-    .A4, .sheetsize_default { /* portrait */
+    .A4 { /* portrait */
       width: 180mm;
       height: 277mm;
     }
@@ -62,6 +62,14 @@
       {% set bottom_rows = [bom_rows, titleblock_rows]|max + 1 %}
     {% endif %}
 
+    .A4 #diagram, .A3 #diagram {
+        height: {{ 277 - bottom_rows * 4.25 }}mm;
+    }
+
+    .A2 #diagram {
+        height: {{ 400 - bottom_rows * 4.25 }}mm;
+    }
+
     #diagram {
       position: relative;
       top: 0;
@@ -69,14 +77,6 @@
       max-width: 100%;
       text-align: center;
       vertical-align: middle;
-    }
-
-    #diagram {
-      {% if sheetsize == A2 %}
-        height: {{ 400 - bottom_rows * 4.25 }}mm;
-      {% else %}
-        height: {{ 277 - bottom_rows * 4.25 }}mm;
-      {% endif %}
     }
 
     #diagram svg, #diagram img {
@@ -96,10 +96,9 @@
       margin: 0;
     }
 
-    /* TODO: auto-adjust based on portrait (larger margin on left) or landscape (larger margin on top) */
     #page {
-      margin: 10mm;
-      margin-left: 20mm;
+      margin-top: 10mm;
+      margin-left: 15mm; /* TODO: maybe scale this value depending on sheetsize */
     }
 
   </style>
@@ -111,7 +110,7 @@
         {{ description }}
       </div>
 
-      <div id="diagram" class={{ sheetsize }}>
+      <div id="diagram">
         {{ diagram }}
       </div>
 
