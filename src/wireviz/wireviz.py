@@ -2,12 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from enum import Enum
 import os
 from pathlib import Path
 import sys
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional, Union
 
 import yaml
+from PIL import Image
+from PIL.PngImagePlugin import PngInfo
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -15,14 +18,27 @@ if __name__ == '__main__':
 from wireviz import __version__
 from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
-from wireviz.wv_helper import expand, open_file_read
+from wireviz.wv_helper import expand, open_file_read, open_file_write
 
+class ConcealEnum(Enum):
+    """Options for concealing input in cmd-line arguments"""
+    ALL = 'all' # Hides all input
+    PREPEND = 'prepend' # Hides just the prepend file
+    MAIN = 'main' # Hides just the main file
+    NONE = 'none' # Default, saves all input
 
-def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, str, Tuple[str]) = None) -> Any:
+def parse(
+    yaml_input: str,
+    prepend_yaml_input: str = '',
+    file_out: Union[str, Path] = None,
+    return_types: Optional[Union[str, Tuple[str]]] = None,
+    conceal_input: ConcealEnum = ConcealEnum.NONE,
+) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
 
     :param yaml_input: a string containing the yaml input data
+    :prepend_yaml_input: default '', a string containing the prepend file yaml input data
     :param file_out:
     :param return_types: if None, then returns None; if the value is a string, then a
         corresponding data format will be returned; if the value is a tuple of strings,
@@ -31,9 +47,10 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
          - "png" - will return the PNG data
          - "svg" - will return the SVG data
          - "harness" - will return the `Harness` instance
+    :conceal_input: defines which input files to conceal, if any
     """
 
-    yaml_data = yaml.safe_load(yaml_input)
+    yaml_data = yaml.safe_load(prepend_yaml_input + yaml_input)
 
     harness = Harness(
         metadata = Metadata(**yaml_data.get('metadata', {})),
@@ -188,6 +205,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
 
     if file_out is not None:
         harness.output(filename=file_out, fmt=('png', 'svg'), view=False)
+        save_yaml_to_png(file_out, yaml_input, conceal_input)
 
     if return_types is not None:
         returns = []
@@ -207,7 +225,7 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
+def parse_file(yaml_file: str, file_out: Union[str, Path] = None) -> None:
     with open_file_read(yaml_file) as file:
         yaml_input = file.read()
 
@@ -224,41 +242,60 @@ def parse_cmdline():
         description='Generate cable and wiring harness documentation from YAML descriptions',
     )
     parser.add_argument('-V', '--version', action='version', version='%(prog)s ' + __version__)
-    parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
-    parser.add_argument('-o', '--output_file', action='store', type=str, metavar='OUTPUT')
+    parser.add_argument('input_file', action='store', type=Path, metavar='YAML_FILE')
+    parser.add_argument('-o', '--output_file', action='store', type=Path, metavar='OUTPUT')
     # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
-    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
-    return parser.parse_args()
+    parser.add_argument('--prepend-file', action='store', type=Path, metavar='YAML_FILE')
+    parser.add_argument('--conceal-input', choices=[choice.value for choice in ConcealEnum], default=ConcealEnum.NONE.value, metavar='CONCEAL_INPUT')
+    return parser.parse_cmd_args()
 
+def save_yaml_to_png(file_out:Path, yaml_input:str, prepend_yaml_input:str, conceal_input:ConcealEnum):
+    if conceal_input == ConcealEnum.ALL:
+        return
+    file_out = file_out.with_suffix('.png')
+    with Image.open(fp=file_out) as im:
+        txt = PngInfo()
+        if conceal_input != ConcealEnum.PREPEND:
+            txt.add_itxt('prepend_yaml', prepend_yaml_input, zip=True)
+        if conceal_input != ConcealEnum.MAIN:
+            txt.add_itxt('yaml', yaml_input, zip=True)
+        im.save(fp=file_out, pnginfo=txt)
+
+def read_yaml_from_png(file_in:Path):
+    with Image.open(fp=file_in.with_suffix('.png')) as im:
+        im.load()
+        yaml_input = im.text['yaml']
+        prepend_yaml_input = im.text['prepend_yaml']
+    for file_ending, file_data in [('_prepend_out.yaml',prepend_yaml_input),('out.yaml',yaml_input)]:
+            with open_file_write(file_in.parent / (file_in.stem + file_ending)) as fh:
+                fh.write(file_data) # Extract yaml to separate file
+    return prepend_yaml_input, yaml_input
 
 def main():
-
     args = parse_cmdline()
-
-    if not os.path.exists(args.input_file):
+    input_file_base = args.input_file.parent / args.input_file.stem
+    if not args.input_file.is_file():
         print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
         sys.exit(1)
 
-    with open_file_read(args.input_file) as fh:
-        yaml_input = fh.read()
-
-    if args.prepend_file:
-        if not os.path.exists(args.prepend_file):
-            print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
-            sys.exit(1)
-        with open_file_read(args.prepend_file) as fh:
-            prepend = fh.read()
-            yaml_input = prepend + yaml_input
-
-    if not args.output_file:
-        file_out = args.input_file
-        pre, _ = os.path.splitext(file_out)
-        file_out = pre  # extension will be added by graphviz output function
+    if ".png" == args.input_file.suffix: # Extract from png containing yaml data
+        prepend_yaml_input, yaml_input = read_yaml_from_png(input_file_base)
     else:
-        file_out = args.output_file
-    file_out = os.path.abspath(file_out)
+        with open_file_read(args.input_file) as fh:
+            yaml_input = fh.read()
 
-    parse(yaml_input, file_out=file_out)
+        if args.prepend_file:
+            if not args.prepend_file.is_file():
+                print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
+                sys.exit(1)
+            with open_file_read(args.prepend_file) as fh:
+                prepend_yaml_input = fh.read()
+        else:
+            prepend_yaml_input = ''
+        
+
+    file_out = args.output_file if args.output_file else input_file_base
+    parse(yaml_input, prepend_yaml=prepend_yaml_input, file_out=file_out.resolve(), conceal_input=ConcealEnum(args.conceal_input))
 
 
 if __name__ == '__main__':
