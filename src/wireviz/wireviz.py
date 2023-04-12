@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+from enum import Enum
 import os
 from pathlib import Path
 import sys
@@ -19,13 +20,19 @@ from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
 from wireviz.wv_helper import expand, open_file_read, open_file_write
 
+class ConcealEnum(Enum):
+    """Options for concealing input in cmd-line arguments"""
+    ALL = 'all' # Hides all input
+    PREPEND = 'prepend' # Hides just the prepend file
+    MAIN = 'main' # Hides just the main file
+    NONE = 'none' # Default, saves all input
 
 def parse(
     yaml_input: str,
     prepend_yaml_input: str = '',
     file_out: Union[str, Path] = None,
     return_types: Optional[Union[str, Tuple[str]]] = None,
-    conceal_input: bool = False,
+    conceal_input: ConcealEnum = ConcealEnum.NONE,
 ) -> Any:
     """
     Parses yaml input string and does the high-level harness conversion
@@ -40,7 +47,7 @@ def parse(
          - "png" - will return the PNG data
          - "svg" - will return the SVG data
          - "harness" - will return the `Harness` instance
-    :conceal_input: if True, raw yaml data will not be saved to png outputs
+    :conceal_input: defines which input files to conceal, if any
     """
 
     yaml_data = yaml.safe_load(prepend_yaml_input + yaml_input)
@@ -239,17 +246,19 @@ def parse_cmdline():
     parser.add_argument('-o', '--output_file', action='store', type=Path, metavar='OUTPUT')
     # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
     parser.add_argument('--prepend-file', action='store', type=Path, metavar='YAML_FILE')
-    parser.add_argument('--conceal-input', action='store_false', metavar='PRESERVE_INPUT')
+    parser.add_argument('--conceal-input', choices=[choice.value for choice in ConcealEnum], default=ConcealEnum.NONE.value, metavar='CONCEAL_INPUT')
     return parser.parse_cmd_args()
 
-def save_yaml_to_png(file_out:Path, yaml_input:str, prepend_yaml_input:str, conceal_input:bool):
-    if not conceal_input:
+def save_yaml_to_png(file_out:Path, yaml_input:str, prepend_yaml_input:str, conceal_input:ConcealEnum):
+    if conceal_input == ConcealEnum.ALL:
         return
     file_out = file_out.with_suffix('.png')
     with Image.open(fp=file_out) as im:
         txt = PngInfo()
-        txt.add_itxt('prepend_yaml', prepend_yaml_input, zip=True)
-        txt.add_itxt('yaml', yaml_input, zip=True)
+        if conceal_input != ConcealEnum.PREPEND:
+            txt.add_itxt('prepend_yaml', prepend_yaml_input, zip=True)
+        if conceal_input != ConcealEnum.MAIN:
+            txt.add_itxt('yaml', yaml_input, zip=True)
         im.save(fp=file_out, pnginfo=txt)
 
 def read_yaml_from_png(file_in:Path):
@@ -286,7 +295,7 @@ def main():
         
 
     file_out = args.output_file if args.output_file else input_file_base
-    parse(yaml_input, prepend_yaml=prepend_yaml_input, file_out=file_out.resolve(), conceal_input=args.conceal_input)
+    parse(yaml_input, prepend_yaml=prepend_yaml_input, file_out=file_out.resolve(), conceal_input=ConcealEnum(args.conceal_input))
 
 
 if __name__ == '__main__':
