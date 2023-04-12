@@ -1,57 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta name="generator" content=" {{ generator }}">
-  <title> {{ title }}</title>
-  <style>
-    body {
-      font-family:  {{ fontname }};
-      background-color:  {{ bgcolor }};
-    }
-
-    table, td, th, #frame {
-      border: 0.35mm solid black; /* line weight based on DIN 15 */
-    }
-
-    table {
-      padding: 0;
-      border-bottom: 0;
-      border-right: 0;
-      border-spacing: 0mm;
-    }
-
-    td, th {
-      border-top: 0;
-      border-left: 0;
-
-      overflow: hidden;
-      /* display: inline-block; */
-      white-space: nowrap;
-      font-size: 2.8mm;
-    }
-
-    /* Canvas size based on DIN 823 / DIN 6771 / EN ISO 5457 */
-
-    #frame {
-      position: relative;
-    }
-
-    .A4 { /* portrait */
-      width: 180mm;
-      height: 277mm;
-    }
-
-    .A3 { /* landscape */
-      width: 390mm;
-      height: 277mm;
-    }
-
-    .A2 { /* landscape */
-      width: 564mm;
-      height: 400mm;
-    }
+{% extends "page.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block extra_head_style %}
+<style>
 
     /* custom count of rows depending on the sheetsize */
     {% if not show_bom %}
@@ -86,44 +36,20 @@
       top: 50%;
       transform: translateY(-50%);
     }
+</style>
 
+{% endblock %}
 
-  </style>
-  <style type="text/css" media="print">
+{% block frame_content %}
+    <div id="diagram">
+      {{ diagram }}
+    </div>
 
-    @page {
-      size: {{ sheetsize }} {{ orientation }};
-      margin: 0;
-    }
+    {% if show_notes %}
+    {{ notes }}
+    {% endif %}
 
-    #page {
-      margin-top: 10mm;
-      margin-left: 15mm; /* TODO: maybe scale this value depending on sheetsize */
-    }
-
-  </style>
-</head>
-<body>
-  <div id="page">
-    <div id="frame" class={{ sheetsize }}>
-      <div id="description">
-        {{ description }}
-      </div>
-
-      <div id="diagram">
-        {{ diagram }}
-      </div>
-
-      {% if show_notes %}
-      {{ notes }}
-      {% endif %}
-
-      {% if show_bom %}
-      {{ bom }}
-      {% endif %}
-
-      {{ titleblock }}
-    </div> <!-- /frame -->
-  </div> <!-- /page -->
-</body>
-</html>
+    {% if show_bom %}
+    {{ bom }}
+    {% endif %}
+{% endblock %}

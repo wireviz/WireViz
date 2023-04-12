@@ -3,16 +3,17 @@
     position: absolute;
     bottom: {{ (titleblock_rows + 1)  * 4.25 }}mm;
     right: 0;
+    width:180mm;
   }
 
   .A3 #bom, .A2 #bom { /* BOM to the left of title block */
     position: absolute;
+    {% if bom_updated_position %}
+    {{ bom_updated_position }}
+    {% else %}
     bottom: 0mm;
     left: 0mm;
-  }
-
-  #bom table {
-    width:180mm;
+    {% endif %}
   }
 
   #bom tr {

@@ -1,0 +1,17 @@
+{% extends "page.html" %}
+{% block title %}titlepage {{ title }}{% endblock %}
+{% block extra_head_style %}
+<style>
+</style>
+{% endblock %}
+
+{% block frame_content %}
+    <h1> {{ title }} </h1>
+    {% if show_notes %}
+    {{ notes }}
+    {% endif %}
+
+    {% if show_bom %}
+    {{ bom }}
+    {% endif %}
+{% endblock %}

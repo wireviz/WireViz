@@ -9,7 +9,10 @@ import logging
 from weasyprint import HTML
 
 import wireviz  # for doing wireviz.__file__
+from wireviz.wv_bom import bom_list
+from wireviz.wv_utils import bom2tsv
 from wireviz.wv_dataclasses import Metadata, Options
+from wireviz.wv_harness_quantity import HarnessQuantity
 from wireviz.wv_templates import get_template
 
 mime_subtype_replacements = {"jpg": "jpeg", "tif": "tiff"}
@@ -81,6 +84,32 @@ def generate_pdf_output(
     all_pages = [p for doc in documents for p in doc.pages]
     documents[0].copy(all_pages).write_pdf(output_path)
 
+def generate_shared_bom(
+    output_dir,
+    shared_bom,
+    use_qty_multipliers=False,
+    files=None,
+    multiplier_file_name=None,
+):
+    shared_bom_base = output_dir / "shared_bom"
+    shared_bom_file = shared_bom_base.with_suffix(".tsv")
+    print(f'Generating shared bom at {shared_bom_base}')
+
+    if use_qty_multipliers:
+        harnesses = HarnessQuantity(files, multiplier_file_name, output_dir=output_dir)
+        harnesses.fetch_qty_multipliers_from_file()
+        qty_multipliers = harnesses.multipliers
+        print(f'Using quantity multipliers: {qty_multipliers}')
+        for bom_item in shared_bom.values():
+            bom_item.scale_per_harness(qty_multipliers)
+
+    shared_bomlist = bom_list(shared_bom, False)
+
+    shared_bom_tsv = bom2tsv(shared_bomlist)
+    shared_bom_file.open("w").write(shared_bom_tsv)
+
+    return shared_bom_base, shared_bomlist
+
 
 def generate_html_output(
     filename: Path,
@@ -91,18 +120,20 @@ def generate_html_output(
     print("Generating html output")
     template_name = metadata.get("template", {}).get("name", "simple")
 
-    # embed SVG diagram
-    with filename.with_suffix(".svg").open("r") as f:
-        svgdata = re.sub(
-            "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
-            "<!-- XML and DOCTYPE declarations from SVG file removed -->",
-            f.read(),
-            1,
-        )
+    svgdata = None
+    if template_name != 'titlepage':
+        # embed SVG diagram for all but the titlepage
+        with filename.with_suffix(".svg").open("r") as f:
+            svgdata = re.sub(
+                "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
+                "<!-- XML and DOCTYPE declarations from SVG file removed -->",
+                f.read(),
+                1,
+            )
 
     # generate BOM table
     # generate BOM header (may be at the top or bottom of the table)
-    bom_reversed = False if template_name == "simple" else True
+    bom_reversed = False if template_name == "simple" or template_name == "titlepage" else True
     bom_header = bom[0]
     bom_columns = [
         "bom_col_{}".format("id" if c == "#" else c.lower()) for c in bom_header

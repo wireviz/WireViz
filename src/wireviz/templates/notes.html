@@ -12,15 +12,15 @@
   .A3 #notes, .A2 #notes { /* NOTES on top of title block */
     position: absolute;
     {% if notes_on_right %}
-    bottom: {{ (titleblock_rows + 1) * 4.25 }}mm;
     right: 0;
+    bottom: {{ (titleblock_rows + 1) * 4.25 }}mm;
     {% else %}
+    left: 0;
     {% if show_bom %}
     bottom: {{ (bom_rows + 1) * 4.25 }}mm;
     {% else %}
     bottom: 0;
     {% endif %}
-    left: 0;
     {% endif %}
   }
 
