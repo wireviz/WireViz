@@ -63,23 +63,21 @@ def build_generated(groupkeys):
             with (path / readme).open("w") as out:
                 out.write(f'# {groups[key]["title"]}\n\n')
         # collect and iterate input YAML files
+        yaml_files = [f for f in collect_filenames("Building", key, input_extensions)]
+        try:
+            res = cli([
+                "--formats", "ghpstb",  # no pdf for now
+                "--prepend", yaml_files[0].parent / "metadata.yml",
+                *[str(f) for f in yaml_files],
+            ])
+        except BaseException as e:
+            if str(e) != "0" and not isinstance(
+                e, (click.ClickException, SystemExit)
+            ):
+                raise
 
-        for yaml_file in collect_filenames("Building", key, input_extensions):
-            try:
-                res = cli([
-                    "--formats",
-                    "ghpstPb",
-                    str(yaml_file),
-                    "--prepend",
-                    yaml_file.parent / "metadata.yml"
-                ])
-            except BaseException as e:
-                if str(e) != "0" and not isinstance(
-                    e, (click.ClickException, SystemExit)
-                ):
-                    raise
-
-            if build_readme:
+        if build_readme:
+            for yaml_file in yaml_files:
                 i = "".join(filter(str.isdigit, yaml_file.stem))
 
                 with (path / readme).open("a") as out:
@@ -113,42 +111,6 @@ def clean_generated(groupkeys):
                 print(f'  rm "{filename}"')
                 filename.unlink()
 
-
-def compare_generated(groupkeys, branch="", include_graphviz_output=False):
-    if branch:
-        branch = f" {branch.strip()}"
-    compare_extensions = (
-        generated_extensions
-        if include_graphviz_output
-        else extensions_not_containing_graphviz_output
-    )
-    for key in groupkeys:
-        # collect and compare files
-        for filename in collect_filenames("Comparing", key, compare_extensions):
-            cmd = f'git --no-pager diff{branch} -- "{filename}"'
-            print(f"  {cmd}")
-            os.system(cmd)
-
-
-def restore_generated(groupkeys, branch=""):
-    if branch:
-        branch = f" {branch.strip()}"
-    for key in groupkeys:
-        # collect input YAML files
-        filename_list = collect_filenames("Restoring", key, input_extensions)
-        # collect files to restore
-        filename_list = [
-            fn.with_suffix(ext) for fn in filename_list for ext in generated_extensions
-        ]
-        if readme in groups[key]:
-            filename_list.append(groups[key]["path"] / readme)
-        # restore files
-        for filename in filename_list:
-            cmd = f'git checkout{branch} -- "{filename}"'
-            print(f"  {cmd}")
-            os.system(cmd)
-
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description=f"{APP_NAME} Example Manager",
@@ -168,19 +130,6 @@ def parse_args():
         help="what to do with the generated files (default: build)",
     )
     parser.add_argument(
-        "-c",
-        "--compare-graphviz-output",
-        action="store_true",
-        help="the Graphviz output is also compared (default: False)",
-    )
-    parser.add_argument(
-        "-b",
-        "--branch",
-        action="store",
-        default="",
-        help="branch or commit to compare with or restore from",
-    )
-    parser.add_argument(
         "-g",
         "--groups",
         nargs="+",
@@ -197,10 +146,6 @@ def main():
         build_generated(args.groups)
     elif args.action == "clean":
         clean_generated(args.groups)
-    elif args.action == "compare" or args.action == "diff":
-        compare_generated(args.groups, args.branch, args.compare_graphviz_output)
-    elif args.action == "restore":
-        restore_generated(args.groups, args.branch)
 
 
 if __name__ == "__main__":

@@ -423,6 +423,7 @@ class BomEntry:
 class Options:
     fontname: PlainText = "arial"
     show_bom: bool = True
+    show_index_table: bool = False
     show_notes: bool = True
     notes_on_right: bool = True
     notes_width: str = "100mm"

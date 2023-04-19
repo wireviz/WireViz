@@ -156,6 +156,7 @@ def generate_html_output(
         "bgcolor": options.bgcolor.html,
         "show_bom": options.show_bom,
         "show_notes": options.show_notes,
+        "show_index_table": options.show_index_table,
         "notes_on_right": options.notes_on_right,
         "notes_width": options.notes_width,
         "diagram": svgdata,
@@ -207,8 +208,70 @@ def generate_html_output(
     if "notes" in replacements:
         replacements["notes"] = get_template("notes.html").render(replacements)
 
+    # prepare index_table
+    replacements["index_table"] = get_template("index_table.html").render(replacements)
+
     # generate page template
     page_rendered = get_template(template_name, ".html").render(replacements)
 
     # save generated file
     filename.with_suffix(".html").open("w").write(page_rendered)
+
+def generate_titlepage(yaml_data, extra_metadata, shared_bom, for_pdf=False):
+    print('Generating titlepage')
+
+    index_table_content = []
+    index_table_content.append((
+        1, extra_metadata['titlepage'], ''
+    ))
+
+    for index, page_name in enumerate(extra_metadata['output_names']):
+        index_table_content.append((
+            index+2, page_name, ''
+        ))
+
+
+    if not for_pdf:
+        index_table_content = [(
+            p[0],
+            f"<a href={Path(p[1]).with_suffix('.html')}>{p[1]}</a>",
+            p[2],
+        ) for p in index_table_content]
+
+
+    #if create_titlepage:
+    #    extra_metadata["index_table_content"].append([
+    #        sheet_current,
+    #        f"<a href={Path(_output_name).with_suffix('.html')}>{extra_metadata['sheet_name']}</a>",
+    #        "",
+    #    ])
+    #index_table_content.insert(0, [
+    #    1,
+    #    f"<a href={Path('titlepage').with_suffix('.html')}>Title Page</a>",
+    #    ''
+    #])
+
+    titlepage_metadata = {
+        **yaml_data.get("metadata", {}),
+        **extra_metadata,
+        "sheet_current": 1,
+        "sheet_name": "titlepage",
+        "output_name": "titlepage",
+        "index_table_header": ["Sheet", "Harness", "Notes"],
+        "index_table_content": index_table_content,
+        "bom_updated_position": "top: 20mm; left: 10mm",
+        "notes_width": "200mm",
+    }
+    titlepage_metadata['template']['name'] = 'titlepage'
+    titlepage_options = {
+        "show_bom": True,
+        "show_index_table": True,
+        "show_notes": True,
+        **yaml_data.get("options", {}),
+    }
+    generate_html_output(
+        extra_metadata['output_dir']/ extra_metadata['titlepage'],
+        bom = bom_list(shared_bom),
+        metadata = Metadata(**titlepage_metadata), # TBD what we need to add here
+        options = Options(**titlepage_options),
+    )
