@@ -1,0 +1,69 @@
+<style>
+  .A4 #index_table { /* index_table on top of title block */
+    position: absolute;
+    top: 20mm;
+    left: 0;
+    width:180mm;
+  }
+
+  .A3 #index_table, .A2 #index_table { /* index_table to the left of title block */
+    position: absolute;
+    {% if index_table_updated_position %}
+    {{ index_table_updated_position }}
+    {% else %}
+    top: {{ 20 + (bom_rows + 2) * 4.25 + 10}}mm;
+    left: 10mm;
+    {% endif %}
+  }
+
+  #index_table tr {
+    height: 4.25mm;
+  }
+
+  #index_table tr:nth-child(odd) {
+    background-color: #EEEEEE
+  }
+
+  #index_table table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  #index_table .index_table_col_id {
+    text-align: center;
+    font-weight: bold;
+  }
+
+  #index_table .index_table_col_qty {
+    text-align: right;
+  }
+
+</style>
+
+
+<!-- index_table HEADER GENERATION MACRO --!>
+{% macro index_table_header_gen() -%}
+    <tr>
+      {% for item in index_table_header %}
+      <td><b> {{ item }} </b></td>
+      {% endfor %}
+    </tr>
+{%- endmacro %}
+
+<!-- index_table TEMPLATE --!>
+<div id="index_table">
+  <b> INDEX TABLE </b>
+  <table>
+    {{ index_table_header_gen() }}
+
+  {% for row in index_table_content %}
+    <tr>
+    {% for item in row %}
+      <td> {{ item }} </td>
+    {% endfor %}
+    </tr>
+  {% endfor %}
+
+  </table >
+</div>
