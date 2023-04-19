@@ -22,7 +22,6 @@ def partnumbers2list(
     if not isinstance(partnumbers, list):
         partnumbers = [partnumbers]
 
-
     # if there's no parent, fold
     if parent_partnumbers is None:
         return PartNumberInfo.list_keep_only_eq(partnumbers).str_list

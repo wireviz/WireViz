@@ -65,15 +65,17 @@ def build_generated(groupkeys):
         # collect and iterate input YAML files
         yaml_files = [f for f in collect_filenames("Building", key, input_extensions)]
         try:
-            res = cli([
-                "--formats", "ghpstb",  # no pdf for now
-                "--prepend", yaml_files[0].parent / "metadata.yml",
-                *[str(f) for f in yaml_files],
-            ])
+            res = cli(
+                [
+                    "--formats",
+                    "ghpstb",  # no pdf for now
+                    "--prepend",
+                    yaml_files[0].parent / "metadata.yml",
+                    *[str(f) for f in yaml_files],
+                ]
+            )
         except BaseException as e:
-            if str(e) != "0" and not isinstance(
-                e, (click.ClickException, SystemExit)
-            ):
+            if str(e) != "0" and not isinstance(e, (click.ClickException, SystemExit)):
                 raise
 
         if build_readme:
@@ -110,6 +112,7 @@ def clean_generated(groupkeys):
             if filename.is_file():
                 print(f'  rm "{filename}"')
                 filename.unlink()
+
 
 def parse_args():
     parser = argparse.ArgumentParser(

@@ -157,7 +157,9 @@ class PartNumberInfo:
     }
 
     def __bool__(self):
-        return bool(self.pn or self.manufacturer or self.mpn or self.supplier or self.spn)
+        return bool(
+            self.pn or self.manufacturer or self.mpn or self.supplier or self.spn
+        )
 
     def __hash__(self):
         return hash((self.pn, self.manufacturer, self.mpn, self.supplier, self.spn))
@@ -175,7 +177,7 @@ class PartNumberInfo:
         empty_if_none = lambda x: "" if x is None else str(x)
 
         if isinstance(self.pn, list):
-            raise ValueError(f'pn ({self.pn}) should not be a list')
+            raise ValueError(f"pn ({self.pn}) should not be a list")
         self.pn = empty_if_none(self.pn)
         self.manufacturer = empty_if_none(self.manufacturer)
         self.mpn = empty_if_none(self.mpn)
@@ -222,33 +224,33 @@ class PartNumberInfo:
         part = self.copy()
 
         if other is None:
-            if op == '==':
+            if op == "==":
                 return part
-            elif op == '!=':
+            elif op == "!=":
                 return None
             else:
-                raise NotImplementedError(f'op {op} not supported')
+                raise NotImplementedError(f"op {op} not supported")
 
         if isinstance(other, list):
             for item in other:
                 part = part.clear_per_field(op, item)
         else:
             for k in ["pn", "manufacturer", "mpn", "supplier", "spn"]:
-                if op == '==':
+                if op == "==":
                     if part[k] == other[k]:
                         part[k] = ""
-                elif op == '!=':
+                elif op == "!=":
                     if part[k] != other[k]:
                         part[k] = ""
                 else:
-                    raise NotImplementedError(f'op {op} not supported')
+                    raise NotImplementedError(f"op {op} not supported")
         return part
 
     def keep_only_eq(self, other):
-        return self.clear_per_field('!=', other)
+        return self.clear_per_field("!=", other)
 
     def remove_eq(self, other):
-        return self.clear_per_field('==', other)
+        return self.clear_per_field("==", other)
 
     @staticmethod
     def list_keep_only_eq(partnumbers):
@@ -256,6 +258,7 @@ class PartNumberInfo:
         for p in partnumbers:
             pn = pn.keep_only_eq(p)
         return pn
+
 
 @dataclass
 class BomEntry:
@@ -277,7 +280,6 @@ class BomEntry:
     MAX_PRINTED_DESIGNATORS: int = 2
     restrict_printed_lengths: bool = True
 
-
     scaled_per_harness = False
 
     # Map a bom key to the header
@@ -291,7 +293,7 @@ class BomEntry:
     }
 
     def __repr__(self):
-        return f'{id}: {self.partnumbers}, {self.qty}'
+        return f"{id}: {self.partnumbers}, {self.qty}"
 
     def __hash__(self):
         return hash((self.partnumbers, self.description))
@@ -323,9 +325,7 @@ class BomEntry:
         setattr(self, key, value)
 
     def __post_init__(self):
-        assert isinstance(
-            self.qty, NumberAndUnit
-        ), f"Unexpected qty type {self.qty}"
+        assert isinstance(self.qty, NumberAndUnit), f"Unexpected qty type {self.qty}"
         assert isinstance(
             self.partnumbers, PartNumberInfo
         ), f"Unexpected partnumbers type {self.partnumbers}"
@@ -342,11 +342,13 @@ class BomEntry:
             if not isinstance(self.qty_multiplier, str):
                 self.qty *= float(self.qty_multiplier)
 
-
     @property
     def description_str(self):
         description = self.description
-        if self.restrict_printed_lengths and len(description) > self.MAX_PRINTED_DESCRIPTION:
+        if (
+            self.restrict_printed_lengths
+            and len(description) > self.MAX_PRINTED_DESCRIPTION
+        ):
             description = f"{description[:self.MAX_PRINTED_DESCRIPTION]} (...)"
         return description
 
@@ -356,7 +358,10 @@ class BomEntry:
             return ""
 
         all_designators = sorted(self.designators)
-        if self.restrict_printed_lengths and len(all_designators) > self.MAX_PRINTED_DESIGNATORS:
+        if (
+            self.restrict_printed_lengths
+            and len(all_designators) > self.MAX_PRINTED_DESIGNATORS
+        ):
             all_designators = all_designators[: self.MAX_PRINTED_DESIGNATORS] + ["..."]
         return ", ".join(all_designators)
 
@@ -403,18 +408,22 @@ class BomEntry:
 
     def scale_per_harness(self, qty_multipliers):
         if self.scaled_per_harness:
-            logging.warn('{self}: Already scaled')
+            logging.warn("{self}: Already scaled")
 
         qty = NumberAndUnit(0, self.qty.unit_str)
         for name, info in self.per_harness.items():
             multiplier_name = [k for k in qty_multipliers.keys() if name.endswith(k)]
             if len(multiplier_name) == 0:
-                raise ValueError(f'No multiplier found for harness {name} in {qty_multipliers}')
+                raise ValueError(
+                    f"No multiplier found for harness {name} in {qty_multipliers}"
+                )
             if len(multiplier_name) > 1:
-                raise ValueError(f'Conflicting multipliers found ({multiplier_name}) for harness {name} in {qty_multipliers}')
+                raise ValueError(
+                    f"Conflicting multipliers found ({multiplier_name}) for harness {name} in {qty_multipliers}"
+                )
 
-            info['qty'] *= qty_multipliers[multiplier_name[0]]
-            qty += info['qty']
+            info["qty"] *= qty_multipliers[multiplier_name[0]]
+            qty += info["qty"]
         self.qty = qty
         self.scaled_per_harness = True
 
@@ -563,7 +572,7 @@ class Component:
         self.qty = NumberAndUnit.to_number_and_unit(self.qty)
         self.amount = NumberAndUnit.to_number_and_unit(self.amount)
         if isinstance(self.pn, list):
-            raise RuntimeError(f'PN ({self.pn}) should not be a list')
+            raise RuntimeError(f"PN ({self.pn}) should not be a list")
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, Component):
@@ -766,15 +775,21 @@ class Connector(GraphicalComponent):
         }
         for subitem in self.additional_components:
             if isinstance(subitem.qty_multiplier, str):
-                computed_factor = qty_multipliers_computed[subitem.qty_multiplier.upper()]
-            #if isinstance(subitem.qty_multiplier, QtyMultiplierConnector):
+                computed_factor = qty_multipliers_computed[
+                    subitem.qty_multiplier.upper()
+                ]
+            # if isinstance(subitem.qty_multiplier, QtyMultiplierConnector):
             #    computed_factor = qty_multipliers_computed[subitem.qty_multiplier.name.upper()]
-            #elif isinstance(subitem.qty_multiplier, QtyMultiplierCable):
+            # elif isinstance(subitem.qty_multiplier, QtyMultiplierCable):
             #    raise Exception("Used a cable multiplier in a connector!")
-            elif isinstance(subitem.qty_multiplier, int) or isinstance(subitem.qty_multiplier, float):
+            elif isinstance(subitem.qty_multiplier, int) or isinstance(
+                subitem.qty_multiplier, float
+            ):
                 computed_factor = subitem.qty_multiplier
             else:
-                raise ValueError(f'Unexpected qty multiplier "{subitem.qty_multiplier}"')
+                raise ValueError(
+                    f'Unexpected qty multiplier "{subitem.qty_multiplier}"'
+                )
             subitem._qty_multiplier_computed = computed_factor
 
 

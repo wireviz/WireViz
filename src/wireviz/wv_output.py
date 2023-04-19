@@ -64,25 +64,26 @@ def embed_svg_images_file(
 
 def generate_pdf_output(
     filename_list: List[Path],
-    options: Dict=None,
+    options: Dict = None,
 ):
-    '''Generate a pdf output, options are ignored for now, expect the formatting
-       to be done within the html files
-    '''
+    """Generate a pdf output, options are ignored for now, expect the formatting
+    to be done within the html files
+    """
     if isinstance(filename_list, Path):
         filename_list = [filename_list]
-        output_path = filename_list[0].with_suffix('.pdf')
+        output_path = filename_list[0].with_suffix(".pdf")
     else:
         output_dir = filename_list[0].parent
-        output_path = (output_dir / output_dir.name).with_suffix('.pdf')
+        output_path = (output_dir / output_dir.name).with_suffix(".pdf")
 
-    filepath_list = [f.with_suffix('.html') for f in filename_list]
+    filepath_list = [f.with_suffix(".html") for f in filename_list]
 
-    print(f'Generating pdf output: {output_path}')
+    print(f"Generating pdf output: {output_path}")
     files_html = [HTML(path) for path in filepath_list]
     documents = [f.render() for f in files_html]
     all_pages = [p for doc in documents for p in doc.pages]
     documents[0].copy(all_pages).write_pdf(output_path)
+
 
 def generate_shared_bom(
     output_dir,
@@ -93,13 +94,13 @@ def generate_shared_bom(
 ):
     shared_bom_base = output_dir / "shared_bom"
     shared_bom_file = shared_bom_base.with_suffix(".tsv")
-    print(f'Generating shared bom at {shared_bom_base}')
+    print(f"Generating shared bom at {shared_bom_base}")
 
     if use_qty_multipliers:
         harnesses = HarnessQuantity(files, multiplier_file_name, output_dir=output_dir)
         harnesses.fetch_qty_multipliers_from_file()
         qty_multipliers = harnesses.multipliers
-        print(f'Using quantity multipliers: {qty_multipliers}')
+        print(f"Using quantity multipliers: {qty_multipliers}")
         for bom_item in shared_bom.values():
             bom_item.scale_per_harness(qty_multipliers)
 
@@ -121,7 +122,7 @@ def generate_html_output(
     template_name = metadata.get("template", {}).get("name", "simple")
 
     svgdata = None
-    if template_name != 'titlepage':
+    if template_name != "titlepage":
         # embed SVG diagram for all but the titlepage
         with filename.with_suffix(".svg").open("r") as f:
             svgdata = re.sub(
@@ -133,7 +134,9 @@ def generate_html_output(
 
     # generate BOM table
     # generate BOM header (may be at the top or bottom of the table)
-    bom_reversed = False if template_name == "simple" or template_name == "titlepage" else True
+    bom_reversed = (
+        False if template_name == "simple" or template_name == "titlepage" else True
+    )
     bom_header = bom[0]
     bom_columns = [
         "bom_col_{}".format("id" if c == "#" else c.lower()) for c in bom_header
@@ -141,7 +144,6 @@ def generate_html_output(
     bom_content = bom[1:]
     if bom_reversed:
         bom_content.reverse()
-
 
     if metadata:
         sheet_current = metadata["sheet_current"]
@@ -217,39 +219,37 @@ def generate_html_output(
     # save generated file
     filename.with_suffix(".html").open("w").write(page_rendered)
 
+
 def generate_titlepage(yaml_data, extra_metadata, shared_bom, for_pdf=False):
-    print('Generating titlepage')
+    print("Generating titlepage")
 
     index_table_content = []
-    index_table_content.append((
-        1, extra_metadata['titlepage'], ''
-    ))
+    index_table_content.append((1, extra_metadata["titlepage"], ""))
 
-    for index, page_name in enumerate(extra_metadata['output_names']):
-        index_table_content.append((
-            index+2, page_name, ''
-        ))
-
+    for index, page_name in enumerate(extra_metadata["output_names"]):
+        index_table_content.append((index + 2, page_name, ""))
 
     if not for_pdf:
-        index_table_content = [(
-            p[0],
-            f"<a href={Path(p[1]).with_suffix('.html')}>{p[1]}</a>",
-            p[2],
-        ) for p in index_table_content]
+        index_table_content = [
+            (
+                p[0],
+                f"<a href={Path(p[1]).with_suffix('.html')}>{p[1]}</a>",
+                p[2],
+            )
+            for p in index_table_content
+        ]
 
-
-    #if create_titlepage:
+    # if create_titlepage:
     #    extra_metadata["index_table_content"].append([
     #        sheet_current,
     #        f"<a href={Path(_output_name).with_suffix('.html')}>{extra_metadata['sheet_name']}</a>",
     #        "",
     #    ])
-    #index_table_content.insert(0, [
+    # index_table_content.insert(0, [
     #    1,
     #    f"<a href={Path('titlepage').with_suffix('.html')}>Title Page</a>",
     #    ''
-    #])
+    # ])
 
     titlepage_metadata = {
         **yaml_data.get("metadata", {}),
@@ -262,7 +262,7 @@ def generate_titlepage(yaml_data, extra_metadata, shared_bom, for_pdf=False):
         "bom_updated_position": "top: 20mm; left: 10mm",
         "notes_width": "200mm",
     }
-    titlepage_metadata['template']['name'] = 'titlepage'
+    titlepage_metadata["template"]["name"] = "titlepage"
     titlepage_options = {
         "show_bom": True,
         "show_index_table": True,
@@ -270,8 +270,8 @@ def generate_titlepage(yaml_data, extra_metadata, shared_bom, for_pdf=False):
         **yaml_data.get("options", {}),
     }
     generate_html_output(
-        extra_metadata['output_dir']/ extra_metadata['titlepage'],
-        bom = bom_list(shared_bom),
-        metadata = Metadata(**titlepage_metadata), # TBD what we need to add here
-        options = Options(**titlepage_options),
+        extra_metadata["output_dir"] / extra_metadata["titlepage"],
+        bom=bom_list(shared_bom),
+        metadata=Metadata(**titlepage_metadata),  # TBD what we need to add here
+        options=Options(**titlepage_options),
     )

@@ -30,7 +30,11 @@ from wireviz.wv_graphviz import (
     parse_arrow_str,
     set_dot_basics,
 )
-from wireviz.wv_output import embed_svg_images_file, generate_html_output, generate_pdf_output
+from wireviz.wv_output import (
+    embed_svg_images_file,
+    generate_html_output,
+    generate_pdf_output,
+)
 from wireviz.wv_utils import bom2tsv
 
 
