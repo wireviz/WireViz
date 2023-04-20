@@ -1,0 +1,20 @@
+{% import 'colors_macro.html' as colors %}
+{% set pin = pins[0] %}
+<!-- Connector definition Table !-->
+<table border="0" cellborder="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
+  <!-- Header !-->
+  <tr>
+    <td>
+      <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
+        <tr>
+          <td port="p1l"> {{ type }} </td>
+          <td > {{ subtype }} </td>
+          {% if show_pincount %} <td> {{ pincount }}-pin </td> {% endif %}
+          {% if color %} <td > {{ color }} </td> {% endif %}
+          {% if color %} {{ colors.colorbar_cells(color, color_len, "p1r") }} {% endif %}
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+

@@ -1,0 +1,47 @@
+{% macro colorbar_cell(color, is_first, is_last, port_last, mini=false) -%}
+  {% if is_first%}
+    {% set side_l = "L" %}
+  {% else %}
+    {% set side_l = "" %}
+  {% endif %}
+  {% if is_last%}
+    {% set side_r = "R" %}
+  {% else %}
+    {% set side_r = "" %}
+  {% endif %}
+  {% if mini %}
+    {% set mini_params = 'height="8" width="8" fixedsize="true"' %}
+  {% else %}
+    {% set mini_params = "" %}
+  {% endif %}
+
+  {% if is_last and port_last %}
+  <td port="{{port_last}}" bgcolor="{{color.html}}" sides="TB{{side_l}}{{side_r}}" {{mini_params}}> </td>
+  {% else %}
+  <td bgcolor="{{color.html}}" sides="TB{{side_l}}{{side_r}}" {{mini_params}}> </td>
+  {% endif %}
+{%- endmacro %}
+
+{% macro colorbar_cells(color, color_len, port_last, mini=false) -%}
+  {% for subcolor in color.colors %}
+    {% if loop.index == 1 %}
+      {%set is_first = "true" %}
+    {% else %}
+      {%set is_first = "false" %}
+    {% endif %}
+    {% if loop.index == color_len %}
+      {%set is_last = "true" %}
+    {% else %}
+      {%set is_last = "false" %}
+    {% endif %}
+    {{ colorbar_cell(subcolor, is_first, is_last, port_last, mini) }}
+  {% endfor %}
+{%- endmacro %}
+
+{% macro color_minitable(color, color_len) -%}
+  <table border="0" cellborder="1" cellspacing="0" cellpadding="0" height="8" width="{{ color_len * 8 }}">
+    <tr>
+      {{ colorbar_cells(color, color_len, port_last="", mini="true") }}
+    </tr>
+  </table>
+{%- endmacro %}

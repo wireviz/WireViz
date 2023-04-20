@@ -1,26 +1,48 @@
+{% import 'colors_macro.html' as colors %}
 <!-- Connector definition Table !-->
-<!-- Has 3 columns !-->
-<table border="0" cellborder="1" cellspacing="0" cellpadding="3" bgcolor="#FFFFFF">
-
+<table border="0" cellborder="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
   <!-- Header !-->
   <tr>
-    <td colspan="{{ columns }}">
-      <b> {{ designator }} </b>
+    <td>
+      <table border="0" cellborder="1" cellspacing="0" cellpadding="3" bgcolor="#FFFFFF">
+        <tr>
+          <td>
+            <b> {{ designator }} </b>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
   <tr>
-    <td> {{ type }} </td>
-    <td> {{ subtype }} </td>
-    {% if show_pincount %} <td > {{ pincount }}-pin </td> {% endif %}
+    <td>
+      <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
+        <tr>
+          <td> {{ type }} </td>
+          <td> {{ subtype }} </td>
+          {% if show_pincount %} <td > {{ pincount }}-pin </td> {% endif %}
+          {% if color %} <td > {{ color }} </td> {% endif %}
+        </tr>
+      </table>
+    </td>
   </tr>
   <!-- Pins !-->
-  {% for pin in pins  %}
-    <tr>
-      {% if use_left %}  <td port="p{{ pin.index + 1 }}l"> {{ pin.id }} </td> {% endif %}
-      <td colspan="2"> {{ pin.label }} </td>
-      {% if use_right %} <td port="p{{ pin.index + 1 }}r"> {{ pin.id }} </td> {% endif %}
-    </tr>
-  {% endfor %}
+  <tr>
+    <td>
+      <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
+        {% for pin in pins  %}
+          <tr>
+            {% if use_left %}  <td port="p{{ pin.index + 1 }}l"> {{ pin.id }} </td> {% endif %}
+            <td colspan="2"> {{ pin.label }} </td>
+            {% if has_pincolors %}
+            <td sides="TBL"> {{ pin.color }} </td>
+            <td sides="TBR"> { colors.color_minitable(pin.color, pin.color_len) } </td>
+            {% endif %}
+            {% if use_right %} <td port="p{{ pin.index + 1 }}r"> {{ pin.id }} </td> {% endif %}
+          </tr>
+        {% endfor %}
+      </table>
+    </td>
+  </tr>
   <!-- Additional Components !-->
 </table>
 
