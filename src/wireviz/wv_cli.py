@@ -202,8 +202,8 @@ def cli(
         generate_titlepage(yaml_data, extra_metadata, shared_bom)
 
         if "pdf" in output_formats:
-            extra_metadata["titlepage"] = extra_metadata["titlepage"].with_suffix(
-                "_for_pdf"
+            extra_metadata["titlepage"] = extra_metadata["titlepage"].with_stem(
+                extra_metadata["titlepage"].stem + "_for_pdf"
             )
             if create_titlepage:
                 extra_metadata["output_names"].insert(
