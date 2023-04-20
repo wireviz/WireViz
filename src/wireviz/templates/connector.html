@@ -6,9 +6,8 @@
     <td>
       <table border="0" cellborder="1" cellspacing="0" cellpadding="3" bgcolor="#FFFFFF">
         <tr>
-          <td>
-            <b> {{ designator }} </b>
-          </td>
+          <td colspan="2"> <b> {{ designator }} </b> </td>
+          <!-- <td> BOM: {{ bom_id }} </td> !-->
         </tr>
       </table>
     </td>
@@ -21,6 +20,7 @@
           <td> {{ subtype }} </td>
           {% if show_pincount %} <td > {{ pincount }}-pin </td> {% endif %}
           {% if color %} <td > {{ color }} </td> {% endif %}
+          {% if color %} {{ colors.colorbar_cells(color, color_len) }} {% endif %}
         </tr>
       </table>
     </td>

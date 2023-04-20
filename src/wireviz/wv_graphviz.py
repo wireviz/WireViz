@@ -70,6 +70,7 @@ def gv_node_connector(connector: Connector) -> Table:
         'use_right': use_right,
         'pins': pins,
         'columns': columns,
+        'bom_id': connector.bom_entry.id,
         # TODO: support asdict(connector)
         'type': html_line_breaks(connector.type),
         'subtype': html_line_breaks(connector.subtype),
