@@ -50,15 +50,18 @@ def gv_node_connector(connector: Connector) -> Table:
     pins = []
     use_left = bool(connector.ports_left)
     use_right = bool(connector.ports_right)
+    has_pincolors = any([_pin.color for _pin in connector.pin_objects.values()])
     for pin in connector.pin_objects.values():
         if not connector.should_show_pin(pin.id):
             continue
+        color = str(pin.color) if pin.color else "" if has_pincolors else None
         pins.append({
             'id': pin.id,
             'index': pin.index,
             'label': pin.label,
-            #'color': pin.color,
-            #TODO: support color minitable?
+            'color': color,
+            'color_len': len(pin.color),
+            'has_pincolors': has_pincolors,
         })
     columns = 2 + (1 if use_left else 0) + (1 if use_right else 0)
     params = {
@@ -71,9 +74,19 @@ def gv_node_connector(connector: Connector) -> Table:
         'type': html_line_breaks(connector.type),
         'subtype': html_line_breaks(connector.subtype),
         'pincount': connector.pincount,
-        'show_pincount': connector.show_pincount
+        'show_pincount': connector.show_pincount,
+        'color': connector.color,
+        'color_len': len(connector.color),
     }
-    return get_template("connector.html").render(params)
+    # TODO: extend connector style support
+    is_simple_connector = connector.style == 'simple'
+    template_name = "connector.html"
+    if is_simple_connector:
+        template_name = "simple-connector.html"
+
+    rendered = get_template(template_name).render(params)
+    cleaned_render = '\n'.join([l.rstrip() for l in rendered.split('\n') if l.strip()])
+    return cleaned_render
     ## If no wires connected (except maybe loop wires)?
     #if isinstance(connector, Connector):
     #    if not (connector.ports_left or connector.ports_right):
