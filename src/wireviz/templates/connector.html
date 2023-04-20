@@ -7,11 +7,28 @@
       <table border="0" cellborder="1" cellspacing="0" cellpadding="3" bgcolor="#FFFFFF">
         <tr>
           <td colspan="2"> <b> {{ designator }} </b> </td>
-          <!-- <td> BOM: {{ bom_id }} </td> !-->
+          {% if bom_id %}
+          <td> BOM: {{ bom_id }} </td>
+          {% endif %}
         </tr>
       </table>
     </td>
   </tr>
+  <!-- Part Number !-->
+  {% if line_pn %}
+  <tr>
+    <td>
+      <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
+        <tr>
+          {% for item in line_pn %}
+          <td> {{item}} </td>
+          {% endfor %}
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endif %}
+  <!-- Info !-->
   <tr>
     <td>
       <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
@@ -43,6 +60,26 @@
       </table>
     </td>
   </tr>
+  <!-- Image !-->
+  {% if image %}
+  <tr>
+    <td>
+      {% include "images.html" %}
+    </td>
+  </tr>
+  {% endif %}
   <!-- Additional Components !-->
+  <!-- Notes !-->
+  {% if line_notes %}
+  <tr>
+    <td>
+      <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
+        <tr>
+          <td> {{ line_notes }} </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  {% endif %}
 </table>
 

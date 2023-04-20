@@ -1,0 +1,16 @@
+{% if image %}
+<table border="0" cellborder="0" cellpadding="3" cellspacing="0" >
+  <tr>
+    <td balign="left" sides="TLR"><img scale="{{ image.scale }}" src="{{ image.src }}" /></td>
+  </tr>
+  {% if image.caption %}
+  <tr>
+    <td balign="left" sides="BLR">
+      {{ image.caption }}
+    </td>
+  </tr>
+  {% endif %}
+</table>
+{% else %}
+<!-- No Image Defined !-->
+{% endif %}

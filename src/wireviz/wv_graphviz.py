@@ -46,6 +46,35 @@ def gv_pin_row(pin, connector) -> Tr:
     ]
     return Tr(cells)
 
+def image_and_caption_cells(component: Component) -> (Td, Td):
+    if not component.image:
+        return (None, None)
+
+    image_tag = Img(scale=component.image.scale, src=component.image.src)
+    image_cell_inner = Td(image_tag, flat=True)
+    if component.image.fixedsize:
+        # further nest the image in a table with width/height/fixedsize parameters,
+        # and place that table in a cell
+        image_cell = Td(
+            Table(Tr(image_cell_inner), border=0, cellborder=0, cellspacing=0, id="!")
+        )
+    else:
+        image_cell = image_cell_inner
+
+    image_cell.update_attribs(
+        balign="left",
+        bgcolor=component.image.bgcolor.html,
+        sides="TLR" if component.image.caption else None,
+    )
+
+    if component.image.caption:
+        caption_cell = Td(
+            f"{html_line_breaks(component.image.caption)}", balign="left", sides="BLR"
+        )
+    else:
+        caption_cell = None
+    return (image_cell, caption_cell)
+
 def gv_node_connector(connector: Connector) -> Table:
     pins = []
     use_left = bool(connector.ports_left)
@@ -64,10 +93,12 @@ def gv_node_connector(connector: Connector) -> Table:
             'has_pincolors': has_pincolors,
         })
     columns = 2 + (1 if use_left else 0) + (1 if use_right else 0)
+    # TODO: group per line/item
     params = {
         'designator': f"{remove_links(connector.designator)}",
         'use_left': use_left,
         'use_right': use_right,
+        'line_pn': partnumbers2list(connector.partnumbers),
         'pins': pins,
         'columns': columns,
         'bom_id': connector.bom_entry.id,
@@ -78,6 +109,8 @@ def gv_node_connector(connector: Connector) -> Table:
         'show_pincount': connector.show_pincount,
         'color': connector.color,
         'color_len': len(connector.color),
+        'image': connector.image,
+        'line_notes': html_line_breaks(connector.notes),
     }
     # TODO: extend connector style support
     is_simple_connector = connector.style == 'simple'
@@ -520,52 +553,6 @@ def color_minitable(color: Optional[MultiColor]) -> Union[Table, str]:
         width=8 * len(cells),
         fixedsize="true",
     )
-
-
-def image_and_caption_cells(component: Component) -> (Td, Td):
-    if not component.image:
-        return (None, None)
-
-    image_tag = Img(scale=component.image.scale, src=component.image.src)
-    image_cell_inner = Td(image_tag, flat=True)
-    if component.image.fixedsize:
-        # further nest the image in a table with width/height/fixedsize parameters,
-        # and place that table in a cell
-        image_cell_inner.update_attribs(**html_size_attr_dict(component.image))
-        image_cell = Td(
-            Table(Tr(image_cell_inner), border=0, cellborder=0, cellspacing=0, id="!")
-        )
-    else:
-        image_cell = image_cell_inner
-
-    image_cell.update_attribs(
-        balign="left",
-        bgcolor=component.image.bgcolor.html,
-        sides="TLR" if component.image.caption else None,
-    )
-
-    if component.image.caption:
-        caption_cell = Td(
-            f"{html_line_breaks(component.image.caption)}", balign="left", sides="BLR"
-        )
-    else:
-        caption_cell = None
-    return (image_cell, caption_cell)
-
-
-def html_size_attr_dict(image):
-    # Return Graphviz HTML attributes to specify minimum or fixed size of a TABLE or TD object
-    pass
-
-    attr_dict = {}
-    if image:
-        if image.width:
-            attr_dict["width"] = image.width
-        if image.height:
-            attr_dict["height"] = image.height
-        if image.fixedsize:
-            attr_dict["fixedsize"] = "true"
-    return attr_dict
 
 
 def set_dot_basics(dot, options):
