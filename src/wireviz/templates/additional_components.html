@@ -1,0 +1,16 @@
+<table border="0" cellborder="0" cellpadding="3" cellspacing="0" >
+  {% for subitem in additional_components %}
+  <tr>
+    {% if subitem.bom_entry.id %}
+    <td align="right" > {{ subitem.bom_entry.id }} </td>
+    {% endif %}
+    <td align="right" > {{ subitem.bom_entry.qty.number }} </td>
+    {% if subitem.bom_entry.qty.unit %}
+    <td align="left"  > {{ subitem.bom_entry.qty.unit }} </td>
+    {% else %}
+    <td align="left"  > </td>
+    {% endif %}
+    <td align="left"  > {{ subitem.bom_entry.description }} </td>
+  </tr>
+  {% endfor %}
+</table>

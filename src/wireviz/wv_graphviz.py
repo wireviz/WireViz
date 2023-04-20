@@ -111,6 +111,7 @@ def gv_node_connector(connector: Connector) -> Table:
         'color_len': len(connector.color),
         'image': connector.image,
         'line_notes': html_line_breaks(connector.notes),
+        'additional_components': connector.additional_components,
     }
     # TODO: extend connector style support
     is_simple_connector = connector.style == 'simple'

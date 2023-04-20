@@ -69,6 +69,13 @@
   </tr>
   {% endif %}
   <!-- Additional Components !-->
+  {% if additional_components %}
+  <tr>
+    <td>
+      {% include "additional_components.html" %}
+    </td>
+  </tr>
+  {% endif %}
   <!-- Notes !-->
   {% if line_notes %}
   <tr>
