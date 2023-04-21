@@ -34,22 +34,28 @@ def partnumbers2list(
     return [p.str_list for p in partnumbers if p]
 
 
-def bom_list(bom, restrict_printed_lengths=True):
+def bom_list(bom, restrict_printed_lengths=True, filter_entries=False):
     entries_as_dict = []
-    has_content = set()
     # First pass, get all bom dict and identify filled columns
     for entry in bom.values():
         entry.restrict_printed_lengths = restrict_printed_lengths
-        has_content = has_content.union(entry.bom_defined)
         entries_as_dict.append(entry.bom_dict)
 
-    first_entry = list(bom.values())[0]  # Used for column manipulation
-    keys_with_content = [k for k in first_entry.bom_keys if k in has_content]
-    headers = [first_entry.bom_column(k) for k in keys_with_content]
+    has_content = {}
+    bom_columns = list(entries_as_dict[0].keys())
+    has_content = {
+        k
+        for k in bom_columns
+        if any(e[k] for e in entries_as_dict)
+    }
+
+    headers = bom_columns
+    if filter_entries:
+        headers = [k for k in bom_columns if k in has_content]
 
     entries_as_list = []
     for entry in entries_as_dict:
-        entries_as_list.append([v for k, v in entry.items() if k in keys_with_content])
+        entries_as_list.append([v for k, v in entry.items() if k in headers])
 
     table = [headers] + entries_as_list
 
