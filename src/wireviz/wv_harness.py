@@ -186,7 +186,7 @@ class Harness:
                 key=lambda x: (x[1].id,),
             )
         )
-        # from wireviz.wv_bom import print_bom_table ; print_bom_table(self.bom)  # for debugging
+        from wireviz.wv_bom import print_bom_table ; print_bom_table(self.bom)  # for debugging
 
     def connect(
         self,
@@ -386,8 +386,8 @@ class Harness:
         if "gv" in fmt:
             graph.save(filename=filename.with_suffix(".gv"))
         # BOM output
-        bomlist = bom_list(self.bom)
         if "tsv" in fmt:
+            bomlist = bom_list(self.bom, restrict_printed_lengths=False)
             bom_tsv = bom2tsv(bomlist)
             filename.with_suffix(".tsv").open("w").write(bom_tsv)
         if "csv" in fmt:
@@ -395,6 +395,7 @@ class Harness:
             print("CSV output is not yet supported")
         # HTML output
         if "html" in fmt:
+            bomlist = bom_list(self.bom, filter_entries=True)
             generate_html_output(filename, bomlist, self.metadata, self.options)
         # PDF output
         if "pdf" in fmt:
