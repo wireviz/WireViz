@@ -186,7 +186,7 @@ class Harness:
                 key=lambda x: (x[1].id,),
             )
         )
-        from wireviz.wv_bom import print_bom_table ; print_bom_table(self.bom)  # for debugging
+        # from wireviz.wv_bom import print_bom_table ; print_bom_table(self.bom)  # for debugging
 
     def connect(
         self,
