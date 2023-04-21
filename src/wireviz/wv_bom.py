@@ -36,18 +36,18 @@ def partnumbers2list(
 
 def bom_list(bom, restrict_printed_lengths=True, filter_entries=False):
     entries_as_dict = []
+    bom_columns = []
+    has_content = set()
     # First pass, get all bom dict and identify filled columns
     for entry in bom.values():
         entry.restrict_printed_lengths = restrict_printed_lengths
-        entries_as_dict.append(entry.bom_dict)
-
-    has_content = {}
-    bom_columns = list(entries_as_dict[0].keys())
-    has_content = {
-        k
-        for k in bom_columns
-        if any(e[k] for e in entries_as_dict)
-    }
+        entry_as_dict = entry.bom_dict_pretty_column
+        entries_as_dict.append(entry_as_dict)
+        for k in entry_as_dict:
+            if k not in bom_columns:
+                bom_columns.append(k)
+            if entry_as_dict[k] is not None and entry_as_dict[k] != "":
+                has_content.add(k)
 
     headers = bom_columns
     if filter_entries:
@@ -55,7 +55,12 @@ def bom_list(bom, restrict_printed_lengths=True, filter_entries=False):
 
     entries_as_list = []
     for entry in entries_as_dict:
-        entries_as_list.append([v for k, v in entry.items() if k in headers])
+        entries_as_list.append([entry.get(k, "") for k in headers])
+
+    # sanity check
+    expected_length = len(entries_as_list[0])
+    for e in entries_as_list:
+        assert len(e) == expected_length, f'entries {e} length is not {expected_length}'
 
     table = [headers] + entries_as_list
 

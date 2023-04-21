@@ -342,15 +342,19 @@ class BomEntry:
             if not isinstance(self.qty_multiplier, str):
                 self.qty *= float(self.qty_multiplier)
 
+    def restrict_length(data, max_len):
+        return f"{data[:max_len]} ..."
+
     @property
     def description_str(self):
         description = self.description
         if (
-            self.restrict_printed_lengths
-            and len(description) > self.MAX_PRINTED_DESCRIPTION
+            not self.restrict_printed_lengths or
+            'href' in description or
+            len(description) < self.MAX_PRINTED_DESCRIPTION
         ):
-            description = f"{description[:self.MAX_PRINTED_DESCRIPTION]} (...)"
-        return description
+            return description
+        return f"{description[:self.MAX_PRINTED_DESCRIPTION]} (...)"
 
     @property
     def designators_str(self):
@@ -405,6 +409,10 @@ class BomEntry:
         if key in self.partnumbers.BOM_KEY_TO_COLUMNS:
             return self.partnumbers.BOM_KEY_TO_COLUMNS[key]
         raise ValueError(f"key '{key}' not found in bom keys")
+
+    @property
+    def bom_dict_pretty_column(self):
+        return {self.bom_column(k): v for k, v in self.bom_dict.items()}
 
     def scale_per_harness(self, qty_multipliers):
         if self.scaled_per_harness:
