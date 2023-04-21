@@ -271,7 +271,7 @@ def generate_titlepage(yaml_data, extra_metadata, shared_bom, for_pdf=False):
     }
     generate_html_output(
         extra_metadata["output_dir"] / extra_metadata["titlepage"],
-        bom=bom_list(shared_bom),
+        bom=bom_list(shared_bom, restrict_printed_lengths=False, filter_entries=True),
         metadata=Metadata(**titlepage_metadata),  # TBD what we need to add here
         options=Options(**titlepage_options),
     )
