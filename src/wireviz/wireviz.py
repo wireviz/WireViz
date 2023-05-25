@@ -212,16 +212,39 @@ def parse(yaml_input: str, file_out: (str, Path) = None, return_types: (None, st
         return tuple(returns) if len(returns) != 1 else returns[0]
 
 
-def parse_file(yaml_file: str, file_out: (str, Path) = None) -> None:
-    with open_file_read(yaml_file) as file:
-        yaml_input = file.read()
+def parse_file(yaml_file: str, file_out: (str, Path) = None, prepend_files: list = None) -> None:
+    """Parse a YAML file and generate a cable harness diagram
+    
+    Arguments:
+        yaml_file {str} -- Path to YAML file
+        file_out {str} -- Path to output file (default: {None})
+        prepend_files {list} -- List of files to prepend to YAML file (default: {None})
+    """
+
+    # Construct a yaml data string from the input file and any prepended files
+    yaml_data = ''
+
+    input_files = []
+
+    if prepend_files:
+        input_files.extend(prepend_files)
+    
+    input_files.append(yaml_file)
+
+    for filename in input_files:
+        if not os.path.isfile(filename):
+            raise FileNotFoundError(f'Could not find input file {filename}')
+        
+        with open_file_read(filename) as file:
+            yaml_data += file.read() + '\n'
 
     if not file_out:
         fn, fext = os.path.splitext(yaml_file)
         file_out = fn
+
     file_out = os.path.abspath(file_out)
 
-    parse(yaml_input, file_out=file_out)
+    parse(yaml_data, file_out=file_out)
 
 
 def parse_cmdline():
@@ -232,7 +255,7 @@ def parse_cmdline():
     parser.add_argument('input_file', action='store', type=str, metavar='YAML_FILE')
     parser.add_argument('-o', '--output_file', action='store', type=str, metavar='OUTPUT')
     # Not implemented: parser.add_argument('--generate-bom', action='store_true', default=True)
-    parser.add_argument('--prepend-file', action='store', type=str, metavar='YAML_FILE')
+    parser.add_argument('--prepend-file', action='store', nargs='+', type=str, metavar='YAML_FILE')
     return parser.parse_args()
 
 
@@ -240,30 +263,11 @@ def main():
 
     args = parse_cmdline()
 
-    if not os.path.exists(args.input_file):
-        print(f'Error: input file {args.input_file} inaccessible or does not exist, check path')
-        sys.exit(1)
-
-    with open_file_read(args.input_file) as fh:
-        yaml_input = fh.read()
-
-    if args.prepend_file:
-        if not os.path.exists(args.prepend_file):
-            print(f'Error: prepend input file {args.prepend_file} inaccessible or does not exist, check path')
-            sys.exit(1)
-        with open_file_read(args.prepend_file) as fh:
-            prepend = fh.read()
-            yaml_input = prepend + yaml_input
-
-    if not args.output_file:
-        file_out = args.input_file
-        pre, _ = os.path.splitext(file_out)
-        file_out = pre  # extension will be added by graphviz output function
-    else:
-        file_out = args.output_file
-    file_out = os.path.abspath(file_out)
-
-    parse(yaml_input, file_out=file_out)
+    parse_file(
+        args.input_file,
+        file_out=args.output_file,
+        prepend_files=args.prepend_file
+    )
 
 
 if __name__ == '__main__':
