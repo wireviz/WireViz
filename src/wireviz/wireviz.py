@@ -393,7 +393,8 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             # if inp is a long YAML string, Pathlib will raise OSError: [Errno 63]
             # when trying to expand and resolve it as a path.
             # Catch this error, but raise any others
-            if type(e) is OSError and e.errno != 36 and e.errno != 22:
+            from errno import ENAMETOOLONG
+            if type(e) is OSError and e.errno != ENAMETOOLONG:
                 raise e
             # file does not exist; assume inp is a YAML string
             yaml_str = inp
