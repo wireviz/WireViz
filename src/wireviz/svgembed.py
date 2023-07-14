@@ -38,15 +38,3 @@ def get_mime_subtype(filename: Union[str, Path]) -> str:
     if mime_subtype in mime_subtype_replacements:
         mime_subtype = mime_subtype_replacements[mime_subtype]
     return mime_subtype
-
-
-def embed_svg_images_file(
-    filename_in: Union[str, Path], overwrite: bool = True
-) -> None:
-    filename_in = Path(filename_in).resolve()
-    filename_out = filename_in.with_suffix(".b64.svg")
-    filename_out.write_text(
-        embed_svg_images(filename_in.read_text(), filename_in.parent)
-    )
-    if overwrite:
-        filename_out.replace(filename_in)

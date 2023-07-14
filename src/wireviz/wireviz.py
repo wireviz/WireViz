@@ -58,7 +58,7 @@ def parse(
         return_types (optional):
             One of the supported return types (see above), or a tuple of multiple return types.
             If set to None, no output is returned by the function.
-        output_formats (optional):
+        output_formats (Tuple[str], optional):
             One of the supported output types (see above), or a tuple of multiple output formats.
             If set to None, no files are generated.
         output_dir (Path | str, optional):
@@ -87,15 +87,18 @@ def parse(
 
     yaml_data, yaml_file = _get_yaml_data_and_path(inp)
     if output_formats:
-        # need to write data to file, determine output directory and filename
-        output_dir = _get_output_dir(yaml_file, output_dir)
-        output_name = _get_output_name(yaml_file, output_name)
-        output_file = output_dir / output_name
+        if str(output_dir) == "-":
+            # write to stdout
+            output_dir = None
+        else:
+            # write to directory
+            output_dir = _get_output_dir(yaml_file, output_dir)
+            output_name = _get_output_name(yaml_file, output_name)
 
     if yaml_file:
         # if reading from file, ensure that input file's parent directory is included in image_paths
         default_image_path = yaml_file.parent.resolve()
-        if not default_image_path in [Path(x).resolve() for x in image_paths]:
+        if default_image_path not in [Path(x).resolve() for x in image_paths]:
             image_paths.append(default_image_path)
 
     # define variables =========================================================
@@ -362,11 +365,11 @@ def parse(
             harness.add_bom_item(line)
 
     if output_formats:
-        harness.output(filename=output_file, fmt=output_formats, view=False)
+        harness.output(formats=output_formats, output_dir=output_dir, output_name=output_name)
 
     if return_types:
         returns = []
-        if isinstance(return_types, str):  # only one return type speficied
+        if isinstance(return_types, str):  # only one return type specified
             return_types = [return_types]
 
         return_types = [t.lower() for t in return_types]
@@ -390,10 +393,11 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             # if no FileNotFoundError exception happens, get file contents
             yaml_str = open_file_read(yaml_path).read()
         except (FileNotFoundError, OSError) as e:
-            # if inp is a long YAML string, Pathlib will raise OSError: [Errno 63]
+            # if inp is a long YAML string, Pathlib will raise OSError: [Errno 63].
             # when trying to expand and resolve it as a path.
-            # Catch this error, but raise any others
-            if type(e) is OSError and e.errno != 63:
+            # it can also raise OSError: [Errno 36] File name too long.
+            # Catch these errors, but raise any others.
+            if type(e) is OSError and e.errno != 63 and e.errno != 36:
                 raise e
             # file does not exist; assume inp is a YAML string
             yaml_str = inp
@@ -417,7 +421,7 @@ def _get_output_dir(input_file: Path, default_output_dir: Path) -> Path:
     return output_dir.resolve()
 
 
-def _get_output_name(input_file: Path, default_output_name: Path) -> str:
+def _get_output_name(input_file: Path, default_output_name: Union[None, str]) -> str:
     if default_output_name:  # user-specified output name
         output_name = default_output_name
     else:  # auto-determine appropriate output name
@@ -429,7 +433,7 @@ def _get_output_name(input_file: Path, default_output_name: Path) -> str:
 
 
 def main():
-    print("When running from the command line, please use wv_cli.py instead.")
+    sys.stderr.write("When running from the command line, please use wv_cli.py instead.")
 
 
 if __name__ == "__main__":

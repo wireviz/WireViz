@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import sys
 from dataclasses import InitVar, dataclass, field
 from enum import Enum, auto
 from pathlib import Path
@@ -280,7 +280,7 @@ class Cable:
             self.gauge = g
 
             if self.gauge_unit is not None:
-                print(
+                sys.stderr.write(
                     f"Warning: Cable {self.name} gauge_unit={self.gauge_unit} is ignored because its gauge contains {u}"
                 )
             if u.upper() == "AWG":
@@ -304,7 +304,7 @@ class Cable:
                 )
             self.length = L
             if self.length_unit is not None:
-                print(
+                sys.stderr.write(
                     f"Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}"
                 )
             self.length_unit = u
