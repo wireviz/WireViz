@@ -359,7 +359,7 @@ class Cable:
             # hide designators for auto-generated cables by default
             self.show_name = self.name[0:2] != "__"
 
-        if not self.show_wirenumbers:
+        if self.show_wirenumbers is None:
             # by default, show wire numbers for cables, hide for bundles
             self.show_wirenumbers = self.category != "bundle"
 
