@@ -23,7 +23,7 @@
 
 ### Hotfix
 
-- Adjust GraphViz generation code for compatibility with v0.18 of the `graphviz` Python package ([#258](https://github.com/formatc1702/WireViz/issues/258), [#262](https://github.com/formatc1702/WireViz/pull/261))
+- Adjust GraphViz generation code for compatibility with v0.18 of the `graphviz` Python package ([#258](https://github.com/formatc1702/WireViz/issues/258), [#261](https://github.com/formatc1702/WireViz/pull/261))
 
 
 ## [0.3.1](https://github.com/formatc1702/WireViz/tree/v0.3.1) (2021-10-25)
