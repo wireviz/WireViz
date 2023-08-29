@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import sys
 from typing import Dict, List
 
 COLOR_CODES = {
@@ -138,7 +138,7 @@ def get_color_hex(input: Colors, pad: bool = False) -> List[str]:
             if c[0] != "#" or not all(d in _hex_digits for d in c[1:]):
                 if c != input:
                     c += f" in input: {input}"
-                print(f"Invalid hex color: {c}")
+                sys.stderr.write(f"Invalid hex color: {c}")
                 output[i] = color_default
     else:  # Color name(s)
 
@@ -148,7 +148,7 @@ def get_color_hex(input: Colors, pad: bool = False) -> List[str]:
             except KeyError:
                 if c != input:
                     c += f" in input: {input}"
-                print(f"Unknown color name: {c}")
+                sys.stderr.write(f"Unknown color name: {c}")
                 return color_default
 
         output = [lookup(input[i : i + 2]) for i in range(0, len(input), 2)]

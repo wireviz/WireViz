@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import re
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from itertools import zip_longest
 from pathlib import Path
-from typing import Any, List, Union
+from typing import Any, List, Union, Optional
 
 from graphviz import Graph
 
@@ -20,13 +21,12 @@ from wireviz.DataClasses import (
     Tweak,
     Side,
 )
-from wireviz.svgembed import embed_svg_images_file
+from wireviz.svgembed import embed_svg_images
 from wireviz.wv_bom import (
     HEADER_MPN,
     HEADER_PN,
     HEADER_SPN,
     bom_list,
-    component_table_entry,
     generate_bom,
     get_additional_component_table,
     pn_info_string,
@@ -543,11 +543,11 @@ class Harness:
                                     f'( +)?{attr}=("[^"]*"|[^] ]*)(?(1)| *)', "", entry
                                 )
                                 if n_subs < 1:
-                                    print(
+                                    sys.stderr.write(
                                         f"Harness.create_graph() warning: {attr} not found in {keyword}!"
                                     )
                                 elif n_subs > 1:
-                                    print(
+                                    sys.stderr.write(
                                         f"Harness.create_graph() warning: {attr} removed {n_subs} times in {keyword}!"
                                     )
                                 continue
@@ -562,7 +562,7 @@ class Harness:
                                 # If attr not found, then append it
                                 entry = re.sub(r"\]$", f" {attr}={value}]", entry)
                             elif n_subs > 1:
-                                print(
+                                sys.stderr.write(
                                     f"Harness.create_graph() warning: {attr} overridden {n_subs} times in {keyword}!"
                                 )
 
@@ -650,55 +650,61 @@ class Harness:
         graph = self.graph
         return embed_svg_images(graph.pipe(format="svg").decode("utf-8"), Path.cwd())
 
-
     def output(
-        self,
-        filename: (str, Path),
-        view: bool = False,
-        cleanup: bool = True,
-        fmt: tuple = ("html", "png", "svg", "tsv"),
+            self,
+            output_dir: Optional[Union[str, Path]],
+            output_name: Optional[Union[str, Path]],
+            formats: List[str] | tuple[str]
     ) -> None:
         # graphical output
         graph = self.graph
-        svg_already_exists = Path(
-            f"{filename}.svg"
-        ).exists()  # if SVG already exists, do not delete later
-        # graphical output
-        for f in fmt:
-            if f in ("png", "svg", "html"):
-                if f == "html":  # if HTML format is specified,
-                    f = "svg"  # generate SVG for embedding into HTML
-                # SVG file will be renamed/deleted later
-                _filename = f"{filename}.tmp" if f == "svg" else filename
-                # TODO: prevent rendering SVG twice when both SVG and HTML are specified
-                graph.format = f
-                graph.render(filename=_filename, view=view, cleanup=cleanup)
-        # embed images into SVG output
-        if "svg" in fmt or "html" in fmt:
-            embed_svg_images_file(f"{filename}.tmp.svg")
-        # GraphViz output
-        if "gv" in fmt:
-            graph.save(filename=f"{filename}.gv")
-        # BOM output
-        bomlist = bom_list(self.bom())
-        if "tsv" in fmt:
-            open_file_write(f"{filename}.bom.tsv").write(tuplelist2tsv(bomlist))
-        if "csv" in fmt:
-            # TODO: implement CSV output (preferrably using CSV library)
-            print("CSV output is not yet supported")
-        # HTML output
-        if "html" in fmt:
-            generate_html_output(filename, bomlist, self.metadata, self.options)
-        # PDF output
-        if "pdf" in fmt:
+
+        if "csv" in formats:
+            # TODO: implement CSV output (preferably using CSV library)
+            sys.stderr.write("CSV output is not yet supported")
+        if "pdf" in formats:
             # TODO: implement PDF output
-            print("PDF output is not yet supported")
-        # delete SVG if not needed
-        if "html" in fmt and not "svg" in fmt:
-            # SVG file was just needed to generate HTML
-            Path(f"{filename}.tmp.svg").unlink()
-        elif "svg" in fmt:
-            Path(f"{filename}.tmp.svg").replace(f"{filename}.svg")
+            sys.stderr.write("PDF output is not yet supported")
+
+        outputs = {}
+        if "svg" in formats or "html" in formats:
+            # embed images into SVG output
+            outputs["svg"] = embed_svg_images(graph.pipe(format="svg", encoding="utf8"))
+
+        if "png" in formats:
+            outputs["png"] = graph.pipe(format="png")
+
+        # GraphViz output
+        if "gv" in formats:
+            outputs["gv"] = graph.pipe(format="gv")
+
+        if "tsv" in formats or "html" in formats:
+            bomlist = bom_list(self.bom())
+            # BOM output
+            if "tsv" in formats:
+                outputs["tsv"] = tuplelist2tsv(bomlist)
+
+            # HTML output
+            if "html" in formats and "svg" in outputs:
+                outputs["html"] = generate_html_output(outputs["svg"], output_dir, bomlist, self.metadata, self.options)
+
+        # print to stdout or write files in order
+        for f in formats:
+            if f in outputs:
+                output = outputs[f]
+                if output_dir is None or output_name is None:
+                    if isinstance(output, (bytes, bytearray)):
+                        sys.stdout.buffer.write(output)
+                    else:
+                        sys.stdout.write(output)
+                else:
+                    file = f"{output_dir}/{output_name}.{f}"
+                    if isinstance(output, (bytes, bytearray)):
+                        with open(file, "wb") as binary_file:
+                            binary_file.write(output)
+                    else:
+                        with open(file, "w") as binary_file:
+                            binary_file.write(output)
 
     def bom(self):
         if not self._bom:

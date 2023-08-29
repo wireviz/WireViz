@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import sys
 from pathlib import Path
 from typing import Dict, List
 
@@ -147,10 +148,10 @@ def aspect_ratio(image_src):
         image = Image.open(image_src)
         if image.width > 0 and image.height > 0:
             return image.width / image.height
-        print(f"aspect_ratio(): Invalid image size {image.width} x {image.height}")
+        sys.stderr.write(f"aspect_ratio(): Invalid image size {image.width} x {image.height}")
     # ModuleNotFoundError and FileNotFoundError are the most expected, but all are handled equally.
     except Exception as error:
-        print(f"aspect_ratio(): {type(error).__name__}: {error}")
+        sys.stderr.write(f"aspect_ratio(): {type(error).__name__}: {error}")
     return 1  # Assume 1:1 when unable to read actual image size
 
 

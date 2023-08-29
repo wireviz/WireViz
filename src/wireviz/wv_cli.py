@@ -3,6 +3,7 @@
 import os
 import sys
 from pathlib import Path
+from typing import Union
 
 import click
 
@@ -67,12 +68,11 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def wireviz(file, format, prepend, output_dir, output_name, version):
+def wireviz(file, format, prepend, output_dir: Union[Path, None], output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
-    print()
-    print(f"{APP_NAME} {__version__}")
+    sys.stderr.write(f"{APP_NAME} {__version__}\n")
     if version:
         return  # print version number only and exit
 
@@ -88,10 +88,13 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     output_formats = []
     for code in format:
         if code in format_codes:
-            output_formats.append(format_codes[code])
+            output_format: str = format_codes[code]
+            # unique
+            if output_format not in output_formats:
+                output_formats.append(output_format)
         else:
             raise Exception(f"Unknown output format: {code}")
-    output_formats = tuple(sorted(set(output_formats)))
+
     output_formats_str = (
         f'[{"|".join(output_formats)}]'
         if len(output_formats) > 1
@@ -105,44 +108,63 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             prepend_file = Path(prepend_file)
             if not prepend_file.exists():
                 raise Exception(f"File does not exist:\n{prepend_file}")
-            print("Prepend file:", prepend_file)
+
+            sys.stderr.write(f"Prepend file: {prepend_file}")
 
             prepend_input += open_file_read(prepend_file).read() + "\n"
     else:
         prepend_input = ""
 
-    # run WireVIz on each input file
-    for file in filepaths:
-        file = Path(file)
-        if not file.exists():
-            raise Exception(f"File does not exist:\n{file}")
-
-        # file_out = file.with_suffix("") if not output_file else output_file
-        _output_dir = file.parent if not output_dir else output_dir
-        _output_name = file.stem if not output_name else output_name
-
-        print("Input file:  ", file)
-        print(
-            "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
+    output_stdout = str(output_dir) == "-" or output_name == "-"
+    if output_stdout and len(filepaths) == 0:
+        wv.parse(
+            sys.stdin.read(),
+            output_dir="-",
+            output_formats=tuple(output_formats),
         )
 
-        yaml_input = open_file_read(file).read()
-        file_dir = file.parent
+    # run WireViz on each input file
+    for file in filepaths:
+        if file == "-":
+            # read from stdin
+            yaml_input = prepend_input + sys.stdin.read()
+            image_paths = []
+        else:
+            file = Path(file)
+            if not file.exists():
+                raise Exception(f"File does not exist:\n{file}")
 
-        yaml_input = prepend_input + yaml_input
-        image_paths = {file_dir}
+            sys.stderr.write(f"Input file: {file}\n")
+            yaml_input = open_file_read(file).read()
+            file_dir = file.parent
+
+            yaml_input = prepend_input + yaml_input
+            image_paths = {file_dir}
+
         for p in prepend:
             image_paths.add(Path(p).parent)
 
+        # file_out = file.with_suffix("") if not output_file else output_file
+        if output_stdout or file == "-":
+            sys.stderr.write(f"Output: <stdout>.{output_formats_str}\n")
+            _output_dir = "-"
+            _output_name = None
+        else:
+            _output_dir = file.parent if not output_dir else output_dir
+            _output_name = file.stem if not output_name else output_name
+            sys.stderr.write(
+                f"Output file: {Path(_output_dir / _output_name)}.{output_formats_str}"
+            )
+
         wv.parse(
             yaml_input,
-            output_formats=output_formats,
+            output_formats=tuple(output_formats),
             output_dir=_output_dir,
             output_name=_output_name,
             image_paths=list(image_paths),
         )
 
-    print()
+    sys.stderr.write('')
 
 
 if __name__ == "__main__":

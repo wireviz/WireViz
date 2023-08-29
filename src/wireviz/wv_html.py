@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, List, Optional
 
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import Metadata, Options
@@ -10,45 +10,46 @@ from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import (
     flatten2d,
     open_file_read,
-    open_file_write,
     smart_file_resolve,
 )
 
 
 def generate_html_output(
-    filename: Union[str, Path],
+    svg_input: str,
+    output_dir: Optional[Path],
     bom_list: List[List[str]],
     metadata: Metadata,
     options: Options,
-):
-
+) -> str:
     # load HTML template
-    templatename = metadata.get("template", {}).get("name")
-    if templatename:
-        # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
-        templatefile = smart_file_resolve(
-            f"{templatename}.html",
-            [Path(filename).parent, Path(__file__).parent / "templates"],
-        )
-    else:
-        # fall back to built-in simple template if no template was provided
-        templatefile = Path(__file__).parent / "templates/simple.html"
+    template_name = metadata.get("template", {}).get("name")
+    builtin_template_directory = Path(__file__).parent / "templates"  # built-in template directory
+    if template_name:
+        possible_paths = []
+        # if relative path to template was provided, check directory of YAML file first
+        if output_dir is not None:
+            possible_paths.append(output_dir)
 
-    html = open_file_read(templatefile).read()
+        possible_paths.append(builtin_template_directory)  # fallback
+        template_file = smart_file_resolve(f"{template_name}.html", possible_paths)
+    else:
+        # fallback to built-in simple template if no template was provided
+        template_file = builtin_template_directory / "simple.html"
+
+    html = open_file_read(template_file).read()
 
     # embed SVG diagram
-    with open_file_read(f"{filename}.tmp.svg") as file:
-        svgdata = re.sub(
-            "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
-            "<!-- XML and DOCTYPE declarations from SVG file removed -->",
-            file.read(),
-            1,
-        )
+    svg_data = re.sub(
+        "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
+        "<!-- XML and DOCTYPE declarations from SVG file removed -->",
+        svg_input,
+        1,
+    )
 
     # generate BOM table
     bom = flatten2d(bom_list)
 
-    # generate BOM header (may be at the top or bottom of the table)
+    # generate BOM header (might be at the top or bottom of the table)
     bom_header_html = "  <tr>\n"
     for item in bom[0]:
         th_class = f"bom_col_{item.lower()}"
@@ -80,7 +81,7 @@ def generate_html_output(
         "<!-- %generator% -->": f"{APP_NAME} {__version__} - {APP_URL}",
         "<!-- %fontname% -->": options.fontname,
         "<!-- %bgcolor% -->": wv_colors.translate_color(options.bgcolor, "hex"),
-        "<!-- %diagram% -->": svgdata,
+        "<!-- %diagram% -->": svg_data,
         "<!-- %bom% -->": bom_html,
         "<!-- %bom_reversed% -->": bom_html_reversed,
         "<!-- %sheet_current% -->": "1",  # TODO: handle multi-page documents
@@ -114,6 +115,4 @@ def generate_html_output(
     replacements_sorted = sorted(replacements, key=len, reverse=True)
     replacements_escaped = map(re.escape, replacements_sorted)
     pattern = re.compile("|".join(replacements_escaped))
-    html = pattern.sub(lambda match: replacements[match.group(0)], html)
-
-    open_file_write(f"{filename}.html").write(html)
+    return pattern.sub(lambda match: replacements[match.group(0)], html)
