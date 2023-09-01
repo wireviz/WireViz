@@ -390,10 +390,11 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             # if no FileNotFoundError exception happens, get file contents
             yaml_str = open_file_read(yaml_path).read()
         except (FileNotFoundError, OSError) as e:
-            # if inp is a long YAML string, Pathlib will raise OSError: [Errno 63]
+            # if inp is a long YAML string, Pathlib will raise OSError: [errno.ENAMETOOLONG]
             # when trying to expand and resolve it as a path.
             # Catch this error, but raise any others
-            if type(e) is OSError and e.errno != 63:
+            from errno import ENAMETOOLONG
+            if type(e) is OSError and e.errno != ENAMETOOLONG:
                 raise e
             # file does not exist; assume inp is a YAML string
             yaml_str = inp
