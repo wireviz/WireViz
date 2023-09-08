@@ -211,7 +211,6 @@ class Connector:
             for pin in loop:
                 if pin not in self.pins:
                     raise Exception(f'Unknown loop pin "{pin}" for connector "{self.name}"!')
-                # Resolve https://github.com/formatc1702/WireViz/issues/263
                 # Make sure loop connected pins are not hidden.
                 self.activate_pin(pin)
 
