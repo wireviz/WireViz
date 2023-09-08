@@ -34,7 +34,7 @@ groups = {
 }
 
 input_extensions = [".yml"]
-extensions_not_containing_graphviz_output = [".gv", ".bom.tsv"]
+extensions_not_containing_graphviz_output = [".gv", ".tsv"]
 extensions_containing_graphviz_output = [".png", ".svg", ".html"]
 generated_extensions = (
     extensions_not_containing_graphviz_output + extensions_containing_graphviz_output
@@ -87,7 +87,7 @@ def build_generated(groupkeys):
 
                     out.write(f"![]({yaml_file.stem}.png)\n\n")
                     out.write(
-                        f"[Source]({yaml_file.name}) - [Bill of Materials]({yaml_file.stem}.bom.tsv)\n\n\n"
+                        f"[Source]({yaml_file.name}) - [Bill of Materials]({yaml_file.stem}.tsv)\n\n\n"
                     )
 
 

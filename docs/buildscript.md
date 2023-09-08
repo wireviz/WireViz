@@ -26,7 +26,7 @@ Possible group names:
   - `tutorial` to process`tutorial/{readme.md,tutorial*.*}`
   - `demos` to process`examples/demo*.*`
 
-  Affected filetypes: `.gv`, `.bom.tsv`, `.png`, `.svg`, `.html`
+  Affected filetypes: `.gv`, `.tsv`, `.png`, `.svg`, `.html`
 
 
 ## Usage hints
