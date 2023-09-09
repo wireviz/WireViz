@@ -1,5 +1,5 @@
 connectors:
-  X1:
+  X11:
     type: D-Sub
     subtype: female
     pinlabels: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
@@ -18,9 +18,9 @@ cables:
 
 connections:
   -
-    - X1: [5,2,3]
+    - X11: [5,2,3]
     - W1: [1,2,3]
     - X2: [1,3,2]
   -
-    - X1: 5
+    - X11: 5
     - W1: s
