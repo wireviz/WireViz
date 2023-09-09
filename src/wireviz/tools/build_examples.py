@@ -31,6 +31,7 @@ groups = {
         "path": dir / "examples",
         "prefix": "demo",
     },
+    **{p.stem: {"path": p} for p in (dir / "tests").glob("**")},
 }
 
 input_extensions = [".yml"]
@@ -43,7 +44,7 @@ generated_extensions = (
 
 def collect_filenames(description, groupkey, ext_list):
     path = groups[groupkey]["path"]
-    patterns = [f"{groups[groupkey]['prefix']}*{ext}" for ext in ext_list]
+    patterns = [f"{groups[groupkey].get('prefix', '')}*{ext}" for ext in ext_list]
     if ext_list != input_extensions and readme in groups[groupkey]:
         patterns.append(readme)
     print(f'{description} {groupkey} in "{path}"')
