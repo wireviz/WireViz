@@ -88,14 +88,21 @@ class SingleColor:
         elif isinstance(inp, int):
             hex_str = f"#{inp:06x}"
             self._html = hex_str
-            self._code_en = hex_str  # do not perform reverse lookup
-        elif inp.upper() in known_colors.keys():
+            self._code_en = hex_str  # do not perform reverse lookup - why not?
+        elif not isinstance(inp, str):
+            raise Exception(f"Unknown single color {inp}!")
+        else:
             inp_upper = inp.upper()
-            self._code_en = inp_upper
-            self._html = known_colors[inp_upper].html
-        else:  # assume it's a valid HTML color name
-            self._html = inp
-            self._code_en = inp
+            if inp_upper in known_colors.keys():
+                self._code_en = inp_upper
+                self._html = known_colors[inp_upper].html
+            else:
+                try:  # Maybe inp is an int as string?
+                    inp = f"#{int(inp, 0):06x}"
+                except ValueError:
+                    pass  # assume it's a valid HTML color name
+                self._html = inp
+                self._code_en = inp
 
     @property
     def html_padded(self):
@@ -129,25 +136,25 @@ class MultiColor:
                     pass
                 elif isinstance(item, SingleColor):
                     self.colors.append(item)
-                else:  # string
+                else:  # string or integer (type check done inside)
                     self.colors.append(SingleColor(item))
         elif isinstance(inp, SingleColor):  # single color
             self.colors = [inp]
-        else:  # split input into list
-            if ":" in str(inp):
-                self.colors = [SingleColor(item) for item in inp.split(":")]
-            else:
-                if isinstance(inp, int):
-                    self.colors = [SingleColor(inp)]
-                elif len(inp) % 2 == 0:
-                    items = [inp[i : i + 2] for i in range(0, len(inp), 2)]
-                    known = [item.upper() in known_colors.keys() for item in items]
-                    if all(known):
-                        self.colors = [SingleColor(item) for item in items]
-                    else:  # assume it's a valud HTML color name
-                        self.colors = [SingleColor(inp)]
-                else:  # assume it's a valid HTML color name
-                    self.colors = [SingleColor(inp)]
+        elif isinstance(inp, int):
+            self.colors = [SingleColor(inp)]
+        elif not isinstance(inp, str):
+            raise Exception(f"Unknown multi-color {inp}!")
+        elif ":" in inp:  # split input into list
+            self.colors = [SingleColor(item) for item in inp.split(":")]
+        else:
+            if len(inp) % 2 == 0:
+                items = [inp[i : i + 2] for i in range(0, len(inp), 2)]
+                known = [item.upper() in known_colors.keys() for item in items]
+                if all(known):
+                    self.colors = [SingleColor(item) for item in items]
+                    return
+            # assume it's a valid HTML color name
+            self.colors = [SingleColor(inp)]
 
     def __len__(self):
         return len(self.colors)
