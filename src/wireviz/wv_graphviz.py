@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import warnings
 from itertools import zip_longest
 from typing import Any, List, Optional, Tuple, Union
 
@@ -580,15 +581,9 @@ def apply_dot_tweaks(dot, tweak):
                         f'( +)?{attr}=("[^"]*"|[^] ]*)(?(1)| *)', "", entry
                     )
                     if n_subs < 1:
-                        print(
-                            "Harness.create_graph() warning: "
-                            f"{attr} not found in {keyword}!"
-                        )
+                        warnings.warn(f"tweak: {attr} not found in {keyword}!")
                     elif n_subs > 1:
-                        print(
-                            "Harness.create_graph() warning: "
-                            f"{attr} removed {n_subs} times in {keyword}!"
-                        )
+                        warnings.warn(f"tweak: {attr} removed {n_subs} times in {keyword}!")
                     continue
 
                 if len(value) == 0 or " " in value:
@@ -601,10 +596,7 @@ def apply_dot_tweaks(dot, tweak):
                     # If attr not found, then append it
                     entry = re.sub(r"\]$", f" {attr}={value}]", entry)
                 elif n_subs > 1:
-                    print(
-                        "Harness.create_graph() warning: "
-                        f"{attr} overridden {n_subs} times in {keyword}!"
-                    )
+                    warnings.warn(f"tweak: {attr} overridden {n_subs} times in {keyword}!")
 
             dot.body[i] = entry
 
