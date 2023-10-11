@@ -124,9 +124,10 @@ def gv_additional_component_table(component):
         rows.append(Tr(firstline))
 
         if subitem.has_pn_info:
+            pn_list = partnumbers2list(subitem.partnumbers)
             secondline = [
                 Td("", colspan=3),
-                Td(f"# TODO PN string", align="left"),  # TODO
+                Td(", ".join(pn for pn in pn_list if pn), align="left"),
                 Td(""),
             ]
             rows.append(Tr(secondline))
