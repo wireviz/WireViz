@@ -175,7 +175,7 @@ class Component:
     subtype: Union[MultilineHypertext, List[MultilineHypertext]] = None
 
     # part number
-    partnumbers: PartNumberInfo = None  # filled by fill_partnumbers()
+    partnumbers: PartNumberInfo = None  # filled by __post_init__()
     # the following are provided for user convenience and should not be accessed later.
     # their contents are loaded into partnumbers during the child class __post_init__()
     pn: str = None
@@ -190,7 +190,7 @@ class Component:
     ignore_in_bom: bool = False
     bom_id: Optional[str] = None  # to be filled after harness is built
 
-    def fill_partnumbers(self):
+    def __post_init__(self):
         partnos = [self.pn, self.manufacturer, self.mpn, self.supplier, self.spn]
         partnos = [remove_links(entry) for entry in partnos]
         partnos = tuple(partnos)
@@ -271,7 +271,7 @@ class AdditionalComponent(Component):
     note: str = None
 
     def __post_init__(self):
-        super().fill_partnumbers()
+        super().__post_init__()
         self.bgcolor = SingleColor(self.bgcolor)
         self.qty = self.parse_number_and_unit(self.qty, None)
         self.amount = self.parse_number_and_unit(self.amount, None)
@@ -366,7 +366,7 @@ class Connector(TopLevelGraphicalComponent):
         return None  # connectors do not support units.
 
     def __post_init__(self) -> None:
-        super().fill_partnumbers()
+        super().__post_init__()
 
         self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
@@ -651,7 +651,7 @@ class Cable(TopLevelGraphicalComponent):
             return None  # non-bundles do not support lists of part data
 
     def __post_init__(self) -> None:
-        super().fill_partnumbers()
+        super().__post_init__()
 
         self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
