@@ -196,6 +196,9 @@ class Component:
         partnos = tuple(partnos)
         self.partnumbers = PartNumberInfo(*partnos)
 
+        self.qty = self.parse_number_and_unit(self.qty, None)
+        self.amount = self.parse_number_and_unit(self.amount, None)
+
     def parse_number_and_unit(
         self,
         inp: Optional[Union[NumberAndUnit, float, int, str]],
@@ -260,21 +263,40 @@ class Component:
     def has_pn_info(self) -> bool:
         return any([self.pn, self.manufacturer, self.mpn, self.supplier, self.spn])
 
+    @property
+    def description(self) -> str:
+        return f"{self.type}{', ' + self.subtype if self.subtype else ''}"
+
 
 @dataclass
-class AdditionalComponent(Component):
-    qty_multiplier: Union[QtyMultiplierConnector, QtyMultiplierCable, int] = 1
-    _qty_multiplier_computed: Union[int, float] = 1
-    designators: Optional[str] = None  # used for components definedi in the
-    #                                    additional_bom_items section within another component
-    bgcolor: SingleColor = None  #       ^ same here
-    note: str = None
+class AdditionalBomItem(Component):
+    designators: Optional[str] = None
+
+    @property
+    def additional_components(self):
+        # An additional item may not have further nested additional comonents.
+        # This property is currently needed for objects in the same list as
+        # TopLevelGraphicalComponent objects in a Harness method.
+        return []
+
+
+@dataclass
+class GraphicalComponent(Component):  # abstract class
+    bgcolor: Optional[SingleColor] = None
 
     def __post_init__(self):
         super().__post_init__()
         self.bgcolor = SingleColor(self.bgcolor)
-        self.qty = self.parse_number_and_unit(self.qty, None)
-        self.amount = self.parse_number_and_unit(self.amount, None)
+
+
+@dataclass
+class AdditionalComponent(GraphicalComponent):
+    qty_multiplier: Union[QtyMultiplierConnector, QtyMultiplierCable, int] = 1
+    _qty_multiplier_computed: Union[int, float] = 1
+    note: str = None
+
+    def __post_init__(self):
+        super().__post_init__()
 
         if isinstance(self.qty_multiplier, float) or isinstance(
             self.qty_multiplier, int
@@ -290,22 +312,8 @@ class AdditionalComponent(Component):
                 raise Exception(f"Unknown qty multiplier: {self.qty_multiplier}")
 
     @property
-    def additional_components(self):
-        # an additional component may not have further nested additional comonents
-        return []
-
-    @property
     def bom_qty(self):
         return self.qty.number * self._qty_multiplier_computed
-
-    @property
-    def description(self) -> str:
-        return f"{self.type}{', ' + self.subtype if self.subtype else ''}"
-
-
-@dataclass
-class GraphicalComponent(Component):  # abstract class, for future use
-    bgcolor: Optional[SingleColor] = None
 
 
 @dataclass
@@ -368,11 +376,15 @@ class Connector(TopLevelGraphicalComponent):
     def __post_init__(self) -> None:
         super().__post_init__()
 
-        self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
         self.color = MultiColor(self.color)
 
         # connectors do not support custom qty or amount
+        if self.qty != NumberAndUnit(1, None):
+            raise Exception("Connector qty != 1 not supported")
+        if self.amount is not None:
+            raise Exception("Connector amount not supported")
+        # TODO: Delete next two assignments if tests above is sufficient. Please verify!
         self.qty = NumberAndUnit(1, None)
         self.amount = None
 
@@ -653,7 +665,6 @@ class Cable(TopLevelGraphicalComponent):
     def __post_init__(self) -> None:
         super().__post_init__()
 
-        self.bgcolor = SingleColor(self.bgcolor)
         self.bgcolor_title = SingleColor(self.bgcolor_title)
         self.color = MultiColor(self.color)
 
