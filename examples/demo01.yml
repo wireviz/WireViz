@@ -1,8 +1,13 @@
+metadata:
+  title: demo01
+
 connectors:
   X1:
     type: D-Sub
     subtype: female
     pinlabels: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
+    loops:
+      - [7,8]
   X2:
     type: Molex KK 254
     subtype: female

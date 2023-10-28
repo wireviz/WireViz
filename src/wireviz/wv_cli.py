@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
 import wireviz.wireviz as wv
 from wireviz import APP_NAME, __version__
-from wireviz.wv_helper import open_file_read
+from wireviz.wv_utils import open_file_read
 
 format_codes = {
     "c": "csv",
@@ -23,9 +23,12 @@ format_codes = {
     "t": "tsv",
 }
 
-epilog = "The -f or --format option accepts a string containing one or more of the "
-epilog += "following characters to specify which file types to output:\n"
-epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
+
+epilog = (
+    "The -f or --format option accepts a string containing one or more of the "
+    "following characters to specify which file types to output:\n"
+    + f", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
+)
 
 
 @click.command(epilog=epilog, no_args_is_help=True)
@@ -58,7 +61,10 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     "--output-name",
     default=None,
     type=str,
-    help="File name (without extension) to use for output files, if different from input file name.",
+    help=(
+        "File name (without extension) to use for output files, "
+        "if different from input file name."
+    ),
 )
 @click.option(
     "-V",
@@ -71,7 +77,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
-    print()
+    print()  # blank line before execution
     print(f"{APP_NAME} {__version__}")
     if version:
         return  # print version number only and exit
@@ -105,6 +111,8 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             prepend_file = Path(prepend_file)
             if not prepend_file.exists():
                 raise Exception(f"File does not exist:\n{prepend_file}")
+            if not prepend_file.is_file():
+                raise Exception(f"Path is not a file:\n{prepend_file}")
             print("Prepend file:", prepend_file)
 
             prepend_input += open_file_read(prepend_file).read() + "\n"
@@ -116,6 +124,8 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
         file = Path(file)
         if not file.exists():
             raise Exception(f"File does not exist:\n{file}")
+        if not file.is_file():
+            raise Exception(f"Path is not a file:\n{file}")
 
         # file_out = file.with_suffix("") if not output_file else output_file
         _output_dir = file.parent if not output_dir else output_dir
@@ -142,7 +152,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             image_paths=list(image_paths),
         )
 
-    print()
+    print()  # blank line after execution
 
 
 if __name__ == "__main__":

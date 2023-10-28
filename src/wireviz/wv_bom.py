@@ -1,266 +1,87 @@
 # -*- coding: utf-8 -*-
 
-from dataclasses import asdict
-from itertools import groupby
-from typing import Any, Dict, List, Optional, Tuple, Union
+from collections import namedtuple
+from dataclasses import dataclass
+from enum import Enum, IntEnum
+from typing import List, Optional, Union
 
-from wireviz.DataClasses import AdditionalComponent, Cable, Color, Connector
-from wireviz.wv_colors import translate_color
-from wireviz.wv_gv_html import html_bgcolor_attr, html_line_breaks
-from wireviz.wv_helper import clean_whitespace
+import tabulate as tabulate_module
 
-BOM_COLUMNS_ALWAYS = ("id", "description", "qty", "unit", "designators")
-BOM_COLUMNS_OPTIONAL = ("pn", "manufacturer", "mpn", "supplier", "spn")
-BOM_COLUMNS_IN_KEY = ("description", "unit") + BOM_COLUMNS_OPTIONAL
+from wireviz.wv_utils import html_line_breaks
 
-HEADER_PN = "P/N"
-HEADER_MPN = "MPN"
-HEADER_SPN = "SPN"
-
-BOMKey = Tuple[str, ...]
-BOMColumn = str  # = Literal[*BOM_COLUMNS_ALWAYS, *BOM_COLUMNS_OPTIONAL]
-BOMEntry = Dict[BOMColumn, Union[str, int, float, List[str], None]]
+BOM_HASH_FIELDS = "description qty_unit amount partnumbers"
 
 
-def optional_fields(part: Union[Connector, Cable, AdditionalComponent]) -> BOMEntry:
-    """Return part field values for the optional BOM columns as a dict."""
-    part = asdict(part)
-    return {field: part.get(field) for field in BOM_COLUMNS_OPTIONAL}
+BomEntry = namedtuple("BomEntry", "category qty designators")
+BomHash = namedtuple("BomHash", BOM_HASH_FIELDS)
+BomHashList = namedtuple("BomHashList", BOM_HASH_FIELDS)
+PartNumberInfo = namedtuple("PartNumberInfo", "pn manufacturer mpn supplier spn")
+
+# TODO: different BOM modes
+# BomMode
+# "normal"  # no bubbles, full PN info in GV node
+# "bubbles"  # = "full" -> maximum info in GV node
+# "hide PN info"
+# "PN crossref" = "PN bubbles" + "hide PN info"
+# "additionally: BOM table in GV graph label (#227)"
+# "title block in GV graph label"
 
 
-def get_additional_component_table(
-    harness: "Harness", component: Union[Connector, Cable]
+BomCategory = IntEnum(  # to enforce ordering in BOM
+    "BomEntry", "CONNECTOR CABLE WIRE ADDITIONAL_INSIDE ADDITIONAL_OUTSIDE"
+)
+QtyMultiplierConnector = Enum(
+    "QtyMultiplierConnector", "PINCOUNT POPULATED CONNECTIONS"
+)
+QtyMultiplierCable = Enum(
+    "QtyMultiplierCable", "WIRECOUNT TERMINATION LENGTH TOTAL_LENGTH"
+)
+
+PART_NUMBER_HEADERS = PartNumberInfo(
+    pn="P/N", manufacturer=None, mpn="MPN", supplier=None, spn="SPN"
+)
+
+
+def partnumbers2list(
+    partnumbers: PartNumberInfo, parent_partnumbers: PartNumberInfo = None
 ) -> List[str]:
-    """Return a list of diagram node table row strings with additional components."""
-    rows = []
-    if component.additional_components:
-        rows.append(["Additional components"])
-        for part in component.additional_components:
-            common_args = {
-                "qty": part.qty * component.get_qty_multiplier(part.qty_multiplier),
-                "unit": part.unit,
-                "bgcolor": part.bgcolor,
-            }
-            if harness.options.mini_bom_mode:
-                id = get_bom_index(
-                    harness.bom(),
-                    bom_entry_key({**asdict(part), "description": part.description}),
-                )
-                rows.append(
-                    component_table_entry(
-                        f"#{id} ({part.type.rstrip()})", **common_args
-                    )
-                )
-            else:
-                rows.append(
-                    component_table_entry(
-                        part.description, **common_args, **optional_fields(part)
-                    )
-                )
-    return rows
+    if parent_partnumbers is None:
+        _is_toplevel = True
+        parent_partnumbers = partnumbers
+    else:
+        _is_toplevel = False
 
+    # Note: != operator used as XOR in the following section (https://stackoverflow.com/a/433161)
 
-def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOMEntry]:
-    """Return a list of BOM entries with additional components."""
-    bom_entries = []
-    for part in component.additional_components:
-        bom_entries.append(
-            {
-                "description": part.description,
-                "qty": part.qty * component.get_qty_multiplier(part.qty_multiplier),
-                "unit": part.unit,
-                "designators": component.name if component.show_name else None,
-                **optional_fields(part),
-            }
+    if _is_toplevel != isinstance(parent_partnumbers.pn, List):
+        # top level and not a list, or wire level and list
+        cell_pn = pn_info_string(PART_NUMBER_HEADERS.pn, None, partnumbers.pn)
+    else:
+        # top level and list -> do per wire later
+        # wire level and not list -> already done at top level
+        cell_pn = None
+
+    if _is_toplevel != isinstance(parent_partnumbers.mpn, List):
+        # TODO: edge case: different manufacturers, but same MPN?
+        cell_mpn = pn_info_string(
+            PART_NUMBER_HEADERS.mpn, partnumbers.manufacturer, partnumbers.mpn
         )
-    return bom_entries
+    else:
+        cell_mpn = None
 
-
-def bom_entry_key(entry: BOMEntry) -> BOMKey:
-    """Return a tuple of string values from the dict that must be equal to join BOM entries."""
-    if "key" not in entry:
-        entry["key"] = tuple(
-            clean_whitespace(make_str(entry.get(c))) for c in BOM_COLUMNS_IN_KEY
+    if _is_toplevel != isinstance(parent_partnumbers.spn, List):
+        # TODO: edge case: different suppliers, but same SPN?
+        cell_spn = pn_info_string(
+            PART_NUMBER_HEADERS.spn, partnumbers.supplier, partnumbers.spn
         )
-    return entry["key"]
+    else:
+        cell_spn = None
 
-
-def generate_bom(harness: "Harness") -> List[BOMEntry]:
-    """Return a list of BOM entries generated from the harness."""
-    from wireviz.Harness import Harness  # Local import to avoid circular imports
-
-    bom_entries = []
-    # connectors
-    for connector in harness.connectors.values():
-        if not connector.ignore_in_bom:
-            description = (
-                "Connector"
-                + (f", {connector.type}" if connector.type else "")
-                + (f", {connector.subtype}" if connector.subtype else "")
-                + (f", {connector.pincount} pins" if connector.show_pincount else "")
-                + (
-                    f", {translate_color(connector.color, harness.options.color_mode)}"
-                    if connector.color
-                    else ""
-                )
-            )
-            bom_entries.append(
-                {
-                    "description": description,
-                    "designators": connector.name if connector.show_name else None,
-                    **optional_fields(connector),
-                }
-            )
-
-        # add connectors aditional components to bom
-        bom_entries.extend(get_additional_component_bom(connector))
-
-    # cables
-    # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of description?
-    for cable in harness.cables.values():
-        if not cable.ignore_in_bom:
-            if cable.category != "bundle":
-                # process cable as a single entity
-                description = (
-                    "Cable"
-                    + (f", {cable.type}" if cable.type else "")
-                    + (f", {cable.wirecount}")
-                    + (
-                        f" x {cable.gauge} {cable.gauge_unit}"
-                        if cable.gauge
-                        else " wires"
-                    )
-                    + (" shielded" if cable.shield else "")
-                    + (
-                        f", {translate_color(cable.color, harness.options.color_mode)}"
-                        if cable.color
-                        else ""
-                    )
-                )
-                bom_entries.append(
-                    {
-                        "description": description,
-                        "qty": cable.length,
-                        "unit": cable.length_unit,
-                        "designators": cable.name if cable.show_name else None,
-                        **optional_fields(cable),
-                    }
-                )
-            else:
-                # add each wire from the bundle to the bom
-                for index, color in enumerate(cable.colors):
-                    description = (
-                        "Wire"
-                        + (f", {cable.type}" if cable.type else "")
-                        + (f", {cable.gauge} {cable.gauge_unit}" if cable.gauge else "")
-                        + (
-                            f", {translate_color(color, harness.options.color_mode)}"
-                            if color
-                            else ""
-                        )
-                    )
-                    bom_entries.append(
-                        {
-                            "description": description,
-                            "qty": cable.length,
-                            "unit": cable.length_unit,
-                            "designators": cable.name if cable.show_name else None,
-                            **{
-                                k: index_if_list(v, index)
-                                for k, v in optional_fields(cable).items()
-                            },
-                        }
-                    )
-
-        # add cable/bundles aditional components to bom
-        bom_entries.extend(get_additional_component_bom(cable))
-
-    # add harness aditional components to bom directly, as they both are List[BOMEntry]
-    bom_entries.extend(harness.additional_bom_items)
-
-    # remove line breaks if present and cleanup any resulting whitespace issues
-    bom_entries = [
-        {k: clean_whitespace(v) for k, v in entry.items()} for entry in bom_entries
-    ]
-
-    # deduplicate bom
-    bom = []
-    for _, group in groupby(sorted(bom_entries, key=bom_entry_key), key=bom_entry_key):
-        group_entries = list(group)
-        designators = sum(
-            (make_list(entry.get("designators")) for entry in group_entries), []
-        )
-        total_qty = sum(entry.get("qty", 1) for entry in group_entries)
-        bom.append(
-            {
-                **group_entries[0],
-                "qty": round(total_qty, 3),
-                "designators": sorted(set(designators)),
-            }
-        )
-
-    # add an incrementing id to each bom entry
-    return [{**entry, "id": index} for index, entry in enumerate(bom, 1)]
-
-
-def get_bom_index(bom: List[BOMEntry], target: BOMKey) -> int:
-    """Return id of BOM entry or raise exception if not found."""
-    for entry in bom:
-        if bom_entry_key(entry) == target:
-            return entry["id"]
-    raise Exception("Internal error: No BOM entry found matching: " + "|".join(target))
-
-
-def bom_list(bom: List[BOMEntry]) -> List[List[str]]:
-    """Return list of BOM rows as lists of column strings with headings in top row."""
-    keys = list(BOM_COLUMNS_ALWAYS)  # Always include this fixed set of BOM columns.
-    for fieldname in BOM_COLUMNS_OPTIONAL:
-        # Include only those optional BOM columns that are in use.
-        if any(entry.get(fieldname) for entry in bom):
-            keys.append(fieldname)
-    # Custom mapping from internal name to BOM column headers.
-    # Headers not specified here are generated by capitilising the internal name.
-    bom_headings = {
-        "pn": HEADER_PN,
-        "mpn": HEADER_MPN,
-        "spn": HEADER_SPN,
-    }
-    return [
-        [bom_headings.get(k, k.capitalize()) for k in keys]
-    ] + [  # Create header row with key names
-        [make_str(entry.get(k)) for k in keys] for entry in bom
-    ]  # Create string list for each entry row
-
-
-def component_table_entry(
-    type: str,
-    qty: Union[int, float],
-    unit: Optional[str] = None,
-    bgcolor: Optional[Color] = None,
-    pn: Optional[str] = None,
-    manufacturer: Optional[str] = None,
-    mpn: Optional[str] = None,
-    supplier: Optional[str] = None,
-    spn: Optional[str] = None,
-) -> str:
-    """Return a diagram node table row string with an additional component."""
-    part_number_list = [
-        pn_info_string(HEADER_PN, None, pn),
-        pn_info_string(HEADER_MPN, manufacturer, mpn),
-        pn_info_string(HEADER_SPN, supplier, spn),
-    ]
-    output = (
-        f"{qty}"
-        + (f" {unit}" if unit else "")
-        + f" x {type}"
-        + ("<br/>" if any(part_number_list) else "")
-        + (", ".join([pn for pn in part_number_list if pn]))
-    )
-    # format the above output as left aligned text in a single visible cell
-    # indent is set to two to match the indent in the generated html table
-    return f"""<table border="0" cellspacing="0" cellpadding="3" cellborder="1"{html_bgcolor_attr(bgcolor)}><tr>
-   <td align="left" balign="left">{html_line_breaks(output)}</td>
-  </tr></table>"""
+    cell_contents = [cell_pn, cell_mpn, cell_spn]
+    if any(cell_contents):
+        return [html_line_breaks(cell) for cell in cell_contents]
+    else:
+        return None
 
 
 def pn_info_string(
@@ -274,16 +95,51 @@ def pn_info_string(
         return None
 
 
-def index_if_list(value: Any, index: int) -> Any:
-    """Return the value indexed if it is a list, or simply the value otherwise."""
-    return value[index] if isinstance(value, list) else value
+def bom_list(bom):
+    headers = (
+        "# Qty Unit Description Amount Unit Designators "
+        "P/N Manufacturer MPN Supplier SPN Category".split(" ")
+    )
+    rows = []
+    rows.append(headers)
+    # fill rows
+    for hash, entry in bom.items():
+        cells = [
+            entry["id"],
+            entry["qty"],
+            hash.qty_unit,
+            hash.description,
+            hash.amount.number if hash.amount else None,
+            hash.amount.unit if hash.amount else None,
+            ", ".join(sorted(entry["designators"])),
+        ]
+        if hash.partnumbers:
+            cells.extend(
+                [
+                    hash.partnumbers.pn,
+                    hash.partnumbers.manufacturer,
+                    hash.partnumbers.mpn,
+                    hash.partnumbers.supplier,
+                    hash.partnumbers.spn,
+                ]
+            )
+        else:
+            cells.extend([None, None, None, None, None])
+        # cells.extend([f"{entry['category']} ({entry['category'].name})"])  # for debugging
+        rows.append(cells)
+    # remove empty columns
+    transposed = list(map(list, zip(*rows)))
+    transposed = [
+        column
+        for column in transposed
+        if any([cell is not None for cell in column[1:]])
+        #                                           ^ ignore header cell in check
+    ]
+    rows = list(map(list, zip(*transposed)))
+    return rows
 
 
-def make_list(value: Any) -> list:
-    """Return value if a list, empty list if None, or single element list otherwise."""
-    return value if isinstance(value, list) else [] if value is None else [value]
-
-
-def make_str(value: Any) -> str:
-    """Return comma separated elements if a list, empty string if None, or value as a string otherwise."""
-    return ", ".join(str(element) for element in make_list(value))
+def print_bom_table(bom):
+    print()
+    print(tabulate_module.tabulate(bom_list(bom), headers="firstrow"))
+    print()

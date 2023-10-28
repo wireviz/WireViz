@@ -1,0 +1,12 @@
+# The following tools have proven useful during development
+# Feel free to install while inside the WireViz virtualenv, using:
+# pip install -r devtools.txt
+
+# Code formatting
+black  # black src/wireviz/*.py
+isort  # isort src/wireviz/*py
+
+# Development aids
+pudb       # import pudb; pudb.set_trace()
+autoflake  # autoflake -i --remove-all-unused-imports src/wireviz/*.py
+pyan       # pyan3 src/wireviz/*.py -uncge --html > temp/pyan.html

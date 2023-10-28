@@ -7,13 +7,12 @@ import sys
 from pathlib import Path
 
 script_path = Path(__file__).absolute()
-
-sys.path.insert(0, str(script_path.parent.parent))  # to find wireviz module
-from wv_helper import open_file_append, open_file_read, open_file_write
+sys.path.insert(0, str(script_path.parent.parent.parent))  # to find wireviz module
 
 from wireviz import APP_NAME, __version__, wireviz
+from wireviz.wv_utils import open_file_append, open_file_read, open_file_write
 
-dir = script_path.parent.parent.parent
+dir = script_path.parent.parent.parent.parent
 readme = "readme.md"
 groups = {
     "examples": {
@@ -32,10 +31,11 @@ groups = {
         "path": dir / "examples",
         "prefix": "demo",
     },
+    **{p.stem: {"path": p} for p in (dir / "tests").glob("**")},
 }
 
 input_extensions = [".yml"]
-extensions_not_containing_graphviz_output = [".gv", ".bom.tsv"]
+extensions_not_containing_graphviz_output = [".gv", ".tsv"]
 extensions_containing_graphviz_output = [".png", ".svg", ".html"]
 generated_extensions = (
     extensions_not_containing_graphviz_output + extensions_containing_graphviz_output
@@ -44,7 +44,7 @@ generated_extensions = (
 
 def collect_filenames(description, groupkey, ext_list):
     path = groups[groupkey]["path"]
-    patterns = [f"{groups[groupkey]['prefix']}*{ext}" for ext in ext_list]
+    patterns = [f"{groups[groupkey].get('prefix', '')}*{ext}" for ext in ext_list]
     if ext_list != input_extensions and readme in groups[groupkey]:
         patterns.append(readme)
     print(f'{description} {groupkey} in "{path}"')
@@ -88,7 +88,7 @@ def build_generated(groupkeys):
 
                     out.write(f"![]({yaml_file.stem}.png)\n\n")
                     out.write(
-                        f"[Source]({yaml_file.name}) - [Bill of Materials]({yaml_file.stem}.bom.tsv)\n\n\n"
+                        f"[Source]({yaml_file.name}) - [Bill of Materials]({yaml_file.stem}.tsv)\n\n\n"
                     )
 
 
@@ -98,7 +98,7 @@ def clean_generated(groupkeys):
         for filename in collect_filenames("Cleaning", key, generated_extensions):
             if filename.is_file():
                 print(f'  rm "{filename}"')
-                Path(filename).unlink()
+                filename.unlink()
 
 
 def compare_generated(groupkeys, branch="", include_graphviz_output=False):

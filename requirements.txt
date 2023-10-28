@@ -3,3 +3,4 @@ graphviz
 pillow
 pyyaml
 setuptools
+tabulate

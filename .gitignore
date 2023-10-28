@@ -1,15 +1,21 @@
+# OS-specific files
 .DS_Store
+desktop.ini
+Thumbs.db
+
+# Development aids
 .idea/
-.eggs
-__pycache__
-.*.swp
-*.egg-info
-*.pyc
-build
-data
-dist
+.vscode/
+temp/
 venv/
 .venv/
-desktop.ini
-thumbs.db
-temp/
+
+# Build/compile/release artifacts
+build/
+dist/
+*.egg-info
+*.pyc
+
+# Other temporary files
+__pycache__
+.*.swp

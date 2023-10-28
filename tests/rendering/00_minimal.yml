@@ -1,0 +1,26 @@
+connectors:
+  X1:
+    pincount: 4
+  X2:
+    pincount: 4
+  X3:
+    pincount: 2
+  F:
+    style: simple
+
+cables:
+  C1:
+    wirecount: 4
+  W2:
+    wirecount: 2
+    category: bundle
+
+connections:
+  -
+    - X1: [1-4]
+    - C1: [1-4]
+    - X2: [1-4]
+  -
+    - X3: [1,2]
+    - W2: [1,2]
+    - F.

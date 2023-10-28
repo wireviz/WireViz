@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import Dict, List
+from typing import List, Optional, Union
 
 awg_equiv_table = {
     "0.09": "28",
@@ -70,9 +70,10 @@ def expand(yaml_data):
 
 
 def get_single_key_and_value(d: dict):
-    k = list(d.keys())[0]
-    v = d[k]
-    return (k, v)
+    # used for defining a line in a harness' connection set
+    # E.g. for the YAML input `- X1: 1`
+    # this function returns a tuple in the form ("X1", "1")
+    return next(iter(d.items()))
 
 
 def int2tuple(inp):
@@ -90,14 +91,18 @@ def flatten2d(inp):
     ]
 
 
-def tuplelist2tsv(inp, header=None):
+def bom2tsv(inp, header=None):
     output = ""
     if header is not None:
         inp.insert(0, header)
-    inp = flatten2d(inp)
     for row in inp:
+        row = [item if item is not None else "" for item in row]
         output = output + "\t".join(str(remove_links(item)) for item in row) + "\n"
     return output
+
+
+def html_line_breaks(inp):
+    return remove_links(inp).replace("\n", "<br />") if isinstance(inp, str) else inp
 
 
 def remove_links(inp):
@@ -154,7 +159,7 @@ def aspect_ratio(image_src):
     return 1  # Assume 1:1 when unable to read actual image size
 
 
-def smart_file_resolve(filename: str, possible_paths: (str, List[str])) -> Path:
+def smart_file_resolve(filename: str, possible_paths: Union[str, List[str]]) -> Path:
     if not isinstance(possible_paths, List):
         possible_paths = [possible_paths]
     filename = Path(filename)

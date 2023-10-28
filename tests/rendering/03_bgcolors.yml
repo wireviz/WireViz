@@ -1,0 +1,51 @@
+options:
+  bgcolor_connector: 0xFFCCCC
+  bgcolor_cable: 0xCCFFCC
+  bgcolor_bundle: 0xCCCCFF
+
+
+connectors:
+  X1:
+    pincount: 4
+    bgcolor: 0xFF9999
+    bgcolor_title: 0xFF6666
+  X2:
+    pincount: 4
+  X3:
+    pincount: 4
+    color: GN
+  X:
+    pincount: 2
+  F:
+    style: simple
+
+cables:
+  C1:
+    wirecount: 4
+    bgcolor: 0x99FF99
+    bgcolor_title: 0x66FF66
+  C2:
+    wirecount: 4
+    color: PK
+  W1:
+    wirecount: 2
+    category: bundle
+  W2:
+    wirecount: 2
+    category: bundle
+    bgcolor: 0x9999FF
+    bgcolor_title: 0x6666FF
+
+connections:
+  -
+    - X1: [1-4]
+    - C1: [1-4]
+    - X2: [1-4]
+    - C2: [1-4]
+    - X3: [1-4]
+  -
+    - X.X4: [1,2]
+    - W1: [1,2]
+    - X.X5: [1,2]
+    - W2: [1,2]
+    - F.

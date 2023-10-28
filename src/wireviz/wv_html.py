@@ -1,119 +1,125 @@
 # -*- coding: utf-8 -*-
 
-import re
-from pathlib import Path
-from typing import Dict, List, Union
+from collections.abc import Iterable
+from dataclasses import dataclass, field
+from typing import Dict
 
-from wireviz import APP_NAME, APP_URL, __version__, wv_colors
-from wireviz.DataClasses import Metadata, Options
-from wireviz.wv_gv_html import html_line_breaks
-from wireviz.wv_helper import (
-    flatten2d,
-    open_file_read,
-    open_file_write,
-    smart_file_resolve,
-)
+indent_count = 1
 
 
-def generate_html_output(
-    filename: Union[str, Path],
-    bom_list: List[List[str]],
-    metadata: Metadata,
-    options: Options,
-):
+class Attribs(Dict):
+    def __repr__(self):
+        if len(self) == 0:
+            return ""
 
-    # load HTML template
-    templatename = metadata.get("template", {}).get("name")
-    if templatename:
-        # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
-        templatefile = smart_file_resolve(
-            f"{templatename}.html",
-            [Path(filename).parent, Path(__file__).parent / "templates"],
-        )
-    else:
-        # fall back to built-in simple template if no template was provided
-        templatefile = Path(__file__).parent / "templates/simple.html"
+        html = []
+        for k, v in self.items():
+            if v is not None:
+                html.append(f' {k}="{v}"')
+            # else:
+            #     html.append(f" {k}")
+        return "".join(html)
 
-    html = open_file_read(templatefile).read()
 
-    # embed SVG diagram
-    with open_file_read(f"{filename}.tmp.svg") as file:
-        svgdata = re.sub(
-            "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
-            "<!-- XML and DOCTYPE declarations from SVG file removed -->",
-            file.read(),
-            1,
-        )
+@dataclass
+class Tag:
+    contents = None
+    attribs: Attribs = field(default_factory=Attribs)
+    flat: bool = None
+    delete_if_empty: bool = False
 
-    # generate BOM table
-    bom = flatten2d(bom_list)
+    def __init__(self, contents, flat=None, delete_if_empty=False, **kwargs):
+        self.contents = contents
+        self.flat = flat
+        self.delete_if_empty = delete_if_empty
+        self.attribs = Attribs({**kwargs})
 
-    # generate BOM header (may be at the top or bottom of the table)
-    bom_header_html = "  <tr>\n"
-    for item in bom[0]:
-        th_class = f"bom_col_{item.lower()}"
-        bom_header_html = f'{bom_header_html}    <th class="{th_class}">{item}</th>\n'
-    bom_header_html = f"{bom_header_html}  </tr>\n"
+    def update_attribs(self, **kwargs):
+        for k, v in kwargs.items():
+            self.attribs[k] = v
 
-    # generate BOM contents
-    bom_contents = []
-    for row in bom[1:]:
-        row_html = "  <tr>\n"
-        for i, item in enumerate(row):
-            td_class = f"bom_col_{bom[0][i].lower()}"
-            row_html = f'{row_html}    <td class="{td_class}">{item}</td>\n'
-        row_html = f"{row_html}  </tr>\n"
-        bom_contents.append(row_html)
+    @property
+    def tagname(self):
+        return type(self).__name__.lower()
 
-    bom_html = (
-        '<table class="bom">\n' + bom_header_html + "".join(bom_contents) + "</table>\n"
-    )
-    bom_html_reversed = (
-        '<table class="bom">\n'
-        + "".join(list(reversed(bom_contents)))
-        + bom_header_html
-        + "</table>\n"
-    )
+    @property
+    def auto_flat(self):
+        if self.flat is not None:  # user specified
+            return self.flat
+        if not _is_iterable_not_str(self.contents):  # catch str, int, float, ...
+            if not isinstance(self.contents, Tag):  # avoid recursion
+                return not "\n" in str(self.contents)  # flatten if single line
 
-    # prepare simple replacements
-    replacements = {
-        "<!-- %generator% -->": f"{APP_NAME} {__version__} - {APP_URL}",
-        "<!-- %fontname% -->": options.fontname,
-        "<!-- %bgcolor% -->": wv_colors.translate_color(options.bgcolor, "hex"),
-        "<!-- %diagram% -->": svgdata,
-        "<!-- %bom% -->": bom_html,
-        "<!-- %bom_reversed% -->": bom_html_reversed,
-        "<!-- %sheet_current% -->": "1",  # TODO: handle multi-page documents
-        "<!-- %sheet_total% -->": "1",  # TODO: handle multi-page documents
-    }
+    @property
+    def is_empty(self):
+        return self.get_contents(force_flat=True) == ""
 
-    # prepare metadata replacements
-    if metadata:
-        for item, contents in metadata.items():
-            if isinstance(contents, (str, int, float)):
-                replacements[f"<!-- %{item}% -->"] = html_line_breaks(str(contents))
-            elif isinstance(contents, Dict):  # useful for authors, revisions
-                for index, (category, entry) in enumerate(contents.items()):
-                    if isinstance(entry, Dict):
-                        replacements[f"<!-- %{item}_{index+1}% -->"] = str(category)
-                        for entry_key, entry_value in entry.items():
-                            replacements[
-                                f"<!-- %{item}_{index+1}_{entry_key}% -->"
-                            ] = html_line_breaks(str(entry_value))
+    def indent_lines(self, lines, force_flat=False):
+        if self.auto_flat or force_flat:
+            return lines
+        else:
+            indenter = " " * indent_count
+            return "\n".join(f"{indenter}{line}" for line in lines.split("\n"))
 
-        replacements['"sheetsize_default"'] = '"{}"'.format(
-            metadata.get("template", {}).get("sheetsize", "")
-        )
-        # include quotes so no replacement happens within <style> definition
+    def get_contents(self, force_flat=False):
+        separator = "" if self.auto_flat or force_flat else "\n"
+        if _is_iterable_not_str(self.contents):
+            return separator.join(
+                [
+                    self.indent_lines(str(c), force_flat)
+                    for c in self.contents
+                    if c is not None
+                ]
+            )
+        elif self.contents is None:
+            return ""
+        else:  # str, int, float, etc.
+            return self.indent_lines(str(self.contents), force_flat)
 
-    # perform replacements
-    # regex replacement adapted from:
-    # https://gist.github.com/bgusach/a967e0587d6e01e889fd1d776c5f3729
+    def __repr__(self):
+        separator = "" if self.auto_flat else "\n"
+        if self.delete_if_empty and self.is_empty:
+            return ""
+        else:
+            html = [
+                f"<{self.tagname}{str(self.attribs)}>",
+                f"{self.get_contents()}",
+                f"</{self.tagname}>",
+            ]
+            html_joined = separator.join(html)
+            return html_joined
 
-    # longer replacements first, just in case
-    replacements_sorted = sorted(replacements, key=len, reverse=True)
-    replacements_escaped = map(re.escape, replacements_sorted)
-    pattern = re.compile("|".join(replacements_escaped))
-    html = pattern.sub(lambda match: replacements[match.group(0)], html)
 
-    open_file_write(f"{filename}.html").write(html)
+@dataclass
+class TagSingleton(Tag):
+    def __init__(self, **kwargs):
+        self.attribs = Attribs({**kwargs})
+
+    def __repr__(self):
+        return f"<{self.tagname}{str(self.attribs)} />"
+
+
+def _is_iterable_not_str(inp):
+    # str is iterable, but should be treated as not iterable
+    return isinstance(inp, Iterable) and not isinstance(inp, str)
+
+
+@dataclass
+class Br(TagSingleton):
+    pass
+
+
+class Img(TagSingleton):
+    pass
+
+
+class Td(Tag):
+    pass
+
+
+class Tr(Tag):
+    pass
+
+
+class Table(Tag):
+    pass

@@ -1,0 +1,35 @@
+connectors:
+  X1:
+    color: YEGN
+    pincount: 4
+    pincolors: [WHBK, BKWH, GNYE, GNWHRD]
+  X2:
+    color: 0xCCCCCC:0x333333
+    pincount: 4
+    pincolors: [0xFF8000:0x80FF00, 0x00FF80, 0x8000FF]
+  X3:
+    color: red:yellow
+    pincount: 4
+    pincolors: [deeppink, tomato, salmon, indianred]
+  F:
+    style: simple
+    color: IVTQ
+
+cables:
+  C1:
+    wirecount: 4
+    color: GDSR
+    colors: [RDYE, YEGN, GNBU, BURD]
+  C2:
+    wirecount: 4
+    colors: [0xFF8000:0x80FF00, YEGN, GNBU, BURD]
+
+connections:
+  -
+    - X1: [1-4]
+    - C1: [1-4]
+    - X2: [1-4]
+    - C2: [1-4]
+    - X3: [1-4]
+    - --
+    - F.

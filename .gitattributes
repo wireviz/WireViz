@@ -2,8 +2,8 @@ docs/* linguist-documentation
 examples/* linguist-documentation
 tutorial/* linguist-documentation
 
-**/*.bom.tsv linguist-generated
-**/*.bom.csv linguist-generated
+**/*.tsv linguist-generated
+**/*.csv linguist-generated
 **/*.gv linguist-generated
 **/*.html linguist-generated
 **/*.png linguist-generated

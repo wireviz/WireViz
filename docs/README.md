@@ -74,13 +74,13 @@ Output file:
 
 ![Sample output diagram](../examples/demo01.png)
 
-[Bill of Materials](../examples/demo01.bom.tsv) (auto-generated)
+[Bill of Materials](../examples/demo01.tsv) (auto-generated)
 
 ### Demo 02
 
 ![](../examples/demo02.png)
 
-[Source](../examples/demo02.yml) - [Bill of Materials](../examples/demo02.bom.tsv)
+[Source](../examples/demo02.yml) - [Bill of Materials](../examples/demo02.tsv)
 
 ### Syntax, tutorial and example gallery
 
@@ -133,7 +133,7 @@ Depending on the options specified, this will output some or all of the followin
 mywire.gv         GraphViz output
 mywire.svg        Wiring diagram as vector image
 mywire.png        Wiring diagram as raster image
-mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
+mywire.tsv        BOM (bill of materials) as tab-separated text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 
