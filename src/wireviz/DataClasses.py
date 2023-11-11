@@ -18,7 +18,7 @@ MultilineHypertext = (
 Designator = PlainText  # Case insensitive unique name of connector or cable
 
 # Literal type aliases below are commented to avoid requiring python 3.8
-ConnectorMultiplier = PlainText  # = Literal['pincount', 'populated']
+ConnectorMultiplier = PlainText  # = Literal['pincount', 'populated', 'unpopulated']
 CableMultiplier = (
     PlainText  # = Literal['wirecount', 'terminations', 'length', 'total_length']
 )
@@ -232,6 +232,8 @@ class Connector:
             return self.pincount
         elif qty_multiplier == "populated":
             return sum(self.visible_pins.values())
+        elif qty_multiplier == 'unpopulated':
+            return (self.pincount - sum(self.visible_pins.values()))
         else:
             raise ValueError(
                 f"invalid qty multiplier parameter for connector {qty_multiplier}"
