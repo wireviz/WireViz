@@ -305,8 +305,6 @@ class TopLevelGraphicalComponent(GraphicalComponent):  # abstract class
     additional_parameters: Optional[Dict] = None
     additional_components: List[AdditionalComponent] = field(default_factory=list)
     notes: Optional[MultilineHypertext] = None
-    # BOM options
-    add_up_in_bom: Optional[bool] = None
     # rendering options
     bgcolor_title: Optional[SingleColor] = None
     show_name: Optional[bool] = None
