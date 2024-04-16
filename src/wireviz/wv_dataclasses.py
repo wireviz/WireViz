@@ -314,7 +314,6 @@ class TopLevelGraphicalComponent(GraphicalComponent):  # abstract class
 class Connector(TopLevelGraphicalComponent):
     # connector-specific properties
     style: Optional[str] = None
-    category: Optional[str] = None
     loops: List[List[Pin]] = field(default_factory=list)
     # pin information in particular
     pincount: Optional[int] = None
