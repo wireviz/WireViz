@@ -15,7 +15,7 @@
 - Improve technical drawing output ([#74](https://github.com/wireviz/WireViz/pull/74), [#32](https://github.com/wireviz/WireViz/issues/32), [#239](https://github.com/wireviz/WireViz/pull/239))
 - Embed images in SVG output ([#189](https://github.com/wireviz/WireViz/pull/189))
 - Add ability to choose output formats using the `-f`/`--format` command line option ([#60](https://github.com/wireviz/WireViz/issues/60))
-
+- Add option to multiply additional component quantity by number of unpopulated positions on connector ([#298](https://github.com/wireviz/WireViz/pull/298))
 
 ### Misc. fixes
 - Use `isort` and `black` for cleaner code and easier merging ([#248](https://github.com/wireviz/WireViz/pull/248))
