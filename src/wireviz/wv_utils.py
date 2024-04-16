@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import re
+from collections import namedtuple
 from pathlib import Path
 from typing import List, Optional, Union
+
+NumberAndUnit = namedtuple("NumberAndUnit", "number unit")
 
 awg_equiv_table = {
     "0.09": "28",
@@ -74,6 +77,32 @@ def get_single_key_and_value(d: dict):
     # E.g. for the YAML input `- X1: 1`
     # this function returns a tuple in the form ("X1", "1")
     return next(iter(d.items()))
+
+
+def parse_number_and_unit(
+    inp: Optional[Union[NumberAndUnit, float, int, str]],
+    default_unit: Optional[str] = None,
+) -> Optional[NumberAndUnit]:
+    if inp is None:
+        return None
+    elif isinstance(inp, NumberAndUnit):
+        return inp
+    elif isinstance(inp, float) or isinstance(inp, int):
+        return NumberAndUnit(float(inp), default_unit)
+    elif isinstance(inp, str):
+        if " " in inp:
+            number, unit = inp.split(" ", 1)
+        else:
+            number, unit = inp, default_unit
+        try:
+            number = float(number)
+        except ValueError:
+            raise Exception(
+                f"{inp} is not a valid number and unit.\n"
+                "It must be a number, or a number and unit separated by a space."
+            )
+        else:
+            return NumberAndUnit(number, unit)
 
 
 def int2tuple(inp):
