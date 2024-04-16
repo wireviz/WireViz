@@ -131,8 +131,10 @@ class AdditionalComponent:
 
     @property
     def description(self) -> str:
-        s = self.type.rstrip() + f", {self.subtype.rstrip()}" if self.subtype else ""
-        return s
+        t = self.type.rstrip()
+        st = f", {self.subtype.rstrip()}" if self.subtype else ""
+        t = t + st
+        return t
 
 
 @dataclass
