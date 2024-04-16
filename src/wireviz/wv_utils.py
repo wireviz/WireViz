@@ -88,21 +88,25 @@ def parse_number_and_unit(
     elif isinstance(inp, NumberAndUnit):
         return inp
     elif isinstance(inp, float) or isinstance(inp, int):
-        return NumberAndUnit(float(inp), default_unit)
+        return NumberAndUnit(inp, default_unit)
     elif isinstance(inp, str):
         if " " in inp:
-            number, unit = inp.split(" ", 1)
+            num_str, unit = inp.split(" ", 1)
         else:
-            number, unit = inp, default_unit
+            num_str, unit = inp, default_unit
+
         try:
-            number = float(number)
-        except ValueError:
-            raise Exception(
-                f"{inp} is not a valid number and unit.\n"
-                "It must be a number, or a number and unit separated by a space."
-            )
-        else:
-            return NumberAndUnit(number, unit)
+            number = int(num_str)
+        except ValueError:  # maybe it is a float?
+            try:
+                number = float(num_str)
+            except ValueError:  # neither float nor int
+                raise Exception(
+                    f"{inp} is not a valid number and unit.\n"
+                    "It must be a number, or a number and unit separated by a space."
+                )
+
+        return NumberAndUnit(number, unit)
 
 
 def int2tuple(inp):
