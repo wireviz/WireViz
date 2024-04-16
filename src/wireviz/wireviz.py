@@ -355,6 +355,19 @@ def parse(
                         # mate two connectors as a whole
                         harness.add_mate_component(from_name, to_name, designator)
 
+    # warn about unused templates
+
+    proposed_components = list(template_connectors.keys()) + list(
+        template_cables.keys()
+    )
+    used_components = set(designators_and_templates.values())
+    forgotten_components = [c for c in proposed_components if not c in used_components]
+    if len(forgotten_components) > 0:
+        print(
+            "Warning: The following components are not referenced in any connection set:"
+        )
+        print(", ".join(forgotten_components))
+
     # harness population completed =============================================
 
     if "additional_bom_items" in yaml_data:
