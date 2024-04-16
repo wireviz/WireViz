@@ -233,7 +233,7 @@ class Connector:
         elif qty_multiplier == "populated":
             return sum(self.visible_pins.values())
         elif qty_multiplier == 'unpopulated':
-            return (self.pincount - sum(self.visible_pins.values()))
+            return max(0, self.pincount - sum(self.visible_pins.values()))
         else:
             raise ValueError(
                 f"invalid qty multiplier parameter for connector {qty_multiplier}"
