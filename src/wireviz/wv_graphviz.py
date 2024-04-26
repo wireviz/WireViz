@@ -114,11 +114,28 @@ def gv_additional_component_table(component):
 
     rows = []
     for subitem in component.additional_components:
+
+        if subitem.explicit_qty:
+            text_qty, unit_qty = subitem.qty_computed, "x"
+            if subitem.amount_computed is not None:
+                text_desc = f"{subitem.amount_computed.number} {subitem.amount_computed.unit} {subitem.description}"
+            else:
+                text_desc = f"{subitem.description}"
+        else:
+            if subitem.amount_computed is not None:
+                text_qty, unit_qty = (
+                    subitem.amount_computed.number,
+                    subitem.amount_computed.unit,
+                )
+            else:
+                text_qty, unit_qty = "1", "x"
+            text_desc = subitem.description
+
         firstline = [
             Td(bom_bubble(subitem.bom_id)),
-            Td(f"{subitem.bom_qty}", align="right"),
-            Td(f"{subitem.qty.unit if subitem.qty.unit else 'x'}", align="left"),
-            Td(f"{subitem.description}", align="left"),
+            Td(text_qty, align="right"),
+            Td(unit_qty, align="left"),
+            Td(text_desc, align="left"),
             Td(f"{subitem.note if subitem.note else ''}", align="left"),
         ]
         rows.append(Tr(firstline))
@@ -584,7 +601,9 @@ def apply_dot_tweaks(dot, tweak):
                     if n_subs < 1:
                         warnings.warn(f"tweak: {attr} not found in {keyword}!")
                     elif n_subs > 1:
-                        warnings.warn(f"tweak: {attr} removed {n_subs} times in {keyword}!")
+                        warnings.warn(
+                            f"tweak: {attr} removed {n_subs} times in {keyword}!"
+                        )
                     continue
 
                 if len(value) == 0 or " " in value:
@@ -597,7 +616,9 @@ def apply_dot_tweaks(dot, tweak):
                     # If attr not found, then append it
                     entry = re.sub(r"\]$", f" {attr}={value}]", entry)
                 elif n_subs > 1:
-                    warnings.warn(f"tweak: {attr} overridden {n_subs} times in {keyword}!")
+                    warnings.warn(
+                        f"tweak: {attr} overridden {n_subs} times in {keyword}!"
+                    )
 
             dot.body[i] = entry
 

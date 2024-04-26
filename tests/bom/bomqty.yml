@@ -7,21 +7,16 @@ connectors:
     type: Contains additional components
     pincount: 6
     additional_components:
-      -
-        type: One, no unit
-      -
-        type: Two kilometers
-        qty: 2 km
-      -
-        type: Takes pincount times seven
+      - type: One, no unit
+      - type: Two kilometers
+        amount: 2 km
+      - type: Takes pincount times seven
         qty: 7
         qty_multiplier: pincount
-      -
-        type: Takes 10 mm per populated pin
-        qty: 10 mm
+      - type: Takes 10 mm per populated pin
+        amount: 10 mm
         qty_multiplier: populated
-      -
-        type: Takes number of connections
+      - type: Takes number of connections
         qty_multiplier: connections
 
 cables:
@@ -31,22 +26,19 @@ cables:
     length: 1.5
     color_code: DIN
     additional_components:
-      -
-        type: One
-      -
-        type: Three centimeters
-        qty: 3 cm
-      -
-        type: Takes wirecount times two
+      - type: One
+      - type: Three centimeters
+        amount: 3 cm
+      - type: Takes wirecount times two
         qty: 2
         qty_multiplier: wirecount
-      -
-        type: Takes length times three
-        qty: 3 # adding unit here should cause error because the length already has a unit
+      - type: Takes length times three
+        qty: 3
+        # adding amount here should cause error because the length already has a unit
         qty_multiplier: length
-      -
-        type: Takes total length times three
-        qty: 2 # adding unit here should cause error because the length already has a unit
+      - type: Takes total length times three
+        qty: 2
+        # adding amount here should cause error because the length already has a unit
         qty_multiplier: total_length
 
   W2:
@@ -55,11 +47,9 @@ cables:
     colors: [tomato, skyblue]
 
 connections:
-  -
-    - X1: [1-3]
+  - - X1: [1-3]
     - C1: [1-3]
     - X2: [1-3]
-  -
-    - X1: [3,4]
-    - W2: [1,2]
-    - X2: [3,4]
+  - - X1: [3, 4]
+    - W2: [1, 2]
+    - X2: [3, 4]

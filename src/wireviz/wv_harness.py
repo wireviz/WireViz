@@ -86,7 +86,7 @@ class Harness:
         arrow = Arrow(direction=parse_arrow_str(arrow_str), weight=ArrowWeight.SINGLE)
         self.mates.append(MateComponent(from_name, to_name, arrow))
 
-    def populate_bom(self):
+    def populate_bom(self):  # called once harness creation is complete
         # helper lists
         all_toplevel_items = (
             list(self.connectors.values())
@@ -131,11 +131,9 @@ class Harness:
             if item.ignore_in_bom:
                 continue
             if not item.bom_hash in self.bom:
-                print(f"{item}'s hash' not found in BOM dict.")
+                print(f"{item}'s hash' not found in BOM dict.")  # Should not happen
                 continue
             item.bom_id = self.bom[item.bom_hash]["id"]
-
-        # print_bom_table(self.bom)  # for debugging
 
     def _add_to_internal_bom(self, item: Component):
         if item.ignore_in_bom:
@@ -173,38 +171,50 @@ class Harness:
                 cat = ""
 
             if item.category == "bundle":
+                # wires of a bundle are added as individual BOM entries
                 for subitem in item.wire_objects.values():
                     _add(
                         hash=subitem.bom_hash,
-                        qty=item.bom_qty,  # should be 1
+                        qty=item.qty,  # should be 1
                         designator=item.designator,  # inherit from parent item
                         category=cat,
                     )
             else:
                 _add(
                     hash=item.bom_hash,
-                    qty=item.bom_qty,
+                    qty=item.qty,  # should be 1
                     designator=item.designator,
                     category=cat,
                 )
+
             if item.additional_components:
-                if item.category == "bundle":
-                    pass  # TODO
                 item.compute_qty_multipliers()
-            for comp in item.additional_components:
-                if comp.ignore_in_bom:
-                    continue
-                _add(
-                    hash=comp.bom_hash,
-                    designator=item.designator,
-                    qty=comp.bom_qty,
-                    category=BomCategory.ADDITIONAL_INSIDE,
-                )
+
+                for comp in item.additional_components:
+                    if comp.ignore_in_bom:
+                        continue
+
+                    if comp.sum_amounts_in_bom:
+                        if comp.amount_computed:
+                            total_qty = comp.qty_computed * comp.amount_computed.number
+                        else:
+                            total_qty = comp.qty_computed
+                    else:
+                        total_qty = comp.qty_computed
+                    _add(
+                        hash=comp.bom_hash,
+                        designator=item.designator,
+                        qty=total_qty,
+                        # no explicit qty specified; assume qty = 1
+                        # used to simplify add.comp. table within parent node
+                        # e.g. show "10 mm Heatshrink" instead of "1x 10 mm Heatshrink"
+                        category=BomCategory.ADDITIONAL_INSIDE,
+                    )
         elif isinstance(item, AdditionalBomItem):
             cat = BomCategory.ADDITIONAL_OUTSIDE
             _add(
                 hash=item.bom_hash,
-                qty=item.bom_qty,
+                qty=item.qty,
                 designator=None,
                 category=cat,
             )

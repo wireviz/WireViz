@@ -190,7 +190,7 @@ class Component:
     supplier: str = None
     spn: str = None
     # BOM info
-    qty: NumberAndUnit = NumberAndUnit(1, None)
+    qty: Optional[Union[None, int, float]] = None
     amount: Optional[NumberAndUnit] = None
     sum_amounts_in_bom: bool = True
     ignore_in_bom: bool = False
@@ -201,43 +201,30 @@ class Component:
         partnos = [remove_links(entry) for entry in partnos]
         partnos = tuple(partnos)
         self.partnumbers = PartNumberInfo(*partnos)
-
-        self.qty = parse_number_and_unit(self.qty, None)
         self.amount = parse_number_and_unit(self.amount, None)
 
     @property
     def bom_hash(self) -> BomHash:
+        if isinstance(self, AdditionalComponent):
+            _amount = self.amount_computed
+        else:
+            _amount = self.amount
+
         if self.sum_amounts_in_bom:
             _hash = BomHash(
                 description=self.description,
-                qty_unit=self.amount.unit if self.amount else None,
+                qty_unit=_amount.unit if _amount else None,
                 amount=None,
                 partnumbers=self.partnumbers,
             )
         else:
             _hash = BomHash(
                 description=self.description,
-                qty_unit=self.qty.unit,
-                amount=self.amount,
+                qty_unit=None,
+                amount=_amount,
                 partnumbers=self.partnumbers,
             )
         return _hash
-
-    @property
-    def bom_qty(self) -> float:
-        if self.sum_amounts_in_bom:
-            if self.amount:
-                return self.qty.number * self.amount.number
-            else:
-                return self.qty.number
-        else:
-            return self.qty.number
-
-    def bom_amount(self) -> NumberAndUnit:
-        if self.sum_amounts_in_bom:
-            return NumberAndUnit(None, None)
-        else:
-            return self.amount
 
     @property
     def has_pn_info(self) -> bool:
@@ -272,7 +259,9 @@ class GraphicalComponent(Component):  # abstract class
 @dataclass
 class AdditionalComponent(GraphicalComponent):
     qty_multiplier: Union[QtyMultiplierConnector, QtyMultiplierCable, int] = 1
-    _qty_multiplier_computed: Union[int, float] = 1
+    qty_computed: Optional[int] = None
+    explicit_qty: bool = True
+    amount_computed: Optional[NumberAndUnit] = None
     note: str = None
 
     def __post_init__(self):
@@ -291,9 +280,13 @@ class AdditionalComponent(GraphicalComponent):
             else:
                 raise Exception(f"Unknown qty multiplier: {self.qty_multiplier}")
 
-    @property
-    def bom_qty(self):
-        return self.qty.number * self._qty_multiplier_computed
+        if self.qty is None and self.qty_multiplier in [
+            QtyMultiplierCable.TOTAL_LENGTH,
+            QtyMultiplierCable.LENGTH,
+            1,
+        ]:  # simplify add.comp. table in parent node for implicit qty 1
+            self.qty = 1
+            self.explicit_qty = False
 
 
 @dataclass
@@ -357,13 +350,12 @@ class Connector(TopLevelGraphicalComponent):
         self.color = MultiColor(self.color)
 
         # connectors do not support custom qty or amount
-        if self.qty != NumberAndUnit(1, None):
+        if self.qty is None:
+            self.qty = 1
+        if self.qty != 1:
             raise Exception("Connector qty != 1 not supported")
         if self.amount is not None:
             raise Exception("Connector amount not supported")
-        # TODO: Delete next two assignments if tests above is sufficient. Please verify!
-        self.qty = NumberAndUnit(1, None)
-        self.amount = None
 
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
@@ -467,7 +459,12 @@ class Connector(TopLevelGraphicalComponent):
                 raise Exception("Used a cable multiplier in a connector!")
             else:  # int or float
                 computed_factor = subitem.qty_multiplier
-            subitem._qty_multiplier_computed = computed_factor
+
+            if subitem.qty is not None:
+                subitem.qty_computed = subitem.qty * computed_factor
+            else:
+                subitem.qty_computed = computed_factor
+            subitem.amount_computed = subitem.amount
 
 
 @dataclass
@@ -602,14 +599,17 @@ class Cable(TopLevelGraphicalComponent):
     @property
     def bom_hash(self):
         if self.category == "bundle":
-            raise Exception("Do this at the wire level!")  # TODO
+            # This line should never be reached, since caller checks
+            # whether item is a bundle and if so, calls bom_hash
+            # for each individual wire instead
+            raise Exception("Do this at the wire level!")
         else:
             return super().bom_hash
 
     @property
     def description(self) -> str:
         if self.category == "bundle":
-            raise Exception("Do this at the wire level!")  # TODO
+            raise Exception("Do this at the wire level!")
         else:
             substrs = [
                 ("", "Cable"),
@@ -646,6 +646,12 @@ class Cable(TopLevelGraphicalComponent):
 
         self.bgcolor_title = SingleColor(self.bgcolor_title)
         self.color = MultiColor(self.color)
+
+        # cables do not support custom qty or amount
+        if self.qty is None:
+            self.qty = 1
+        if self.qty != 1:
+            raise Exception("Cable qty != 1 not supported")
 
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
@@ -770,27 +776,40 @@ class Cable(TopLevelGraphicalComponent):
         )
         qty_multipliers_computed = {
             "WIRECOUNT": len(self.wire_objects),
-            "TERMINATIONS": 999,  # TODO
+            # "TERMINATIONS": ___,  # TODO
             "LENGTH": self.length.number if self.length else 0,
             "TOTAL_LENGTH": total_length,
         }
         for subitem in self.additional_components:
             if isinstance(subitem.qty_multiplier, QtyMultiplierCable):
                 computed_factor = qty_multipliers_computed[subitem.qty_multiplier.name]
-                # inherit component's length unit if appropriate
                 if subitem.qty_multiplier.name in ["LENGTH", "TOTAL_LENGTH"]:
-                    if subitem.qty.unit is not None:
+                    # since length can have a unit, use amount fields to hold
+                    if subitem.amount is not None:
                         raise Exception(
-                            f"No unit may be specified when using"
-                            f"{subitem.qty_multiplier} as a multiplier"
+                            f"No amount may be specified when using "
+                            f"{subitem.qty_multiplier.name} as a multiplier."
                         )
-                    subitem.qty = NumberAndUnit(subitem.qty.number, self.length.unit)
+                    subitem.qty_computed = subitem.qty if subitem.qty else 1
+                    subitem.amount_computed = NumberAndUnit(
+                        computed_factor, self.length.unit
+                    )
+                else:
+                    # multiplier unrelated to length, therefore no unit
+                    if subitem.qty is not None:
+                        subitem.qty_computed = subitem.qty * computed_factor
+                    else:
+                        subitem.qty_computed = computed_factor
+                    subitem.amount_computed = subitem.amount
 
             elif isinstance(subitem.qty_multiplier, QtyMultiplierConnector):
                 raise Exception("Used a connector multiplier in a cable!")
             else:  # int or float
-                computed_factor = subitem.qty_multiplier
-            subitem._qty_multiplier_computed = computed_factor
+                if subitem.qty is not None:
+                    subitem.qty_computed = subitem.qty * subitem.qty_multiplier
+                else:
+                    subitem.qty_computed = subitem.qty_multiplier
+                subitem.amount_computed = subitem.amount
 
 
 @dataclass
