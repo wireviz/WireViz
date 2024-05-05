@@ -12,14 +12,12 @@ connectors:
     spn: 1234
     # add a list of additional components to a part (shown in graph)
     additional_components:
-      -
-        type: Crimp # short identifier used in graph
+      - type: Crimp # short identifier used in graph
         subtype: Molex KK 254, 22-30 AWG # extra information added to type in bom
         qty_multiplier: populated # multipier for quantity (number of populated pins)
         manufacturer: Molex # set manufacter name
         mpn: 08500030 # set manufacturer part number
-      -
-        type: Test
+      - type: Test
         qty: 1
         pn: ABC
         manufacturer: Molex
@@ -48,28 +46,24 @@ cables:
     length: 1
     gauge: 0.25 mm2
     colors: [YE, BK, BK, RD]
-    manufacturer: [WiresCo,WiresCo,WiresCo,WiresCo] # set a manufacter per wire
-    mpn: [W1-YE,W1-BK,W1-BK,W1-RD]
-    supplier: [WireShack,WireShack,WireShack,WireShack]
-    spn: [1001,1002,1002,1009]
-    pn: [WIRE1,WIRE2,WIRE2,WIRE3]
+    manufacturer: [WiresCo, WiresCo, WiresCo, WiresCo] # set a manufacter per wire
+    mpn: [W1-YE, W1-BK, W1-BK, W1-RD]
+    supplier: [WireShack, WireShack, WireShack, WireShack]
+    spn: [1001, 1002, 1002, 1009]
+    pn: [WIRE1, WIRE2, WIRE2, WIRE3]
     # add a list of additional components to a part (shown in graph)
     additional_components:
-      -
-        type: Sleve # short identifier used in graph
+      - type: Sleve # short identifier used in graph
         subtype: Braided nylon, black, 3mm # extra information added to type in bom
         qty_multiplier: length # multipier for quantity (length of cable)
         unit: m
         pn: SLV-1
 
-
 connections:
-  -
-    - X1: [1-4]
+  - - X1: [1-4]
     - W1: [1-4]
     - X2: [1-4]
-  -
-    - X1: [1-4]
+  - - X1: [1-4]
     - W2: [1-4]
     - X3: [1-4]
 
