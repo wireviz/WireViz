@@ -36,7 +36,11 @@ def get_additional_component_table(
     if component.additional_components:
         rows.append(["Additional components"])
         # Ignore components that have qty 0
-        for part in [part for part in component.additional_components if component.get_qty_multiplier(part.qty_multiplier)]:
+        for part in [
+            part
+            for part in component.additional_components
+            if component.get_qty_multiplier(part.qty_multiplier)
+        ]:
             common_args = {
                 "qty": part.qty * component.get_qty_multiplier(part.qty_multiplier),
                 "unit": part.unit,
@@ -65,7 +69,11 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
     """Return a list of BOM entries with additional components."""
     bom_entries = []
     # Ignore components that have qty 0
-    for part in [part for part in component.additional_components if component.get_qty_multiplier(part.qty_multiplier)]:
+    for part in [
+        part
+        for part in component.additional_components
+        if component.get_qty_multiplier(part.qty_multiplier)
+    ]:
         bom_entries.append(
             {
                 "description": part.description,
