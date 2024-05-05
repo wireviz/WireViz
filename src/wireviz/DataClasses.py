@@ -212,7 +212,9 @@ class Connector:
                 raise Exception("Loops must be between exactly two pins!")
             for pin in loop:
                 if pin not in self.pins:
-                    raise Exception(f'Unknown loop pin "{pin}" for connector "{self.name}"!')
+                    raise Exception(
+                        f'Unknown loop pin "{pin}" for connector "{self.name}"!'
+                    )
                 # Make sure loop connected pins are not hidden.
                 self.activate_pin(pin)
 
@@ -234,7 +236,7 @@ class Connector:
             return self.pincount
         elif qty_multiplier == "populated":
             return sum(self.visible_pins.values())
-        elif qty_multiplier == 'unpopulated':
+        elif qty_multiplier == "unpopulated":
             return max(0, self.pincount - sum(self.visible_pins.values()))
         else:
             raise ValueError(

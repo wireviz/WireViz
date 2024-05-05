@@ -97,9 +97,9 @@ def generate_html_output(
                     if isinstance(entry, Dict):
                         replacements[f"<!-- %{item}_{index+1}% -->"] = str(category)
                         for entry_key, entry_value in entry.items():
-                            replacements[
-                                f"<!-- %{item}_{index+1}_{entry_key}% -->"
-                            ] = html_line_breaks(str(entry_value))
+                            replacements[f"<!-- %{item}_{index+1}_{entry_key}% -->"] = (
+                                html_line_breaks(str(entry_value))
+                            )
 
         replacements['"sheetsize_default"'] = '"{}"'.format(
             metadata.get("template", {}).get("sheetsize", "")

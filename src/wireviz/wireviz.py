@@ -117,7 +117,9 @@ def parse(
 
     # When title is not given, either deduce it from filename, or use default text.
     if "title" not in harness.metadata:
-        harness.metadata["title"] = Path(yaml_file).stem if yaml_file else "WireViz diagram and BOM"
+        harness.metadata["title"] = (
+            Path(yaml_file).stem if yaml_file else "WireViz diagram and BOM"
+        )
 
     # add items
     # parse YAML input file ====================================================
@@ -202,7 +204,6 @@ def parse(
         expected_type = alternating_types[1 - alternating_types.index(expected_type)]
 
     for connection_set in connection_sets:
-
         # figure out number of parallel connections within this set
         connectioncount = []
         for entry in connection_set:
@@ -408,6 +409,7 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             # when trying to expand and resolve it as a path.
             # Catch this error, but raise any others
             from errno import ENAMETOOLONG
+
             if type(e) is OSError and e.errno != ENAMETOOLONG:
                 raise e
             # file does not exist; assume inp is a YAML string

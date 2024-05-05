@@ -94,7 +94,7 @@ class Harness:
         to_pin: (int, str),
     ) -> None:
         # check from and to connectors
-        for (name, pin) in zip([from_name, to_name], [from_pin, to_pin]):
+        for name, pin in zip([from_name, to_name], [from_pin, to_pin]):
             if name is not None and name in self.connectors:
                 connector = self.connectors[name]
                 # check if provided name is ambiguous
@@ -372,16 +372,20 @@ class Harness:
                         )
                     manufacturer_info = pn_info_string(
                         HEADER_MPN,
-                        cable.manufacturer[i - 1]
-                        if isinstance(cable.manufacturer, list)
-                        else None,
+                        (
+                            cable.manufacturer[i - 1]
+                            if isinstance(cable.manufacturer, list)
+                            else None
+                        ),
                         cable.mpn[i - 1] if isinstance(cable.mpn, list) else None,
                     )
                     supplier_info = pn_info_string(
                         HEADER_SPN,
-                        cable.supplier[i - 1]
-                        if isinstance(cable.supplier, list)
-                        else None,
+                        (
+                            cable.supplier[i - 1]
+                            if isinstance(cable.supplier, list)
+                            else None
+                        ),
                         cable.spn[i - 1] if isinstance(cable.spn, list) else None,
                     )
                     if manufacturer_info:
@@ -444,9 +448,11 @@ class Harness:
                     # shield is shown with specified color and black borders, or as a thin black wire otherwise
                     dot.attr(
                         "edge",
-                        color=":".join(["#000000", shield_color_hex, "#000000"])
-                        if isinstance(cable.shield, str)
-                        else "#000000",
+                        color=(
+                            ":".join(["#000000", shield_color_hex, "#000000"])
+                            if isinstance(cable.shield, str)
+                            else "#000000"
+                        ),
                     )
                 if connection.from_pin is not None:  # connect to left
                     from_connector = self.connectors[connection.from_name]
@@ -649,7 +655,6 @@ class Harness:
     def svg(self):
         graph = self.graph
         return embed_svg_images(graph.pipe(format="svg").decode("utf-8"), Path.cwd())
-
 
     def output(
         self,
