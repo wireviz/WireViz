@@ -216,7 +216,7 @@ class Connector:
                         f'Unknown loop pin "{pin}" for connector "{self.name}"!'
                     )
                 # Make sure loop connected pins are not hidden.
-                self.activate_pin(pin)
+                self.activate_pin(pin, None)
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
@@ -318,7 +318,7 @@ class Cable:
                     f"Warning: Cable {self.name} length_unit={self.length_unit} is ignored because its length contains {u}"
                 )
             self.length_unit = u
-        elif not any(isinstance(self.length, t) for t in [int, float]):
+        elif not isinstance(self.length, (int, float)):
             raise Exception(f"Cable {self.name} length has a non-numeric value")
         elif self.length_unit is None:
             self.length_unit = "m"

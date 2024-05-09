@@ -7,6 +7,7 @@
   - Components that are not referenced in any connection set will not be rendered. Instead, a warning will be output in the console. ([#328](https://github.com/wireviz/WireViz/issues/328), [#332](https://github.com/wireviz/WireViz/pull/332))
 - New command line interface ([#244](https://github.com/wireviz/WireViz/pull/244)). Run `wireviz --help` for details 
   - The path specified with the `-o`/`--output-dir` option no longer includes the filename (without extension) of the generated files. Use the `-O`/`--output-name` option to specify a different filename for the generated files.
+- The `.gv` file is no longer included as a default output format (only as an intermediate file during processing) unless specified with the new `-f` option described below.
 
 
 ### New features
@@ -49,9 +50,7 @@
 - Remove HTML links from the input attributes ([#164](https://github.com/formatc1702/WireViz/pull/164))
 - Add harness metadata section ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
 - Add support for supplier and supplier part number information ([#240](https://github.com/formatc1702/WireViz/issues/240), [#241](https://github.com/formatc1702/WireViz/pull/241/))
-- Add graph rendering options (colors, font, color name display style, ...) ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
-- Add support for supplier and supplier part number information ([#240](https://github.com/formatc1702/WireViz/issues/240), [#241](https://github.com/formatc1702/WireViz/pull/241/))
-- Add graph rendering options (colors, font, color name display style, ...) ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
+- Add graph rendering options (background colors, fontname, color name display style, ...) ([#158](https://github.com/formatc1702/WireViz/issues/158), [#214](https://github.com/formatc1702/WireViz/pull/214))
 - Add support for background colors for cables and connectors, as well as for some individual cells ([#210](https://github.com/formatc1702/WireViz/issues/210), [#219](https://github.com/formatc1702/WireViz/pull/219))
 - Add optional tweaking of the .gv output ([#215](https://github.com/formatc1702/WireViz/pull/215)) (experimental)
 
