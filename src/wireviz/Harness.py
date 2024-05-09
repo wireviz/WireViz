@@ -53,6 +53,17 @@ from wireviz.wv_helper import (
 )
 from wireviz.wv_html import generate_html_output
 
+OLD_CONNECTOR_ATTR = {
+    "pinout": "was renamed to 'pinlabels' in v0.2",
+    "pinnumbers": "was renamed to 'pins' in v0.2",
+    "autogenerate": "is replaced with new syntax in v0.4",
+}
+
+def check_old(node: str, old_attr: dict, args: dict) -> None:
+    """Raise exception for any outdated attributes in args."""
+    for attr, descr in old_attr.items():
+        if attr in args:
+            raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
 
 @dataclass
 class Harness:
@@ -68,6 +79,7 @@ class Harness:
         self.additional_bom_items = []
 
     def add_connector(self, name: str, *args, **kwargs) -> None:
+        check_old(f"Connector '{name}'", OLD_CONNECTOR_ATTR, kwargs)
         self.connectors[name] = Connector(name, *args, **kwargs)
 
     def add_cable(self, name: str, *args, **kwargs) -> None:
