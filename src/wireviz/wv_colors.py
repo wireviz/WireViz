@@ -28,7 +28,7 @@ COLOR_CODES = {
         "BUVT", "VTBU", "OGVT", "VTOG", "GNVT", "VTGN", "BNVT", "VTBN", "SLVT", "VTSL",
     ],
     "TELALT": [  # 25x2: Tip and then ring of each pair
-        "WHBU", "BU", "WHOG", "OG", "WHGN", "GN", "WHBN", "BN", "WHSL", "SL",
+        "WHBU", "BU",   "WHOG", "OG",   "WHGN", "GN",   "WHBN", "BN",   "WHSL", "SL",
         "RDBU", "BURD", "RDOG", "OGRD", "RDGN", "GNRD", "RDBN", "BNRD", "RDSL", "SLRD",
         "BKBU", "BUBK", "BKOG", "OGBK", "BKGN", "GNBK", "BKBN", "BNBK", "BKSL", "SLBK",
         "YEBU", "BUYE", "YEOG", "OGYE", "YEGN", "GNYE", "YEBN", "BNYE", "YESL", "SLYE",
@@ -156,7 +156,7 @@ def get_color_hex(input: Colors, pad: bool = False) -> List[str]:
     if len(output) == 2:  # Give wires with EXACTLY 2 colors that striped look.
         output += output[:1]
     elif pad and len(output) == 1:  # Hacky style fix: Give single color wires
-        output *= 3  # a triple-up so that wires are the same size.
+        output *= 3  #              a triple-up so that wires are the same size
 
     return output
 

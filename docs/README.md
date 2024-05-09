@@ -137,7 +137,7 @@ mywire.bom.tsv    BOM (bill of materials) as tab-separated text file
 mywire.html       HTML page with wiring diagram and BOM embedded
 ```
 
-Wildcars in the file path are also supported to process multiple files at once, e.g.:
+Wildcards in the file path are also supported to process multiple files at once, e.g.:
 ```
 $ wireviz ~/path/to/files/*.yml
 ```
