@@ -1,0 +1,8 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 1 wires	0.1	m	
+2	Cable, 4 wires	0.4	m	W1, W2, W21, W3
+3	Connector, Ferrule, GY	4		
+4	Connector, JST SM, female, 4 pins	1		X2
+5	Connector, JST SM, male, 4 pins	2		X1, X3
+6	Connector, Screw terminal connector, 4 pins, GN	1		X4
+7	Connector, Splice, CU	8		

@@ -1,3 +1,26 @@
+metadata:
+
+  title: WireViz Demo 2
+  pn: WV-DEMO-02
+
+  authors:
+    Created:
+      name: D. Rojas
+      date: 2020-05-20
+    Approved:
+      name: D. Rojas
+      date: 2020-05-20
+
+  revisions:
+    A:
+      name: D. Rojas
+      date: 2020-10-17
+      changelog: WireViz 0.2 release
+
+  template:
+    name: din-6771
+    sheetsize: A3
+
 templates: # defining templates to be used later on
   - &molex_f
     type: Molex KK 254
@@ -22,9 +45,8 @@ connectors:
   X4:
     <<: *molex_f
     pinlabels: [GND, +12V, MISO, MOSI, SCK]
-  ferrule_crimp:
+  F:
     style: simple
-    autogenerate: true
     type: Crimp ferrule
     subtype: 0.25 mm²
     color: YE
@@ -64,6 +86,6 @@ connections:
     - W3: [1-4]
     - X4: [1,3-5]
   -
-    - ferrule_crimp
+    - F.
     - W4: [1,2]
     - X4: [1,2]
