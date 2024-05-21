@@ -17,8 +17,8 @@ from wireviz.DataClasses import (
     MatePin,
     Metadata,
     Options,
-    Tweak,
     Side,
+    Tweak,
 )
 from wireviz.svgembed import embed_svg_images_file
 from wireviz.wv_bom import (
@@ -29,6 +29,7 @@ from wireviz.wv_bom import (
     component_table_entry,
     generate_bom,
     get_additional_component_table,
+    make_list,
     pn_info_string,
 )
 from wireviz.wv_colors import get_color_hex, translate_color
@@ -78,12 +79,42 @@ class Harness:
         self._bom = []  # Internal Cache for generated bom
         self.additional_bom_items = []
 
+    def extend_tweak(self, node: Union[Connector, Cable]) -> None:
+        """Extend self.tweak with node.tweak after replacing placeholders."""
+        if node.tweak:
+            ph = node.tweak.placeholder
+            # An empty string is a legal value to avoid the global placeholder
+            if ph is None:  # This must therefore be a test for None!
+                ph = self.tweak.placeholder  # Use the global placeholder
+            # Create function rph() to replace any placeholder with node name
+            rph = (lambda s: s.replace(ph, node.name)) if ph else lambda s: s
+            n_override = node.tweak.override or {}
+            s_override = self.tweak.override or {}
+            for id, n_dict in n_override.items():
+                id = rph(id)
+                s_dict = s_override.get(id, {})
+                for k, v in n_dict.items():
+                    k, v = rph(k), rph(v)
+                    if k in s_dict and v != s_dict[k]:
+                        raise ValueError(
+                            f"{node.name}.tweak.override.{id}.{k} conflicts with another"
+                        )
+                    s_dict[k] = v
+                s_override[id] = s_dict or None  # Will never be None?
+            self.tweak.override = s_override or None
+            self.tweak.append = (
+                make_list(self.tweak.append)
+                + [rph(v) for v in make_list(node.tweak.append)]
+            ) or None
+
     def add_connector(self, name: str, *args, **kwargs) -> None:
         check_old(f"Connector '{name}'", OLD_CONNECTOR_ATTR, kwargs)
         self.connectors[name] = Connector(name, *args, **kwargs)
+        self.extend_tweak(self.connectors[name])
 
     def add_cable(self, name: str, *args, **kwargs) -> None:
         self.cables[name] = Cable(name, *args, **kwargs)
+        self.extend_tweak(self.cables[name])
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
         self.mates.append(MatePin(from_name, from_pin, to_name, to_pin, arrow_type))
