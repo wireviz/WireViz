@@ -595,6 +595,7 @@ class Harness:
                 typecheck("tweak.append", self.tweak.append, str)
                 dot.body.append(self.tweak.append)
 
+        # TODO: All code below until "return dot" must be moved above all tweak processing!
         for mate in self.mates:
             if mate.shape[0] == "<" and mate.shape[-1] == ">":
                 dir = "both"
@@ -613,29 +614,18 @@ class Harness:
                 raise Exception(f"{mate} is an unknown mate")
 
             from_connector = self.connectors[mate.from_name]
-            if (
-                isinstance(mate, MatePin)
-                and self.connectors[mate.from_name].style != "simple"
-            ):
+            to_connector = self.connectors[mate.to_name]
+            if isinstance(mate, MatePin) and from_connector.style != "simple":
                 from_pin_index = from_connector.pins.index(mate.from_pin)
                 from_port_str = f":p{from_pin_index+1}r"
             else:  # MateComponent or style == 'simple'
                 from_port_str = ""
-            if (
-                isinstance(mate, MatePin)
-                and self.connectors[mate.to_name].style != "simple"
-            ):
+            if isinstance(mate, MatePin) and to_connector.style != "simple":
                 to_pin_index = to_connector.pins.index(mate.to_pin)
-                to_port_str = (
-                    f":p{to_pin_index+1}l"
-                    if isinstance(mate, MatePin)
-                    and self.connectors[mate.to_name].style != "simple"
-                    else ""
-                )
+                to_port_str = f":p{to_pin_index+1}l"
             else:  # MateComponent or style == 'simple'
                 to_port_str = ""
             code_from = f"{mate.from_name}{from_port_str}:e"
-            to_connector = self.connectors[mate.to_name]
             code_to = f"{mate.to_name}{to_port_str}:w"
 
             dot.attr("edge", color=color, style="dashed", dir=dir)
