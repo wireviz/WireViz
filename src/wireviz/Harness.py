@@ -20,7 +20,7 @@ from wireviz.DataClasses import (
     Tweak,
     Side,
 )
-from wireviz.svgembed import embed_svg_images_file
+from wireviz.svgembed import embed_svg_images, embed_svg_images_file
 from wireviz.wv_bom import (
     HEADER_MPN,
     HEADER_PN,
