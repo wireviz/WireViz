@@ -81,6 +81,9 @@ def generate_html_output(
         "<!-- %fontname% -->": options.fontname,
         "<!-- %bgcolor% -->": wv_colors.translate_color(options.bgcolor, "hex"),
         "<!-- %diagram% -->": svgdata,
+        # TODO: "<!-- %diagram_png_base64% -->": base64 of png file
+        "<!-- %filename% -->": str(filename),
+        "<!-- %filename_stem% -->": Path(filename).stem,
         "<!-- %bom% -->": bom_html,
         "<!-- %bom_reversed% -->": bom_html_reversed,
         "<!-- %sheet_current% -->": "1",  # TODO: handle multi-page documents
