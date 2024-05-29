@@ -18,7 +18,7 @@ format_codes = {
     "g": "gv",
     "h": "html",
     "p": "png",
-    # "P": "pdf",
+    "P": "pdf",
     "s": "svg",
     "t": "tsv",
 }
