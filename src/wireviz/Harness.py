@@ -530,6 +530,38 @@ class Harness:
                 fillcolor=translate_color(bgcolor, "HEX"),
             )
 
+        # mates
+        for mate in self.mates:
+            if mate.shape[-1] == ">":
+                dir = "both" if mate.shape[0] == "<" else "forward"
+            else:
+                dir = "back" if mate.shape[0] == "<" else "none"
+
+            if isinstance(mate, MatePin):
+                color = "#000000"
+            elif isinstance(mate, MateComponent):
+                color = "#000000:#000000"
+            else:
+                raise Exception(f"{mate} is an unknown mate")
+
+            from_connector = self.connectors[mate.from_name]
+            to_connector = self.connectors[mate.to_name]
+            if isinstance(mate, MatePin) and from_connector.style != "simple":
+                from_pin_index = from_connector.pins.index(mate.from_pin)
+                from_port_str = f":p{from_pin_index+1}r"
+            else:  # MateComponent or style == 'simple'
+                from_port_str = ""
+            if isinstance(mate, MatePin) and to_connector.style != "simple":
+                to_pin_index = to_connector.pins.index(mate.to_pin)
+                to_port_str = f":p{to_pin_index+1}l"
+            else:  # MateComponent or style == 'simple'
+                to_port_str = ""
+            code_from = f"{mate.from_name}{from_port_str}:e"
+            code_to = f"{mate.to_name}{to_port_str}:w"
+
+            dot.attr("edge", color=color, style="dashed", dir=dir)
+            dot.edge(code_from, code_to)
+
         def typecheck(name: str, value: Any, expect: type) -> None:
             if not isinstance(value, expect):
                 raise Exception(
@@ -595,41 +627,9 @@ class Harness:
                 typecheck("tweak.append", self.tweak.append, str)
                 dot.body.append(self.tweak.append)
 
-        # TODO: All code below until "return dot" must be moved above all tweak processing!
-        for mate in self.mates:
-            if mate.shape[0] == "<" and mate.shape[-1] == ">":
-                dir = "both"
-            elif mate.shape[0] == "<":
-                dir = "back"
-            elif mate.shape[-1] == ">":
-                dir = "forward"
-            else:
-                dir = "none"
-
-            if isinstance(mate, MatePin):
-                color = "#000000"
-            elif isinstance(mate, MateComponent):
-                color = "#000000:#000000"
-            else:
-                raise Exception(f"{mate} is an unknown mate")
-
-            from_connector = self.connectors[mate.from_name]
-            to_connector = self.connectors[mate.to_name]
-            if isinstance(mate, MatePin) and from_connector.style != "simple":
-                from_pin_index = from_connector.pins.index(mate.from_pin)
-                from_port_str = f":p{from_pin_index+1}r"
-            else:  # MateComponent or style == 'simple'
-                from_port_str = ""
-            if isinstance(mate, MatePin) and to_connector.style != "simple":
-                to_pin_index = to_connector.pins.index(mate.to_pin)
-                to_port_str = f":p{to_pin_index+1}l"
-            else:  # MateComponent or style == 'simple'
-                to_port_str = ""
-            code_from = f"{mate.from_name}{from_port_str}:e"
-            code_to = f"{mate.to_name}{to_port_str}:w"
-
-            dot.attr("edge", color=color, style="dashed", dir=dir)
-            dot.edge(code_from, code_to)
+        # Tweak processing above must be the last before returning dot.
+        # Please don't insert any code that might change the dot contents
+        # after tweak processing.
 
         return dot
 
