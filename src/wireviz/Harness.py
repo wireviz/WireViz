@@ -246,9 +246,19 @@ class Harness:
                             # fmt: on
                         else:
                             pinhtml.append('    <td colspan="2"></td>')
+                    
+                    for short, short_color in zip_longest(connector.internal_shorts, connector.internal_shorts_color):
+                        if short_color == None:
+                            short_color = "BK"
+                            
+                        if pinindex+1 in short:
+                            pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(short_color, "HEX")}">&#11044;</FONT></td>')
+                        else:
+                            pinhtml.append(f'    <td></td>')
 
                     if connector.ports_right:
                         pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
+                    
                     pinhtml.append("   </tr>")
 
                 pinhtml.append("  </table>")
@@ -257,6 +267,13 @@ class Harness:
                     row.replace("<!-- connector table -->", "\n".join(pinhtml))
                     for row in html
                 ]
+                
+                for short, short_color in zip_longest(connector.internal_shorts, connector.internal_shorts_color):
+                    print("Short_connections: " + str(short) + str(short_color))
+                    if short_color == None:
+                        short_color = "BK"
+                    # TODO adding dashed Line for Jumpers
+                
 
             html = "\n".join(html)
             dot.node(

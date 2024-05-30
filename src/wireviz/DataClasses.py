@@ -164,6 +164,8 @@ class Connector:
     loops: List[List[Pin]] = field(default_factory=list)
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
+    internal_shorts: Optional[List[List[Pin]]] =  field(default_factory=list)
+    internal_shorts_color: Optional[List[Color]] =  field(default_factory=list)
 
     def __post_init__(self) -> None:
 
