@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import re
 from collections import Counter
 from dataclasses import dataclass
@@ -269,11 +270,17 @@ class Harness:
                 ]
                 
                 for short, short_color in zip_longest(connector.internal_shorts, connector.internal_shorts_color):
-                    print("Short_connections: " + str(short) + str(short_color))
                     if short_color == None:
                         short_color = "BK"
-                    # TODO adding dashed Line for Jumpers
+                    dot.attr("edge", color=str(wv_colors.translate_color(short_color, "HEX")),  headclip="false", tailclip="false", style="dashed")
+                    for i in  range(1, len(short)):
+                        dot.edge(
+                        f"{connector.name}:p{short[i - 1]}j:c",
+                        f"{connector.name}:p{short[i]}j:c",
+                        straight="straight"
+                        )
                 
+                dot.attr("edge",  headclip="true", tailclip="true", style="bold")
 
             html = "\n".join(html)
             dot.node(
@@ -663,6 +670,12 @@ class Harness:
     # cache for the GraphViz Graph object
     # do not access directly, use self.graph instead
     _graph = None
+            
+    # This renders the graph with gvpr and neato, this is needed to be able to draw the stright lines for the jumpers
+    def graphRender(self, type, filename, graph):
+        graph.save(filename=f"{filename}_tmp.gv")
+        os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")
+        os.remove(f"{filename}_tmp.gv") 
 
     @property
     def graph(self):
@@ -688,8 +701,6 @@ class Harness:
     def output(
         self,
         filename: (str, Path),
-        view: bool = False,
-        cleanup: bool = True,
         fmt: tuple = ("html", "png", "svg", "tsv"),
     ) -> None:
         # graphical output
@@ -706,7 +717,8 @@ class Harness:
                 _filename = f"{filename}.tmp" if f == "svg" else filename
                 # TODO: prevent rendering SVG twice when both SVG and HTML are specified
                 graph.format = f
-                graph.render(filename=_filename, view=view, cleanup=cleanup)
+                # graph.render(filename=_filename) # old rendering methode, befor jumper implementations
+                self.graphRender(f, _filename, graph)
         # embed images into SVG output
         if "svg" in fmt or "html" in fmt:
             embed_svg_images_file(f"{filename}.tmp.svg")

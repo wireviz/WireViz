@@ -1,0 +1,28 @@
+/*******************************************************************
+
+  see https://forum.graphviz.org/t/straitening-one-line-throu-a-table/2196
+  input must include pos values (must be output from one of the engines w/ -Tdot)
+  
+*******************************************************************/
+BEG_G{
+  string tok[int];
+  int cnt;
+
+/***************************************
+  $G.bb="";
+  $G.nodesep="";
+  $G.ranksep="";
+  $G.splines="true";
+****************************************/
+}
+/********************************************************
+  the weakness is in the head==tail test
+  it would be better to mark every target edge with a new attribute and test for that attribute
+*********************************************************/
+E[straight] {
+  cnt=tokens($.pos,tok," ");
+  $.oldpos=$.pos;
+  pos=tok[0]+" " + tok[0]+" "+tok[cnt-1]+" "+tok[cnt-1];
+  $.label="";  // remove pesky label
+  $.lp="";      // remove peskier label pos
+}

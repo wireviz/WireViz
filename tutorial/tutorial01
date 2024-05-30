@@ -4,11 +4,6 @@ graph {
 	graph [bgcolor="#FFFFFF" fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor="#FFFFFF" fontname=arial height=0 margin=0 shape=none style=filled width=0]
 	edge [fontname=arial style=bold]
-	edge [color="#FF66CC" headclip=false style=dashed tailclip=false]
-	X1:p1j:c -- X1:p5j:c [straight=straight]
-	X1:p5j:c -- X1:p7j:c [straight=straight]
-	edge [color="#FF0000" headclip=false style=dashed tailclip=false]
-	X1:p2j:c -- X1:p6j:c [straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X1 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -19,64 +14,27 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td balign="left">Molex KK 254</td>
-   <td balign="left">female</td>
-   <td balign="left">7-pin</td>
+   <td balign="left">4-pin</td>
   </tr></table>
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1">
    <tr>
-    <td>GND</td>
-    <td  port="p1J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF66CC">&#11044;</FONT></td>
-    <td></td>
     <td port="p1r">1</td>
    </tr>
    <tr>
-    <td>VCC</td>
-    <td></td>
-    <td  port="p2J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF0000">&#11044;</FONT></td>
     <td port="p2r">2</td>
    </tr>
    <tr>
-    <td>RX</td>
-    <td></td>
-    <td></td>
     <td port="p3r">3</td>
    </tr>
    <tr>
-    <td>TX</td>
-    <td></td>
-    <td></td>
     <td port="p4r">4</td>
-   </tr>
-   <tr>
-    <td>GND</td>
-    <td  port="p5J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF66CC">&#11044;</FONT></td>
-    <td></td>
-    <td port="p5r">5</td>
-   </tr>
-   <tr>
-    <td>VCC</td>
-    <td></td>
-    <td  port="p6J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF0000">&#11044;</FONT></td>
-    <td port="p6r">6</td>
-   </tr>
-   <tr>
-    <td>GND</td>
-    <td  port="p7J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF66CC">&#11044;</FONT></td>
-    <td></td>
-    <td port="p7r">7</td>
    </tr>
   </table>
  </td></tr>
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
-	edge [color="#000000" headclip=false style=dashed tailclip=false]
-	X2:p1j:c -- X2:p5j:c [straight=straight]
-	X2:p5j:c -- X2:p7j:c [straight=straight]
-	edge [color="#000000" headclip=false style=dashed tailclip=false]
-	X2:p2j:c -- X2:p6j:c [straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X2 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -87,73 +45,39 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td balign="left">Molex KK 254</td>
-   <td balign="left">female</td>
-   <td balign="left">7-pin</td>
+   <td balign="left">4-pin</td>
   </tr></table>
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1">
    <tr>
     <td port="p1l">1</td>
-    <td>GND</td>
-    <td  port="p1J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
-    <td></td>
    </tr>
    <tr>
     <td port="p2l">2</td>
-    <td>VCC</td>
-    <td></td>
-    <td  port="p2J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
    </tr>
    <tr>
     <td port="p3l">3</td>
-    <td>RX</td>
-    <td></td>
-    <td></td>
    </tr>
    <tr>
     <td port="p4l">4</td>
-    <td>TX</td>
-    <td></td>
-    <td></td>
-   </tr>
-   <tr>
-    <td port="p5l">5</td>
-    <td>GND</td>
-    <td  port="p5J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
-    <td></td>
-   </tr>
-   <tr>
-    <td port="p6l">6</td>
-    <td>VCC</td>
-    <td></td>
-    <td  port="p6J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
-   </tr>
-   <tr>
-    <td port="p7l">7</td>
-    <td>GND</td>
-    <td  port="p7J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
-    <td></td>
    </tr>
   </table>
  </td></tr>
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
-	edge [color="#000000:#895956:#000000"]
+	edge [color="#000000:#ffffff:#000000"]
 	X1:p1r:e -- W1:w1:w
 	W1:w1:e -- X2:p1l:w
-	edge [color="#000000:#ff0000:#000000"]
+	edge [color="#000000:#ffffff:#000000"]
 	X1:p2r:e -- W1:w2:w
 	W1:w2:e -- X2:p2l:w
-	edge [color="#000000:#ff8000:#000000"]
+	edge [color="#000000:#ffffff:#000000"]
 	X1:p3r:e -- W1:w3:w
-	W1:w3:e -- X2:p4l:w
-	edge [color="#000000:#ffff00:#000000"]
+	W1:w3:e -- X2:p3l:w
+	edge [color="#000000:#ffffff:#000000"]
 	X1:p4r:e -- W1:w4:w
-	W1:w4:e -- X2:p3l:w
-	edge [color="#000000"]
-	X1:p1r:e -- W1:ws:w
+	W1:w4:e -- X2:p4l:w
 	W1 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
  <tr><td>
@@ -163,87 +87,77 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td balign="left">Serial</td>
    <td balign="left">4x</td>
-   <td balign="left">0.25 mm² (24 AWG)</td>
-   <td balign="left">+ S</td>
-   <td balign="left">0.2 m</td>
+   <td balign="left">1 m</td>
   </tr></table>
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellborder="0">
    <tr><td>&nbsp;</td></tr>
    <tr>
-    <td>X1:1:GND</td>
+    <td>X1:1</td>
     <td>
-     1:BN
+     1
     </td>
-    <td>X2:1:GND</td>
+    <td>X2:1</td>
    </tr>
    <tr>
     <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w1" height="6">
      <table cellspacing="0" cellborder="0" border="0">
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
-      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#895956" border="0"></td></tr>
+      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffffff" border="0"></td></tr>
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
      </table>
     </td>
    </tr>
    <tr>
-    <td>X1:2:VCC</td>
+    <td>X1:2</td>
     <td>
-     2:RD
+     2
     </td>
-    <td>X2:2:VCC</td>
+    <td>X2:2</td>
    </tr>
    <tr>
     <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w2" height="6">
      <table cellspacing="0" cellborder="0" border="0">
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
-      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ff0000" border="0"></td></tr>
+      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffffff" border="0"></td></tr>
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
      </table>
     </td>
    </tr>
    <tr>
-    <td>X1:3:RX</td>
+    <td>X1:3</td>
     <td>
-     3:OG
+     3
     </td>
-    <td>X2:4:TX</td>
+    <td>X2:3</td>
    </tr>
    <tr>
     <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w3" height="6">
      <table cellspacing="0" cellborder="0" border="0">
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
-      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ff8000" border="0"></td></tr>
+      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffffff" border="0"></td></tr>
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
      </table>
     </td>
    </tr>
    <tr>
-    <td>X1:4:TX</td>
+    <td>X1:4</td>
     <td>
-     4:YE
+     4
     </td>
-    <td>X2:3:RX</td>
+    <td>X2:4</td>
    </tr>
    <tr>
     <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w4" height="6">
      <table cellspacing="0" cellborder="0" border="0">
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
-      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffff00" border="0"></td></tr>
+      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#ffffff" border="0"></td></tr>
       <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0"></td></tr>
      </table>
     </td>
    </tr>
-   <tr><td>&nbsp;</td></tr>
-   <tr>
-    <td>X1:1:GND</td>
-    <td>Shield</td>
-    <td><!-- s_out --></td>
-   </tr>
-   <tr><td colspan="3" cellpadding="0" height="2" bgcolor="#000000" border="0" port="ws"></td></tr>
    <tr><td>&nbsp;</td></tr>
   </table>
  </td></tr>
