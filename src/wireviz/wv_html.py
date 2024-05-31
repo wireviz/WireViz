@@ -6,6 +6,7 @@ from typing import Dict, List, Union
 
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import Metadata, Options
+from wireviz.svgembed import data_URI_base64
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import (
     flatten2d,
@@ -81,7 +82,7 @@ def generate_html_output(
         "<!-- %fontname% -->": options.fontname,
         "<!-- %bgcolor% -->": wv_colors.translate_color(options.bgcolor, "hex"),
         "<!-- %diagram% -->": svgdata,
-        # TODO: "<!-- %diagram_png_base64% -->": base64 of png file
+        "<!-- %diagram_png_base64% -->": data_URI_base64(f"{filename}.png"),
         "<!-- %filename% -->": str(filename),
         "<!-- %filename_stem% -->": Path(filename).stem,
         "<!-- %bom% -->": bom_html,
