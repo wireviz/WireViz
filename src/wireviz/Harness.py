@@ -272,7 +272,7 @@ class Harness:
                 for short, short_color in zip_longest(connector.internal_shorts, connector.internal_shorts_color):
                     if short_color == None:
                         short_color = "BK"
-                    dot.attr("edge", color=str(wv_colors.translate_color(short_color, "HEX")),  headclip="false", tailclip="false", style="dashed")
+                    dot.attr("edge", color=str(wv_colors.translate_color(short_color, "HEX")),  headclip="false", tailclip="false", style="solid,bold")
                     for i in  range(1, len(short)):
                         dot.edge(
                         f"{connector.name}:p{short[i - 1]}j:c",

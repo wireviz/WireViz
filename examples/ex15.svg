@@ -71,17 +71,17 @@
 <!-- X1&#45;&#45;X1 -->
 <g id="edge1" class="edge">
 <title>X1:c&#45;&#45;X1:c</title>
-<path fill="none" stroke="#ff66cc" stroke-dasharray="5,2" d="M83.72,-156C83.72,-156 83.72,-60 83.72,-60"/>
+<path fill="none" stroke="#ff66cc" stroke-width="2" d="M83.72,-156C83.72,-156 83.72,-60 83.72,-60"/>
 </g>
 <!-- X1&#45;&#45;X1 -->
 <g id="edge2" class="edge">
 <title>X1:c&#45;&#45;X1:c</title>
-<path fill="none" stroke="#ff66cc" stroke-dasharray="5,2" d="M83.72,-60C83.72,-60 83.72,-12 83.72,-12"/>
+<path fill="none" stroke="#ff66cc" stroke-width="2" d="M83.72,-60C83.72,-60 83.72,-12 83.72,-12"/>
 </g>
 <!-- X1&#45;&#45;X1 -->
 <g id="edge3" class="edge">
 <title>X1:c&#45;&#45;X1:c</title>
-<path fill="none" stroke="#ff0000" stroke-dasharray="5,2" d="M127.53,-132C127.53,-132 127.53,-36 127.53,-36"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M127.53,-132C127.53,-132 127.53,-36 127.53,-36"/>
 </g>
 <!-- W1 -->
 <g id="node2" class="node">
@@ -254,17 +254,17 @@
 <!-- X2&#45;&#45;X2 -->
 <g id="edge13" class="edge">
 <title>X2:c&#45;&#45;X2:c</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M876.53,-159C876.53,-159 876.53,-63 876.53,-63"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M876.53,-159C876.53,-159 876.53,-63 876.53,-63"/>
 </g>
 <!-- X2&#45;&#45;X2 -->
 <g id="edge14" class="edge">
 <title>X2:c&#45;&#45;X2:c</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M876.53,-63C876.53,-63 876.53,-15 876.53,-15"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M876.53,-63C876.53,-63 876.53,-15 876.53,-15"/>
 </g>
 <!-- X2&#45;&#45;X2 -->
 <g id="edge15" class="edge">
 <title>X2:c&#45;&#45;X2:c</title>
-<path fill="none" stroke="#000000" stroke-dasharray="5,2" d="M920.34,-135C920.34,-135 920.34,-39 920.34,-39"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M920.34,-135C920.34,-135 920.34,-39 920.34,-39"/>
 </g>
 </g>
 </svg>
