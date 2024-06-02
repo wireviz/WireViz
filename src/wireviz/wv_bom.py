@@ -204,7 +204,9 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
         bom.append(
             {
                 **group_entries[0],
-                "qty": round(total_qty, 3),
+                "qty": int(total_qty)
+                if float(total_qty).is_integer()
+                else round(total_qty, 3),
                 "designators": sorted(set(designators)),
             }
         )
