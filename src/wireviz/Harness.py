@@ -253,6 +253,9 @@ class Harness:
 
                 pinhtml.append("  </table>")
 
+                if len(pinhtml) == 2:  # Table start and end with no rows between?
+                    pinhtml = ["<!-- all pins hidden -->"]  # Avoid Graphviz error
+
                 html = [
                     row.replace("<!-- connector table -->", "\n".join(pinhtml))
                     for row in html
