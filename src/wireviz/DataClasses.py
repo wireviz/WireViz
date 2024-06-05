@@ -136,6 +136,17 @@ class AdditionalComponent:
         t = t + st
         return t
 
+@dataclass
+class Short:
+    name: Designator
+    pins: List[Pin] = field(default_factory=list)
+    color: Optional[Color] = None
+    manufacturer: Optional[MultilineHypertext] = None
+    mpn: Optional[MultilineHypertext] = None
+    description: Optional[str] = None
+    length: Optional[float] = None
+    length_unit: Optional[str] = None
+    
 
 @dataclass
 class Connector:
@@ -162,10 +173,10 @@ class Connector:
     show_pincount: Optional[bool] = None
     hide_disconnected_pins: bool = False
     loops: List[List[Pin]] = field(default_factory=list)
-    ignore_in_bom: bool = False
+    ignore_in_bom: bool = False#ß
     additional_components: List[AdditionalComponent] = field(default_factory=list)
-    internal_shorts: Optional[List[List[Pin]]] =  field(default_factory=list)
-    internal_shorts_color: Optional[List[Color]] =  field(default_factory=list)
+    shorts: List[Short] =  field(default_factory=list)
+    shorts_graph_bom: Optional[bool] = False
 
     def __post_init__(self) -> None:
 
@@ -223,6 +234,10 @@ class Connector:
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
+
+        for i, item in enumerate(self.shorts):
+            if isinstance(item, dict):
+                self.shorts[i] = Short(**item)
 
     def activate_pin(self, pin: Pin, side: Side) -> None:
         self.visible_pins[pin] = True

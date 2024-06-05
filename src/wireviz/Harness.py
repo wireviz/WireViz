@@ -205,6 +205,7 @@ class Harness:
                      translate_color(connector.color, self.options.color_mode) if connector.color else None,
                      html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
+                    '<!-- short bom table -->' if connector.shorts_graph_bom else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
             # fmt: on
@@ -218,6 +219,21 @@ class Harness:
                 pinhtml.append(
                     '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
                 )
+
+                if len(connector.shorts) > 0:
+                    pinhtml.append("   <tr>")
+                    if connector.ports_left:
+                        pinhtml.append(f'    <td></td>')
+                    if connector.pinlabels:
+                        pinhtml.append(f"    <td></td>")
+                        
+                    for shortName in connector.shorts:
+                        pinhtml.append(f'    <td>{shortName}</td>')
+
+                    if connector.ports_right:
+                        pinhtml.append(f'    <td></td>')
+                    pinhtml.append("   </tr>")
+                    
 
                 for pinindex, (pinname, pinlabel, pincolor) in enumerate(
                     zip_longest(
@@ -248,12 +264,19 @@ class Harness:
                         else:
                             pinhtml.append('    <td colspan="2"></td>')
                     
-                    for short, short_color in zip_longest(connector.internal_shorts, connector.internal_shorts_color):
-                        if short_color == None:
-                            short_color = "BK"
+                    for shortName in connector.shorts:
+                        short = connector.shorts[shortName]
+                        shPins = short.get('pins');
+                        shColor = short.get('color');
+                        # shManufacturer = short.get('manufacturer');
+                        # shMpn = short.get('mpn');
+                        # shDescription = short.get('description');
+                        
+                        if shColor == None:
+                            shColor = "BK"
                             
-                        if pinindex+1 in short:
-                            pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(short_color, "HEX")}">&#11044;</FONT></td>')
+                        if pinindex+1 in shPins:
+                            pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(shColor, "HEX")}">&#11044;</FONT></td>')
                         else:
                             pinhtml.append(f'    <td></td>')
 
@@ -269,14 +292,71 @@ class Harness:
                     for row in html
                 ]
                 
-                for short, short_color in zip_longest(connector.internal_shorts, connector.internal_shorts_color):
-                    if short_color == None:
-                        short_color = "BK"
-                    dot.attr("edge", color=str(wv_colors.translate_color(short_color, "HEX")),  headclip="false", tailclip="false", style="solid,bold")
-                    for i in  range(1, len(short)):
+                if connector.shorts_graph_bom:        
+                    shorthtml = []
+                    shorthtml.append(
+                        '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
+                    )
+                    
+                    
+                    shorthtml.append("   <tr>")
+                    shorthtml.append(f'    <td>Short</td>')
+                    shorthtml.append(f'    <td>Manufacturer</td>')
+                    shorthtml.append(f'    <td>M.P.N.</td>')
+                    shorthtml.append(f'    <td>Length</td>')
+                    shorthtml.append(f'    <td>Description</td>')
+                    shorthtml.append("   </tr>")
+                    
+                    for shortName in connector.shorts:
+                        short = connector.shorts[shortName]
+                        shPins = short.get('pins');
+                        shColor = short.get('color');
+                        shManufacturer = short.get('manufacturer') if short.get('manufacturer') != None else "";
+                        shMpn = short.get('mpn') if short.get('mpn') != None else "";
+                        shDescription = short.get('description') if short.get('description') != None else "";
+                        length = short.get('length') if short.get('length') != None else "";
+                        if short.get('length_unit') != None and short.get('length') != None:
+                            length_unit = short.get('length_unit')
+                        elif short.get('length') == None:
+                            length_unit = ""
+                        else:
+                            length_unit = "mm"
+                        
+                        if shColor == None:
+                            shColor = "BK"
+                        
+                        shorthtml.append("   <tr>")
+                        
+                        shorthtml.append(f'    <td>{shortName}</td>')
+                        shorthtml.append(f'    <td>{shManufacturer}</td>')
+                        shorthtml.append(f'    <td>{shMpn}</td>')
+                        shorthtml.append(f'    <td>{length}{length_unit}</td>')
+                        shorthtml.append(f'    <td>{shDescription}</td>')
+                        
+                        shorthtml.append("   </tr>")
+                    
+                    shorthtml.append("  </table>")
+                
+                    html = [
+                        row.replace("<!-- short bom table -->", "\n".join(shorthtml))
+                        for row in html
+                    ]
+                
+                for shortName in connector.shorts:
+                    short = connector.shorts[shortName]
+                    shPins = short.get('pins');
+                    shColor = short.get('color');
+                    # shManufacturer = short.get('manufacturer');
+                    # shMpn = short.get('mpn');
+                    # shDescription = short.get('description');
+                        
+                    if shColor == None:
+                        shColor = "BK"
+                    dot.attr("edge", color=str(wv_colors.translate_color(shColor, "HEX")),  headclip="false", tailclip="false", style="solid,bold")
+                    for i in  range(1, len(shPins)):
                         dot.edge(
-                        f"{connector.name}:p{short[i - 1]}j:c",
-                        f"{connector.name}:p{short[i]}j:c",
+                        f"{connector.name}:p{shPins[i - 1]}j:c",
+                        f"{connector.name}:p{shPins[i]}j:c",
                         straight="straight"
                         )
                 
