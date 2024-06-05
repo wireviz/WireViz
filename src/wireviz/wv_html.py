@@ -96,7 +96,7 @@ def generate_html_output(
 
     replacement_if_used("<!-- %diagram% -->", svgdata)
     replacement_if_used(
-        "<!-- %diagram_png_base64% -->", lambda: data_URI_base64(f"{filename}.png")
+        "<!-- %diagram_png_b64% -->", lambda: data_URI_base64(f"{filename}.png")
     )
 
     # prepare metadata replacements
