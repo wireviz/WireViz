@@ -2,13 +2,22 @@
 
 ## [0.4.1] (2024-XX-XX)
 
+### Improvements to help reported issues
+- Improved error message for strange YAML input TODO (342 383)
+- TODO (377 380)
+- TODO (175 371)
+
 ### Bugfixes
 
-- Use correct default title ([#360](https://github.com/wireviz/WireViz/issues/360), [#361](https://github.com/wireviz/WireViz/pull/361))
+- TODO (377 381)
+- TODO (257 375)
+- Avoid decimal point and trailing zero for integer BOM quantities ([#340](https://github.com/wireviz/WireViz/issues/340), [#374](https://github.com/wireviz/WireViz/pull/374))
 - Update project URL references ([#364](https://github.com/wireviz/WireViz/pull/364))
+- Add missing import of embed_svg_images ([#363](https://github.com/wireviz/WireViz/pull/363))
+- Use correct default title ([#360](https://github.com/wireviz/WireViz/issues/360), [#361](https://github.com/wireviz/WireViz/pull/361))
+- TODO (355 358)
 - Include missing files in published package ([#345](https://github.com/wireviz/WireViz/issues/345), [#347](https://github.com/wireviz/WireViz/pull/347)) 
-- TODO 344 346 355 358
-
+- Handle OSError [errno.EINVAL] ([#344](https://github.com/wireviz/WireViz/issues/344), [#346](https://github.com/wireviz/WireViz/pull/346))
 
 
 ## [0.4](https://github.com/wireviz/WireViz/tree/v0.4) (2024-05-12)
