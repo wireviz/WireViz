@@ -1,5 +1,16 @@
 # Change Log
 
+## [0.4.1] (2024-XX-XX)
+
+### Bugfixes
+
+- Use correct default title ([#360](https://github.com/wireviz/WireViz/issues/360), [#361](https://github.com/wireviz/WireViz/pull/361))
+- Update project URL references ([#364](https://github.com/wireviz/WireViz/pull/364))
+- Include missing files in published package ([#345](https://github.com/wireviz/WireViz/issues/345), [#347](https://github.com/wireviz/WireViz/pull/347)) 
+- TODO 344 346 355 358
+
+
+
 ## [0.4](https://github.com/wireviz/WireViz/tree/v0.4) (2024-05-12)
 
 ### Backward-incompatible changes
