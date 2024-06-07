@@ -36,7 +36,7 @@ groups = {
 
 input_extensions = [".yml"]
 extensions_not_containing_graphviz_output = [".gv", ".bom.tsv"]
-extensions_containing_graphviz_output = [".png", ".svg", ".html"]
+extensions_containing_graphviz_output = [".png", ".svg", ".html", ".pdf"]
 generated_extensions = (
     extensions_not_containing_graphviz_output + extensions_containing_graphviz_output
 )
@@ -64,7 +64,7 @@ def build_generated(groupkeys):
         # collect and iterate input YAML files
         for yaml_file in collect_filenames("Building", key, input_extensions):
             print(f'  "{yaml_file}"')
-            wireviz.parse(yaml_file, output_formats=("gv", "html", "png", "svg", "tsv"))
+            wireviz.parse(yaml_file, output_formats=("gv", "html", "png", "svg", "tsv", "pdf"))
 
             if build_readme:
                 i = "".join(filter(str.isdigit, yaml_file.stem))
