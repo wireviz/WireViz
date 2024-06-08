@@ -172,6 +172,7 @@ class Harness:
             bgcolor=wv_colors.translate_color(self.options.bgcolor, "HEX"),
             nodesep="0.33",
             fontname=self.options.fontname,
+            dpi = f'{self.options.output_dpi}',
         )
         dot.attr(
             "node",
