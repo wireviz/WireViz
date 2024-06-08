@@ -387,6 +387,9 @@ If any component is defined in the `connectors` or `cables` sections but not ref
   # about additional components inside the diagram node (connector/cable box).
   # If False, show all info about additional components inside the diagram node.
   mini_bom_mode: <bool>        # Default = True
+
+  # DPI setting for image outputs, https://graphviz.org/docs/attrs/dpi/
+  output_dpi: <float>          # Default 96.0
 ```
 
 
