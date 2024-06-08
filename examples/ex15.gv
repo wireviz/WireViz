@@ -4,10 +4,10 @@ graph {
 	graph [bgcolor="#FFFFFF" fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor="#FFFFFF" fontname=arial height=0 margin=0 shape=none style=filled width=0]
 	edge [fontname=arial style=bold]
-	edge [color="#FF66CC" headclip=false style=dashed tailclip=false]
+	edge [color="#FF66CC" headclip=false style="solid,bold" tailclip=false]
 	X1:p1j:c -- X1:p5j:c [straight=straight]
 	X1:p5j:c -- X1:p7j:c [straight=straight]
-	edge [color="#FF0000" headclip=false style=dashed tailclip=false]
+	edge [color="#FF0000" headclip=false style="solid,bold" tailclip=false]
 	X1:p2j:c -- X1:p6j:c [straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X1 [label=<
@@ -26,6 +26,12 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1">
+   <tr>
+    <td></td>
+    <td>SH1</td>
+    <td>SH2</td>
+    <td></td>
+   </tr>
    <tr>
     <td>GND</td>
     <td  port="p1J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF66CC">&#11044;</FONT></td>
@@ -70,12 +76,37 @@ graph {
    </tr>
   </table>
  </td></tr>
+ <tr><td>
+  <table border="0" cellspacing="0" cellpadding="3" cellborder="1">
+   <tr>
+    <td>Short</td>
+    <td>Manufacturer</td>
+    <td>M.P.N.</td>
+    <td>Length</td>
+    <td>Description</td>
+   </tr>
+   <tr>
+    <td>SH1</td>
+    <td>WireViz</td>
+    <td>42XCD42A5</td>
+    <td></td>
+    <td>shortPart</td>
+   </tr>
+   <tr>
+    <td>SH2</td>
+    <td>WireViz</td>
+    <td>42XCD42A5</td>
+    <td>42mm</td>
+    <td>shortPart</td>
+   </tr>
+  </table>
+ </td></tr>
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
-	edge [color="#000000" headclip=false style=dashed tailclip=false]
+	edge [color="#000000" headclip=false style="solid,bold" tailclip=false]
 	X2:p1j:c -- X2:p5j:c [straight=straight]
 	X2:p5j:c -- X2:p7j:c [straight=straight]
-	edge [color="#000000" headclip=false style=dashed tailclip=false]
+	edge [color="#000000" headclip=false style="solid,bold" tailclip=false]
 	X2:p2j:c -- X2:p6j:c [straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X2 [label=<
@@ -94,6 +125,12 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1">
+   <tr>
+    <td></td>
+    <td></td>
+    <td>SH1</td>
+    <td>SH2</td>
+   </tr>
    <tr>
     <td port="p1l">1</td>
     <td>GND</td>

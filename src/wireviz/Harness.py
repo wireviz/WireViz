@@ -20,6 +20,7 @@ from wireviz.DataClasses import (
     Options,
     Tweak,
     Side,
+    Short,
 )
 from wireviz.svgembed import embed_svg_images_file
 from wireviz.wv_bom import (
@@ -185,6 +186,9 @@ class Harness:
             fontname=self.options.fontname,
         )
         dot.attr("edge", style="bold", fontname=self.options.fontname)
+        
+        # print(self.connectors)
+        # print(self.connectors.values())
 
         for connector in self.connectors.values():
 
@@ -306,6 +310,13 @@ class Harness:
                     shorthtml.append(f'    <td>Length</td>')
                     shorthtml.append(f'    <td>Description</td>')
                     shorthtml.append("   </tr>")
+                    
+                    # print(connector.shorts)
+                    
+                    #shorts = connector.shorts
+                    #for shortI in shorts.values():
+                        # print(shortI)
+                        # print(shortI.name)
                     
                     for shortName in connector.shorts:
                         short = connector.shorts[shortName]

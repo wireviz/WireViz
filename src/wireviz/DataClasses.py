@@ -235,6 +235,8 @@ class Connector:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
+        # self.shorts = {}
+
         for i, item in enumerate(self.shorts):
             if isinstance(item, dict):
                 self.shorts[i] = Short(**item)
