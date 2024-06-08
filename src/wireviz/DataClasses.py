@@ -146,6 +146,7 @@ class Short:
     description: Optional[str] = None
     length: Optional[float] = None
     length_unit: Optional[str] = None
+    type: Optional[MultilineHypertext] = None
     
 
 @dataclass

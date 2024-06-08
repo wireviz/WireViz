@@ -186,9 +186,6 @@ class Harness:
             fontname=self.options.fontname,
         )
         dot.attr("edge", style="bold", fontname=self.options.fontname)
-        
-        # print(self.connectors)
-        # print(self.connectors.values())
 
         for connector in self.connectors.values():
 
@@ -223,8 +220,14 @@ class Harness:
                 pinhtml.append(
                     '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
                 )
+                
+                intShorts = False
+                
+                for shortName in connector.shorts:
+                    if connector.shorts[shortName].get("type") == None or connector.shorts[shortName].get("type") == "internal":
+                        intShorts = True
 
-                if len(connector.shorts) > 0:
+                if len(connector.shorts) > 0 and intShorts:
                     pinhtml.append("   <tr>")
                     if connector.ports_left:
                         pinhtml.append(f'    <td></td>')
@@ -232,7 +235,8 @@ class Harness:
                         pinhtml.append(f"    <td></td>")
                         
                     for shortName in connector.shorts:
-                        pinhtml.append(f'    <td>{shortName}</td>')
+                        if connector.shorts[shortName].get("type") == None or connector.shorts[shortName].get("type") == "internal":
+                            pinhtml.append(f'    <td>{shortName}</td>')
 
                     if connector.ports_right:
                         pinhtml.append(f'    <td></td>')
@@ -270,19 +274,24 @@ class Harness:
                     
                     for shortName in connector.shorts:
                         short = connector.shorts[shortName]
-                        shPins = short.get('pins');
-                        shColor = short.get('color');
+                        shPins = short.get('pins')
+                        shColor = short.get('color')
+                        shType = short.get('type')
                         # shManufacturer = short.get('manufacturer');
                         # shMpn = short.get('mpn');
                         # shDescription = short.get('description');
                         
-                        if shColor == None:
-                            shColor = "BK"
-                            
-                        if pinindex+1 in shPins:
-                            pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(shColor, "HEX")}">&#11044;</FONT></td>')
-                        else:
-                            pinhtml.append(f'    <td></td>')
+                        if shType == None or shType == "internal":
+                            if shColor == None:
+                                shColor = "BK"
+                                
+                            if pinindex+1 in shPins:
+                                pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(shColor, "HEX")}">&#11044;</FONT></td>')
+                            else:
+                                pinhtml.append(f'    <td></td>')
+                        elif shType == "loop":
+                            pass
+                        
 
                     if connector.ports_right:
                         pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
@@ -320,12 +329,13 @@ class Harness:
                     
                     for shortName in connector.shorts:
                         short = connector.shorts[shortName]
-                        shPins = short.get('pins');
-                        shColor = short.get('color');
-                        shManufacturer = short.get('manufacturer') if short.get('manufacturer') != None else "";
-                        shMpn = short.get('mpn') if short.get('mpn') != None else "";
-                        shDescription = short.get('description') if short.get('description') != None else "";
-                        length = short.get('length') if short.get('length') != None else "";
+                        shPins = short.get('pins')
+                        shColor = short.get('color')
+                        shType = short.get('type')
+                        shManufacturer = short.get('manufacturer') if short.get('manufacturer') != None else ""
+                        shMpn = short.get('mpn') if short.get('mpn') != None else ""
+                        shDescription = short.get('description') if short.get('description') != None else ""
+                        length = short.get('length') if short.get('length') != None else ""
                         if short.get('length_unit') != None and short.get('length') != None:
                             length_unit = short.get('length_unit')
                         elif short.get('length') == None:
@@ -357,19 +367,39 @@ class Harness:
                     short = connector.shorts[shortName]
                     shPins = short.get('pins');
                     shColor = short.get('color');
+                    shType = short.get('type')
                     # shManufacturer = short.get('manufacturer');
                     # shMpn = short.get('mpn');
                     # shDescription = short.get('description');
                         
                     if shColor == None:
                         shColor = "BK"
-                    dot.attr("edge", color=str(wv_colors.translate_color(shColor, "HEX")),  headclip="false", tailclip="false", style="solid,bold")
-                    for i in  range(1, len(shPins)):
-                        dot.edge(
-                        f"{connector.name}:p{shPins[i - 1]}j:c",
-                        f"{connector.name}:p{shPins[i]}j:c",
-                        straight="straight"
-                        )
+                    
+                    
+                    if shType == None or shType == "internal":
+                        dot.attr("edge", color=str(wv_colors.translate_color(shColor, "HEX")),  headclip="false", tailclip="false", style="solid,bold")
+                        for i in  range(1, len(shPins)):
+                            dot.edge(
+                            f"{connector.name}:p{shPins[i - 1]}j:c",
+                            f"{connector.name}:p{shPins[i]}j:c",
+                            straight="straight"
+                            )
+                    elif shType == "loop":
+                        dot.attr("edge", color=f'#000000:{wv_colors.translate_color(shColor, "HEX")}:#000000')
+                        if connector.ports_left:
+                            loop_side = "l"
+                            loop_dir = "w"
+                        elif connector.ports_right:
+                            loop_side = "r"
+                            loop_dir = "e"
+                        else:
+                            raise Exception("No side for loops")
+                        
+                        for i in  range(1, len(shPins)):
+                            dot.edge(
+                                f"{connector.name}:p{shPins[i - 1]}{loop_side}:{loop_dir}",
+                                f"{connector.name}:p{shPins[i]}{loop_side}:{loop_dir}",
+                            )
                 
                 dot.attr("edge",  headclip="true", tailclip="true", style="bold")
 
