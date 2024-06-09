@@ -86,9 +86,15 @@ tweak:  # optional tweaking of .gv output
   loops: <List>  # every list item is itself a list of exactly two pins
                  # on the connector that are to be shorted
 
-  # Internal Shorts, see ex15 (all optional)
-  internal_shorts: <List>[<List>]   # this contains a list of shorts, the shorts are represented as a list of Pins, see ex15
-  internal_shorts_color: <List>     # this contains list contains the colors the shorts are to be represented, Index 42 in the color List defines the color of the Short with the Index 42 in the internal_shorts list
+  # shorts
+  shorts:
+    <name>:
+      pins: <pins>
+      color: <color>                  # optional
+      manufacturer: <manufacturer>    # optional
+      mpn: <mpn>                      # optional
+      description: <description>      # optional
+      type: <loop/internal>           # optional, default is internal
 ```
 
 ## Cable attributes
