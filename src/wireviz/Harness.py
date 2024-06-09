@@ -284,6 +284,7 @@ class Harness:
                     dot.edge(
                         f"{connector.name}:p{loop[0]}{loop_side}:{loop_dir}",
                         f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}",
+                        label=" ",  # Work-around to avoid over-sized loops.
                     )
 
         # determine if there are double- or triple-colored wires in the harness;
