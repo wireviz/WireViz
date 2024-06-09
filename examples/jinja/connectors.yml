@@ -1,0 +1,7 @@
+connectors:
+{%- for i in range(1, 5) %}
+  X{{i}}:
+    type: Molex KK 254
+    subtype: female
+    pinlabels: [GND, RX, TX]
+{%- endfor %}
