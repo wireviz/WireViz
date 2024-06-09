@@ -3,6 +3,7 @@
 import os
 import sys
 from pathlib import Path
+import jinja2
 
 import click
 
@@ -51,6 +52,13 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     help="YAML file to prepend to the input file (optional).",
 )
 @click.option(
+    "-I",
+    "--include-path",
+    default=None,
+    type=Path,
+    help="Include path used for Jinja2 templates",
+)
+@click.option(
     "-o",
     "--output-dir",
     default=None,
@@ -71,7 +79,7 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def wireviz(file, format, prepend, output_dir, output_name, version):
+def wireviz(file, format, prepend, include_path, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
@@ -115,6 +123,15 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     else:
         prepend_input = ""
 
+
+    searchpath = [Path(f).parent for f in filepaths]
+    if include_path is not None:
+        searchpath.append(include_path)
+
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(searchpath=searchpath),
+    )
+
     # run WireVIz on each input file
     for file in filepaths:
         file = Path(file)
@@ -130,7 +147,11 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
         )
 
-        yaml_input = open_file_read(file).read()
+        template = env.get_template(file.name)
+        yaml_input = template.render()
+        with open(Path(_output_dir / (_output_name + '.rendered.yml')), 'w') as f:
+            f.write(yaml_input)
+
         file_dir = file.parent
 
         yaml_input = prepend_input + yaml_input
