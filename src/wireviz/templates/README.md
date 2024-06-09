@@ -43,6 +43,7 @@ Note that there must be one single space between `--` and `%` at both ends.
 | `<!-- %{item}% -->`           | String or numeric value of `metadata.{item}` |
 | `<!-- %{item}_{i}% -->`       | Category number `{i}` within dict value of `metadata.{item}` |
 | `<!-- %{item}_{i}_{key}% -->` | Value of `metadata.{item}.{category}.{key}` |
+| `<!-- %template_sheetsize% -->` | Value of `metadata.template.sheetsize` |
 
 Note that `{item}`, `{category}` and `{key}` in the description above can be
 any valid YAML key, and `{i}` is an integer representing the 1-based index of

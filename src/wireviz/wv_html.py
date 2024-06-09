@@ -87,6 +87,9 @@ def generate_html_output(
         "<!-- %bom_reversed% -->": bom_html_reversed,
         "<!-- %sheet_current% -->": "1",  # TODO: handle multi-page documents
         "<!-- %sheet_total% -->": "1",  # TODO: handle multi-page documents
+        "<!-- %template_sheetsize% -->": metadata.get("template", {}).get(
+            "sheetsize", ""
+        ),
     }
 
     def replacement_if_used(key: str, func: Callable[[], str]) -> None:
@@ -112,11 +115,8 @@ def generate_html_output(
                             replacements[f"<!-- %{item}_{index+1}_{entry_key}% -->"] = (
                                 html_line_breaks(str(entry_value))
                             )
-
-        replacements['"sheetsize_default"'] = '"{}"'.format(
-            metadata.get("template", {}).get("sheetsize", "")
-        )
-        # include quotes so no replacement happens within <style> definition
+                    elif isinstance(entry, (str, int, float)):
+                        pass  # TODO?: replacements[f"<!-- %{item}_{category}% -->"] = html_line_breaks(str(entry))
 
     # perform replacements
     # regex replacement adapted from:
