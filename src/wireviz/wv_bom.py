@@ -4,7 +4,7 @@ from dataclasses import asdict
 from itertools import groupby
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from wireviz.DataClasses import AdditionalComponent, Cable, Color, Connector
+from wireviz.DataClasses import AdditionalComponent, Cable, Color, Connector, Short
 from wireviz.wv_colors import translate_color
 from wireviz.wv_gv_html import html_bgcolor_attr, html_line_breaks
 from wireviz.wv_helper import clean_whitespace
@@ -22,7 +22,7 @@ BOMColumn = str  # = Literal[*BOM_COLUMNS_ALWAYS, *BOM_COLUMNS_OPTIONAL]
 BOMEntry = Dict[BOMColumn, Union[str, int, float, List[str], None]]
 
 
-def optional_fields(part: Union[Connector, Cable, AdditionalComponent]) -> BOMEntry:
+def optional_fields(part: Union[Connector, Cable, AdditionalComponent, Short]) -> BOMEntry:
     """Return part field values for the optional BOM columns as a dict."""
     part = asdict(part)
     return {field: part.get(field) for field in BOM_COLUMNS_OPTIONAL}
@@ -85,6 +85,38 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
         )
     return bom_entries
 
+def get_shorts_bom(connector: Union[Connector]) -> List[BOMEntry]:
+    """Return a list of BOM entries with additional components."""
+    bom_entries = []
+    # Ignore components that have qty 0
+    for shortName in connector.shorts:
+        short = connector.shorts[shortName]
+        shPins = short.get('pins')
+        shColor = short.get('color')
+        shType = short.get('type')
+        shManufacturer = short.get('manufacturer') if short.get('manufacturer') != None else ""
+        shMpn = short.get('mpn') if short.get('mpn') != None else ""
+        shDescription = short.get('description') if short.get('description') != None else ""
+        length = short.get('length') if short.get('length') != None else 1
+        if short.get('length_unit') != None and short.get('length') != None:
+            length_unit = short.get('length_unit')
+        elif short.get('length') == None:
+            length_unit = ""
+        else:
+            length_unit = "mm"
+            
+        bom_entries.append(
+            {
+                "description": str(shDescription),
+                "qty": length,
+                "unit": str(length_unit),
+                "designators": str(connector.name + "/" + shortName),
+                "manufacturer": shManufacturer, 
+                "mpn": shMpn,
+                # **optional_fields(short),
+            }
+        )
+    return bom_entries
 
 def bom_entry_key(entry: BOMEntry) -> BOMKey:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
@@ -124,6 +156,7 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
 
         # add connectors aditional components to bom
         bom_entries.extend(get_additional_component_bom(connector))
+        bom_entries.extend(get_shorts_bom(connector))
 
     # cables
     # TODO: If category can have other non-empty values than 'bundle', maybe it should be part of description?

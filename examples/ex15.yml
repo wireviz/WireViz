@@ -17,7 +17,6 @@ connectors:
         mpn: 42XCD42A5
         description: shortPart
         length: 42
-    shorts_graph_bom: true
   X2:
     type: Molex KK 254
     subtype: female

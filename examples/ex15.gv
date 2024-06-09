@@ -76,31 +76,6 @@ graph {
    </tr>
   </table>
  </td></tr>
- <tr><td>
-  <table border="0" cellspacing="0" cellpadding="3" cellborder="1">
-   <tr>
-    <td>Short</td>
-    <td>Manufacturer</td>
-    <td>M.P.N.</td>
-    <td>Length</td>
-    <td>Description</td>
-   </tr>
-   <tr>
-    <td>SH1</td>
-    <td>WireViz</td>
-    <td>42XCD42A5</td>
-    <td></td>
-    <td>shortPart</td>
-   </tr>
-   <tr>
-    <td>SH2</td>
-    <td>WireViz</td>
-    <td>42XCD42A5</td>
-    <td>42mm</td>
-    <td>shortPart</td>
-   </tr>
-  </table>
- </td></tr>
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
 	edge [color="#000000" headclip=false style="solid,bold" tailclip=false]

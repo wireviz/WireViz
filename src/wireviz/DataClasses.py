@@ -177,7 +177,6 @@ class Connector:
     ignore_in_bom: bool = False#ß
     additional_components: List[AdditionalComponent] = field(default_factory=list)
     shorts: List[Short] =  field(default_factory=list)
-    shorts_graph_bom: Optional[bool] = False
 
     def __post_init__(self) -> None:
 
@@ -236,7 +235,10 @@ class Connector:
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
-        # self.shorts = {}
+
+        for i, item in enumerate(self.shorts):
+            if isinstance(item, dict):
+                self.additional_components[i] = Short(**item)
 
         for i, item in enumerate(self.shorts):
             if isinstance(item, dict):

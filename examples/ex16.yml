@@ -1,3 +1,6 @@
+options:
+  mini_bom_mode: false
+  
 connectors:
   X1:
     type: Molex KK 254 # more information
@@ -8,9 +11,11 @@ connectors:
         pins: [1, 5, 7]
         color: PK
         type: loop
+        length: 42
       SH2:
         pins: [2, 6]
         color: RD
+        length: 42.3
   X2:
     type: Molex KK 254
     subtype: female

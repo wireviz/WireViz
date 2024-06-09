@@ -206,7 +206,6 @@ class Harness:
                      translate_color(connector.color, self.options.color_mode) if connector.color else None,
                      html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
-                    '<!-- short bom table -->' if connector.shorts_graph_bom else None,
                     [html_image(connector.image)],
                     [html_caption(connector.image)]]
             # fmt: on
@@ -304,64 +303,6 @@ class Harness:
                     row.replace("<!-- connector table -->", "\n".join(pinhtml))
                     for row in html
                 ]
-                
-                if connector.shorts_graph_bom:        
-                    shorthtml = []
-                    shorthtml.append(
-                        '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
-                    )
-                    
-                    
-                    shorthtml.append("   <tr>")
-                    shorthtml.append(f'    <td>Short</td>')
-                    shorthtml.append(f'    <td>Manufacturer</td>')
-                    shorthtml.append(f'    <td>M.P.N.</td>')
-                    shorthtml.append(f'    <td>Length</td>')
-                    shorthtml.append(f'    <td>Description</td>')
-                    shorthtml.append("   </tr>")
-                    
-                    # print(connector.shorts)
-                    
-                    #shorts = connector.shorts
-                    #for shortI in shorts.values():
-                        # print(shortI)
-                        # print(shortI.name)
-                    
-                    for shortName in connector.shorts:
-                        short = connector.shorts[shortName]
-                        shPins = short.get('pins')
-                        shColor = short.get('color')
-                        shType = short.get('type')
-                        shManufacturer = short.get('manufacturer') if short.get('manufacturer') != None else ""
-                        shMpn = short.get('mpn') if short.get('mpn') != None else ""
-                        shDescription = short.get('description') if short.get('description') != None else ""
-                        length = short.get('length') if short.get('length') != None else ""
-                        if short.get('length_unit') != None and short.get('length') != None:
-                            length_unit = short.get('length_unit')
-                        elif short.get('length') == None:
-                            length_unit = ""
-                        else:
-                            length_unit = "mm"
-                        
-                        if shColor == None:
-                            shColor = "BK"
-                        
-                        shorthtml.append("   <tr>")
-                        
-                        shorthtml.append(f'    <td>{shortName}</td>')
-                        shorthtml.append(f'    <td>{shManufacturer}</td>')
-                        shorthtml.append(f'    <td>{shMpn}</td>')
-                        shorthtml.append(f'    <td>{length}{length_unit}</td>')
-                        shorthtml.append(f'    <td>{shDescription}</td>')
-                        
-                        shorthtml.append("   </tr>")
-                    
-                    shorthtml.append("  </table>")
-                
-                    html = [
-                        row.replace("<!-- short bom table -->", "\n".join(shorthtml))
-                        for row in html
-                    ]
                 
                 for shortName in connector.shorts:
                     short = connector.shorts[shortName]
