@@ -88,6 +88,9 @@ def parse(
         raise Exception("No output formats or return types specified")
 
     yaml_data, yaml_file = _get_yaml_data_and_path(inp)
+    assert isinstance(
+        yaml_data, dict
+    ), f"Expected a dict as top-level YAML input, but got: {type(yaml_data)}"
     if output_formats:
         # need to write data to file, determine output directory and filename
         output_dir = _get_output_dir(yaml_file, output_dir)
