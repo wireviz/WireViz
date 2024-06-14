@@ -4,11 +4,6 @@ graph {
 	graph [bgcolor="#FFFFFF" fontname=arial nodesep=0.33 rankdir=LR ranksep=2]
 	node [fillcolor="#FFFFFF" fontname=arial height=0 margin=0 shape=none style=filled width=0]
 	edge [fontname=arial style=bold]
-	edge [color="#000000:#FF66CC:#000000"]
-	X1:p1r:e -- X1:p5r:e
-	X1:p5r:e -- X1:p7r:e
-	edge [color="#FF0000" headclip=false style="solid,bold" tailclip=false]
-	X1:p2j:c -- X1:p6j:c [straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X1 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -27,54 +22,57 @@ graph {
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1">
    <tr>
-    <td></td>
-    <td>SH2</td>
-    <td></td>
-   </tr>
-   <tr>
     <td>GND</td>
-    <td></td>
     <td port="p1r">1</td>
    </tr>
    <tr>
     <td>VCC</td>
-    <td  port="p2J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF0000">&#11044;</FONT></td>
     <td port="p2r">2</td>
    </tr>
    <tr>
     <td>RX</td>
-    <td></td>
     <td port="p3r">3</td>
    </tr>
    <tr>
     <td>TX</td>
-    <td></td>
     <td port="p4r">4</td>
    </tr>
    <tr>
     <td>GND</td>
-    <td></td>
     <td port="p5r">5</td>
    </tr>
    <tr>
     <td>VCC</td>
-    <td  port="p6J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF0000">&#11044;</FONT></td>
     <td port="p6r">6</td>
    </tr>
    <tr>
     <td>GND</td>
-    <td></td>
     <td port="p7r">7</td>
    </tr>
   </table>
  </td></tr>
+ <tr><td>
+  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
+   <td balign="left">Additional components</td>
+  </tr></table>
+ </td></tr>
+ <tr><td>
+  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
+   <td align="left" balign="left">42 mm x shortPartA<br/>WireViz: 42XCD42A5</td>
+  </tr></table>
+ </td></tr>
+ <tr><td>
+  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
+   <td align="left" balign="left">74 mm x shortPartB<br/>WireViz: 42XCD42A5</td>
+  </tr></table>
+ </td></tr>
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
-	edge [color="#000000:#000000:#000000"]
-	X2:p1l:w -- X2:p5l:w
-	X2:p5l:w -- X2:p7l:w
-	edge [color="#000000:#000000:#000000"]
-	X2:p2l:w -- X2:p6l:w
+	edge [color="#000000:#FF66CC:#000000"]
+	X1:p1r:e -- X1:p5r:e
+	X1:p5r:e -- X1:p7r:e
+	edge [color="#000000:#FF0000:#000000"]
+	X1:p2r:e -- X1:p6r:e
 	edge [headclip=true style=bold tailclip=true]
 	X2 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -122,8 +120,23 @@ graph {
    </tr>
   </table>
  </td></tr>
+ <tr><td>
+  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
+   <td balign="left">Additional components</td>
+  </tr></table>
+ </td></tr>
+ <tr><td>
+  <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
+   <td align="left" balign="left">42 mm x shortPartC<br/>WireViz: 42XCD42A5</td>
+  </tr></table>
+ </td></tr>
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
+	edge [color="#000000:#FF66CC:#000000"]
+	X2:p1l:w -- X2:p5l:w
+	X2:p5l:w -- X2:p7l:w
+	edge [color="#000000:#FF66CC:#000000"]
+	X2:p2l:w -- X2:p6l:w
 	edge [color="#000000:#895956:#000000"]
 	X1:p1r:e -- W1:w1:w
 	W1:w1:e -- X2:p1l:w

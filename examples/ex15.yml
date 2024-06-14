@@ -4,28 +4,28 @@ connectors:
     subtype: female
     pinlabels: [GND, VCC, RX, TX, GND, VCC, GND] # pincount is implicit in pinout
     shorts:
-      SH1:
-        pins: [1, 5, 7]
+      - SH1: [1, 5, 7]
+      - SH2: [2, 6]
+    additional_components:
+      - shorts: [SH1, LO1, LO2]
         color: PK
         manufacturer: WireViz
         mpn: 42XCD42A5
-        description: shortPart
-      SH2:
-        pins: [2, 6]
+        type: shortPartA
+        qty: 42
+        unit: mm
+      - shorts: SH2
         color: RD
         manufacturer: WireViz
         mpn: 42XCD42A5
-        description: shortPart
-        length: 42
+        type: shortPartB
   X2:
     type: Molex KK 254
     subtype: female
     pinlabels: [GND, VCC, RX, TX, GND, VCC, GND]
     shorts:
-      SH1:
-        pins: [1, 5, 7]
-      SH2:
-        pins: [2, 6]
+      - SH1: [1, 5, 7]
+      - SH2: [2, 6]
 
 cables:
   W1:
