@@ -87,14 +87,7 @@ tweak:  # optional tweaking of .gv output
                  # on the connector that are to be shorted
 
   # shorts
-  shorts:
-    <name>:
-      pins: <pins>
-      color: <color>                  # optional
-      manufacturer: <manufacturer>    # optional
-      mpn: <mpn>                      # optional
-      description: <description>      # optional
-      type: <loop/internal>           # optional, default is internal
+  shorts: <List>
 ```
 
 ## Cable attributes

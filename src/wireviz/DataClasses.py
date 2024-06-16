@@ -18,7 +18,7 @@ MultilineHypertext = (
 Designator = PlainText  # Case insensitive unique name of connector or cable
 
 # Literal type aliases below are commented to avoid requiring python 3.8
-ConnectorMultiplier = PlainText  # = Literal['pincount', 'populated', 'unpopulated', 'shorts']
+ConnectorMultiplier = PlainText  # = Literal['pincount', 'populated', 'unpopulated']
 CableMultiplier = (
     PlainText  # = Literal['wirecount', 'terminations', 'length', 'total_length']
 )
@@ -207,18 +207,17 @@ class Connector:
             # hide pincount for simple (1 pin) connectors by default
             self.show_pincount = self.style != "simple"
 
-        # for loop in self.loops:
-        #     # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
-        #     # TODO: include properties of wire used to create the loop
-        #     if len(loop) != 2:
-        #         raise Exception("Loops must be between exactly two pins!")
-        #     for pin in loop:
-        #         if pin not in self.pins:
-        #             raise Exception(
-        #                 f'Unknown loop pin "{pin}" for connector "{self.name}"!'
-        #             )
-        #         # Make sure loop connected pins are not hidden.
-        #         self.activate_pin(pin, None)
+        for loop in self.loops:
+            # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
+            # TODO: include properties of wire used to create the loop
+            for loopName in loop:
+                for pin in loop[loopName]:
+                    if pin not in self.pins:
+                        raise Exception(
+                            f'Unknown loop pin "{pin}" for connector "{self.name}"!'
+                        )
+                    # Make sure loop connected pins are not hidden.
+                    self.activate_pin(pin, None)
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):

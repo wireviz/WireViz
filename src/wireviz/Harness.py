@@ -8,6 +8,7 @@ from itertools import zip_longest
 from pathlib import Path
 from typing import Any, List, Union
 from dataclasses import asdict
+from distutils.spawn import find_executable
 
 from graphviz import Graph
 
@@ -731,9 +732,13 @@ class Harness:
             
     # This renders the graph with gvpr and neato, this is needed to be able to draw the stright lines for the jumpers
     def graphRender(self, type, filename, graph):
-        graph.save(filename=f"{filename}_tmp.gv")
-        os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")
-        os.remove(f"{filename}_tmp.gv") 
+        
+        if find_executable("dot") and find_executable("gvpr") and find_executable("neato"):
+            graph.save(filename=f"{filename}_tmp.gv")
+            os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")
+            os.remove(f"{filename}_tmp.gv") 
+        else:    
+            graph.render(filename=filename) # old rendering methode, befor jumper implementations
 
     @property
     def graph(self):
