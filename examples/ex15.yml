@@ -1,8 +1,8 @@
 connectors:
   X1:
-    type: Molex KK 254 # more information
+    type: Molex KK 254
     subtype: female
-    pinlabels: [GND, VCC, RX, TX, GND, VCC, GND] # pincount is implicit in pinout
+    pinlabels: [GND, VCC, RX, TX, GND, VCC, GND]
     shorts:
       - SH1: [1, 5, 7]
       - SH2: [2, 6]
@@ -29,11 +29,11 @@ connectors:
 
 cables:
   W1:
-    color_code: IEC # auto-color wires based on a standard
-    wirecount: 4 # need to specify number of wires explicitly when using a color code
-    gauge: 0.25 mm2 # also accepts AWG as unit
-    show_equiv: true # auto-calculate AWG equivalent from metric gauge
-    length: 0.2 # length in m
+    color_code: IEC
+    wirecount: 4
+    gauge: 0.25 mm2
+    show_equiv: true
+    length: 0.2
     shield: true
     type: Serial
 
@@ -41,7 +41,7 @@ connections:
   -
     - X1: [1-4]
     - W1: [1-4]
-    - X2: [1,2,4,3] # crossover
-  - # connection from connector pin to wire shielding
+    - X2: [1,2,4,3]
+  -
     - X1: 1
     - W1: s
