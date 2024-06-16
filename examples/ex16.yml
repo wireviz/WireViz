@@ -14,14 +14,14 @@ connectors: # This is based on ex1 and adds some Loops to the connectors
         color: PK   # The color of the short, can also be multicolor
         manufacturer: WireViz
         mpn: 42XCD42A5
-        type: shortPartA
+        type: loopPartA
         qty: 42   # The length or some other quantity 
         unit: mm  # The unit of the qty, in this example the length
       - references: LO2
         color: RDBUOGLB   # multicolor example
         manufacturer: WireViz
         mpn: 42XCD42A5
-        type: shortPartB
+        type: loopPartB
         qty: 74
         unit: mm
 
@@ -37,7 +37,7 @@ connectors: # This is based on ex1 and adds some Loops to the connectors
         color: PK
         manufacturer: WireViz
         mpn: 42XCD42A5
-        type: shortPartC
+        type: loopPartC
         qty: 21
         unit: mm
 

@@ -348,6 +348,7 @@ class Harness:
                     dot.edge(
                         f"{connector.name}:p{loopPins[i - 1]}{loop_side}:{loop_dir}",
                         f"{connector.name}:p{loopPins[i]}{loop_side}:{loop_dir}",
+                        label=f"{connector.name}-{loopName}",
                     )
 
             # if len(connector.loops) > 0:
