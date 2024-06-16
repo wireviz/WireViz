@@ -98,31 +98,18 @@
 <text text-anchor="start" x="345.41" y="-273.95" font-family="arial" font-size="14.00">X1:1:GND</text>
 <text text-anchor="start" x="438.5" y="-273.95" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;1:BN &#160;&#160;&#160;</text>
 <text text-anchor="start" x="531.58" y="-273.95" font-family="arial" font-size="14.00">X2:1:GND</text>
-<polygon fill="#000000" stroke="none" points="332.25,-267.25 332.25,-269.25 610,-269.25 610,-267.25 332.25,-267.25"/>
-<polygon fill="#895956" stroke="none" points="332.25,-265.25 332.25,-267.25 610,-267.25 610,-265.25 332.25,-265.25"/>
-<polygon fill="#000000" stroke="none" points="332.25,-263.25 332.25,-265.25 610,-265.25 610,-263.25 332.25,-263.25"/>
 <text text-anchor="start" x="345.79" y="-247.95" font-family="arial" font-size="14.00">X1:2:VCC</text>
 <text text-anchor="start" x="437.75" y="-247.95" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;2:RD &#160;&#160;&#160;</text>
 <text text-anchor="start" x="531.95" y="-247.95" font-family="arial" font-size="14.00">X2:2:VCC</text>
-<polygon fill="#000000" stroke="none" points="332.25,-241.25 332.25,-243.25 610,-243.25 610,-241.25 332.25,-241.25"/>
-<polygon fill="#ff0000" stroke="none" points="332.25,-239.25 332.25,-241.25 610,-241.25 610,-239.25 332.25,-239.25"/>
-<polygon fill="#000000" stroke="none" points="332.25,-237.25 332.25,-239.25 610,-239.25 610,-237.25 332.25,-237.25"/>
 <text text-anchor="start" x="351.04" y="-221.95" font-family="arial" font-size="14.00">X1:3:RX</text>
 <text text-anchor="start" x="437" y="-221.95" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;3:OG &#160;&#160;&#160;</text>
 <text text-anchor="start" x="537.95" y="-221.95" font-family="arial" font-size="14.00">X2:4:TX</text>
-<polygon fill="#000000" stroke="none" points="332.25,-215.25 332.25,-217.25 610,-217.25 610,-215.25 332.25,-215.25"/>
-<polygon fill="#ff8000" stroke="none" points="332.25,-213.25 332.25,-215.25 610,-215.25 610,-213.25 332.25,-213.25"/>
-<polygon fill="#000000" stroke="none" points="332.25,-211.25 332.25,-213.25 610,-213.25 610,-211.25 332.25,-211.25"/>
 <text text-anchor="start" x="351.79" y="-195.95" font-family="arial" font-size="14.00">X1:4:TX</text>
 <text text-anchor="start" x="438.87" y="-195.95" font-family="arial" font-size="14.00"> &#160;&#160;&#160;&#160;4:YE &#160;&#160;&#160;</text>
 <text text-anchor="start" x="537.2" y="-195.95" font-family="arial" font-size="14.00">X2:3:RX</text>
-<polygon fill="#000000" stroke="none" points="332.25,-189.25 332.25,-191.25 610,-191.25 610,-189.25 332.25,-189.25"/>
-<polygon fill="#ffff00" stroke="none" points="332.25,-187.25 332.25,-189.25 610,-189.25 610,-187.25 332.25,-187.25"/>
-<polygon fill="#000000" stroke="none" points="332.25,-185.25 332.25,-187.25 610,-187.25 610,-185.25 332.25,-185.25"/>
 <text text-anchor="start" x="376.16" y="-169.95" font-family="arial" font-size="14.00"> </text>
 <text text-anchor="start" x="345.41" y="-149.95" font-family="arial" font-size="14.00">X1:1:GND</text>
 <text text-anchor="start" x="451.25" y="-149.95" font-family="arial" font-size="14.00">Shield</text>
-<polygon fill="#000000" stroke="none" points="332.25,-143.25 332.25,-145.25 610,-145.25 610,-143.25 332.25,-143.25"/>
 <text text-anchor="start" x="376.16" y="-127.95" font-family="arial" font-size="14.00"> </text>
 </g>
 <!-- X1&#45;&#45;W1 -->
@@ -157,6 +144,39 @@
 <g id="edge8" class="edge">
 <title>X1:e&#45;&#45;W1:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M188.25,-262.5C271.06,-262.5 249.44,-144.25 332.25,-144.25"/>
+</g>
+<!-- W1&#45;&#45;W1 -->
+<g id="edge9" class="edge">
+<title>W1:w&#45;&#45;W1:e</title>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-264.25C424.83,-264.25 517.42,-264.25 610,-264.25"/>
+<path fill="none" stroke="#895956" stroke-width="2" d="M332.25,-266.25C424.83,-266.25 517.42,-266.25 610,-266.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-268.25C424.83,-268.25 517.42,-268.25 610,-268.25"/>
+</g>
+<!-- W1&#45;&#45;W1 -->
+<g id="edge10" class="edge">
+<title>W1:w&#45;&#45;W1:e</title>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-238.25C424.83,-238.25 517.42,-238.25 610,-238.25"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M332.25,-240.25C424.83,-240.25 517.42,-240.25 610,-240.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-242.25C424.83,-242.25 517.42,-242.25 610,-242.25"/>
+</g>
+<!-- W1&#45;&#45;W1 -->
+<g id="edge11" class="edge">
+<title>W1:w&#45;&#45;W1:e</title>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-212.25C424.83,-212.25 517.42,-212.25 610,-212.25"/>
+<path fill="none" stroke="#ff8000" stroke-width="2" d="M332.25,-214.25C424.83,-214.25 517.42,-214.25 610,-214.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-216.25C424.83,-216.25 517.42,-216.25 610,-216.25"/>
+</g>
+<!-- W1&#45;&#45;W1 -->
+<g id="edge12" class="edge">
+<title>W1:w&#45;&#45;W1:e</title>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-186.25C424.83,-186.25 517.42,-186.25 610,-186.25"/>
+<path fill="none" stroke="#ffff00" stroke-width="2" d="M332.25,-188.25C424.83,-188.25 517.42,-188.25 610,-188.25"/>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-190.25C424.83,-190.25 517.42,-190.25 610,-190.25"/>
+</g>
+<!-- W1&#45;&#45;W1 -->
+<g id="edge13" class="edge">
+<title>W1:w&#45;&#45;W1:e</title>
+<path fill="none" stroke="#000000" stroke-width="2" d="M332.25,-144.25C424.83,-144.25 517.42,-144.25 610,-144.25"/>
 </g>
 <!-- X2 -->
 <g id="node3" class="node">
@@ -205,49 +225,49 @@
 <text text-anchor="start" x="758" y="-51.7" font-family="arial" font-size="14.00">WireViz: 42XCD42A5</text>
 </g>
 <!-- W1&#45;&#45;X2 -->
-<g id="edge9" class="edge">
+<g id="edge14" class="edge">
 <title>W1:e&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-264.25C673.97,-264.25 689.97,-264 754,-264"/>
 <path fill="none" stroke="#895956" stroke-width="2" d="M610,-266.25C674,-266.25 690,-266 754,-266"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-268.25C674.03,-268.25 690.03,-268 754,-268"/>
 </g>
 <!-- W1&#45;&#45;X2 -->
-<g id="edge10" class="edge">
+<g id="edge15" class="edge">
 <title>W1:e&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-238.25C674.22,-238.26 690.22,-240.01 754,-240"/>
 <path fill="none" stroke="#ff0000" stroke-width="2" d="M610,-240.25C674,-240.25 690,-242 754,-242"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-242.25C673.78,-242.24 689.78,-243.99 754,-244"/>
 </g>
 <!-- W1&#45;&#45;X2 -->
-<g id="edge11" class="edge">
+<g id="edge16" class="edge">
 <title>W1:e&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-212.25C673.01,-213.07 687.75,-192.82 754,-192"/>
 <path fill="none" stroke="#ff8000" stroke-width="2" d="M610,-214.25C674.63,-214.25 689.37,-194 754,-194"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-216.25C676.25,-215.43 690.99,-195.18 754,-196"/>
 </g>
 <!-- W1&#45;&#45;X2 -->
-<g id="edge12" class="edge">
+<g id="edge17" class="edge">
 <title>W1:e&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-186.25C677.18,-187.44 690.48,-217.19 754,-216"/>
 <path fill="none" stroke="#ffff00" stroke-width="2" d="M610,-188.25C675.35,-188.25 688.65,-218 754,-218"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M610,-190.25C673.52,-189.07 686.82,-218.82 754,-220"/>
 </g>
 <!-- X2&#45;&#45;X2 -->
-<g id="edge13" class="edge">
+<g id="edge18" class="edge">
 <title>X2:w&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M754.37,-267.97C689.25,-280 559.75,-280 557.75,-218 559.75,-156 689.25,-156 754.37,-168.04"/>
 <path fill="none" stroke="#ff66cc" stroke-width="2" d="M754,-266C689.25,-278 559.75,-278 559.75,-218 559.75,-158 689.25,-158 754,-170"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M753.64,-264.04C689.25,-276 559.75,-276 561.75,-218 559.75,-160 689.25,-160 753.64,-171.97"/>
 </g>
 <!-- X2&#45;&#45;X2 -->
-<g id="edge14" class="edge">
+<g id="edge19" class="edge">
 <title>X2:w&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M754.37,-171.97C689.25,-184 559.75,-184 557.75,-146 559.75,-108 689.25,-108 754.37,-120.04"/>
 <path fill="none" stroke="#ff66cc" stroke-width="2" d="M754,-170C689.25,-182 559.75,-182 559.75,-146 559.75,-110 689.25,-110 754,-122"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M753.64,-168.04C689.25,-180 559.75,-180 561.75,-146 559.75,-112 689.25,-112 753.64,-123.97"/>
 </g>
 <!-- X2&#45;&#45;X2 -->
-<g id="edge15" class="edge">
+<g id="edge20" class="edge">
 <title>X2:w&#45;&#45;X2:w</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M754.37,-243.97C689.25,-256 559.75,-256 557.75,-194 559.75,-132 689.25,-132 754.37,-144.04"/>
 <path fill="none" stroke="#ff66cc" stroke-width="2" d="M754,-242C689.25,-254 559.75,-254 559.75,-194 559.75,-134 689.25,-134 754,-146"/>

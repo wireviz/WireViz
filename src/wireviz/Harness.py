@@ -448,8 +448,9 @@ class Harness:
                 wirehtml.append(f"   <tr>")
                 wirehtml.append(f'    <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}">')
                 wirehtml.append('     <table cellspacing="0" cellborder="0" border="0">')
-                for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
-                    wirehtml.append(f'      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>')
+                #for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
+                #    wirehtml.append(f'      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>')
+                wirehtml.append(f'    <tr><td colspan="3" cellpadding="0" height="6" border="0"></td></tr>')
                 wirehtml.append("     </table>")
                 wirehtml.append("    </td>")
                 wirehtml.append("   </tr>")
@@ -509,11 +510,11 @@ class Harness:
                     # shield is shown with specified color and black borders
                     shield_color_hex = wv_colors.get_color_hex(cable.shield)[0]
                     attributes = (
-                        f'height="6" bgcolor="{shield_color_hex}" border="2" sides="tb"'
+                        f'height="6"  border="2" sides="tb"'# bgcolor="{shield_color_hex}"
                     )
                 else:
                     # shield is shown as a thin black wire
-                    attributes = f'height="2" bgcolor="#000000" border="0"'
+                    attributes = f'height="2"  border="0"' # bgcolor="#000000"
                 # fmt: off
                 wirehtml.append(f'   <tr><td colspan="3" cellpadding="0" {attributes} port="ws"></td></tr>')
                 # fmt: on
@@ -598,6 +599,14 @@ class Harness:
                         row.replace(f"<!-- {connection.via_port}_out -->", to_string)
                         for row in html
                     ]
+                    
+                # Connection in the Wire
+                code_left_1 = f"{cable.name}:w{connection.via_port}:w"
+                code_left_2 = f"{cable.name}:w{connection.via_port}:e"
+                dot.edge(code_left_1, 
+                         code_left_2, 
+                         straight="straight",
+                         )
 
             style, bgcolor = (
                 ("filled,dashed", self.options.bgcolor_bundle)
