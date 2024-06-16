@@ -1,10 +1,12 @@
 /*******************************************************************
 
   see https://forum.graphviz.org/t/straitening-one-line-throu-a-table/2196
-  input must include pos values (must be output from one of the engines w/ -Tdot)
+  input must include pos values (must be output from one of the engines w/ -Tdot)#
+  Thanks to steveroush and FeRDNYC
   
 *******************************************************************/
 BEG_G{
+  double x1,y1,x2,y2,x3,y3,x4,y4;
   string tok[int];
   int cnt;
 
@@ -15,14 +17,18 @@ BEG_G{
   $G.splines="true";
 ****************************************/
 }
-/********************************************************
-  the weakness is in the head==tail test
-  it would be better to mark every target edge with a new attribute and test for that attribute
-*********************************************************/
 E[straight] {
   cnt=tokens($.pos,tok," ");
   $.oldpos=$.pos;
-  pos=tok[0]+" " + tok[0]+" "+tok[cnt-1]+" "+tok[cnt-1];
+  x1 = xOf(tok[0]);
+  y1 = yOf(tok[0]);
+  x4 = xOf(tok[cnt-1]);
+  y4 = yOf(tok[cnt-1]);
+  x2 = x1 + (x4-x1)/3.;
+  y2 = y1 + (y4-y1)/3.;
+  x3 = x1 + 2.*(x4-x1)/3.;
+  y3 = y1 + 2.*(y4-y1)/3.;
+  pos=sprintf("%.3f,%.3f %.3f,%.3f %.3f,%.3f %.3f,%.3f", x1,y1, x2,y2, x3,y3, x4,y4);
   $.label="";  // remove pesky label
   $.lp="";      // remove peskier label pos
 }
