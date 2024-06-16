@@ -1,24 +1,21 @@
-options:
-  mini_bom_mode: false
-  
-connectors:
+connectors: # This is based on ex1 and adds some Loops to the connectors
   X1:
     type: Molex KK 254
     subtype: female
     pinlabels: [GND, VCC, RX, TX, GND, VCC, GND]
-    loops:
-      - LO1: [1, 5, 7]
+    loops: # A List(Dict) of loops is created
+      - LO1: [1, 5, 7]  # First is the designator than a list of pins to be shorted
       - LO2: [2, 6]
-    additional_components:
+    additional_components:  # Some Additional Components to describe the short in more detail
       - references: LO1
-        color: PK
+        color: PK   # The color of the short, can also be multicolor
         manufacturer: WireViz
         mpn: 42XCD42A5
         type: shortPartA
-        qty: 42
-        unit: mm
+        qty: 42   # The length or some other quantity 
+        unit: mm  # The unit of the qty, in this example the length
       - references: LO2
-        color: RD
+        color: RDBUOGLB   # multicolor example
         manufacturer: WireViz
         mpn: 42XCD42A5
         type: shortPartB
@@ -33,7 +30,7 @@ connectors:
       - LO1: [1, 5, 7]
       - LO2: [2, 6]
     additional_components:
-      - references: [LO1, LO2]
+      - references: [LO1, LO2]  # example to show how one additional_components can reference more than one short or loop
         color: PK
         manufacturer: WireViz
         mpn: 42XCD42A5

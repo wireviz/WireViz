@@ -83,11 +83,18 @@ tweak:  # optional tweaking of .gv output
   hide_disconnected_pins: <bool>  # defaults to false
 
   # loops
-  loops: <List>  # every list item is itself a list of exactly two pins
-                 # on the connector that are to be shorted
-
-  # shorts
-  shorts: <List>
+  loops:              # a list(dict) of loops
+    - <str>: <List>   # every list item is itself a list of pins
+                      # on the connector that are to be shorted with a cable loop
+                      # more information about the loop can be added by additional
+                      # components definition (see below)
+  # Shorts
+  shorts:             # a list(dict) of shorts
+    - <str>: <List>   # every list item is itself a list of pins
+                      # on the connector that are to be shorted represented inside
+                      # the connector table
+                      # more information about the loop can be added by additional
+                      # components definition (see below)
 ```
 
 ## Cable attributes
@@ -424,6 +431,13 @@ Parts can be added to a connector or cable in the section `<additional-component
   supplier: <str>      # supplier name  
   spn: <str>           # supplier part number
   bgcolor: <color>     # Background color of entry in diagram component box
+
+  references: <list>   # A list of designators that are related to this 
+                       # component, for example shorts or loops
+  
+  # Shorts and Loops specific attributs
+  color: <color>       # if a reference to a short or loop is defined than
+                       # this color is used for the short or loop
 ```
 
 Alternatively items can be added to just the BOM by putting them in the section `<bom-item>` above.

@@ -71,7 +71,7 @@ graph {
 	edge [color="#000000:#FF66CC:#000000"]
 	X1:p1r:e -- X1:p5r:e
 	X1:p5r:e -- X1:p7r:e
-	edge [color="#000000:#FF0000:#000000"]
+	edge [color="#000000:#FF0000:#0066FF:#FF8000:#A0DFFF:#000000"]
 	X1:p2r:e -- X1:p6r:e
 	edge [headclip=true style=bold tailclip=true]
 	X2 [label=<
