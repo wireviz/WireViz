@@ -10,14 +10,14 @@ connectors:
       - LO1: [1, 5, 7]
       - LO2: [2, 6]
     additional_components:
-      - shorts: LO1
+      - references: LO1
         color: PK
         manufacturer: WireViz
         mpn: 42XCD42A5
         type: shortPartA
         qty: 42
         unit: mm
-      - shorts: LO2
+      - references: LO2
         color: RD
         manufacturer: WireViz
         mpn: 42XCD42A5
@@ -33,7 +33,7 @@ connectors:
       - LO1: [1, 5, 7]
       - LO2: [2, 6]
     additional_components:
-      - shorts: [LO1, LO2]
+      - references: [LO1, LO2]
         color: PK
         manufacturer: WireViz
         mpn: 42XCD42A5

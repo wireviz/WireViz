@@ -1,5 +1,5 @@
 Id	Description	Qty	Unit	Designators	Manufacturer	MPN
 1	Cable, Serial, 4 x 0.25 mm² shielded	0.2	m	W1		
 2	Connector, Molex KK 254, female, 7 pins	2		X1, X2		
-3	shortPartA	42	mm	X1	WireViz	42XCD42A5
-4	shortPartB	1		X1	WireViz	42XCD42A5
+3	shortPartA	42	mm	X1-SH1	WireViz	42XCD42A5
+4	shortPartB	1		X1-SH2	WireViz	42XCD42A5

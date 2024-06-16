@@ -58,12 +58,12 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td align="left" balign="left">42 mm x shortPartA<br/>WireViz: 42XCD42A5</td>
+   <td align="left" balign="left">42 mm x LO1 x shortPartA<br/>WireViz: 42XCD42A5</td>
   </tr></table>
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td align="left" balign="left">74 mm x shortPartB<br/>WireViz: 42XCD42A5</td>
+   <td align="left" balign="left">74 mm x LO2 x shortPartB<br/>WireViz: 42XCD42A5</td>
   </tr></table>
  </td></tr>
 </table>
@@ -127,7 +127,7 @@ graph {
  </td></tr>
  <tr><td>
   <table border="0" cellspacing="0" cellpadding="3" cellborder="1"><tr>
-   <td align="left" balign="left">42 mm x shortPartC<br/>WireViz: 42XCD42A5</td>
+   <td align="left" balign="left">42 mm x LO1; LO2 x shortPartC<br/>WireViz: 42XCD42A5</td>
   </tr></table>
  </td></tr>
 </table>

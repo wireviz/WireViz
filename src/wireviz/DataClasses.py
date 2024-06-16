@@ -129,7 +129,7 @@ class AdditionalComponent:
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
     bgcolor: Optional[Color] = None
     color: Optional[Color] = None
-    shorts: Optional[List[str]] = field(default_factory=list)
+    references: Optional[List[str]] = field(default_factory=list)
 
     @property
     def description(self) -> str:

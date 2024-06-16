@@ -40,18 +40,19 @@ def get_additional_component_table(
             part
             for part in component.additional_components
             if component.get_qty_multiplier(part.qty_multiplier)
-        ]:
+        ]:  
             
-            if type(part.shorts) == str:
-                numShorts = 1
+            if type(part.references) == str:
+                numRef = 1
             else:
-                numShorts = len(part.shorts)
+                numRef = len(part.references)
             
-            if numShorts > 0:
+            if numRef > 0:
                 common_args = {
-                    "qty": part.qty * numShorts,
+                    "qty": part.qty * numRef,
                     "unit": part.unit,
                     "bgcolor": part.bgcolor,
+                    "designators": part.references,
                 }
             else:
                 common_args = {
@@ -91,11 +92,22 @@ def get_additional_component_bom(component: Union[Connector, Cable]) -> List[BOM
                 "description": part.description,
                 "qty": part.qty * component.get_qty_multiplier(part.qty_multiplier),
                 "unit": part.unit,
-                "designators": component.name if component.show_name else None,
+                "designators": additional_component_bom_desig(component, part), # component.name if component.show_name else None,
                 **optional_fields(part),
             }
         )
     return bom_entries
+#                    "designators": part.references,
+def additional_component_bom_desig(component: Union[Connector, Cable], part) -> Union[str, None]:
+    if component.show_name and not part.references:
+        return component.name
+    elif component.show_name and part.references:
+        if type(part.references) == str:
+            return component.name + "-" + part.references
+        else:
+            return '; '.join([component.name + "-" + x for x in part.references])
+    else:
+        return None
 
 def bom_entry_key(entry: BOMEntry) -> BOMKey:
     """Return a tuple of string values from the dict that must be equal to join BOM entries."""
@@ -263,6 +275,7 @@ def component_table_entry(
     mpn: Optional[str] = None,
     supplier: Optional[str] = None,
     spn: Optional[str] = None,
+    designators: Optional[str] = None,
 ) -> str:
     """Return a diagram node table row string with an additional component."""
     part_number_list = [
@@ -273,6 +286,7 @@ def component_table_entry(
     output = (
         f"{qty}"
         + (f" {unit}" if unit else "")
+        + (f" x {designators_info_string(designators)}" if designators else "")
         + f" x {type}"
         + ("<br/>" if any(part_number_list) else "")
         + (", ".join([pn for pn in part_number_list if pn]))
@@ -294,6 +308,11 @@ def pn_info_string(
     else:
         return None
 
+def designators_info_string(designators: list) -> str:
+    if type(designators) == str:
+        return designators
+    else:
+        return '; '.join(designators)
 
 def index_if_list(value: Any, index: int) -> Any:
     """Return the value indexed if it is a list, or simply the value otherwise."""

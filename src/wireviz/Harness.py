@@ -67,9 +67,9 @@ def check_old(node: str, old_attr: dict, args: dict) -> None:
         if attr in args:
             raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
         
-def getAddCompFromShort(short, part):
+def getAddCompFromRef(reference, part):
     for comp in part.additional_components:
-        if short in comp.shorts:
+        if reference in comp.references:
             return comp;
 
 @dataclass
@@ -273,7 +273,7 @@ class Harness:
                     for short in connector.shorts:
                         shortName = list(short.keys())[0]
                         shortPins = list(short.values())[0]
-                        shortComp = getAddCompFromShort(shortName, connector)
+                        shortComp = getAddCompFromRef(shortName, connector)
                         
                         shColor = "BK"
                         if shortComp != None and shortComp.color != None:
@@ -300,7 +300,7 @@ class Harness:
                 for short in connector.shorts:
                     shortName = list(short.keys())[0]
                     shortPins = list(short.values())[0]
-                    shortComp = getAddCompFromShort(shortName, connector)
+                    shortComp = getAddCompFromRef(shortName, connector)
                         
                     shColor = "BK"
                     if shortComp != None and shortComp.color != None:
@@ -326,10 +326,9 @@ class Harness:
             )
 
             for loop in connector.loops:
-                # print(loop)
                 loopName = list(loop.keys())[0]
                 loopPins = list(loop.values())[0]
-                loopComp = getAddCompFromShort(loopName, connector)
+                loopComp = getAddCompFromRef(loopName, connector)
                         
                 loColor = "BK"
                 if loopComp != None and loopComp.color != None:

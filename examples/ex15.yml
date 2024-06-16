@@ -7,14 +7,14 @@ connectors:
       - SH1: [1, 5, 7]
       - SH2: [2, 6]
     additional_components:
-      - shorts: [SH1, LO1, LO2]
+      - references: SH1
         color: PK
         manufacturer: WireViz
         mpn: 42XCD42A5
         type: shortPartA
         qty: 42
         unit: mm
-      - shorts: SH2
+      - references: SH2
         color: RD
         manufacturer: WireViz
         mpn: 42XCD42A5
