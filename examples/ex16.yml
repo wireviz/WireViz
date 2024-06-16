@@ -1,3 +1,6 @@
+options:
+  mini_bom_mode: false # disable mini_bom to show difference to ex15
+
 connectors: # This is based on ex1 and adds some Loops to the connectors
   X1:
     type: Molex KK 254
