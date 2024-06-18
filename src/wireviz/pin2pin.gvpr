@@ -35,7 +35,7 @@ E[straight] {
   $.label="";  // remove pesky label
   $.lp="";      // remove peskier label pos
 
-  if (hasAttr($, "addPTS") && $.addPTS!=""){
+  if (hasAttr($, "addPTS") && $.addPTS!="" && $.colorPTS!=""){
     // now we place point nodes at the edge ends
     pt[1] = tok[0];
     pt[2] = tok[cnt-1];

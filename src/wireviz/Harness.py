@@ -281,24 +281,7 @@ class Harness:
                         if shortComp != None and shortComp.color != None:
                             shColor = shortComp.color
                             
-                        if pinindex+1 in shortPins:
-                            # path = os.getcwd().replace('\\', '/')
-                            # blackCircle = Image(src=f"{path}/images/circle_5mm_96dpi.png") # , width = 5, height = 5, fixedsize = True circle_5mm_96dpi.png
-                            
-                            # from cairosvg import svg2png
-
-                            # svg_code = """
-                            #     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            #         <circle cx="12" cy="12" r="10"/>
-                            #         <line x1="12" y1="8" x2="12" y2="12"/>
-                            #         <line x1="12" y1="16" x2="12" y2="16"/>
-                            #     </svg>
-                            # """
-
-                            # svg2png(bytestring=svg_code,write_to= f'{path}/output.png')
-                            
-                            # pinhtml.append(f'    <td  port="p{pinindex+1}J">{html_image(blackCircle).replace("<tdX>", "")}</td>')
-                            
+                        if pinindex+1 in shortPins:                            
                             pinhtml.append(f'    <td width="21" port="p{pinindex+1}J"></td>')
                             
                             # pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(shColor, "HEX")}">&#11044;</FONT></td>')
@@ -333,8 +316,8 @@ class Harness:
                         f"{connector.name}:p{shortPins[i - 1]}j:c",
                         f"{connector.name}:p{shortPins[i]}j:c",
                         straight="straight",
-                        addPTS=".18",
-                        colorPTS=str(wv_colors.translate_color(shColor, "HEX")),
+                        addPTS=".18",   # Size of the point at the end of the straight line/edge, it also enables the drawing of it
+                        colorPTS=str(wv_colors.translate_color(shColor, "HEX")),    # the color of the point at the end of the line, it is requered that the circle is drawin
                         )
                 
                 dot.attr("edge",  headclip="true", tailclip="true", style="bold")

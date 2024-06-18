@@ -5,10 +5,10 @@ graph {
 	node [fillcolor="#FFFFFF" fontname=arial height=0 margin=0 shape=none style=filled width=0]
 	edge [fontname=arial style=bold]
 	edge [color="#FF66CC" headclip=false style="solid,bold" tailclip=false]
-	X1:p1j:c -- X1:p5j:c [addPTS=.18 colorPTS="#FF66CC" straight=straight]
-	X1:p5j:c -- X1:p7j:c [addPTS=.18 colorPTS="#FF66CC" straight=straight]
+	X1:p1j:c -- X1:p5j:c [addPTS=.18 straight=straight]
+	X1:p5j:c -- X1:p7j:c [addPTS=.18 straight=straight]
 	edge [color="#FF0000" headclip=false style="solid,bold" tailclip=false]
-	X1:p2j:c -- X1:p6j:c [addPTS=.18 colorPTS="#FF0000" straight=straight]
+	X1:p2j:c -- X1:p6j:c [addPTS=.18 straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X1 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -94,10 +94,10 @@ graph {
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
 	edge [color="#000000" headclip=false style="solid,bold" tailclip=false]
-	X2:p1j:c -- X2:p5j:c [addPTS=.18 colorPTS="#000000" straight=straight]
-	X2:p5j:c -- X2:p7j:c [addPTS=.18 colorPTS="#000000" straight=straight]
+	X2:p1j:c -- X2:p5j:c [addPTS=.18 straight=straight]
+	X2:p5j:c -- X2:p7j:c [addPTS=.18 straight=straight]
 	edge [color="#000000" headclip=false style="solid,bold" tailclip=false]
-	X2:p2j:c -- X2:p6j:c [addPTS=.18 colorPTS="#000000" straight=straight]
+	X2:p2j:c -- X2:p6j:c [addPTS=.18 straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X2 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
