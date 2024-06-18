@@ -5,10 +5,10 @@ graph {
 	node [fillcolor="#FFFFFF" fontname=arial height=0 margin=0 shape=none style=filled width=0]
 	edge [fontname=arial style=bold]
 	edge [color="#FF66CC" headclip=false style="solid,bold" tailclip=false]
-	X1:p1j:c -- X1:p5j:c [straight=straight]
-	X1:p5j:c -- X1:p7j:c [straight=straight]
+	X1:p1j:c -- X1:p5j:c [addPTS=.18 colorPTS="#FF66CC" straight=straight]
+	X1:p5j:c -- X1:p7j:c [addPTS=.18 colorPTS="#FF66CC" straight=straight]
 	edge [color="#FF0000" headclip=false style="solid,bold" tailclip=false]
-	X1:p2j:c -- X1:p6j:c [straight=straight]
+	X1:p2j:c -- X1:p6j:c [addPTS=.18 colorPTS="#FF0000" straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X1 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -34,14 +34,14 @@ graph {
    </tr>
    <tr>
     <td>GND</td>
-    <td  port="p1J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF66CC">&#11044;</FONT></td>
+    <td width="21" port="p1J"></td>
     <td></td>
     <td port="p1r">1</td>
    </tr>
    <tr>
     <td>VCC</td>
     <td></td>
-    <td  port="p2J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF0000">&#11044;</FONT></td>
+    <td width="21" port="p2J"></td>
     <td port="p2r">2</td>
    </tr>
    <tr>
@@ -58,19 +58,19 @@ graph {
    </tr>
    <tr>
     <td>GND</td>
-    <td  port="p5J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF66CC">&#11044;</FONT></td>
+    <td width="21" port="p5J"></td>
     <td></td>
     <td port="p5r">5</td>
    </tr>
    <tr>
     <td>VCC</td>
     <td></td>
-    <td  port="p6J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF0000">&#11044;</FONT></td>
+    <td width="21" port="p6J"></td>
     <td port="p6r">6</td>
    </tr>
    <tr>
     <td>GND</td>
-    <td  port="p7J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#FF66CC">&#11044;</FONT></td>
+    <td width="21" port="p7J"></td>
     <td></td>
     <td port="p7r">7</td>
    </tr>
@@ -94,10 +94,10 @@ graph {
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
 	edge [color="#000000" headclip=false style="solid,bold" tailclip=false]
-	X2:p1j:c -- X2:p5j:c [straight=straight]
-	X2:p5j:c -- X2:p7j:c [straight=straight]
+	X2:p1j:c -- X2:p5j:c [addPTS=.18 colorPTS="#000000" straight=straight]
+	X2:p5j:c -- X2:p7j:c [addPTS=.18 colorPTS="#000000" straight=straight]
 	edge [color="#000000" headclip=false style="solid,bold" tailclip=false]
-	X2:p2j:c -- X2:p6j:c [straight=straight]
+	X2:p2j:c -- X2:p6j:c [addPTS=.18 colorPTS="#000000" straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X2 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -124,14 +124,14 @@ graph {
    <tr>
     <td port="p1l">1</td>
     <td>GND</td>
-    <td  port="p1J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
+    <td width="21" port="p1J"></td>
     <td></td>
    </tr>
    <tr>
     <td port="p2l">2</td>
     <td>VCC</td>
     <td></td>
-    <td  port="p2J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
+    <td width="21" port="p2J"></td>
    </tr>
    <tr>
     <td port="p3l">3</td>
@@ -148,19 +148,19 @@ graph {
    <tr>
     <td port="p5l">5</td>
     <td>GND</td>
-    <td  port="p5J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
+    <td width="21" port="p5J"></td>
     <td></td>
    </tr>
    <tr>
     <td port="p6l">6</td>
     <td>VCC</td>
     <td></td>
-    <td  port="p6J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
+    <td width="21" port="p6J"></td>
    </tr>
    <tr>
     <td port="p7l">7</td>
     <td>GND</td>
-    <td  port="p7J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="#000000">&#11044;</FONT></td>
+    <td width="21" port="p7J"></td>
     <td></td>
    </tr>
   </table>

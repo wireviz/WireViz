@@ -69,10 +69,10 @@ graph {
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
 	edge [color="#000000:#FF66CC:#000000"]
-	X1:p1r:e -- X1:p5r:e [label="X1-LO1"]
-	X1:p5r:e -- X1:p7r:e [label="X1-LO1"]
+	X1:p1r:e -- X1:p5r:e [label=" "]
+	X1:p5r:e -- X1:p7r:e [label=" "]
 	edge [color="#000000:#FF0000:#0066FF:#FF8000:#A0DFFF:#000000"]
-	X1:p2r:e -- X1:p6r:e [label="X1-LO2"]
+	X1:p2r:e -- X1:p6r:e [label=" "]
 	edge [headclip=true style=bold tailclip=true]
 	X2 [label=<
 <table border="0" cellspacing="0" cellpadding="0">
@@ -133,10 +133,10 @@ graph {
 </table>
 > fillcolor="#FFFFFF" shape=box style=filled]
 	edge [color="#000000:#FF66CC:#000000"]
-	X2:p1l:w -- X2:p5l:w [label="X2-LO1"]
-	X2:p5l:w -- X2:p7l:w [label="X2-LO1"]
+	X2:p1l:w -- X2:p5l:w [label=" "]
+	X2:p5l:w -- X2:p7l:w [label=" "]
 	edge [color="#000000:#FF66CC:#000000"]
-	X2:p2l:w -- X2:p6l:w [label="X2-LO2"]
+	X2:p2l:w -- X2:p6l:w [label=" "]
 	edge [color="#000000:#895956:#000000"]
 	X1:p1r:e -- W1:w1:w
 	W1:w1:e -- X2:p1l:w

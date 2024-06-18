@@ -29,7 +29,6 @@
 <polygon fill="none" stroke="black" points="0,-217.5 0,-241.5 58.88,-241.5 58.88,-217.5 0,-217.5"/>
 <text text-anchor="start" x="13.69" y="-224.2" font-family="arial" font-size="14.00">GND</text>
 <polygon fill="none" stroke="black" points="58.88,-217.5 58.88,-241.5 113.75,-241.5 113.75,-217.5 58.88,-217.5"/>
-<text text-anchor="start" x="79.56" y="-225.23" font-family="Sans" font-size="12.00" fill="#ff66cc">⬤</text>
 <polygon fill="none" stroke="black" points="113.75,-217.5 113.75,-241.5 168.63,-241.5 168.63,-217.5 113.75,-217.5"/>
 <polygon fill="none" stroke="black" points="168.63,-217.5 168.63,-241.5 204.5,-241.5 204.5,-217.5 168.63,-217.5"/>
 <text text-anchor="start" x="182.44" y="-224.2" font-family="arial" font-size="14.00">1</text>
@@ -37,7 +36,6 @@
 <text text-anchor="start" x="14.06" y="-200.2" font-family="arial" font-size="14.00">VCC</text>
 <polygon fill="none" stroke="black" points="58.88,-193.5 58.88,-217.5 113.75,-217.5 113.75,-193.5 58.88,-193.5"/>
 <polygon fill="none" stroke="black" points="113.75,-193.5 113.75,-217.5 168.63,-217.5 168.63,-193.5 113.75,-193.5"/>
-<text text-anchor="start" x="134.44" y="-201.23" font-family="Sans" font-size="12.00" fill="#ff0000">⬤</text>
 <polygon fill="none" stroke="black" points="168.63,-193.5 168.63,-217.5 204.5,-217.5 204.5,-193.5 168.63,-193.5"/>
 <text text-anchor="start" x="182.44" y="-200.2" font-family="arial" font-size="14.00">2</text>
 <polygon fill="none" stroke="black" points="0,-169.5 0,-193.5 58.88,-193.5 58.88,-169.5 0,-169.5"/>
@@ -55,7 +53,6 @@
 <polygon fill="none" stroke="black" points="0,-121.5 0,-145.5 58.88,-145.5 58.88,-121.5 0,-121.5"/>
 <text text-anchor="start" x="13.69" y="-128.2" font-family="arial" font-size="14.00">GND</text>
 <polygon fill="none" stroke="black" points="58.88,-121.5 58.88,-145.5 113.75,-145.5 113.75,-121.5 58.88,-121.5"/>
-<text text-anchor="start" x="79.56" y="-129.23" font-family="Sans" font-size="12.00" fill="#ff66cc">⬤</text>
 <polygon fill="none" stroke="black" points="113.75,-121.5 113.75,-145.5 168.63,-145.5 168.63,-121.5 113.75,-121.5"/>
 <polygon fill="none" stroke="black" points="168.63,-121.5 168.63,-145.5 204.5,-145.5 204.5,-121.5 168.63,-121.5"/>
 <text text-anchor="start" x="182.44" y="-128.2" font-family="arial" font-size="14.00">5</text>
@@ -63,13 +60,11 @@
 <text text-anchor="start" x="14.06" y="-104.2" font-family="arial" font-size="14.00">VCC</text>
 <polygon fill="none" stroke="black" points="58.88,-97.5 58.88,-121.5 113.75,-121.5 113.75,-97.5 58.88,-97.5"/>
 <polygon fill="none" stroke="black" points="113.75,-97.5 113.75,-121.5 168.63,-121.5 168.63,-97.5 113.75,-97.5"/>
-<text text-anchor="start" x="134.44" y="-105.23" font-family="Sans" font-size="12.00" fill="#ff0000">⬤</text>
 <polygon fill="none" stroke="black" points="168.63,-97.5 168.63,-121.5 204.5,-121.5 204.5,-97.5 168.63,-97.5"/>
 <text text-anchor="start" x="182.44" y="-104.2" font-family="arial" font-size="14.00">6</text>
 <polygon fill="none" stroke="black" points="0,-73.5 0,-97.5 58.88,-97.5 58.88,-73.5 0,-73.5"/>
 <text text-anchor="start" x="13.69" y="-80.2" font-family="arial" font-size="14.00">GND</text>
 <polygon fill="none" stroke="black" points="58.88,-73.5 58.88,-97.5 113.75,-97.5 113.75,-73.5 58.88,-73.5"/>
-<text text-anchor="start" x="79.56" y="-81.23" font-family="Sans" font-size="12.00" fill="#ff66cc">⬤</text>
 <polygon fill="none" stroke="black" points="113.75,-73.5 113.75,-97.5 168.63,-97.5 168.63,-73.5 113.75,-73.5"/>
 <polygon fill="none" stroke="black" points="168.63,-73.5 168.63,-97.5 204.5,-97.5 204.5,-73.5 168.63,-73.5"/>
 <text text-anchor="start" x="182.44" y="-80.2" font-family="arial" font-size="14.00">7</text>
@@ -218,7 +213,6 @@
 <polygon fill="none" stroke="black" points="802.07,-219.75 802.07,-243.75 856.88,-243.75 856.88,-219.75 802.07,-219.75"/>
 <text text-anchor="start" x="813.72" y="-226.45" font-family="arial" font-size="14.00">GND</text>
 <polygon fill="none" stroke="black" points="856.88,-219.75 856.88,-243.75 907.69,-243.75 907.69,-219.75 856.88,-219.75"/>
-<text text-anchor="start" x="875.54" y="-227.48" font-family="Sans" font-size="12.00" fill="#000000">⬤</text>
 <polygon fill="none" stroke="black" points="907.69,-219.75 907.69,-243.75 958.51,-243.75 958.51,-219.75 907.69,-219.75"/>
 <polygon fill="none" stroke="black" points="770.26,-195.75 770.26,-219.75 802.07,-219.75 802.07,-195.75 770.26,-195.75"/>
 <text text-anchor="start" x="782.04" y="-202.45" font-family="arial" font-size="14.00">2</text>
@@ -226,7 +220,6 @@
 <text text-anchor="start" x="814.1" y="-202.45" font-family="arial" font-size="14.00">VCC</text>
 <polygon fill="none" stroke="black" points="856.88,-195.75 856.88,-219.75 907.69,-219.75 907.69,-195.75 856.88,-195.75"/>
 <polygon fill="none" stroke="black" points="907.69,-195.75 907.69,-219.75 958.51,-219.75 958.51,-195.75 907.69,-195.75"/>
-<text text-anchor="start" x="926.35" y="-203.48" font-family="Sans" font-size="12.00" fill="#000000">⬤</text>
 <polygon fill="none" stroke="black" points="770.26,-171.75 770.26,-195.75 802.07,-195.75 802.07,-171.75 770.26,-171.75"/>
 <text text-anchor="start" x="782.04" y="-178.45" font-family="arial" font-size="14.00">3</text>
 <polygon fill="none" stroke="black" points="802.07,-171.75 802.07,-195.75 856.88,-195.75 856.88,-171.75 802.07,-171.75"/>
@@ -244,7 +237,6 @@
 <polygon fill="none" stroke="black" points="802.07,-123.75 802.07,-147.75 856.88,-147.75 856.88,-123.75 802.07,-123.75"/>
 <text text-anchor="start" x="813.72" y="-130.45" font-family="arial" font-size="14.00">GND</text>
 <polygon fill="none" stroke="black" points="856.88,-123.75 856.88,-147.75 907.69,-147.75 907.69,-123.75 856.88,-123.75"/>
-<text text-anchor="start" x="875.54" y="-131.48" font-family="Sans" font-size="12.00" fill="#000000">⬤</text>
 <polygon fill="none" stroke="black" points="907.69,-123.75 907.69,-147.75 958.51,-147.75 958.51,-123.75 907.69,-123.75"/>
 <polygon fill="none" stroke="black" points="770.26,-99.75 770.26,-123.75 802.07,-123.75 802.07,-99.75 770.26,-99.75"/>
 <text text-anchor="start" x="782.04" y="-106.45" font-family="arial" font-size="14.00">6</text>
@@ -252,13 +244,11 @@
 <text text-anchor="start" x="814.1" y="-106.45" font-family="arial" font-size="14.00">VCC</text>
 <polygon fill="none" stroke="black" points="856.88,-99.75 856.88,-123.75 907.69,-123.75 907.69,-99.75 856.88,-99.75"/>
 <polygon fill="none" stroke="black" points="907.69,-99.75 907.69,-123.75 958.51,-123.75 958.51,-99.75 907.69,-99.75"/>
-<text text-anchor="start" x="926.35" y="-107.48" font-family="Sans" font-size="12.00" fill="#000000">⬤</text>
 <polygon fill="none" stroke="black" points="770.26,-75.75 770.26,-99.75 802.07,-99.75 802.07,-75.75 770.26,-75.75"/>
 <text text-anchor="start" x="782.04" y="-82.45" font-family="arial" font-size="14.00">7</text>
 <polygon fill="none" stroke="black" points="802.07,-75.75 802.07,-99.75 856.88,-99.75 856.88,-75.75 802.07,-75.75"/>
 <text text-anchor="start" x="813.72" y="-82.45" font-family="arial" font-size="14.00">GND</text>
 <polygon fill="none" stroke="black" points="856.88,-75.75 856.88,-99.75 907.69,-99.75 907.69,-75.75 856.88,-75.75"/>
-<text text-anchor="start" x="875.54" y="-83.48" font-family="Sans" font-size="12.00" fill="#000000">⬤</text>
 <polygon fill="none" stroke="black" points="907.69,-75.75 907.69,-99.75 958.51,-99.75 958.51,-75.75 907.69,-75.75"/>
 </g>
 <!-- W1&#45;&#45;X2 -->
@@ -303,6 +293,66 @@
 <g id="edge20" class="edge">
 <title>X2:c&#45;&#45;X2:c</title>
 <path fill="none" stroke="#000000" stroke-width="2" d="M933.09,-207.75C933.09,-175.75 933.09,-143.75 933.09,-111.75"/>
+</g>
+<!-- __CIRCLE__1 -->
+<g id="node4" class="node">
+<title>__CIRCLE__1</title>
+<ellipse fill="#ff66cc" stroke="#ff66cc" cx="86.31" cy="-229.5" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__2 -->
+<g id="node5" class="node">
+<title>__CIRCLE__2</title>
+<ellipse fill="#ff66cc" stroke="#ff66cc" cx="86.31" cy="-133.5" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__3 -->
+<g id="node6" class="node">
+<title>__CIRCLE__3</title>
+<ellipse fill="#ff66cc" stroke="#ff66cc" cx="86.31" cy="-133.5" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__4 -->
+<g id="node7" class="node">
+<title>__CIRCLE__4</title>
+<ellipse fill="#ff66cc" stroke="#ff66cc" cx="86.31" cy="-85.5" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__5 -->
+<g id="node8" class="node">
+<title>__CIRCLE__5</title>
+<ellipse fill="#ff0000" stroke="#ff0000" cx="141.19" cy="-205.5" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__6 -->
+<g id="node9" class="node">
+<title>__CIRCLE__6</title>
+<ellipse fill="#ff0000" stroke="#ff0000" cx="141.19" cy="-109.5" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__7 -->
+<g id="node10" class="node">
+<title>__CIRCLE__7</title>
+<ellipse fill="#000000" stroke="#000000" cx="882.28" cy="-231.75" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__8 -->
+<g id="node11" class="node">
+<title>__CIRCLE__8</title>
+<ellipse fill="#000000" stroke="#000000" cx="882.28" cy="-135.75" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__9 -->
+<g id="node12" class="node">
+<title>__CIRCLE__9</title>
+<ellipse fill="#000000" stroke="#000000" cx="882.28" cy="-135.75" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__10 -->
+<g id="node13" class="node">
+<title>__CIRCLE__10</title>
+<ellipse fill="#000000" stroke="#000000" cx="882.28" cy="-87.75" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__11 -->
+<g id="node14" class="node">
+<title>__CIRCLE__11</title>
+<ellipse fill="#000000" stroke="#000000" cx="933.09" cy="-207.75" rx="6.48" ry="6.48"/>
+</g>
+<!-- __CIRCLE__12 -->
+<g id="node15" class="node">
+<title>__CIRCLE__12</title>
+<ellipse fill="#000000" stroke="#000000" cx="933.09" cy="-111.75" rx="6.48" ry="6.48"/>
 </g>
 </g>
 </svg>

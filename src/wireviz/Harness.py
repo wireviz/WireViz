@@ -22,6 +22,7 @@ from wireviz.DataClasses import (
     Options,
     Tweak,
     Side,
+    Image,
 )
 from wireviz.svgembed import embed_svg_images_file
 from wireviz.wv_bom import (
@@ -281,7 +282,26 @@ class Harness:
                             shColor = shortComp.color
                             
                         if pinindex+1 in shortPins:
-                            pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(shColor, "HEX")}">&#11044;</FONT></td>')
+                            # path = os.getcwd().replace('\\', '/')
+                            # blackCircle = Image(src=f"{path}/images/circle_5mm_96dpi.png") # , width = 5, height = 5, fixedsize = True circle_5mm_96dpi.png
+                            
+                            # from cairosvg import svg2png
+
+                            # svg_code = """
+                            #     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            #         <circle cx="12" cy="12" r="10"/>
+                            #         <line x1="12" y1="8" x2="12" y2="12"/>
+                            #         <line x1="12" y1="16" x2="12" y2="16"/>
+                            #     </svg>
+                            # """
+
+                            # svg2png(bytestring=svg_code,write_to= f'{path}/output.png')
+                            
+                            # pinhtml.append(f'    <td  port="p{pinindex+1}J">{html_image(blackCircle).replace("<tdX>", "")}</td>')
+                            
+                            pinhtml.append(f'    <td width="21" port="p{pinindex+1}J"></td>')
+                            
+                            # pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(shColor, "HEX")}">&#11044;</FONT></td>')
                         else:
                             pinhtml.append(f'    <td></td>')
                         
@@ -312,7 +332,9 @@ class Harness:
                         dot.edge(
                         f"{connector.name}:p{shortPins[i - 1]}j:c",
                         f"{connector.name}:p{shortPins[i]}j:c",
-                        straight="straight"
+                        straight="straight",
+                        addPTS=".18",
+                        colorPTS=str(wv_colors.translate_color(shColor, "HEX")),
                         )
                 
                 dot.attr("edge",  headclip="true", tailclip="true", style="bold")
@@ -744,8 +766,9 @@ class Harness:
     def graphRender(self, type, filename, graph):
         
         if find_executable("dot") and find_executable("gvpr") and find_executable("neato"):
+            os.environ['GVPRPATH'] = str(Path(__file__).parent)
             graph.save(filename=f"{filename}_tmp.gv")
-            os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")
+            os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")#{':cairo'if type == 'svg' else ''}
             os.remove(f"{filename}_tmp.gv") 
         else:    
             graph.render(filename=filename) # old rendering methode, befor jumper implementations
