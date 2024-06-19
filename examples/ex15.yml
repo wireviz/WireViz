@@ -29,7 +29,7 @@ connectors: # This is based on ex1 and adds some Shorts to the connectors
 
 cables:
   W1:
-    color_code: IEC
+    color_code: TEL
     wirecount: 4
     gauge: 0.25 mm2
     show_equiv: true
