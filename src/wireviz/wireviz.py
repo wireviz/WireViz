@@ -377,7 +377,7 @@ def parse(
             harness.add_bom_item(line)
 
     if output_formats:
-        harness.output(filename=output_file, fmt=output_formats, view=False)
+        harness.output(filename=output_file, fmt=output_formats)
 
     if return_types:
         returns = []
