@@ -69,7 +69,7 @@ def check_old(node: str, old_attr: dict, args: dict) -> None:
     for attr, descr in old_attr.items():
         if attr in args:
             raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
-        
+
 def getAddCompFromRef(reference, part):
     for comp in part.additional_components:
         if reference in comp.references:
@@ -234,7 +234,7 @@ class Harness:
                         pinhtml.append(f'    <td></td>')
                     if connector.pinlabels:
                         pinhtml.append(f"    <td></td>")
-                        
+
                     for short in connector.shorts:
                         shortName = list(short.keys())[0]
                         pinhtml.append(f'    <td>{shortName}</td>')
@@ -242,7 +242,7 @@ class Harness:
                     if connector.ports_right:
                         pinhtml.append(f'    <td></td>')
                     pinhtml.append("   </tr>")
-                    
+
 
                 for pinindex, (pinname, pinlabel, pincolor) in enumerate(
                     zip_longest(
@@ -272,27 +272,25 @@ class Harness:
                             # fmt: on
                         else:
                             pinhtml.append('    <td colspan="2"></td>')
-                    
+                    # Add Short columns
                     for short in connector.shorts:
                         shortName = list(short.keys())[0]
                         shortPins = list(short.values())[0]
                         shortComp = getAddCompFromRef(shortName, connector)
-                        
+
                         shColor = "BK"
                         if shortComp != None and shortComp.color != None:
                             shColor = shortComp.color
-                            
-                        if pinindex+1 in shortPins:                            
+
+                        if pinindex+1 in shortPins:
                             pinhtml.append(f'    <td width="21" port="p{pinindex+1}J"></td>')
-                            
-                            # pinhtml.append(f'    <td  port="p{pinindex+1}J"><FONT FACE="Sans" POINT-SIZE="12.0" COLOR="{wv_colors.translate_color(shColor, "HEX")}">&#11044;</FONT></td>')
                         else:
                             pinhtml.append(f'    <td></td>')
-                        
+
 
                     if connector.ports_right:
                         pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
-                    
+
                     pinhtml.append("   </tr>")
 
                 pinhtml.append("  </table>")
@@ -301,16 +299,17 @@ class Harness:
                     row.replace("<!-- connector table -->", "\n".join(pinhtml))
                     for row in html
                 ]
-                
+
+                # Add short connections/vertical lines with dots
                 for short in connector.shorts:
                     shortName = list(short.keys())[0]
                     shortPins = list(short.values())[0]
                     shortComp = getAddCompFromRef(shortName, connector)
-                        
+
                     shColor = "BK"
                     if shortComp != None and shortComp.color != None:
                         shColor = shortComp.color
-                    
+
                     dot.attr("edge", color=str(wv_colors.translate_color(shColor, "HEX")),  headclip="false", tailclip="false", style="solid,bold")
                     for i in  range(1, len(shortPins)):
                         dot.edge(
@@ -318,9 +317,9 @@ class Harness:
                         f"{connector.name}:p{shortPins[i]}j:c",
                         straight="straight",
                         addPTS=".18",   # Size of the point at the end of the straight line/edge, it also enables the drawing of it
-                        colorPTS=str(wv_colors.translate_color(shColor, "HEX")),    # the color of the point at the end of the line, it is requered that the circle is drawin
+                        colorPTS=str(wv_colors.translate_color(shColor, "HEX")),    # the color of the point at the end of the line, it is required that the circle is drawing
                         )
-                
+
                 dot.attr("edge",  headclip="true", tailclip="true", style="bold")
 
             html = "\n".join(html)
@@ -332,15 +331,16 @@ class Harness:
                 fillcolor=translate_color(self.options.bgcolor_connector, "HEX"),
             )
 
+            # Draw loop connections
             for loop in connector.loops:
                 loopName = list(loop.keys())[0]
                 loopPins = list(loop.values())[0]
                 loopComp = getAddCompFromRef(loopName, connector)
-                        
+
                 loColor = "BK"
                 if loopComp != None and loopComp.color != None:
                     loColor = loopComp.color
-                        
+
                 dot.attr("edge", color=f"#000000:{wv_colors.translate_color(loColor, 'HEX')}:#000000")
                 if connector.ports_left:
                     loop_side = "l"
@@ -356,22 +356,6 @@ class Harness:
                         f"{connector.name}:p{loopPins[i]}{loop_side}:{loop_dir}",
                         label= " ",
                     )
-
-            # if len(connector.loops) > 0:
-            #     dot.attr("edge", color="#000000:#ffffff:#000000")
-            #     if connector.ports_left:
-            #         loop_side = "l"
-            #         loop_dir = "w"
-            #     elif connector.ports_right:
-            #         loop_side = "r"
-            #         loop_dir = "e"
-            #     else:
-            #         raise Exception("No side for loops")
-            #     for loop in connector.loops:
-            #         dot.edge(
-            #             f"{connector.name}:p{loop[0]}{loop_side}:{loop_dir}",
-            #             f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}",
-            #         )
 
         # determine if there are double- or triple-colored wires in the harness;
         # if so, pad single-color wires to make all wires of equal thickness
@@ -606,12 +590,12 @@ class Harness:
                         row.replace(f"<!-- {connection.via_port}_out -->", to_string)
                         for row in html
                     ]
-                    
+
                 # Connection in the Wire
                 code_left_1 = f"{cable.name}:w{connection.via_port}:w"
                 code_left_2 = f"{cable.name}:w{connection.via_port}:e"
-                dot.edge(code_left_1, 
-                         code_left_2, 
+                dot.edge(code_left_1,
+                         code_left_2,
                          straight="straight",
                          )
 
@@ -745,16 +729,21 @@ class Harness:
     # cache for the GraphViz Graph object
     # do not access directly, use self.graph instead
     _graph = None
-            
+
     # This renders the graph with gvpr and neato, this is needed to be able to draw the stright lines for the jumpers
     def graphRender(self, type, filename, graph):
-        
+        # Chack if the needed commands are existing
         if find_executable("dot") and find_executable("gvpr") and find_executable("neato"):
+            # Set enviorments variable to path of this file
             os.environ['GVPRPATH'] = str(Path(__file__).parent)
+            # Export the gv output to a temporay file
             graph.save(filename=f"{filename}_tmp.gv")
-            os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")#{':cairo'if type == 'svg' else ''}
+            # Run the vomand and generait the output
+            os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")
+            # Remove the temporary file
             os.remove(f"{filename}_tmp.gv")
-        else:    
+        else:
+            print('The "dot", "gvpr" and "neato" comand where not found on the system, use old methode of generaiton, this may lead to not wanted output.')
             graph.render(filename=filename) # old rendering methode, befor jumper implementations
 
     @property
@@ -797,7 +786,6 @@ class Harness:
                 _filename = f"{filename}.tmp" if f == "svg" else filename
                 # TODO: prevent rendering SVG twice when both SVG and HTML are specified
                 graph.format = f
-                # graph.render(filename=_filename) # old rendering methode, befor jumper implementations
                 self.graphRender(f, _filename, graph)
         # embed images into SVG output
         if "svg" in fmt or "html" in fmt:
@@ -805,9 +793,10 @@ class Harness:
         # GraphViz output
         if "gv" in fmt:
             graph.save(filename=f"{filename}.gv")
+            # Print the needed comand for generaitong an output
             filename_str = str(filename)
             shutil.copyfile(str(Path(__file__).parent).replace('\\', '/') + "/pin2pin.gvpr", filename_str + "_pin2pin.gvpr")
-            print(f"Use: dot {filename_str}_tmp.gv | gvpr -q -cf {filename_str}_pin2pin.gvpr | neato -n2 -T<type> -o {filename_str}.<type>")
+            print(f"Use: dot {filename_str}.gv | gvpr -q -cf {filename_str}_pin2pin.gvpr | neato -n2 -T<type> -o {filename_str}.<type>")
         # BOM output
         bomlist = bom_list(self.bom())
         if "tsv" in fmt:
