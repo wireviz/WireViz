@@ -7,8 +7,8 @@ graph {
 	edge [color="#FF66CC" headclip=false style="solid,bold" tailclip=false]
 	X1:p1j:c -- X1:p5j:c [addPTS=.18 colorPTS="#FF66CC" straight=straight]
 	X1:p5j:c -- X1:p7j:c [addPTS=.18 colorPTS="#FF66CC" straight=straight]
-	edge [color="#FF0000" headclip=false style="solid,bold" tailclip=false]
-	X1:p2j:c -- X1:p6j:c [addPTS=.18 colorPTS="#FF0000" straight=straight]
+	edge [color="#FF0000:#0066FF:#FF0000" headclip=false style="solid,bold" tailclip=false]
+	X1:p2j:c -- X1:p6j:c [addPTS=.18 colorPTS="#FF0000:#0066FF:#FF0000" straight=straight]
 	edge [headclip=true style=bold tailclip=true]
 	X1 [label=<
 <table border="0" cellspacing="0" cellpadding="0">

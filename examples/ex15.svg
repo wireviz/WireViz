@@ -88,7 +88,9 @@
 <!-- X1&#45;&#45;X1 -->
 <g id="edge3" class="edge">
 <title>X1:c&#45;&#45;X1:c</title>
-<path fill="none" stroke="#ff0000" stroke-width="2" d="M141.19,-205.5C141.19,-173.5 141.19,-141.5 141.19,-109.5"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M139.19,-205.5C139.19,-173.5 139.19,-141.5 139.19,-109.5"/>
+<path fill="none" stroke="#0066ff" stroke-width="2" d="M141.19,-205.5C141.19,-173.5 141.19,-141.5 141.19,-109.5"/>
+<path fill="none" stroke="#ff0000" stroke-width="2" d="M143.19,-205.5C143.19,-173.5 143.19,-141.5 143.19,-109.5"/>
 </g>
 <!-- W1 -->
 <g id="node2" class="node">
