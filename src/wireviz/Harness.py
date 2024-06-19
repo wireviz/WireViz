@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import shutil
 import re
 from collections import Counter
 from dataclasses import dataclass
@@ -752,7 +753,7 @@ class Harness:
             os.environ['GVPRPATH'] = str(Path(__file__).parent)
             graph.save(filename=f"{filename}_tmp.gv")
             os.system(f"dot {filename}_tmp.gv | gvpr -q -cf pin2pin.gvpr | neato -n2 -T{type} -o {filename}.{type}")#{':cairo'if type == 'svg' else ''}
-            os.remove(f"{filename}_tmp.gv") 
+            os.remove(f"{filename}_tmp.gv")
         else:    
             graph.render(filename=filename) # old rendering methode, befor jumper implementations
 
@@ -804,6 +805,9 @@ class Harness:
         # GraphViz output
         if "gv" in fmt:
             graph.save(filename=f"{filename}.gv")
+            filename_str = str(filename)
+            shutil.copyfile(str(Path(__file__).parent).replace('\\', '/') + "/pin2pin.gvpr", filename_str + "_pin2pin.gvpr")
+            print(f"Use: dot {filename_str}_tmp.gv | gvpr -q -cf {filename_str}_pin2pin.gvpr | neato -n2 -T<type> -o {filename_str}.<type>")
         # BOM output
         bomlist = bom_list(self.bom())
         if "tsv" in fmt:
