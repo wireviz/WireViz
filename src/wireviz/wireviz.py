@@ -416,7 +416,7 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             # Catch this error, but raise any others
             from errno import EINVAL, ENAMETOOLONG
 
-            if type(e) is OSError and e.errno not in (EINVAL, ENAMETOOLONG):
+            if type(e) is OSError and e.errno not in (EINVAL, ENAMETOOLONG, None):
                 raise e
             # file does not exist; assume inp is a YAML string
             yaml_str = inp
