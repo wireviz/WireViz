@@ -15,9 +15,9 @@ from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
 from wireviz.wv_helper import (
     expand,
+    file_read_text,
     get_single_key_and_value,
     is_arrow,
-    open_file_read,
     smart_file_resolve,
 )
 
@@ -409,7 +409,7 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
         try:
             yaml_path = Path(inp).expanduser().resolve(strict=True)
             # if no FileNotFoundError exception happens, get file contents
-            yaml_str = open_file_read(yaml_path).read()
+            yaml_str = file_read_text(yaml_path)
         except (FileNotFoundError, OSError, ValueError) as e:
             # if inp is a long YAML string, Pathlib will normally raise
             # FileNotFoundError or OSError(errno = ENAMETOOLONG) when
