@@ -113,16 +113,29 @@ def clean_whitespace(inp):
 
 
 def open_file_read(filename):
+    """Open utf-8 encoded text file for reading - remember closing it when finished"""
     # TODO: Intelligently determine encoding
     return open(filename, "r", encoding="UTF-8")
 
 
 def open_file_write(filename):
+    """Open utf-8 encoded text file for writing - remember closing it when finished"""
     return open(filename, "w", encoding="UTF-8")
 
 
 def open_file_append(filename):
+    """Open utf-8 encoded text file for appending - remember closing it when finished"""
     return open(filename, "a", encoding="UTF-8")
+
+
+def file_read_text(filename: str) -> str:
+    """Read utf-8 encoded text file, close it, and return the text"""
+    return Path(filename).read_text(encoding="utf-8")
+
+
+def file_write_text(filename: str, text: str) -> int:
+    """Write utf-8 encoded text file, close it, and return the number of characters written"""
+    return Path(filename).write_text(text, encoding="utf-8")
 
 
 def is_arrow(inp):
@@ -144,10 +157,10 @@ def aspect_ratio(image_src):
     try:
         from PIL import Image
 
-        image = Image.open(image_src)
-        if image.width > 0 and image.height > 0:
-            return image.width / image.height
-        print(f"aspect_ratio(): Invalid image size {image.width} x {image.height}")
+        with Image.open(image_src) as image:
+            if image.width > 0 and image.height > 0:
+                return image.width / image.height
+            print(f"aspect_ratio(): Invalid image size {image.width} x {image.height}")
     # ModuleNotFoundError and FileNotFoundError are the most expected, but all are handled equally.
     except Exception as error:
         print(f"aspect_ratio(): {type(error).__name__}: {error}")
