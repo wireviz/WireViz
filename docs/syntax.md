@@ -353,6 +353,7 @@ If any component is defined in the `connectors` or `cables` sections but not ref
   # If no value is specified for 'title', then the
   # output filename without extension is used.
 ```
+See [HTML Output Templates](../src/wireviz/templates/) for how metadata entries can be inserted into the HTML output.
 
 ## Options
 

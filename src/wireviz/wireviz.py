@@ -20,6 +20,8 @@ from wireviz.wv_helper import (
     smart_file_resolve,
 )
 
+from . import APP_NAME
+
 
 def parse(
     inp: Union[Path, str, Dict],
@@ -86,6 +88,10 @@ def parse(
         raise Exception("No output formats or return types specified")
 
     yaml_data, yaml_file = _get_yaml_data_and_path(inp)
+    if not isinstance(yaml_data, dict):
+        raise TypeError(
+            f"Expected a dict as top-level YAML input, but got: {type(yaml_data)}"
+        )
     if output_formats:
         # need to write data to file, determine output directory and filename
         output_dir = _get_output_dir(yaml_file, output_dir)
@@ -117,10 +123,7 @@ def parse(
 
     # When title is not given, either deduce it from filename, or use default text.
     if "title" not in harness.metadata:
-        if yaml_file is None:
-            harness.metadata["title"] = "WireViz diagram and BOM"
-        else:
-            harness.metadata["title"] = Path(yaml_file).stem
+        harness.metadata["title"] = output_name or f"{APP_NAME} diagram and BOM"
 
     # add items
     # parse YAML input file ====================================================
@@ -408,11 +411,12 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             yaml_str = open_file_read(yaml_path).read()
         except (FileNotFoundError, OSError) as e:
             # if inp is a long YAML string, Pathlib will raise OSError: [errno.ENAMETOOLONG]
+            # (in Windows, it seems OSError [errno.EINVAL] might be raised in some cases)
             # when trying to expand and resolve it as a path.
             # Catch this error, but raise any others
-            from errno import ENAMETOOLONG
+            from errno import EINVAL, ENAMETOOLONG
 
-            if type(e) is OSError and e.errno != ENAMETOOLONG:
+            if type(e) is OSError and e.errno not in (EINVAL, ENAMETOOLONG):
                 raise e
             # file does not exist; assume inp is a YAML string
             yaml_str = inp
