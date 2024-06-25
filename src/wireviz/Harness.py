@@ -44,11 +44,10 @@ from wireviz.wv_gv_html import (
 )
 from wireviz.wv_helper import (
     awg_equiv,
+    file_write_text,
     flatten2d,
     is_arrow,
     mm2_equiv,
-    open_file_read,
-    open_file_write,
     tuplelist2tsv,
 )
 from wireviz.wv_html import generate_html_output
@@ -693,7 +692,7 @@ class Harness:
         # BOM output
         bomlist = bom_list(self.bom())
         if "tsv" in fmt:
-            open_file_write(f"{filename}.bom.tsv").write(tuplelist2tsv(bomlist))
+            file_write_text(f"{filename}.bom.tsv", tuplelist2tsv(bomlist))
         if "csv" in fmt:
             # TODO: implement CSV output (preferrably using CSV library)
             print("CSV output is not yet supported")
