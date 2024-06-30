@@ -77,6 +77,7 @@ class Harness:
         self.mates = []
         self._bom = []  # Internal Cache for generated bom
         self.additional_bom_items = []
+        self.terminology = self.options.terminology.fully_populated()
 
     def add_connector(self, name: str, *args, **kwargs) -> None:
         check_old(f"Connector '{name}'", OLD_CONNECTOR_ATTR, kwargs)
@@ -200,7 +201,7 @@ class Harness:
                      html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
-                     f'{connector.pincount}-pin' if connector.show_pincount else None,
+                     f'{connector.pincount}-{self.terminology.pin}' if connector.show_pincount else None,
                      translate_color(connector.color, self.options.color_mode) if connector.color else None,
                      html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
@@ -419,7 +420,7 @@ class Harness:
                 wirehtml.append("   <tr><td>&nbsp;</td></tr>")  # spacer
                 wirehtml.append("   <tr>")
                 wirehtml.append("    <td><!-- s_in --></td>")
-                wirehtml.append("    <td>Shield</td>")
+                wirehtml.append(f"    <td>{self.terminology.shield.title()}</td>")
                 wirehtml.append("    <td><!-- s_out --></td>")
                 wirehtml.append("   </tr>")
                 if isinstance(cable.shield, str):
