@@ -409,7 +409,7 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             yaml_path = Path(inp).expanduser().resolve(strict=True)
             # if no FileNotFoundError exception happens, get file contents
             yaml_str = open_file_read(yaml_path).read()
-        except (FileNotFoundError, OSError) as e:
+        except (FileNotFoundError, OSError, ValueError) as e:
             # if inp is a long YAML string, Pathlib will raise OSError: [errno.ENAMETOOLONG]
             # (in Windows, it seems OSError [errno.EINVAL] might be raised in some cases)
             # when trying to expand and resolve it as a path.
