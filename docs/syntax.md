@@ -540,13 +540,32 @@ Remember quoting strings containing a `#` in the YAML file.
 
 Supported values for different international color coding standards are:
 
-- `DIN` for [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100)
+- `DIN` for [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100) (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
 
-  ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=+) ![##895956](https://via.placeholder.com/15/895956/000000?text=+) ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=+) ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=+) ![##999999](https://via.placeholder.com/15/999999/000000?text=+) ![##ff66cc](https://via.placeholder.com/15/ff66cc/000000?text=+) ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=+) ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=+) ![##000000](https://via.placeholder.com/15/000000/000000?text=+) ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=+) ...
+  ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=WT) 
+  ![##895956](https://via.placeholder.com/15/895956/000000?text=BN) 
+  ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=GN) 
+  ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=YE) 
+  ![##999999](https://via.placeholder.com/15/999999/000000?text=GY) 
+  ![##ff66cc](https://via.placeholder.com/15/ff66cc/000000?text=PK) 
+  ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=BU) 
+  ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=RD) 
+  ![##000000](https://via.placeholder.com/15/000000/ffffff?text=BK) 
+  ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=VT) 
 
-- `IEC` for [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) ("ROY G BIV")
+- `IEC` for [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) 
+  (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
 
-  ![##895956](https://via.placeholder.com/15/895956/000000?text=+) ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=+) ![##ff8000](https://via.placeholder.com/15/ff8000/000000?text=+) ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=+) ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=+) ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=+) ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=+) ![##999999](https://via.placeholder.com/15/999999/000000?text=+) ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=+) ![##000000](https://via.placeholder.com/15/000000/000000?text=+) ...
+  ![##895956](https://via.placeholder.com/15/895956/000000?text=BN) 
+  ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=RD) 
+  ![##ff8000](https://via.placeholder.com/15/ff8000/000000?text=OR) 
+  ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=YE) 
+  ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=GN) 
+  ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=BU) 
+  ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=VT) 
+  ![##999999](https://via.placeholder.com/15/999999/000000?text=GY) 
+  ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=WT) 
+  ![##000000](https://via.placeholder.com/15/000000/ffffff?text=BK) 
 
 - `TEL` and `TELALT`  for [25-pair color code](https://en.wikipedia.org/wiki/25-pair_color_code)
 - `T568A` and `T568B` for [TIA/EIA-568](https://en.wikipedia.org/wiki/TIA/EIA-568#Wiring) (e.g. Ethernet)
