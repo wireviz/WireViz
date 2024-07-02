@@ -13,17 +13,64 @@ WireViz is a tool for easily documenting cables, wiring harnesses and connector 
 
 ## Features
 
-* WireViz input files are fully text based
+* WireViz input files contain fully text based [YAML syntax](syntax.md)
   * No special editor required
   * Human readable
   * Easy version control
-  * YAML syntax
-  * UTF-8 input and output files for special character support
+  * UTF-8 special character support
 * Understands and uses color abbreviations as per [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) (black=BK, red=RD, ...)
+
+    ![##000000](https://via.placeholder.com/15/000000/ffffff?text=BK)
+    ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=WH)
+    ![##999999](https://via.placeholder.com/15/999999/000000?text=GY)
+    ![##ff66cc](https://via.placeholder.com/15/ff66cc/000000?text=PK)
+    ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=RD)
+    ![##ff8000](https://via.placeholder.com/15/ff8000/000000?text=OG)
+    ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=YE)
+    ![##708000](https://via.placeholder.com/15/708000/000000?text=OL)
+    ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=GN)
+    ![##00ffff](https://via.placeholder.com/15/00ffff/000000?text=TQ)
+    ![##a0dfff](https://via.placeholder.com/15/a0dfff/000000?text=LB)
+    ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=BU)
+    ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=VT)
+    ![##895956](https://via.placeholder.com/15/895956/000000?text=BN)
+    ![##ceb673](https://via.placeholder.com/15/ceb673/000000?text=BG)
+    ![##f5f0d0](https://via.placeholder.com/15/f5f0d0/000000?text=IV)
+    ![##708090](https://via.placeholder.com/15/708090/000000?text=SL)
+    ![##d6775e](https://via.placeholder.com/15/d6775e/000000?text=CU)
+    ![##aaaaaa](https://via.placeholder.com/15/aaaaaa/000000?text=SN)
+    ![##84878c](https://via.placeholder.com/15/84878c/000000?text=SR)
+    ![##ffcf80](https://via.placeholder.com/15/ffcf80/000000?text=GD)
+
   <!-- * Optionally outputs colors as abbreviation (e.g. 'YE'), full name (e.g. 'yellow') or hex value (e.g. '#ffff00'), with choice of UPPER or lower case (#158) -->
 * Auto-generates standard wire color schemes and allows custom ones if needed
   * [DIN 47100](https://en.wikipedia.org/wiki/DIN_47100) (WT/BN/GN/YE/GY/PK/BU/RD/BK/VT/...)
-  * [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system)   (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
+
+    ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=WT) 
+    ![##895956](https://via.placeholder.com/15/895956/000000?text=BN) 
+    ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=GN) 
+    ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=YE) 
+    ![##999999](https://via.placeholder.com/15/999999/000000?text=GY) 
+    ![##ff66cc](https://via.placeholder.com/15/ff66cc/000000?text=PK) 
+    ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=BU) 
+    ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=RD) 
+    ![##000000](https://via.placeholder.com/15/000000/ffffff?text=BK) 
+    ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=VT) 
+  
+  * [IEC 60757](https://en.wikipedia.org/wiki/Electronic_color_code#Color_band_system) 
+    (BN/RD/OR/YE/GN/BU/VT/GY/WT/BK/...)
+
+    ![##895956](https://via.placeholder.com/15/895956/000000?text=BN) 
+    ![##ff0000](https://via.placeholder.com/15/ff0000/000000?text=RD) 
+    ![##ff8000](https://via.placeholder.com/15/ff8000/000000?text=OR) 
+    ![##ffff00](https://via.placeholder.com/15/ffff00/000000?text=YE) 
+    ![##00ff00](https://via.placeholder.com/15/00ff00/000000?text=GN) 
+    ![##0066ff](https://via.placeholder.com/15/0066ff/000000?text=BU) 
+    ![##8000ff](https://via.placeholder.com/15/8000ff/000000?text=VT) 
+    ![##999999](https://via.placeholder.com/15/999999/000000?text=GY) 
+    ![##ffffff](https://via.placeholder.com/15/ffffff/000000?text=WT) 
+    ![##000000](https://via.placeholder.com/15/000000/ffffff?text=BK) 
+  
   * [25 Pair Color Code](https://en.wikipedia.org/wiki/25-pair_color_code#Color_coding) (BUWH/WHBU/OGWH/WHOG/GNWH/WHGN/BNWH/...)
   * [TIA/EIA 568 A/B](https://en.wikipedia.org/wiki/TIA/EIA-568#Wiring)  (Subset of 25-Pair, used in CAT-5/6/...)
 * Understands wire gauge in mm² or AWG
