@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import platform
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
@@ -420,6 +421,9 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
             from errno import EINVAL, ENAMETOOLONG
 
             if type(e) is OSError and e.errno not in (EINVAL, ENAMETOOLONG, None):
+                print(
+                    f"OSError(errno={e.errno}) in Python {sys.version} at {platform.platform()}"
+                )
                 raise e
             # file does not exist; assume inp is a YAML string
             yaml_str = inp
