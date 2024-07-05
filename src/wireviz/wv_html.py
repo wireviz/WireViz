@@ -35,11 +35,11 @@ def generate_html_output(
         # fall back to built-in simple template if no template was provided
         templatefile = Path(__file__).parent / "templates/simple.html"
 
-    html = file_read_text(templatefile)
+    html = file_read_text(templatefile)  # TODO?: Warn if unexpected meta charset?
 
     # embed SVG diagram (only if used)
     def svgdata() -> str:
-        return re.sub(
+        return re.sub(  # TODO?: Verify xml encoding="utf-8" in SVG?
             "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
             "<!-- XML and DOCTYPE declarations from SVG file removed -->",
             file_read_text(f"{filename}.tmp.svg"),
