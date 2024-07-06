@@ -584,8 +584,6 @@ image:
   height: <int>      # range: 1~65535; unit: points
   # if only one dimension (width/height) is specified, the image is scaled proportionally.
   # if both width and height are specified, the image is stretched to fit.
-  scale: <str>     # Which dimension to scale ['false', 'true', 'width', 'height', 'both']
-  fixedsize: <bool>  # If only one dimension is specified, compute the other
 ```
 
 For more fine grained control over the image parameters, please see [`advanced_image_usage.md`](advanced_image_usage.md).
