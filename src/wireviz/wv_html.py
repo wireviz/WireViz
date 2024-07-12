@@ -22,7 +22,6 @@ def generate_html_output(
     metadata: Metadata,
     options: Options,
 ):
-
     # load HTML template
     templatename = metadata.get("template", {}).get("name")
     if templatename:
@@ -112,9 +111,9 @@ def generate_html_output(
                     if isinstance(entry, Dict):
                         replacements[f"<!-- %{item}_{index+1}% -->"] = str(category)
                         for entry_key, entry_value in entry.items():
-                            replacements[f"<!-- %{item}_{index+1}_{entry_key}% -->"] = (
-                                html_line_breaks(str(entry_value))
-                            )
+                            replacements[
+                                f"<!-- %{item}_{index+1}_{entry_key}% -->"
+                            ] = html_line_breaks(str(entry_value))
                     elif isinstance(entry, (str, int, float)):
                         pass  # TODO?: replacements[f"<!-- %{item}_{category}% -->"] = html_line_breaks(str(entry))
 

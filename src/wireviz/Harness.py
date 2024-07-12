@@ -57,11 +57,13 @@ OLD_CONNECTOR_ATTR = {
     "autogenerate": "is replaced with new syntax in v0.4",
 }
 
+
 def check_old(node: str, old_attr: dict, args: dict) -> None:
     """Raise exception for any outdated attributes in args."""
     for attr, descr in old_attr.items():
         if attr in args:
             raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
+
 
 @dataclass
 class Harness:
@@ -184,7 +186,6 @@ class Harness:
         dot.attr("edge", style="bold", fontname=self.options.fontname)
 
         for connector in self.connectors.values():
-
             # If no wires connected (except maybe loop wires)?
             if not (connector.ports_left or connector.ports_right):
                 connector.ports_left = True  # Use left side pins.
@@ -294,7 +295,6 @@ class Harness:
         )
 
         for cable in self.cables.values():
-
             html = []
 
             awg_fmt = ""
