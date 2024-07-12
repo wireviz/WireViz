@@ -3,6 +3,8 @@
 ## [0.4.1] (2024-XX-XX)
 
 ### Improvements to help reported issues
+
+- Print Python & OS versions when raising unexpected OSError related to #346 & #392 (bugfixes below)
 - Explain unexpeced top-level type ([#342](https://github.com/wireviz/WireViz/issues/342), [#383](https://github.com/wireviz/WireViz/pull/383))
 - Add non-empty label to reduce over-sized loops ([#286](https://github.com/wireviz/WireViz/issues/286), [#381](https://github.com/wireviz/WireViz/pull/381))
 - Improve placeholder name consistency ([#377](https://github.com/wireviz/WireViz/issues/377), [#380](https://github.com/wireviz/WireViz/pull/380))
@@ -12,9 +14,10 @@
 
 - Avoid ResourceWarning: unclosed file ([#309 (comment)](https://github.com/wireviz/WireViz/pull/309#issuecomment-2170988381), [#395](https://github.com/wireviz/WireViz/pull/395))
 - Catch ValueError and OSError(errno=None) ([#318 (review)](https://github.com/wireviz/WireViz/pull/318#pullrequestreview-1457016602), [#391](https://github.com/wireviz/WireViz/issues/391), [#392](https://github.com/wireviz/WireViz/pull/392))
+- Add minor missing doc entry ([#186 (comment)](https://github.com/wireviz/WireViz/pull/186#issuecomment-2139037434), [#186 (comment)](https://github.com/wireviz/WireViz/pull/186#issuecomment-2155032522))
 - Avoid Graphviz error when hiding all pins ([#257](https://github.com/wireviz/WireViz/issues/257), [#375](https://github.com/wireviz/WireViz/pull/375))
 - Avoid decimal point and trailing zero for integer BOM quantities ([#340](https://github.com/wireviz/WireViz/issues/340), [#374](https://github.com/wireviz/WireViz/pull/374))
-- Update project URL references ([#364](https://github.com/wireviz/WireViz/pull/364))
+- Update project URL references ([#316 (comment)](https://github.com/wireviz/WireViz/issues/316#issuecomment-1568748914), [#364](https://github.com/wireviz/WireViz/pull/364))
 - Add missing import of embed_svg_images ([#363](https://github.com/wireviz/WireViz/pull/363))
 - Use correct default title ([#360](https://github.com/wireviz/WireViz/issues/360), [#361](https://github.com/wireviz/WireViz/pull/361))
 - Fix bugs in mate processing ([#355](https://github.com/wireviz/WireViz/issues/355), [#358](https://github.com/wireviz/WireViz/pull/358))
@@ -30,7 +33,6 @@
 - New command line interface ([#244](https://github.com/wireviz/WireViz/pull/244)). Run `wireviz --help` for details 
   - The path specified with the `-o`/`--output-dir` option no longer includes the filename (without extension) of the generated files. Use the `-O`/`--output-name` option to specify a different filename for the generated files.
 - The `.gv` file is no longer included as a default output format (only as an intermediate file during processing) unless specified with the new `-f` option described below.
-
 
 ### New features
 
@@ -76,7 +78,6 @@
 - Add support for background colors for cables and connectors, as well as for some individual cells ([#210](https://github.com/wireviz/WireViz/issues/210), [#219](https://github.com/wireviz/WireViz/pull/219))
 - Add optional tweaking of the .gv output ([#215](https://github.com/wireviz/WireViz/pull/215)) (experimental)
 
-
 ### Misc. fixes
 
 - Remove case-sensitivity issues with pin names and labels ([#160](https://github.com/wireviz/WireViz/issues/160), [#229](https://github.com/wireviz/WireViz/pull/229))
@@ -90,6 +91,7 @@
 - Including images in the harness may lead to issues in the following cases: ([#189](https://github.com/wireviz/WireViz/pull/189), [#220](https://github.com/wireviz/WireViz/issues/220))
   - When using the `-o`/`--output_file` CLI option, specifying an output path in a different directory from the input file
   - When using the `--prepend-file` CLI option, specifying a prepend file in a different directory from the mail input file
+
 
 ## [0.2](https://github.com/wireviz/WireViz/tree/v0.2) (2020-10-17)
 
@@ -105,7 +107,6 @@
 
 See the [syntax description](syntax.md) for details.
 
-
 ### New features
 
 - Add bidirectional AWG/mm2 conversion ([#40](https://github.com/wireviz/WireViz/issues/40), [#41](https://github.com/wireviz/WireViz/pull/41))
@@ -120,7 +121,6 @@ See the [syntax description](syntax.md) for details.
 - Add new features to `build_examples.py` ([#118](https://github.com/wireviz/WireViz/pull/118))
 - Add new colors ([#103](https://github.com/wireviz/WireViz/pull/103), [#113](https://github.com/wireviz/WireViz/pull/113), [#144](https://github.com/wireviz/WireViz/issues/144), [#145](https://github.com/wireviz/WireViz/pull/145))
 - Improve documentation ([#107](https://github.com/wireviz/WireViz/issues/107), [#111](https://github.com/wireviz/WireViz/pull/111))
-
 
 ### Misc. fixes
 
