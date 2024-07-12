@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any, List, Union
 
 from graphviz import Graph
-
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import (
     Cable,
@@ -17,8 +16,8 @@ from wireviz.DataClasses import (
     MatePin,
     Metadata,
     Options,
-    Tweak,
     Side,
+    Tweak,
 )
 from wireviz.svgembed import embed_svg_images, embed_svg_images_file
 from wireviz.wv_bom import (
