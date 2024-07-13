@@ -1,6 +1,6 @@
 # Change Log
 
-## [0.4.1] (2024-XX-XX)
+## [0.4.1] (2024-07-13)
 
 ### Improvements to help reported issues
 
