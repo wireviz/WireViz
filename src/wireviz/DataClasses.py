@@ -253,6 +253,7 @@ class Cable:
     spn: Union[MultilineHypertext, List[MultilineHypertext], None] = None
     pn: Union[Hypertext, List[Hypertext], None] = None
     category: Optional[str] = None
+    style: Optional[str] = None
     type: Optional[MultilineHypertext] = None
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
@@ -362,9 +363,14 @@ class Cable:
                 else:
                     raise Exception("lists of part data are only supported for bundles")
 
+
         if self.show_name is None:
-            # hide designators for auto-generated cables by default
-            self.show_name = self.name[0:2] != "__"
+            # hide designators for simple and for auto-generated cables by default
+            self.show_name = self.style != "simple" and self.name[0:2] != "__"
+
+        if self.show_wirecount is None:
+            # hide wirecount for simple (1 pin) connectors by default
+            self.show_wirecount = self.style != "simple"
 
         if self.show_wirenumbers is None:
             # by default, show wire numbers for cables, hide for bundles
