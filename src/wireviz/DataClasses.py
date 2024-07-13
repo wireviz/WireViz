@@ -91,7 +91,6 @@ class Image:
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
 
     def __post_init__(self):
-
         if self.fixedsize is None:
             # Default True if any dimension specified unless self.scale also is specified.
             self.fixedsize = (self.width or self.height) and self.scale is None
@@ -166,7 +165,6 @@ class Connector:
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
@@ -276,7 +274,6 @@ class Cable:
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
@@ -386,7 +383,6 @@ class Cable:
         to_name: Optional[Designator],
         to_pin: NoneOrMorePinIndices,
     ) -> None:
-
         from_pin = int2tuple(from_pin)
         via_wire = int2tuple(via_wire)
         to_pin = int2tuple(to_pin)

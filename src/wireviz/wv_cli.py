@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
 import wireviz.wireviz as wv
 from wireviz import APP_NAME, __version__
-from wireviz.wv_helper import open_file_read
+from wireviz.wv_helper import file_read_text
 
 format_codes = {
     # "c": "csv",
@@ -111,7 +111,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
                 raise Exception(f"File does not exist:\n{prepend_file}")
             print("Prepend file:", prepend_file)
 
-            prepend_input += open_file_read(prepend_file).read() + "\n"
+            prepend_input += file_read_text(prepend_file) + "\n"
     else:
         prepend_input = ""
 
@@ -130,7 +130,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
         )
 
-        yaml_input = open_file_read(file).read()
+        yaml_input = file_read_text(file)
         file_dir = file.parent
 
         yaml_input = prepend_input + yaml_input

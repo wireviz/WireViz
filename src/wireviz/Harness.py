@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any, List, Union
 
 from graphviz import Graph
-
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import (
     Cable,
@@ -17,10 +16,10 @@ from wireviz.DataClasses import (
     MatePin,
     Metadata,
     Options,
-    Tweak,
     Side,
+    Tweak,
 )
-from wireviz.svgembed import embed_svg_images_file
+from wireviz.svgembed import embed_svg_images, embed_svg_images_file
 from wireviz.wv_bom import (
     HEADER_MPN,
     HEADER_PN,
@@ -44,11 +43,10 @@ from wireviz.wv_gv_html import (
 )
 from wireviz.wv_helper import (
     awg_equiv,
+    file_write_text,
     flatten2d,
     is_arrow,
     mm2_equiv,
-    open_file_read,
-    open_file_write,
     tuplelist2tsv,
 )
 from wireviz.wv_html import generate_html_output
@@ -59,11 +57,13 @@ OLD_CONNECTOR_ATTR = {
     "autogenerate": "is replaced with new syntax in v0.4",
 }
 
+
 def check_old(node: str, old_attr: dict, args: dict) -> None:
     """Raise exception for any outdated attributes in args."""
     for attr, descr in old_attr.items():
         if attr in args:
             raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
+
 
 @dataclass
 class Harness:
@@ -172,7 +172,7 @@ class Harness:
             bgcolor=wv_colors.translate_color(self.options.bgcolor, "HEX"),
             nodesep="0.33",
             fontname=self.options.fontname,
-        )
+        )  # TODO: Add graph attribute: charset="utf-8",
         dot.attr(
             "node",
             shape="none",
@@ -186,7 +186,6 @@ class Harness:
         dot.attr("edge", style="bold", fontname=self.options.fontname)
 
         for connector in self.connectors.values():
-
             # If no wires connected (except maybe loop wires)?
             if not (connector.ports_left or connector.ports_right):
                 connector.ports_left = True  # Use left side pins.
@@ -253,6 +252,9 @@ class Harness:
 
                 pinhtml.append("  </table>")
 
+                if len(pinhtml) == 2:  # Table start and end with no rows between?
+                    pinhtml = ["<!-- all pins hidden -->"]  # Avoid Graphviz error
+
                 html = [
                     row.replace("<!-- connector table -->", "\n".join(pinhtml))
                     for row in html
@@ -281,6 +283,7 @@ class Harness:
                     dot.edge(
                         f"{connector.name}:p{loop[0]}{loop_side}:{loop_dir}",
                         f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}",
+                        label=" ",  # Work-around to avoid over-sized loops.
                     )
 
         # determine if there are double- or triple-colored wires in the harness;
@@ -292,7 +295,6 @@ class Harness:
         )
 
         for cable in self.cables.values():
-
             html = []
 
             awg_fmt = ""
@@ -530,6 +532,38 @@ class Harness:
                 fillcolor=translate_color(bgcolor, "HEX"),
             )
 
+        # mates
+        for mate in self.mates:
+            if mate.shape[-1] == ">":
+                dir = "both" if mate.shape[0] == "<" else "forward"
+            else:
+                dir = "back" if mate.shape[0] == "<" else "none"
+
+            if isinstance(mate, MatePin):
+                color = "#000000"
+            elif isinstance(mate, MateComponent):
+                color = "#000000:#000000"
+            else:
+                raise Exception(f"{mate} is an unknown mate")
+
+            from_connector = self.connectors[mate.from_name]
+            to_connector = self.connectors[mate.to_name]
+            if isinstance(mate, MatePin) and from_connector.style != "simple":
+                from_pin_index = from_connector.pins.index(mate.from_pin)
+                from_port_str = f":p{from_pin_index+1}r"
+            else:  # MateComponent or style == 'simple'
+                from_port_str = ""
+            if isinstance(mate, MatePin) and to_connector.style != "simple":
+                to_pin_index = to_connector.pins.index(mate.to_pin)
+                to_port_str = f":p{to_pin_index+1}l"
+            else:  # MateComponent or style == 'simple'
+                to_port_str = ""
+            code_from = f"{mate.from_name}{from_port_str}:e"
+            code_to = f"{mate.to_name}{to_port_str}:w"
+
+            dot.attr("edge", color=color, style="dashed", dir=dir)
+            dot.edge(code_from, code_to)
+
         def typecheck(name: str, value: Any, expect: type) -> None:
             if not isinstance(value, expect):
                 raise Exception(
@@ -595,51 +629,9 @@ class Harness:
                 typecheck("tweak.append", self.tweak.append, str)
                 dot.body.append(self.tweak.append)
 
-        for mate in self.mates:
-            if mate.shape[0] == "<" and mate.shape[-1] == ">":
-                dir = "both"
-            elif mate.shape[0] == "<":
-                dir = "back"
-            elif mate.shape[-1] == ">":
-                dir = "forward"
-            else:
-                dir = "none"
-
-            if isinstance(mate, MatePin):
-                color = "#000000"
-            elif isinstance(mate, MateComponent):
-                color = "#000000:#000000"
-            else:
-                raise Exception(f"{mate} is an unknown mate")
-
-            from_connector = self.connectors[mate.from_name]
-            if (
-                isinstance(mate, MatePin)
-                and self.connectors[mate.from_name].style != "simple"
-            ):
-                from_pin_index = from_connector.pins.index(mate.from_pin)
-                from_port_str = f":p{from_pin_index+1}r"
-            else:  # MateComponent or style == 'simple'
-                from_port_str = ""
-            if (
-                isinstance(mate, MatePin)
-                and self.connectors[mate.to_name].style != "simple"
-            ):
-                to_pin_index = to_connector.pins.index(mate.to_pin)
-                to_port_str = (
-                    f":p{to_pin_index+1}l"
-                    if isinstance(mate, MatePin)
-                    and self.connectors[mate.to_name].style != "simple"
-                    else ""
-                )
-            else:  # MateComponent or style == 'simple'
-                to_port_str = ""
-            code_from = f"{mate.from_name}{from_port_str}:e"
-            to_connector = self.connectors[mate.to_name]
-            code_to = f"{mate.to_name}{to_port_str}:w"
-
-            dot.attr("edge", color=color, style="dashed", dir=dir)
-            dot.edge(code_from, code_to)
+        # Tweak processing above must be the last before returning dot.
+        # Please don't insert any code that might change the dot contents
+        # after tweak processing.
 
         return dot
 
@@ -664,7 +656,7 @@ class Harness:
         return data.read()
 
     @property
-    def svg(self):
+    def svg(self):  # TODO?: Verify xml encoding="utf-8" in SVG?
         graph = self.graph
         return embed_svg_images(graph.pipe(format="svg").decode("utf-8"), Path.cwd())
 
@@ -699,7 +691,7 @@ class Harness:
         # BOM output
         bomlist = bom_list(self.bom())
         if "tsv" in fmt:
-            open_file_write(f"{filename}.bom.tsv").write(tuplelist2tsv(bomlist))
+            file_write_text(f"{filename}.bom.tsv", tuplelist2tsv(bomlist))
         if "csv" in fmt:
             # TODO: implement CSV output (preferrably using CSV library)
             print("CSV output is not yet supported")
