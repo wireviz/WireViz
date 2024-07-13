@@ -271,6 +271,7 @@ class Cable:
     show_name: Optional[bool] = None
     show_wirecount: bool = True
     show_wirenumbers: Optional[bool] = None
+    show_colorname: bool = True
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
