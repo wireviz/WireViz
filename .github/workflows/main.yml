@@ -27,7 +27,7 @@ jobs:
     - name: Upload examples, demos, and tutorials
       uses: actions/upload-artifact@v4
       with:
-        name: examples-and-tutorials
+        name: examples-and-tutorials-${{ matrix.os }}-${{ matrix.version }}
         path: |
           examples/
           tutorial/
