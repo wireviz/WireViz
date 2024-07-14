@@ -4,11 +4,12 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
+        os: [ubuntu-latest]
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -27,7 +28,7 @@ jobs:
     - name: Upload examples, demos, and tutorials
       uses: actions/upload-artifact@v4
       with:
-        name: examples-and-tutorials-${{ matrix.os }}-${{ matrix.version }}
+        name: examples-and-tutorials-v${{ matrix.python-version }}
         path: |
           examples/
           tutorial/
