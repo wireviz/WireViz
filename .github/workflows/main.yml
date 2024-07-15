@@ -31,3 +31,5 @@ jobs:
         path: |
           examples/
           tutorial/
+        if-no-files-found: error
+        
