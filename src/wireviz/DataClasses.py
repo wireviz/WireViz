@@ -113,6 +113,21 @@ class Image:
                 if self.width:
                     self.height = self.width / aspect_ratio(self.src)
 
+    @classmethod
+    def create(cls, input: Union[None, dict, str, List[Union[dict, str]]]):
+        """Create class instance(s) from alternative YAML input types"""
+        if input in (None, "", []):
+            return None
+        if isinstance(input, list):
+            return [cls.create(entry) for entry in input]
+        if isinstance(input, str):
+            input = {"src": input}
+        if isinstance(input, dict):
+            return cls(**input)
+        raise TypeError(
+            f"Expected None, dict, str, or list as Image input, but got {type(input)}"
+        )
+
 
 @dataclass
 class AdditionalComponent:
@@ -165,8 +180,7 @@ class Connector:
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        if isinstance(self.image, dict):
-            self.image = Image(**self.image)
+        self.image = Image.create(self.image)
 
         self.ports_left = False
         self.ports_right = False
@@ -274,8 +288,7 @@ class Cable:
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        if isinstance(self.image, dict):
-            self.image = Image(**self.image)
+        self.image = Image.create(self.image)
 
         if isinstance(self.gauge, str):  # gauge and unit specified
             try:
