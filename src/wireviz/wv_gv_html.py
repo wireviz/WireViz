@@ -64,6 +64,12 @@ def html_colorbar(color: Color) -> str:
     return html_bgcolor(color, ' width="4"') if color else None
 
 
+def html_image_rows(image):
+    from wireviz.wv_bom import make_list
+
+    return sum([[[html_image(i)], [html_caption(i)]] for i in make_list(image)], [])
+
+
 def html_image(image):
     from wireviz.DataClasses import Image
 
