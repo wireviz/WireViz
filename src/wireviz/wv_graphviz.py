@@ -22,7 +22,7 @@ from wireviz.wv_dataclasses import (
     WireClass,
 )
 from wireviz.wv_html import Img, Table, Td, Tr
-from wireviz.wv_utils import html_line_breaks, remove_links
+from wireviz.wv_utils import html_line_breaks, remove_links, getAddCompFromRef
 
 
 def gv_node_component(component: Component) -> Table:
@@ -260,8 +260,26 @@ def nested_table_dict(d: dict) -> Table:
     return Table(rows, border=0, cellborder=1, cellpadding=3, cellspacing=0)
 
 
+def gv_shorts_info_row(component) -> Tr:
+    shorts_info = []
+    if component.ports_left:
+        shorts_info.append(Td(f''))
+    if component.pinlabels:
+        shorts_info.append(Td(f''))
+
+    for short in component.shorts:
+        shorts_info.append(Td(f'{short}'))
+
+    if component.ports_right:
+        shorts_info.append(Td(f''))
+    return Tr(shorts_info)
+
 def gv_pin_table(component) -> Table:
     pin_rows = []
+    
+    if len(component.shorts) > 0:
+        pin_rows.append(gv_shorts_info_row(component))
+
     for pin in component.pin_objects.values():
         if component.should_show_pin(pin.id):
             pin_rows.append(gv_pin_row(pin, component))
@@ -272,6 +290,16 @@ def gv_pin_table(component) -> Table:
     return tbl
 
 
+def gv_short_row_part(pin, connector) -> List:
+    short_row = []# Td("ADA"), Td("DAD")
+    for short, shPins in connector.shorts.items():
+        if pin.index+1 in shPins:
+            short_row.append(Td("", port=f"p{pin.index+1}j"))
+        else:
+            short_row.append(Td(""))
+    return short_row
+
+
 def gv_pin_row(pin, connector) -> Tr:
     # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
     has_pincolors = any([_pin.color for _pin in connector.pin_objects.values()])
@@ -280,6 +308,7 @@ def gv_pin_row(pin, connector) -> Tr:
         Td(pin.label, delete_if_empty=True),
         Td(str(pin.color) if pin.color else "", sides="TBL") if has_pincolors else None,
         Td(color_minitable(pin.color), sides="TBR") if has_pincolors else None,
+        gv_short_row_part(pin, connector),
         Td(pin.id, port=f"p{pin.index+1}r") if connector.ports_right else None,
     ]
     return Tr(cells)
@@ -295,11 +324,35 @@ def gv_connector_loops(connector: Connector) -> List:
         loop_dir = "e"
     else:
         raise Exception("No side for loops")
-    for loop in connector.loops:
-        head = f"{connector.designator}:p{loop[0]}{loop_side}:{loop_dir}"
-        tail = f"{connector.designator}:p{loop[1]}{loop_side}:{loop_dir}"
-        loop_edges.append((head, tail))
+    
+    for loop, loPins in connector.loops.items():
+        comp = getAddCompFromRef(loop, connector)
+        loColor = "#000000"
+        if comp != None and comp.color != None:
+            loColor = comp.color.html
+
+        for i in range(1, len(loPins)):
+            head = f"{connector.designator}:p{loPins[i - 1]}{loop_side}:{loop_dir}"
+            tail = f"{connector.designator}:p{loPins[i]}{loop_side}:{loop_dir}"
+            loop_edges.append((head, tail, loColor))
     return loop_edges
+
+
+def gv_connector_shorts(connector: Connector) -> List:
+    short_edges = []
+
+    for short, shPins in connector.shorts.items():
+        comp = getAddCompFromRef(short, connector)
+        shColor = "#000000"
+        if comp != None and comp.color != None:
+            shColor = comp.color.html
+
+        for i in range(1, len(shPins)):
+            head = f"{connector.designator}:p{shPins[i - 1]}j:c"
+            tail = f"{connector.designator}:p{shPins[i]}j:c"
+            short_edges.append((head, tail, shColor))
+    return short_edges
+
 
 
 def gv_conductor_table(cable) -> Table:
@@ -372,7 +425,7 @@ def gv_wire_cell(wire: Union[WireClass, ShieldClass], colspan: int) -> Td:
     wire_inner_rows = []
     for j, bgcolor in enumerate(color_list[::-1]):
         wire_inner_cell_attribs = {
-            "bgcolor": bgcolor if bgcolor != "" else "#000000",
+            "bgcolor": "#FFFFFF", # bgcolor if bgcolor != "" else "#000000", # TODO: More elegent solution for making black/whit space needed, since the wire is drawn as an actual edge
             "border": 0,
             "cellpadding": 0,
             "colspan": colspan,
@@ -393,8 +446,10 @@ def gv_wire_cell(wire: Union[WireClass, ShieldClass], colspan: int) -> Td:
 
     return wire_outer_cell
 
+    dot.attr("edge", headclip="true", tailclip="true", style="bold") # TODO: ?
 
-def gv_edge_wire(harness, cable, connection) -> Tuple[str, str, str, str, str]:
+                                                    # color, l1,  l2,  r1,  r2
+def gv_edge_wire(harness, cable, connection) -> Tuple[str,   str, str, str, str]:
     if connection.via.color:
         # check if it's an actual wire and not a shield
         color = f"#000000:{connection.via.color.html_padded}:#000000"
@@ -425,6 +480,24 @@ def gv_edge_wire(harness, cable, connection) -> Tuple[str, str, str, str, str]:
         code_right_1, code_right_2 = None, None
 
     return color, code_left_1, code_left_2, code_right_1, code_right_2
+
+                                                           # color, we,  ww,
+def gv_edge_wire_inside(cable) -> List[Tuple[str,   str, str]]:
+    wires = []
+    # print(cable.wire_objects)
+    for wire in cable.wire_objects.values():
+        color = "#000000"
+        if wire.color:
+        # check if it's an actual wire and not a shield
+            color = f"#000000:{wire.color.html_padded}:#000000"
+        else:  # it's a shield connection
+            color = "#000000"
+
+        we = f"{wire.parent}:w{wire.index+1}:e"
+        ww = f"{wire.parent}:w{wire.index+1}:w"
+
+        wires.append([color, we, ww])
+    return wires
 
 
 def parse_arrow_str(inp: str) -> ArrowDirection:

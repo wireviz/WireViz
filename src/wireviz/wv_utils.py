@@ -214,3 +214,12 @@ def smart_file_resolve(filename: str, possible_paths: Union[str, List[str]]) -> 
                 f"{filename} was not found in any of the following locations: \n"
                 + "\n".join([str(x) for x in possible_paths])
             )
+
+
+# Returns a Additional Component from <part> with the given <reference>
+def getAddCompFromRef(reference, part):
+    #print(part.additional_components)
+    for comp in part.additional_components:
+        if reference in comp.references:
+            return comp;
+        

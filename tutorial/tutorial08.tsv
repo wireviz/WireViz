@@ -1,0 +1,11 @@
+#	Qty	Unit	Description	Designators	P/N	Manufacturer	MPN	Supplier	SPN
+1	2		Connector, Molex KK 254, female, 4 pins	X1, X3		Molex	22013047	Digimouse	1234
+2	1		Connector, Molex KK 254, female, 4 pins	X2	CON4	Molex	22013047	Digimouse	1234
+3	1	m	Cable, 4 x 0.25 mm²	W1	CAB1	CablesCo	ABC123	Cables R Us	999-888-777
+4	2	m	Wire, 0.25 mm², BK	W2	WIRE2	WiresCo	W1-BK	WireShack	1002
+5	1	m	Wire, 0.25 mm², RD	W2	WIRE3	WiresCo	W1-RD	WireShack	1009
+6	1	m	Wire, 0.25 mm², YE	W2	WIRE1	WiresCo	W1-YE	WireShack	1001
+7	12		Crimp, Molex KK 254, 22-30 AWG	X1, X2, X3		Molex	08500030		
+8	1	m	Sleeve, Braided nylon, black, 3mm	W2	SLV-1				
+9	3		Test	X1, X2, X3	ABC	Molex	45454	Mousikey	9999
+10	2		Label, pinout information		Label-ID-1	Brady	B-499		

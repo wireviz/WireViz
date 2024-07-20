@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import namedtuple
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from enum import Enum
 from itertools import zip_longest
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -263,9 +263,13 @@ class AdditionalComponent(GraphicalComponent):
     explicit_qty: bool = True
     amount_computed: Optional[NumberAndUnit] = None
     note: str = None
+    color: Optional[MultiColor] = None
+    references: Optional[List[str]] = field(default_factory=list)
 
     def __post_init__(self):
         super().__post_init__()
+
+        self.color = MultiColor(self.color)
 
         if isinstance(self.qty_multiplier, float) or isinstance(
             self.qty_multiplier, int
@@ -307,7 +311,9 @@ class TopLevelGraphicalComponent(GraphicalComponent):  # abstract class
 class Connector(TopLevelGraphicalComponent):
     # connector-specific properties
     style: Optional[str] = None
-    loops: List[List[Pin]] = field(default_factory=list)
+    # TODO: Move shorts and loops to PinClass
+    loops: Dict[str, List[int]] = field(default_factory=dict)
+    shorts: Dict[str, List[int]] = field(default_factory=dict)
     # pin information in particular
     pincount: Optional[int] = None
     pins: List[Pin] = field(default_factory=list)  # legacy
@@ -412,20 +418,41 @@ class Connector(TopLevelGraphicalComponent):
             # hide pincount for simple (1 pin) connectors by default
             self.show_pincount = self.style != "simple"
 
-        for loop in self.loops:
-            # TODO: allow using pin labels in addition to pin numbers,
-            #       just like when defining regular connections
-            # TODO: include properties of wire used to create the loop
-            if len(loop) != 2:
-                raise Exception("Loops must be between exactly two pins!")
-            for pin in loop:
+        # TODO: allow using pin labels in addition to pin numbers,
+        #       just like when defining regular connections
+        # TODO: include properties of wire used to create the loop
+        for loopName in self.loops:
+            for pin in self.loops[loopName]:
                 if pin not in self.pins:
                     raise Exception(
-                        f'Unknown loop pin "{pin}" for connector "{self.name}"!'
+                        f'Unknown loop pin "{pin}" for connector "{self.designator}"!'
                     )
                 # Make sure loop connected pins are not hidden.
-                # side=None, determine side to show loops during rendering
-                self.activate_pin(pin, side=None, is_connection=True)
+                self.activate_pin(pin, None)
+        for short in self.shorts:
+            for pin in self.shorts[short]:
+                if pin not in self.pins:
+                    raise Exception(
+                        f'Unknown loop pin "{pin}" for connector "{self.designator}"!'
+                    )
+                # Make sure loop connected pins are not hidden.
+                self.activate_pin(pin, None)
+
+        # TODO: Remove the outcommented code here if it is no longer needed as reference
+        # for loop in self.loops:
+        #     # TODO: allow using pin labels in addition to pin numbers,
+        #     #       just like when defining regular connections
+        #     # TODO: include properties of wire used to create the loop
+        #     if len(loop) != 2:
+        #         raise Exception("Loops must be between exactly two pins!")
+        #     for pin in loop:
+        #         if pin not in self.pins:
+        #             raise Exception(
+        #                 f'Unknown loop pin "{pin}" for connector "{self.name}"!'
+        #             )
+        #         # Make sure loop connected pins are not hidden.
+        #         # side=None, determine side to show loops during rendering
+        #         self.activate_pin(pin, side=None, is_connection=True)
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):

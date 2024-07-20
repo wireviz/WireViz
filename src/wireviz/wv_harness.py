@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
+import os
+import shutil
 
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import List, Union
+from distutils.spawn import find_executable
 
 from graphviz import Graph
 
@@ -24,13 +27,16 @@ from wireviz.wv_dataclasses import (
     Side,
     TopLevelGraphicalComponent,
     Tweak,
+    Image,
 )
 from wireviz.wv_graphviz import (
     apply_dot_tweaks,
     calculate_node_bgcolor,
     gv_connector_loops,
+    gv_connector_shorts,
     gv_edge_mate,
     gv_edge_wire,
+    gv_edge_wire_inside,
     gv_node_component,
     parse_arrow_str,
     set_dot_basics,
@@ -40,7 +46,7 @@ from wireviz.wv_output import (
     embed_svg_images_file,
     generate_html_output,
 )
-from wireviz.wv_utils import bom2tsv, open_file_write
+from wireviz.wv_utils import bom2tsv, open_file_write, getAddCompFromRef
 
 
 @dataclass
@@ -321,8 +327,20 @@ class Harness:
             if len(connector.loops) > 0:
                 dot.attr("edge", color="#000000")
                 loops = gv_connector_loops(connector)
-                for head, tail in loops:
-                    dot.edge(head, tail)
+                for head, tail, color in loops:
+                    dot.edge(head, tail, color = color, label = " ", noLabel="noLabel")
+
+            # generate edges for connector shorts
+            if len(connector.shorts) > 0:
+                dot.attr("edge", color="#000000")
+                shorts = gv_connector_shorts(connector)
+                for head, tail, color in shorts:
+                    dot.edge(head, tail,
+                             color=color,
+                             straight="straight",
+                             addPTS=".18",   # Size of the point at the end of the straight line/edge, it also enables the drawing of it
+                             colorPTS=color,
+                             headclip="false", tailclip="false")
 
         # determine if there are double- or triple-colored wires in the harness;
         # if so, pad single-color wires to make all wires of equal thickness
@@ -357,6 +375,10 @@ class Harness:
                     dot.edge(l1, l2)
                 if not (r1, r2) == (None, None):
                     dot.edge(r1, r2)
+
+            for color, we,  ww in gv_edge_wire_inside(cable):
+                if not (we,  ww) == (None, None):
+                    dot.edge(we,  ww, color=color, straight="straight")
 
         for mate in self.mates:
             color, dir, code_from, code_to = gv_edge_mate(mate)
@@ -393,6 +415,21 @@ class Harness:
         graph = self.graph
         return embed_svg_images(graph.pipe(format="svg").decode("utf-8"), Path.cwd())
 
+    def graphRender(self, type, filename, graph):
+        # Chack if the needed commands are existing
+        if find_executable("dot") and find_executable("gvpr") and find_executable("neato"):
+            # Set enviorments variable to path of this file
+            os.environ['GVPRPATH'] = str(Path(__file__).parent)
+            # Export the gv output to a temporay file
+            graph.save(filename=f"{filename}_tmp.gv")
+            # Run the vomand and generait the output
+            os.system(f"dot {filename}_tmp.gv | gvpr -q -cf wv_gvpr.gvpr | neato -n2 -T{type} -o {filename}.{type}")
+            # Remove the temporary file
+            os.remove(f"{filename}_tmp.gv")
+        else:
+            print('The "dot", "gvpr" and "neato" comand where not found on the system, use old methode of generaiton, this may lead to not wanted output.')
+            graph.render(filename=filename) # old rendering methode, befor jumper implementations
+
     def output(
         self,
         filename: Union[str, Path],
@@ -410,13 +447,17 @@ class Harness:
                 _filename = f"{filename}.tmp" if f == "svg" else filename
                 # TODO: prevent rendering SVG twice when both SVG and HTML are specified
                 graph.format = f
-                graph.render(filename=_filename, view=view, cleanup=cleanup)
+                self.graphRender(f, _filename, graph)
         # embed images into SVG output
         if "svg" in fmt or "html" in fmt:
             embed_svg_images_file(f"{filename}.tmp.svg")
         # GraphViz output
         if "gv" in fmt:
             graph.save(filename=f"{filename}.gv")
+            # Print the needed comand for generaitong an output
+            filename_str = str(filename)
+            shutil.copyfile(str(Path(__file__).parent).replace('\\', '/') + "/wv_gvpr.gvpr", filename_str + "_wv_gvpr.gvpr")
+            print(f"Use: dot {filename_str}.gv | gvpr -q -cf {filename_str}_wv_gvpr.gvpr | neato -n2 -T<type> -o {filename_str}.<type>")
         # BOM output
         bomlist = bom_list(self.bom)
         # bomlist = [[]]

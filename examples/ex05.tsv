@@ -1,0 +1,6 @@
+#	Qty	Unit	Description	Designators
+1	3		Connector, Molex KK 254, female, 4 pins	X1, X2, X3
+2	2	m	Wire, I2C, 0.25 mm², PK	W1, W2
+3	2	m	Wire, I2C, 0.25 mm², TQ	W1, W2
+4	2	m	Wire, I2C, 0.25 mm², VT	W1, W2
+5	2	m	Wire, I2C, 0.25 mm², YE	W1, W2

@@ -83,8 +83,18 @@ tweak:  # optional tweaking of .gv output
   hide_disconnected_pins: <bool>  # defaults to false
 
   # loops
-  loops: <List>  # every list item is itself a list of exactly two pins
-                 # on the connector that are to be shorted
+  loops:              # a list(dict) of loops
+    - <str>: <List>   # every list item is itself a list of pins
+                      # on the connector that are to be shorted with a cable loop
+                      # more information about the loop can be added by additional
+                      # components definition (see below)
+  # Shorts
+  shorts:             # a list(dict) of shorts
+    - <str>: <List>   # every list item is itself a list of pins
+                      # on the connector that are to be shorted represented inside
+                      # the connector table
+                      # more information about the loop can be added by additional
+                      # components definition (see below)
 ```
 
 ## Cable attributes

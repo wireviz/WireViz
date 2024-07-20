@@ -1,0 +1,64 @@
+/*******************************************************************
+
+  see https://forum.graphviz.org/t/straitening-one-line-throu-a-table/2196 and https://forum.graphviz.org/t/way-of-drawing-a-black-circle-inside-a-table-field/2273/12
+  input must include pos values (must be output from one of the engines w/ -Tdot)#
+  Thanks to steveroush and FeRDNYC
+
+*******************************************************************/
+BEG_G{
+  double x1,y1,x2,y2,x3,y3,x4,y4;
+  string ptSize, tok[int], pt[];
+  int cnt, circ, i;
+  node_t aNode;
+
+  circ=0;
+
+/***************************************
+  $G.bb="";
+  $G.nodesep="";
+  $G.ranksep="";
+  $G.splines="true";
+****************************************/
+}
+
+// This removes the label text but keeps the position
+E[noLabel] {
+  $.label="";  // remove pesky label
+  // $.lp="";      // remove peskier label pos
+}
+
+E[straight] {
+  cnt=tokens($.pos,tok," ");
+  $.oldpos=$.pos;
+  x1 = xOf(tok[0]);
+  y1 = yOf(tok[0]);
+  x4 = xOf(tok[cnt-1]);
+  y4 = yOf(tok[cnt-1]);
+  x2 = x1 + (x4-x1)/3.;
+  y2 = y1 + (y4-y1)/3.;
+  x3 = x1 + 2.*(x4-x1)/3.;
+  y3 = y1 + 2.*(y4-y1)/3.;
+  pos=sprintf("%.3f,%.3f %.3f,%.3f %.3f,%.3f %.3f,%.3f", x1,y1, x2,y2, x3,y3, x4,y4);
+  $.label="";  // remove pesky label
+  $.lp="";      // remove peskier label pos
+
+  if (hasAttr($, "addPTS") && $.addPTS!="" && $.colorPTS!=""){
+    // now we place point nodes at the edge ends
+    pt[1] = tok[0];
+    pt[2] = tok[cnt-1];
+    ptSize=$.addPTS;
+    for (pt[i]) {
+      if (i==2 && pt[1]==pt[2])
+        continue;
+      aNode=node($G, "__CIRCLE__" + (string)++circ);
+      aNode.pos=pt[i];
+      aNode.shape="point";
+      aNode.width=ptSize;
+      aNode.height=ptSize;
+      aNode.style="filled";
+      aNode.fillcolor=$.colorPTS;
+      aNode.color=$.colorPTS;
+    }
+  }
+
+}

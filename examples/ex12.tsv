@@ -1,0 +1,7 @@
+#	Qty	Unit	Description	Designators
+1	1		Connector, Dupont 2.54mm, female, 5 pins, BK	X2
+2	1		Connector, Dupont 2.54mm, male, 5 pins, BK	X1
+3	2	m	Wire, BK	W1, W2
+4	2	m	Wire, BU	W1, W2
+5	2	m	Wire, GN	W1, W2
+6	2	m	Wire, RD	W1, W2

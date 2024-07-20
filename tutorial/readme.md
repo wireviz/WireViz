@@ -27,7 +27,7 @@ connections:
 
 ![](tutorial01.png)
 
-[Source](tutorial01.yml) - [Bill of Materials](tutorial01.bom.tsv)
+[Source](tutorial01.yml) - [Bill of Materials](tutorial01.tsv)
 
 
 ## 02 - Adding parameters and colors
@@ -68,7 +68,7 @@ connections:
 
 ![](tutorial02.png)
 
-[Source](tutorial02.yml) - [Bill of Materials](tutorial02.bom.tsv)
+[Source](tutorial02.yml) - [Bill of Materials](tutorial02.tsv)
 
 
 ## 03 - Pinouts, shielding, templates (I)
@@ -110,7 +110,7 @@ connections:
 
 ![](tutorial03.png)
 
-[Source](tutorial03.yml) - [Bill of Materials](tutorial03.bom.tsv)
+[Source](tutorial03.yml) - [Bill of Materials](tutorial03.tsv)
 
 
 ## 04 - Templates (II), notes, American standards, daisy chaining (I)
@@ -163,7 +163,7 @@ connections:
 
 ![](tutorial04.png)
 
-[Source](tutorial04.yml) - [Bill of Materials](tutorial04.bom.tsv)
+[Source](tutorial04.yml) - [Bill of Materials](tutorial04.tsv)
 
 
 ## 05 - Ferrules, wire bundles, custom wire colors
@@ -209,7 +209,7 @@ connections:
 
 ![](tutorial05.png)
 
-[Source](tutorial05.yml) - [Bill of Materials](tutorial05.bom.tsv)
+[Source](tutorial05.yml) - [Bill of Materials](tutorial05.tsv)
 
 
 ## 06 - Custom ferrules
@@ -252,7 +252,7 @@ connections:
 
 ![](tutorial06.png)
 
-[Source](tutorial06.yml) - [Bill of Materials](tutorial06.bom.tsv)
+[Source](tutorial06.yml) - [Bill of Materials](tutorial06.tsv)
 
 
 ## 07 - Daisy chaining (II)
@@ -318,7 +318,7 @@ connections:
 
 ![](tutorial07.png)
 
-[Source](tutorial07.yml) - [Bill of Materials](tutorial07.bom.tsv)
+[Source](tutorial07.yml) - [Bill of Materials](tutorial07.tsv)
 
 
 ## 08 - Part numbers and additional components
@@ -389,10 +389,9 @@ cables:
     # add a list of additional components to a part (shown in graph)
     additional_components:
       -
-        type: Sleve # short identifier used in graph
+        type: Sleeve # short identifier used in graph
         subtype: Braided nylon, black, 3mm # extra information added to type in bom
         qty_multiplier: length # multipier for quantity (length of cable)
-        unit: m
         pn: SLV-1
 
 
@@ -408,7 +407,7 @@ connections:
 
 additional_bom_items:
   - # define an additional item to add to the bill of materials (does not appear in graph)
-    description: Label, pinout information
+    type: Label, pinout information
     qty: 2
     designators:
       - X2
@@ -420,6 +419,6 @@ additional_bom_items:
 
 ![](tutorial08.png)
 
-[Source](tutorial08.yml) - [Bill of Materials](tutorial08.bom.tsv)
+[Source](tutorial08.yml) - [Bill of Materials](tutorial08.tsv)
 
 
