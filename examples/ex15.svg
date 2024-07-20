@@ -82,17 +82,23 @@
 <!-- X1&#45;&#45;X1 -->
 <g id="edge1" class="edge">
 <title>X1:c&#45;&#45;X1:c</title>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M86.38,-246C86.38,-214 86.38,-182 86.38,-150"/>
 <path fill="none" stroke="#ff66cc" stroke-width="2" d="M88.38,-246C88.38,-214 88.38,-182 88.38,-150"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M90.38,-246C90.38,-214 90.38,-182 90.38,-150"/>
 </g>
 <!-- X1&#45;&#45;X1 -->
 <g id="edge2" class="edge">
 <title>X1:c&#45;&#45;X1:c</title>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M86.38,-150C86.38,-134 86.38,-118 86.38,-102"/>
 <path fill="none" stroke="#ff66cc" stroke-width="2" d="M88.38,-150C88.38,-134 88.38,-118 88.38,-102"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M90.38,-150C90.38,-134 90.38,-118 90.38,-102"/>
 </g>
 <!-- X1&#45;&#45;X1 -->
 <g id="edge3" class="edge">
 <title>X1:c&#45;&#45;X1:c</title>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M142.62,-222C142.62,-190 142.62,-158 142.62,-126"/>
 <path fill="none" stroke="#ff0000" stroke-width="2" d="M144.62,-222C144.62,-190 144.62,-158 144.62,-126"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M146.62,-222C146.62,-190 146.62,-158 146.62,-126"/>
 </g>
 <!-- W1 -->
 <g id="node2" class="node">
@@ -344,17 +350,23 @@
 <!-- X2&#45;&#45;X2 -->
 <g id="edge18" class="edge">
 <title>X2:c&#45;&#45;X2:c</title>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M885.78,-255C885.78,-223 885.78,-191 885.78,-159"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M887.78,-255C887.78,-223 887.78,-191 887.78,-159"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M889.78,-255C889.78,-223 889.78,-191 889.78,-159"/>
 </g>
 <!-- X2&#45;&#45;X2 -->
 <g id="edge19" class="edge">
 <title>X2:c&#45;&#45;X2:c</title>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M885.78,-159C885.78,-143 885.78,-127 885.78,-111"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M887.78,-159C887.78,-143 887.78,-127 887.78,-111"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M889.78,-159C889.78,-143 889.78,-127 889.78,-111"/>
 </g>
 <!-- X2&#45;&#45;X2 -->
 <g id="edge20" class="edge">
 <title>X2:c&#45;&#45;X2:c</title>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M936.59,-231C936.59,-199 936.59,-167 936.59,-135"/>
 <path fill="none" stroke="#000000" stroke-width="2" d="M938.59,-231C938.59,-199 938.59,-167 938.59,-135"/>
+<path fill="none" stroke="#ffffff" stroke-width="2" d="M940.59,-231C940.59,-199 940.59,-167 940.59,-135"/>
 </g>
 <!-- __CIRCLE__1 -->
 <g id="node4" class="node">

@@ -312,8 +312,9 @@ class Connector(TopLevelGraphicalComponent):
     # connector-specific properties
     style: Optional[str] = None
     # TODO: Move shorts and loops to PinClass
-    loops: Dict[str, List[int]] = field(default_factory=dict)
-    shorts: Dict[str, List[int]] = field(default_factory=dict)
+    loops: Union[Dict[str, List[int]], List[List[int]]] = field(default_factory=dict)
+    shorts: Union[Dict[str, List[int]], List[List[int]]] = field(default_factory=dict)
+    shorts_hide_lable: bool = False
     # pin information in particular
     pincount: Optional[int] = None
     pins: List[Pin] = field(default_factory=list)  # legacy
@@ -417,6 +418,23 @@ class Connector(TopLevelGraphicalComponent):
         if self.show_pincount is None:
             # hide pincount for simple (1 pin) connectors by default
             self.show_pincount = self.style != "simple"
+                
+        # Convert short List to Short Dict
+        if type(self.shorts) == list:
+            self.shorts_hide_lable = True
+            shDict = dict()
+            for shIndex in range(0, len(self.shorts)):
+                key = "AutoSH" + str(shIndex)
+                shDict[key] = self.shorts[shIndex]
+            self.shorts = shDict
+                
+        # Convert loop List to loop Dict
+        if type(self.loops) == list:
+            loDict = dict()
+            for loIndex in range(0, len(self.loops)):
+                key = "AutoLO" + str(loIndex)
+                loDict[key] = self.loops[loIndex]
+            self.loops = loDict
 
         # TODO: allow using pin labels in addition to pin numbers,
         #       just like when defining regular connections

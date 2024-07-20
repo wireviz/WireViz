@@ -106,9 +106,9 @@ graph {
 </table>
 > shape=box style=filled]
 	edge [color="#000000"]
-	X1:p1j:c -- X1:p5j:c [addPTS=.18 color="#FF66CC" colorPTS="#FF66CC" headclip=false straight=straight tailclip=false]
-	X1:p5j:c -- X1:p7j:c [addPTS=.18 color="#FF66CC" colorPTS="#FF66CC" headclip=false straight=straight tailclip=false]
-	X1:p2j:c -- X1:p6j:c [addPTS=.18 color="#FF0000" colorPTS="#FF0000" headclip=false straight=straight tailclip=false]
+	X1:p1j:c -- X1:p5j:c [addPTS=.18 color="#FFFFFF:#FF66CC:#FFFFFF" colorPTS="#FF66CC:#FFFFFF" headclip=false straight=straight tailclip=false]
+	X1:p5j:c -- X1:p7j:c [addPTS=.18 color="#FFFFFF:#FF66CC:#FFFFFF" colorPTS="#FF66CC:#FFFFFF" headclip=false straight=straight tailclip=false]
+	X1:p2j:c -- X1:p6j:c [addPTS=.18 color="#FFFFFF:#FF0000:#FFFFFF" colorPTS="#FF0000:#FFFFFF" headclip=false straight=straight tailclip=false]
 	X2 [label=<
 <table border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
  <tr>
@@ -181,9 +181,9 @@ graph {
 </table>
 > shape=box style=filled]
 	edge [color="#000000"]
-	X2:p1j:c -- X2:p5j:c [addPTS=.18 color="#000000" colorPTS="#000000" headclip=false straight=straight tailclip=false]
-	X2:p5j:c -- X2:p7j:c [addPTS=.18 color="#000000" colorPTS="#000000" headclip=false straight=straight tailclip=false]
-	X2:p2j:c -- X2:p6j:c [addPTS=.18 color="#000000" colorPTS="#000000" headclip=false straight=straight tailclip=false]
+	X2:p1j:c -- X2:p5j:c [addPTS=.18 color="#FFFFFF:#000000:#FFFFFF" colorPTS="#000000:#FFFFFF" headclip=false straight=straight tailclip=false]
+	X2:p5j:c -- X2:p7j:c [addPTS=.18 color="#FFFFFF:#000000:#FFFFFF" colorPTS="#000000:#FFFFFF" headclip=false straight=straight tailclip=false]
+	X2:p2j:c -- X2:p6j:c [addPTS=.18 color="#FFFFFF:#000000:#FFFFFF" colorPTS="#000000:#FFFFFF" headclip=false straight=straight tailclip=false]
 	W1 [label=<
 <table border="0" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
  <tr>

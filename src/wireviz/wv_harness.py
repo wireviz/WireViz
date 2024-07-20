@@ -339,7 +339,7 @@ class Harness:
                              color=color,
                              straight="straight",
                              addPTS=".18",   # Size of the point at the end of the straight line/edge, it also enables the drawing of it
-                             colorPTS=color,
+                             colorPTS=color.replace("#FFFFFF:", ""), 
                              headclip="false", tailclip="false")
 
         # determine if there are double- or triple-colored wires in the harness;

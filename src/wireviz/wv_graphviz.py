@@ -277,7 +277,7 @@ def gv_shorts_info_row(component) -> Tr:
 def gv_pin_table(component) -> Table:
     pin_rows = []
     
-    if len(component.shorts) > 0:
+    if len(component.shorts) > 0 and not component.shorts_hide_lable:
         pin_rows.append(gv_shorts_info_row(component))
 
     for pin in component.pin_objects.values():
@@ -343,9 +343,9 @@ def gv_connector_shorts(connector: Connector) -> List:
 
     for short, shPins in connector.shorts.items():
         comp = getAddCompFromRef(short, connector)
-        shColor = "#000000"
+        shColor = "#FFFFFF:#000000:#FFFFFF"
         if comp != None and comp.color != None:
-            shColor = comp.color.html
+            shColor = f"#FFFFFF:{comp.color.html}:#FFFFFF"
 
         for i in range(1, len(shPins)):
             head = f"{connector.designator}:p{shPins[i - 1]}j:c"
