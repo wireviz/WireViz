@@ -31,67 +31,54 @@ graph {
    <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
     <tr>
      <td>SENSE_P_1</td>
-     []
      <td port="p1r">1</td>
     </tr>
     <tr>
      <td>SENSE_N_1</td>
-     []
      <td port="p2r">14</td>
     </tr>
     <tr>
      <td>SENSE_P_2</td>
-     []
      <td port="p3r">3</td>
     </tr>
     <tr>
      <td>SENSE_N_2</td>
-     []
      <td port="p4r">16</td>
     </tr>
     <tr>
      <td>SENSE_P_3</td>
-     []
      <td port="p5r">5</td>
     </tr>
     <tr>
      <td>SENSE_N_3</td>
-     []
      <td port="p6r">18</td>
     </tr>
     <tr>
      <td>SENSE_P_4</td>
-     []
      <td port="p7r">7</td>
     </tr>
     <tr>
      <td>SENSE_N_4</td>
-     []
      <td port="p8r">20</td>
     </tr>
     <tr>
      <td>SENSE_P_5</td>
-     []
      <td port="p9r">9</td>
     </tr>
     <tr>
      <td>SENSE_N_5</td>
-     []
      <td port="p10r">22</td>
     </tr>
     <tr>
      <td>SENSE_P_6</td>
-     []
      <td port="p11r">11</td>
     </tr>
     <tr>
      <td>SENSE_N_6</td>
-     []
      <td port="p12r">24</td>
     </tr>
     <tr>
      <td>GND</td>
-     []
      <td port="p13r">13</td>
     </tr>
    </table>
@@ -127,242 +114,194 @@ graph {
     <tr>
      <td port="p1l">z2</td>
      
-     []
     </tr>
     <tr>
      <td port="p2l">b2</td>
      
-     []
     </tr>
     <tr>
      <td port="p3l">d2</td>
      
-     []
     </tr>
     <tr>
      <td port="p4l">z4</td>
      
-     []
     </tr>
     <tr>
      <td port="p5l">b4</td>
      
-     []
     </tr>
     <tr>
      <td port="p6l">d4</td>
      
-     []
     </tr>
     <tr>
      <td port="p7l">z6</td>
      
-     []
     </tr>
     <tr>
      <td port="p8l">b6</td>
      
-     []
     </tr>
     <tr>
      <td port="p9l">d6</td>
      
-     []
     </tr>
     <tr>
      <td port="p10l">z8</td>
      
-     []
     </tr>
     <tr>
      <td port="p11l">b8</td>
      
-     []
     </tr>
     <tr>
      <td port="p12l">d8</td>
      
-     []
     </tr>
     <tr>
      <td port="p13l">z10</td>
      
-     []
     </tr>
     <tr>
      <td port="p14l">b10</td>
      
-     []
     </tr>
     <tr>
      <td port="p15l">d10</td>
      
-     []
     </tr>
     <tr>
      <td port="p16l">z12</td>
      
-     []
     </tr>
     <tr>
      <td port="p17l">b12</td>
      
-     []
     </tr>
     <tr>
      <td port="p18l">d12</td>
      
-     []
     </tr>
     <tr>
      <td port="p19l">z14</td>
      
-     []
     </tr>
     <tr>
      <td port="p20l">b14</td>
      
-     []
     </tr>
     <tr>
      <td port="p21l">d14</td>
      
-     []
     </tr>
     <tr>
      <td port="p22l">z16</td>
      
-     []
     </tr>
     <tr>
      <td port="p23l">b16</td>
      
-     []
     </tr>
     <tr>
      <td port="p24l">d16</td>
      
-     []
     </tr>
     <tr>
      <td port="p25l">z18</td>
      
-     []
     </tr>
     <tr>
      <td port="p26l">b18</td>
      
-     []
     </tr>
     <tr>
      <td port="p27l">d18</td>
      
-     []
     </tr>
     <tr>
      <td port="p28l">z20</td>
      
-     []
     </tr>
     <tr>
      <td port="p29l">b20</td>
      
-     []
     </tr>
     <tr>
      <td port="p30l">d20</td>
      
-     []
     </tr>
     <tr>
      <td port="p31l">z22</td>
      
-     []
     </tr>
     <tr>
      <td port="p32l">b22</td>
      
-     []
     </tr>
     <tr>
      <td port="p33l">d22</td>
      
-     []
     </tr>
     <tr>
      <td port="p34l">z24</td>
      
-     []
     </tr>
     <tr>
      <td port="p35l">b24</td>
      
-     []
     </tr>
     <tr>
      <td port="p36l">d24</td>
      
-     []
     </tr>
     <tr>
      <td port="p37l">z26</td>
      
-     []
     </tr>
     <tr>
      <td port="p38l">b26</td>
      
-     []
     </tr>
     <tr>
      <td port="p39l">d26</td>
      
-     []
     </tr>
     <tr>
      <td port="p40l">z28</td>
      
-     []
     </tr>
     <tr>
      <td port="p41l">b28</td>
      
-     []
     </tr>
     <tr>
      <td port="p42l">d28</td>
      
-     []
     </tr>
     <tr>
      <td port="p43l">z30</td>
      
-     []
     </tr>
     <tr>
      <td port="p44l">b30</td>
      
-     []
     </tr>
     <tr>
      <td port="p45l">d30</td>
      
-     []
     </tr>
     <tr>
      <td port="p46l">z32</td>
      
-     []
     </tr>
     <tr>
      <td port="p47l">b32</td>
      
-     []
     </tr>
     <tr>
      <td port="p48l">d32</td>
      
-     []
     </tr>
    </table>
   </td>
@@ -406,25 +345,7 @@ graph {
      <td align="right">X2:z2 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w1">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w1"></td>
     </tr>
     <tr>
      <td align="left"> X1:1:SENSE_P_1</td>
@@ -434,25 +355,7 @@ graph {
      <td align="right">X2:d4 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w2">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w2"></td>
     </tr>
     <tr>
      <td align="left"> X1:16:SENSE_N_2</td>
@@ -462,25 +365,7 @@ graph {
      <td align="right">X2:z8 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w3">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w3"></td>
     </tr>
     <tr>
      <td align="left"> X1:3:SENSE_P_2</td>
@@ -490,25 +375,7 @@ graph {
      <td align="right">X2:d10 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w4">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w4"></td>
     </tr>
     <tr>
      <td align="left"> X1:18:SENSE_N_3</td>
@@ -518,25 +385,7 @@ graph {
      <td align="right">X2:z14 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w5">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w5"></td>
     </tr>
     <tr>
      <td align="left"> X1:5:SENSE_P_3</td>
@@ -546,25 +395,7 @@ graph {
      <td align="right">X2:d16 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w6">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w6"></td>
     </tr>
     <tr>
      <td align="left"> X1:20:SENSE_N_4</td>
@@ -574,25 +405,7 @@ graph {
      <td align="right">X2:z18 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w7">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w7"></td>
     </tr>
     <tr>
      <td align="left"> X1:7:SENSE_P_4</td>
@@ -602,25 +415,7 @@ graph {
      <td align="right">X2:d20 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w8">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w8"></td>
     </tr>
     <tr>
      <td align="left"> X1:22:SENSE_N_5</td>
@@ -630,25 +425,7 @@ graph {
      <td align="right">X2:z24 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w9">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w9"></td>
     </tr>
     <tr>
      <td align="left"> X1:9:SENSE_P_5</td>
@@ -658,25 +435,7 @@ graph {
      <td align="right">X2:d26 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w10">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w10"></td>
     </tr>
     <tr>
      <td align="left"> X1:24:SENSE_N_6</td>
@@ -686,25 +445,7 @@ graph {
      <td align="right">X2:z30 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w11">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w11"></td>
     </tr>
     <tr>
      <td align="left"> X1:11:SENSE_P_6</td>
@@ -714,25 +455,7 @@ graph {
      <td align="right">X2:d32 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="10" port="w12">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w12"></td>
     </tr>
     <tr>
      <td>&nbsp;</td>
@@ -745,13 +468,7 @@ graph {
      <td align="right"> </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="2" port="w13">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w13"></td>
     </tr>
     <tr>
      <td>&nbsp;</td>

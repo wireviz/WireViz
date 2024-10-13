@@ -30,17 +30,14 @@ graph {
    <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
     <tr>
      <td>Dot</td>
-     []
      <td port="p1r">T</td>
     </tr>
     <tr>
      <td>Dash</td>
-     []
      <td port="p2r">R</td>
     </tr>
     <tr>
      <td>Ground</td>
-     []
      <td port="p3r">S</td>
     </tr>
    </table>
@@ -50,7 +47,7 @@ graph {
   <td>
    <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
     <tr>
-     <td balign="left" sides="TLR"><img scale="false" src="C:\Users\Tobias\Documents\git\WireViz\examples\resources\stereo-phone-plug-TRS.png" /></td>
+     <td balign="left" sides="TLR"><img scale="false" src="/home/marc/Documents/projects/WireViz/examples/resources/stereo-phone-plug-TRS.png" /></td>
     </tr>
    </table>
   </td>
@@ -105,19 +102,7 @@ graph {
      <td align="right"> </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w1">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w1"></td>
     </tr>
     <tr>
      <td align="left"> Key:R:Dash</td>
@@ -127,19 +112,7 @@ graph {
      <td align="right"> </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w2">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w2"></td>
     </tr>
     <tr>
      <td align="left"> Key:T:Dot</td>
@@ -149,19 +122,7 @@ graph {
      <td align="right"> </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w3">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w3"></td>
     </tr>
     <tr>
      <td>&nbsp;</td>
@@ -174,19 +135,7 @@ graph {
      <td align="right"> </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w4">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w4"></td>
     </tr>
     <tr>
      <td>&nbsp;</td>
@@ -201,7 +150,7 @@ graph {
      <td balign="left" sides="TLR">
       <table border="0" cellborder="0" cellspacing="0" id="!">
        <tr>
-        <td width="70.0" height="70" fixedsize="true"><img scale="true" src="C:\Users\Tobias\Documents\git\WireViz\examples\resources\cable-WH+BN+GN+shield.png" /></td>
+        <td width="70.0" height="70" fixedsize="true"><img scale="true" src="/home/marc/Documents/projects/WireViz/examples/resources/cable-WH+BN+GN+shield.png" /></td>
        </tr>
       </table>
      </td>
