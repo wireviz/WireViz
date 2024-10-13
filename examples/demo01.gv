@@ -31,47 +31,38 @@ graph {
    <table border="0" cellborder="1" cellpadding="3" cellspacing="0">
     <tr>
      <td>DCD</td>
-     []
      <td port="p1r">1</td>
     </tr>
     <tr>
      <td>RX</td>
-     []
      <td port="p2r">2</td>
     </tr>
     <tr>
      <td>TX</td>
-     []
      <td port="p3r">3</td>
     </tr>
     <tr>
      <td>DTR</td>
-     []
      <td port="p4r">4</td>
     </tr>
     <tr>
      <td>GND</td>
-     []
      <td port="p5r">5</td>
     </tr>
     <tr>
      <td>DSR</td>
-     []
      <td port="p6r">6</td>
     </tr>
     <tr>
      <td>RTS</td>
-     []
      <td port="p7r">7</td>
     </tr>
     <tr>
      <td>CTS</td>
-     []
      <td port="p8r">8</td>
     </tr>
     <tr>
      <td>RI</td>
-     []
      <td port="p9r">9</td>
     </tr>
    </table>
@@ -109,17 +100,14 @@ graph {
     <tr>
      <td port="p1l">1</td>
      <td>GND</td>
-     []
     </tr>
     <tr>
      <td port="p2l">2</td>
      <td>RX</td>
-     []
     </tr>
     <tr>
      <td port="p3l">3</td>
      <td>TX</td>
-     []
     </tr>
    </table>
   </td>
@@ -163,19 +151,7 @@ graph {
      <td align="right">X2:1:GND </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w1">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w1"></td>
     </tr>
     <tr>
      <td align="left"> X1:2:RX</td>
@@ -185,19 +161,7 @@ graph {
      <td align="right">X2:3:TX </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w2">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w2"></td>
     </tr>
     <tr>
      <td align="left"> X1:3:TX</td>
@@ -207,19 +171,7 @@ graph {
      <td align="right">X2:2:RX </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w3">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w3"></td>
     </tr>
     <tr>
      <td>&nbsp;</td>
@@ -232,13 +184,7 @@ graph {
      <td align="right"> </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="2" port="w4">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#FFFFFF" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w4"></td>
     </tr>
     <tr>
      <td>&nbsp;</td>
