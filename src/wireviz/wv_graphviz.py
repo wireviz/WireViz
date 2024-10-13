@@ -263,20 +263,21 @@ def nested_table_dict(d: dict) -> Table:
 def gv_shorts_info_row(component) -> Tr:
     shorts_info = []
     if component.ports_left:
-        shorts_info.append(Td(f''))
+        shorts_info.append(Td(f""))
     if component.pinlabels:
-        shorts_info.append(Td(f''))
+        shorts_info.append(Td(f""))
 
     for short in component.shorts:
-        shorts_info.append(Td(f'{short}'))
+        shorts_info.append(Td(f"{short}"))
 
     if component.ports_right:
-        shorts_info.append(Td(f''))
+        shorts_info.append(Td(f""))
     return Tr(shorts_info)
+
 
 def gv_pin_table(component) -> Table:
     pin_rows = []
-    
+
     if len(component.shorts) > 0 and not component.shorts_hide_lable:
         pin_rows.append(gv_shorts_info_row(component))
 
@@ -291,13 +292,13 @@ def gv_pin_table(component) -> Table:
 
 
 def gv_short_row_part(pin, connector) -> List:
-    short_row = []# Td("ADA"), Td("DAD")
+    short_row = []  # Td("ADA"), Td("DAD")
     for short, shPins in connector.shorts.items():
-        if pin.index+1 in shPins:
+        if pin.index + 1 in shPins:
             short_row.append(Td("", port=f"p{pin.index+1}j"))
         else:
             short_row.append(Td(""))
-    return short_row
+    return short_row if len(short_row) > 0 else None
 
 
 def gv_pin_row(pin, connector) -> Tr:
@@ -324,7 +325,7 @@ def gv_connector_loops(connector: Connector) -> List:
         loop_dir = "e"
     else:
         raise Exception("No side for loops")
-    
+
     for loop, loPins in connector.loops.items():
         comp = getAddCompFromRef(loop, connector)
         loColor = "#000000"
@@ -352,7 +353,6 @@ def gv_connector_shorts(connector: Connector) -> List:
             tail = f"{connector.designator}:p{shPins[i]}j:c"
             short_edges.append((head, tail, shColor))
     return short_edges
-
 
 
 def gv_conductor_table(cable) -> Table:
@@ -417,39 +417,25 @@ def gv_conductor_table(cable) -> Table:
 
 
 def gv_wire_cell(wire: Union[WireClass, ShieldClass], colspan: int) -> Td:
-    if wire.color:
-        color_list = ["#000000"] + wire.color.html_padded_list + ["#000000"]
-    else:
-        color_list = ["#000000"]
-
-    wire_inner_rows = []
-    for j, bgcolor in enumerate(color_list[::-1]):
-        wire_inner_cell_attribs = {
-            "bgcolor": "#FFFFFF", # bgcolor if bgcolor != "" else "#000000", # TODO: More elegent solution for making black/whit space needed, since the wire is drawn as an actual edge
-            "border": 0,
-            "cellpadding": 0,
-            "colspan": colspan,
-            "height": 2,
-        }
-        wire_inner_rows.append(Tr(Td("", **wire_inner_cell_attribs)))
-    wire_inner_table = Table(wire_inner_rows, border=0, cellborder=0, cellspacing=0)
     wire_outer_cell_attribs = {
         "border": 0,
         "cellspacing": 0,
         "cellpadding": 0,
         "colspan": colspan,
-        "height": 2 * len(color_list),
+        "height": 6,
         "port": f"w{wire.index+1}",
     }
     # ports in GraphViz are 1-indexed for more natural maping to pin/wire numbers
-    wire_outer_cell = Td(wire_inner_table, **wire_outer_cell_attribs)
+    wire_outer_cell = Td(None, **wire_outer_cell_attribs)
 
     return wire_outer_cell
 
-    dot.attr("edge", headclip="true", tailclip="true", style="bold") # TODO: ?
+    dot.attr("edge", headclip="true", tailclip="true", style="bold")  # TODO: ?
 
-                                                    # color, l1,  l2,  r1,  r2
-def gv_edge_wire(harness, cable, connection) -> Tuple[str,   str, str, str, str]:
+    # color, l1,  l2,  r1,  r2
+
+
+def gv_edge_wire(harness, cable, connection) -> Tuple[str, str, str, str, str]:
     if connection.via.color:
         # check if it's an actual wire and not a shield
         color = f"#000000:{connection.via.color.html_padded}:#000000"
@@ -481,14 +467,16 @@ def gv_edge_wire(harness, cable, connection) -> Tuple[str,   str, str, str, str]
 
     return color, code_left_1, code_left_2, code_right_1, code_right_2
 
-                                                           # color, we,  ww,
-def gv_edge_wire_inside(cable) -> List[Tuple[str,   str, str]]:
+    # color, we,  ww,
+
+
+def gv_edge_wire_inside(cable) -> List[Tuple[str, str, str]]:
     wires = []
     # print(cable.wire_objects)
     for wire in cable.wire_objects.values():
         color = "#000000"
         if wire.color:
-        # check if it's an actual wire and not a shield
+            # check if it's an actual wire and not a shield
             color = f"#000000:{wire.color.html_padded}:#000000"
         else:  # it's a shield connection
             color = "#000000"
