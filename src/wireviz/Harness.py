@@ -34,9 +34,8 @@ from wireviz.wv_colors import get_color_hex, translate_color
 from wireviz.wv_gv_html import (
     html_bgcolor,
     html_bgcolor_attr,
-    html_caption,
     html_colorbar,
-    html_image,
+    html_image_rows,
     html_line_breaks,
     nested_html_table,
     remove_links,
@@ -203,8 +202,7 @@ class Harness:
                      translate_color(connector.color, self.options.color_mode) if connector.color else None,
                      html_colorbar(connector.color)],
                     '<!-- connector table -->' if connector.style != 'simple' else None,
-                    [html_image(connector.image)],
-                    [html_caption(connector.image)]]
+                    *html_image_rows(connector.image)]
             # fmt: on
 
             rows.extend(get_additional_component_table(self, connector))
@@ -326,8 +324,7 @@ class Harness:
                      translate_color(cable.color, self.options.color_mode) if cable.color else None,
                      html_colorbar(cable.color)],
                     '<!-- wire table -->',
-                    [html_image(cable.image)],
-                    [html_caption(cable.image)]]
+                    *html_image_rows(cable.image)]
             # fmt: on
 
             rows.extend(get_additional_component_table(self, cable))
