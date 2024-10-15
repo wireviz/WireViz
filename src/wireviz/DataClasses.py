@@ -23,6 +23,7 @@ CableMultiplier = (
     PlainText  # = Literal['wirecount', 'terminations', 'length', 'total_length']
 )
 ImageScale = PlainText  # = Literal['false', 'true', 'width', 'height', 'both']
+ImagePosition = PlainText  # = Literal['below', 'above', 'left', 'right']
 
 # Type combinations
 Pin = Union[int, PlainText]  # Pin identifier
@@ -86,6 +87,7 @@ class Image:
     height: Optional[int] = None
     fixedsize: Optional[bool] = None
     bgcolor: Optional[Color] = None
+    position: Optional[ImagePosition] = None
     # Contents of the text cell <td> just below the image cell:
     caption: Optional[MultilineHypertext] = None
     # See also HTML doc at https://graphviz.org/doc/info/shapes.html#html
