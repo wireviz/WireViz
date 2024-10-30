@@ -1,0 +1,95 @@
+name: Native Images On-Demand
+
+run-name: Native Images ${{ inputs.tag }} by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag name
+        required: true
+
+jobs:
+  native_images:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        include:
+          - os: 'ubuntu-latest'
+            platform: 'linux-amd64'
+          - os: 'ARM64' # self-hosted
+            platform: 'linux-arm64'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "refs/tags/${{ github.event.inputs.tag }}"
+      - name: Set up Python 3.11
+        # actions/setup-python does not work on arm64/linux
+        # https://github.com/actions/setup-python/issues/678
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+        # we can skip this step since Python3 is already installed on the self-hosted runner.
+        if: ${{ matrix.platform != 'linux-arm64' }}
+      - name: Install system dependencies
+        run: |
+          sudo apt-get install libfreetype6-dev ccache patchelf graphviz
+        # we can skip this step since system dependencies are already installed on the self-hosted runner.
+        if: ${{ matrix.platform != 'linux-arm64' }}
+      - name: Install project dependencies
+        run: | 
+          pip install -U nuitka
+          pip install .
+      - name: Build single binary image
+        run: |
+          python3 -m nuitka \
+            --include-module=wireviz \
+            --onefile src/wireviz \
+            --output-filename=wireviz-${PLATFORM}.bin
+        env:
+          PLATFORM: ${{ matrix.platform }}
+      - name: Smoke test
+        run: |
+          cat examples/demo01.yml | ./wireviz-${PLATFORM}.bin -f svg - -o -
+        env:
+          PLATFORM: ${{ matrix.platform }}
+      - name: Cache native image
+        uses: actions/cache/save@v3
+        with:
+          path: "wireviz-${{ matrix.platform }}.bin"
+          key: "native-image-${{ matrix.platform }}-${{ github.run_id }}"
+          enableCrossOsArchive: true
+  upload:
+    needs: [ native_images ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set release version
+        env:
+          REF: ${{ github.event.inputs.tag }}
+        run: |
+          echo "release_version=${REF#v}" >> $GITHUB_ENV
+          echo "release_version=${REF#v}" >> $GITHUB_OUTPUT
+      - name: Checkout the repository
+        uses: actions/checkout@v3
+      - name: Restore Native-image-linux-amd64 cache
+        uses: actions/cache/restore@v3
+        with:
+          path: "wireviz-linux-amd64.bin"
+          key: "native-image-linux-amd64-${{ github.run_id }}"
+          fail-on-cache-miss: true
+          enableCrossOsArchive: true
+      - name: Restore Native-image-linux-arm64 cache
+        uses: actions/cache/restore@v3
+        with:
+          path: "wireviz-linux-arm64.bin"
+          key: "native-image-linux-arm64-${{ github.run_id }}"
+          fail-on-cache-miss: true
+          enableCrossOsArchive: true
+      - name: Create release
+        run: |
+          gh release view "v$RELEASE_VERSION" || gh release create "v$RELEASE_VERSION"
+          gh release upload "v$RELEASE_VERSION" ./wireviz-linux-amd64.bin ./wireviz-linux-arm64.bin --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ env.release_version }}
