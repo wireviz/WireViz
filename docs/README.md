@@ -88,6 +88,13 @@ Read the [syntax description](syntax.md) to learn about WireViz' features and ho
 
 See the [tutorial page](../tutorial/readme.md) for sample code, as well as the [example gallery](../examples/readme.md) to see more of what WireViz can do.
 
+### Demo 03
+wireviz -q "design a wire harness that connects two ethernet devices with d38999 connectors on both sides"
+
+Use open AI to design the harness for you. 
+
+Define your openAI API key by setting an environment variable. 
+`OPENAI_KEY={}`
 
 ## Usage
 

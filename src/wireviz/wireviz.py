@@ -89,6 +89,7 @@ def parse(
         raise Exception("No output formats or return types specified")
 
     yaml_data, yaml_file = _get_yaml_data_and_path(inp)
+    print(yaml_data)
     if not isinstance(yaml_data, dict):
         raise TypeError(
             f"Expected a dict as top-level YAML input, but got: {type(yaml_data)}"
@@ -380,7 +381,7 @@ def parse(
     if "additional_bom_items" in yaml_data:
         for line in yaml_data["additional_bom_items"]:
             harness.add_bom_item(line)
-
+    print(output_formats)
     if output_formats:
         harness.output(filename=output_file, fmt=output_formats, view=False)
 

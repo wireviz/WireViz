@@ -12,6 +12,7 @@ if __name__ == "__main__":
 import wireviz.wireviz as wv
 from wireviz import APP_NAME, __version__
 from wireviz.wv_helper import file_read_text
+from wireviz.openai import queryGPT
 
 format_codes = {
     # "c": "csv",
@@ -71,7 +72,18 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def wireviz(file, format, prepend, output_dir, output_name, version):
+
+# add an option to input a chatgpt query
+@click.option(
+    "-q",
+    "--query",
+    default=None,
+    type=str,
+    help="Query to input to chatgpt.",
+)
+
+
+def wireviz(file, format, prepend, output_dir, output_name, version, query):
     """
     Parses the provided FILE and generates the specified outputs.
     """
@@ -80,13 +92,24 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     if version:
         return  # print version number only and exit
 
-    # get list of files
-    try:
-        _ = iter(file)
-    except TypeError:
-        filepaths = [file]
+    # check query
+    if query:
+        gpt_response = queryGPT(query)
+        yml_file= Path("/Users/gouthamsubramanian/harness.yml")
+        with open(yml_file, "w") as file:
+            file.write(gpt_response)
+        print("Response written to", yml_file)
+        filepaths = [yml_file]
     else:
-        filepaths = list(file)
+        try:
+            _ = iter(file)
+        except TypeError:
+            filepaths = [file]
+        else:
+            filepaths = list(file)
+
+
+
 
     # determine output formats
     output_formats = []
@@ -115,7 +138,6 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     else:
         prepend_input = ""
 
-    # run WireVIz on each input file
     for file in filepaths:
         file = Path(file)
         if not file.exists():
