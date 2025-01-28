@@ -31,6 +31,7 @@ def parse(
     output_dir: Union[str, Path] = None,
     output_name: Union[None, str] = None,
     image_paths: Union[Path, str, List] = [],
+    template_dir: Union[str, Path] = None,
 ) -> Any:
     """
     This function takes an input, parses it as a WireViz Harness file,
@@ -382,7 +383,7 @@ def parse(
             harness.add_bom_item(line)
 
     if output_formats:
-        harness.output(filename=output_file, fmt=output_formats, view=False)
+        harness.output(filename=output_file, fmt=output_formats, view=False, templatedir=template_dir)
 
     if return_types:
         returns = []

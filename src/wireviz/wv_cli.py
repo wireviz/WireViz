@@ -65,13 +65,20 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
     help="File name (without extension) to use for output files, if different from input file name.",
 )
 @click.option(
+    "-t",
+    "--template-dir",
+    default=None,
+    type=Path,
+    help="Directory to look into for html template file (optional)",
+)
+@click.option(
     "-V",
     "--version",
     is_flag=True,
     default=False,
     help=f"Output {APP_NAME} version and exit.",
 )
-def wireviz(file, format, prepend, output_dir, output_name, version):
+def wireviz(file, format, prepend, output_dir, output_name, template_dir, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
@@ -144,6 +151,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             output_dir=_output_dir,
             output_name=_output_name,
             image_paths=list(image_paths),
+            template_dir=template_dir,
         )
 
     print()
