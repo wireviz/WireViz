@@ -682,7 +682,7 @@ class Harness:
         ).exists()  # if SVG already exists, do not delete later
         # graphical output
         for f in fmt:
-            if f in ("png", "svg", "html"):
+            if f in ("png", "svg", "html", "pdf"):
                 if f == "html":  # if HTML format is specified,
                     f = "svg"  # generate SVG for embedding into HTML
                 # SVG file will be renamed/deleted later
@@ -707,9 +707,9 @@ class Harness:
         if "html" in fmt:
             generate_html_output(filename, bomlist, self.metadata, self.options)
         # PDF output
-        if "pdf" in fmt:
-            # TODO: implement PDF output
-            print("PDF output is not yet supported")
+        #if "pdf" in fmt:
+        #    # TODO: implement PDF output
+        #    print("PDF output is not yet supported")
         # delete SVG if not needed
         if "html" in fmt and not "svg" in fmt:
             # SVG file was just needed to generate HTML
