@@ -13,3 +13,5 @@ venv/
 desktop.ini
 thumbs.db
 temp/
+.~lock
+#

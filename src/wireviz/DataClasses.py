@@ -128,6 +128,8 @@ class AdditionalComponent:
     unit: Optional[str] = None
     qty_multiplier: Union[ConnectorMultiplier, CableMultiplier, None] = None
     bgcolor: Optional[Color] = None
+    color: Optional[Color] = None
+    references: Optional[List[str]] = field(default_factory=list)
 
     @property
     def description(self) -> str:
@@ -135,7 +137,6 @@ class AdditionalComponent:
         st = f", {self.subtype.rstrip()}" if self.subtype else ""
         t = t + st
         return t
-
 
 @dataclass
 class Connector:
@@ -161,9 +162,10 @@ class Connector:
     show_name: Optional[bool] = None
     show_pincount: Optional[bool] = None
     hide_disconnected_pins: bool = False
-    loops: List[List[Pin]] = field(default_factory=list)
-    ignore_in_bom: bool = False
+    loops: Dict = field(default_factory=list)# List[List[Pin]] = field(default_factory=list)
+    ignore_in_bom: bool = False#ß
     additional_components: List[AdditionalComponent] = field(default_factory=list)
+    shorts: Dict = field(default_factory=list)
 
     def __post_init__(self) -> None:
 
@@ -208,15 +210,14 @@ class Connector:
         for loop in self.loops:
             # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
             # TODO: include properties of wire used to create the loop
-            if len(loop) != 2:
-                raise Exception("Loops must be between exactly two pins!")
-            for pin in loop:
-                if pin not in self.pins:
-                    raise Exception(
-                        f'Unknown loop pin "{pin}" for connector "{self.name}"!'
-                    )
-                # Make sure loop connected pins are not hidden.
-                self.activate_pin(pin, None)
+            for loopName in loop:
+                for pin in loop[loopName]:
+                    if pin not in self.pins:
+                        raise Exception(
+                            f'Unknown loop pin "{pin}" for connector "{self.name}"!'
+                        )
+                    # Make sure loop connected pins are not hidden.
+                    self.activate_pin(pin, None)
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
@@ -228,6 +229,8 @@ class Connector:
             self.ports_left = True
         elif side == Side.RIGHT:
             self.ports_right = True
+            
+    # def get_qty_shorts_AddComp()
 
     def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
         if not qty_multiplier:
