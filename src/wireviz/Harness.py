@@ -191,6 +191,12 @@ class Harness:
                 connector.ports_left = True  # Use left side pins.
 
             html = []
+
+            image_rows = []
+            if connector.image and connector.image.position != 'above':
+                image_rows = [[html_image(connector.image)],
+                          [html_caption(connector.image)]]
+
             # fmt: off
             rows = [[f'{html_bgcolor(connector.bgcolor_title)}{remove_links(connector.name)}'
                         if connector.show_name else None],
@@ -199,16 +205,23 @@ class Harness:
                      html_line_breaks(pn_info_string(HEADER_SPN, connector.supplier, connector.spn))],
                     [html_line_breaks(connector.type),
                      html_line_breaks(connector.subtype),
-                     f'{connector.pincount}-pin' if connector.show_pincount else None,
+                     f'{connector.pincount}-pin' if connector.show_pincount else None],
+                    [html_caption(connector.image) if connector.image and connector.image.position == 'above' else None,
+                     html_image(connector.image) if connector.image and connector.image.position == 'above' else None,
                      translate_color(connector.color, self.options.color_mode) if connector.color else None,
                      html_colorbar(connector.color)],
-                    '<!-- connector table -->' if connector.style != 'simple' else None,
-                    [html_image(connector.image)],
-                    [html_caption(connector.image)]]
+                    '<!-- connector table -->' if connector.style != 'simple' else None]
             # fmt: on
+            imagetable=''
+            if connector.image:
+                if connector.image.position == 'below' or connector.image.position is None:
+                    rows += image_rows
+                else:
+                    imagetable = ''.join(nested_html_table(image_rows, html_bgcolor_attr(connector.bgcolor)))
 
             rows.extend(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
+
             html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
 
             if connector.style != "simple":
@@ -217,11 +230,16 @@ class Harness:
                     '<table border="0" cellspacing="0" cellpadding="3" cellborder="1">'
                 )
 
-                for pinindex, (pinname, pinlabel, pincolor) in enumerate(
-                    zip_longest(
+                firstpin = True
+                pincount = len(connector.pins)
+                if len(connector.pinlabels) > pincount:
+                    pincount = len(connector.pinlabels)
+                if len(connector.pincolors) > pincount:
+                    pincount = len(connector.pincolors)
+
+                for pinindex, (pinname, pinlabel, pincolor) in enumerate(zip_longest(
                         connector.pins, connector.pinlabels, connector.pincolors
-                    )
-                ):
+                    )):
                     if (
                         connector.hide_disconnected_pins
                         and not connector.visible_pins.get(pinname, False)
@@ -229,6 +247,11 @@ class Harness:
                         continue
 
                     pinhtml.append("   <tr>")
+
+                    if firstpin and connector.image and connector.image.position == 'left':
+                        firstpin = False
+                        pinhtml.append(f'<td rowspan="{pincount}">{imagetable}</td>')
+
                     if connector.ports_left:
                         pinhtml.append(f'    <td port="p{pinindex+1}l">{pinname}</td>')
                     if pinlabel:
@@ -248,6 +271,11 @@ class Harness:
 
                     if connector.ports_right:
                         pinhtml.append(f'    <td port="p{pinindex+1}r">{pinname}</td>')
+
+                    if firstpin and connector.image and connector.image.position == 'right':
+                        firstpin = False
+                        pinhtml.append(
+                            f'<td rowspan="{pincount}">{imagetable}</td>')
                     pinhtml.append("   </tr>")
 
                 pinhtml.append("  </table>")
@@ -713,3 +741,4 @@ class Harness:
         if not self._bom:
             self._bom = generate_bom(self)
         return self._bom
+
