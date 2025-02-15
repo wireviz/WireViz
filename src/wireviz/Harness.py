@@ -666,6 +666,7 @@ class Harness:
         view: bool = False,
         cleanup: bool = True,
         fmt: tuple = ("html", "png", "svg", "tsv"),
+        templatedir: (str, Path) = None,
     ) -> None:
         # graphical output
         graph = self.graph
@@ -697,7 +698,7 @@ class Harness:
             print("CSV output is not yet supported")
         # HTML output
         if "html" in fmt:
-            generate_html_output(filename, bomlist, self.metadata, self.options)
+            generate_html_output(filename, bomlist, self.metadata, self.options, templatedir=templatedir)
         # PDF output
         if "pdf" in fmt:
             # TODO: implement PDF output

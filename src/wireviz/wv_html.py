@@ -21,14 +21,23 @@ def generate_html_output(
     bom_list: List[List[str]],
     metadata: Metadata,
     options: Options,
+    templatedir: Union[str, Path],
 ):
+    print("Test")
     # load HTML template
     templatename = metadata.get("template", {}).get("name")
     if templatename:
+        templatedirs = []
+        
+        # if template directory is provided, add it to the lookup paths
+        if templatedir is not None:
+            templatedirs.append(templatedir)
         # if relative path to template was provided, check directory of YAML file first, fall back to built-in template directory
+        templatedirs.extend([Path(filename).parent, Path(__file__).parent / "templates"])
+
         templatefile = smart_file_resolve(
             f"{templatename}.html",
-            [Path(filename).parent, Path(__file__).parent / "templates"],
+            templatedirs,
         )
     else:
         # fall back to built-in simple template if no template was provided
