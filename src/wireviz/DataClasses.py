@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from dataclasses import InitVar, dataclass, field
+from dataclasses import InitVar, asdict, dataclass, field, replace
 from enum import Enum, auto
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
@@ -48,6 +48,19 @@ class Metadata(dict):
 
 
 @dataclass
+class Terminology:
+    """Terms that the user might want to override"""
+
+    pin: Optional[PlainText] = None
+    wire: Optional[PlainText] = None
+    shield: Optional[PlainText] = None
+
+    def fully_populated(self):
+        """Return a copy where empty field values are replaced with their names"""
+        return replace(self, **{k: v or k for k, v in asdict(self).items()})
+
+
+@dataclass
 class Options:
     fontname: PlainText = "arial"
     bgcolor: Color = "WH"
@@ -58,6 +71,7 @@ class Options:
     color_mode: ColorMode = "SHORT"
     mini_bom_mode: bool = True
     template_separator: str = "."
+    terminology: Optional[Terminology] = None
 
     def __post_init__(self):
         if not self.bgcolor_node:
@@ -68,6 +82,7 @@ class Options:
             self.bgcolor_cable = self.bgcolor_node
         if not self.bgcolor_bundle:
             self.bgcolor_bundle = self.bgcolor_cable
+        self.terminology = Terminology(**(self.terminology or {}))
 
 
 @dataclass
