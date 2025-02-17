@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import Union
 
-mime_subtype_replacements = {"jpg": "jpeg", "tif": "tiff"}
+mime_subtype_replacements = {"jpg": "jpeg", "svg": "svg+xml", "tif": "tiff"}
 
 
 # TODO: Share cache and code between data_URI_base64() and embed_svg_images()
