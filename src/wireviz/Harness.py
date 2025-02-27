@@ -65,6 +65,13 @@ def check_old(node: str, old_attr: dict, args: dict) -> None:
             raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
 
 
+# Alan
+def html_length(o) -> str:
+    if o: # Can be None
+        return f'{o.length} {o.length_unit}' if o.length > 0 else None
+    else:
+        return '-'
+
 @dataclass
 class Harness:
     metadata: Metadata
@@ -207,6 +214,10 @@ class Harness:
                     [html_caption(connector.image)]]
             # fmt: on
 
+            if connector.strip.sleeve or connector.strip.insulation:
+                rows.append([
+                    f'Strip Sleeve: {html_length(connector.strip.sleeve)} Insulation: {html_length(connector.strip.insulation)}'
+                ])
             rows.extend(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))

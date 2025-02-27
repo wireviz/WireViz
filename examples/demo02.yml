@@ -36,9 +36,14 @@ connectors:
   X1:
     <<: *molex_f # copying items from the template
     pinlabels: [GND, +5V, SCL, SDA, MISO, MOSI, SCK, N/C]
+    strip:
+      sleeve: 10 mm
+      insulation: 2 mm
   X2:
     <<: *molex_f
     <<: *con_i2c # it is possible to copy from more than one template
+    strip:
+      sleeve: 5 mm
   X3:
     <<: *molex_f
     <<: *con_i2c

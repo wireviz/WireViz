@@ -76,6 +76,18 @@ class Tweak:
     append: Union[str, List[str], None] = None
 
 
+# Alan
+def parse_length(l: str):
+    length: float = 0
+    length_unit: str = 'm'
+    try:
+        length, length_unit = l.split(' ')
+        length = float(length)
+    except Exception:
+        raise Exception(f'length={l} - Length must be a number, or number and unit separated by a space')
+    return {'length': length, 'length_unit': length_unit}
+
+
 @dataclass
 class Image:
     # Attributes of the image object <img>:
@@ -137,6 +149,42 @@ class AdditionalComponent:
 
 
 @dataclass
+class StripSleeve:
+    name: Designator
+    length: float = 0
+    length_unit: Optional[str] = None
+
+    # Alan
+    # def __post_init__(self) -> None:
+    #     normalize_length(self)
+
+
+@dataclass
+class StripInsulation:
+    name: Designator
+    length: float = 0
+    length_unit: Optional[str] = None
+
+    # Alan
+    # def __post_init__(self) -> None:
+    #     print('__post_init__', self.length, '|', self.length_unit)
+        # normalize_length(self)
+
+
+@dataclass
+class Strip:
+    sleeve: Optional[StripSleeve] = None
+    insulation: Optional[StripInsulation] = None
+
+    # Alan
+    def __post_init__(self) -> None:
+        if self.sleeve:
+            self.sleeve = StripSleeve('TODO', **parse_length(self.sleeve))
+        if self.insulation:
+            self.insulation = StripInsulation('TODO', **parse_length(self.insulation))
+
+
+@dataclass
 class Connector:
     name: Designator
     bgcolor: Optional[Color] = None
@@ -151,6 +199,8 @@ class Connector:
     type: Optional[MultilineHypertext] = None
     subtype: Optional[MultilineHypertext] = None
     pincount: Optional[int] = None
+    # additional_parameters: Optional[Dict] = None
+    strip: Optional[Strip] = None
     image: Optional[Image] = None
     notes: Optional[MultilineHypertext] = None
     pins: List[Pin] = field(default_factory=list)
@@ -219,6 +269,11 @@ class Connector:
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
+
+        if self.strip:
+            self.strip = Strip(sleeve=self.strip.get('sleeve'), insulation=self.strip.get('insulation'))
+        else:
+            self.strip = Strip()
 
     def activate_pin(self, pin: Pin, side: Side) -> None:
         self.visible_pins[pin] = True
