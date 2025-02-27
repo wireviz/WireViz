@@ -76,7 +76,6 @@ class Tweak:
     append: Union[str, List[str], None] = None
 
 
-# Alan
 def parse_length(l: str):
     length: float = 0
     length_unit: str = 'm'
@@ -154,10 +153,6 @@ class StripSleeve:
     length: float = 0
     length_unit: Optional[str] = None
 
-    # Alan
-    # def __post_init__(self) -> None:
-    #     normalize_length(self)
-
 
 @dataclass
 class StripInsulation:
@@ -165,18 +160,12 @@ class StripInsulation:
     length: float = 0
     length_unit: Optional[str] = None
 
-    # Alan
-    # def __post_init__(self) -> None:
-    #     print('__post_init__', self.length, '|', self.length_unit)
-        # normalize_length(self)
-
 
 @dataclass
 class Strip:
     sleeve: Optional[StripSleeve] = None
     insulation: Optional[StripInsulation] = None
 
-    # Alan
     def __post_init__(self) -> None:
         if self.sleeve:
             self.sleeve = StripSleeve('TODO', **parse_length(self.sleeve))

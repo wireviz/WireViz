@@ -37,6 +37,7 @@ from wireviz.wv_gv_html import (
     html_caption,
     html_colorbar,
     html_image,
+    html_length,
     html_line_breaks,
     nested_html_table,
     remove_links,
@@ -64,13 +65,6 @@ def check_old(node: str, old_attr: dict, args: dict) -> None:
         if attr in args:
             raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
 
-
-# Alan
-def html_length(o) -> str:
-    if o: # Can be None
-        return f'{o.length} {o.length_unit}' if o.length > 0 else None
-    else:
-        return '-'
 
 @dataclass
 class Harness:
