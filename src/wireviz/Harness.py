@@ -37,6 +37,7 @@ from wireviz.wv_gv_html import (
     html_caption,
     html_colorbar,
     html_image,
+    html_length,
     html_line_breaks,
     nested_html_table,
     remove_links,
@@ -207,6 +208,10 @@ class Harness:
                     [html_caption(connector.image)]]
             # fmt: on
 
+            if connector.strip.sleeve or connector.strip.insulation:
+                rows.append([
+                    f'Strip Sleeve: {html_length(connector.strip.sleeve)} Insulation: {html_length(connector.strip.insulation)}'
+                ])
             rows.extend(get_additional_component_table(self, connector))
             rows.append([html_line_breaks(connector.notes)])
             html.extend(nested_html_table(rows, html_bgcolor_attr(connector.bgcolor)))
