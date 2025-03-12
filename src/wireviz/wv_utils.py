@@ -241,3 +241,10 @@ def check_old(node: str, old_attr: dict, args: dict) -> None:
     for attr, descr in old_attr.items():
         if attr in args:
             raise ValueError(f"'{attr}' in {node}: '{attr}' {descr}")
+
+# Returns a Additional Component from <part> with the given <reference>
+def getAddCompFromRef(reference, part):
+    #print(part.additional_components)
+    for comp in part.additional_components:
+        if reference in comp.references:
+            return comp;

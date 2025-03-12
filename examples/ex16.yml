@@ -1,0 +1,58 @@
+options:
+  mini_bom_mode: false # disable mini_bom to show difference to ex15
+
+connectors: # This is based on ex1 and adds some Loops to the connectors
+  X1:
+    type: Molex KK 254
+    subtype: female
+    pinlabels: [GND, VCC, RX, TX, GND, VCC, GND]
+    loops: # A List(Dict) of loops is created
+      LO1: [1, 5, 7]  # First is the designator than a list of pins to be shorted
+      LO2: [2, 6]
+    additional_components:  # Some Additional Components to describe the short in more detail
+      - references: LO1
+        color: PK   # The color of the short, can also be multicolor
+        manufacturer: WireViz
+        mpn: 42XCD42A5
+        type: loopPartA
+        amount: 42 mm   # The length or some other quantity 
+      - references: LO2
+        color: RDBUOGLB   # multicolor example
+        manufacturer: WireViz
+        mpn: 42XCD42A5
+        type: loopPartB
+        amount: 74 mm
+
+  X2:
+    type: Molex KK 254
+    subtype: female
+    pinlabels: [GND, VCC, RX, TX, GND, VCC, GND]
+    loops:
+      LO1: [1, 5, 7]
+      LO2: [2, 6]
+    additional_components:
+      - references: [LO1, LO2]  # example to show how one additional_components can reference more than one short or loop
+        color: PK
+        manufacturer: WireViz
+        mpn: 42XCD42A5
+        type: loopPartC
+        amount: 21 mm
+
+cables:
+  W1:
+    color_code: IEC
+    wirecount: 4
+    gauge: 0.25 mm2
+    show_equiv: true
+    length: 0.2
+    shield: true
+    type: Serial
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1,2,4,3]
+  -
+    - X1: 1
+    - W1: s

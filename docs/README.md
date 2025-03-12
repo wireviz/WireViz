@@ -148,6 +148,11 @@ To see how to specify the output formats, as well as additional options, run:
 $ wireviz --help
 ```
 
+For using the .gv output one needs to use the following command:
+
+```
+dot <filename>.gv | gvpr -q -cf <filename>_pin2pin.gvpr | neato -n2 -T<type> -o <filename>.<type>
+```
 
 ### (Re-)Building the example projects
 

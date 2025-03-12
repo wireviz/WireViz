@@ -1,0 +1,46 @@
+connectors: # This is based on ex1 and adds some Shorts to the connectors
+  X1: # An example of Shorts with more information
+    type: Molex KK 254
+    subtype: female
+    pinlabels: [GND, VCC, RX, TX, GND, VCC, GND]
+    shorts: # A List(Dict) of shorts is created
+      SH1: [1, 5, 7]  # First is the designator than a list of pins to be shorted
+      SH2: [2, 6]
+    additional_components:  # Some Additional Components to describe the short in more detail
+      - references: SH1
+        color: PK   # The color of the short, can also be multicolor
+        manufacturer: WireViz
+        mpn: 42XCD42A5
+        type: shortPartA
+        amount: 42 mm   # The length or some other quantity 
+      - references: SH2
+        color: RD
+        manufacturer: WireViz
+        mpn: 42XCD42A5
+        type: shortPartB
+  X2: # An example of a simple short definition
+    type: Molex KK 254
+    subtype: female
+    pinlabels: [GND, VCC, RX, TX, GND, VCC, GND]
+    shorts: # The definition is the same as above but there is no additional_components for more information
+      SH1: [1, 5, 7]
+      SH2: [2, 6]
+
+cables:
+  W1:
+    color_code: TEL
+    wirecount: 4
+    gauge: 0.25 mm2
+    show_equiv: true
+    length: 0.2
+    shield: true
+    type: Serial
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1,2,4,3]
+  -
+    - X1: 1
+    - W1: s

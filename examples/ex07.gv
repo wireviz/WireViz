@@ -134,19 +134,7 @@ graph {
      <td align="right">X2:7 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w1">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#000000" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#FFFF00" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#000000" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w1"></td>
     </tr>
     <tr>
      <td align="left"> X1:6</td>
@@ -156,19 +144,7 @@ graph {
      <td align="right">X2:2 </td>
     </tr>
     <tr>
-     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w2">
-      <table border="0" cellborder="0" cellspacing="0">
-       <tr>
-        <td bgcolor="#000000" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#00AA00" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-       <tr>
-        <td bgcolor="#000000" border="0" cellpadding="0" colspan="5" height="2"></td>
-       </tr>
-      </table>
-     </td>
+     <td border="0" cellspacing="0" cellpadding="0" colspan="5" height="6" port="w2"></td>
     </tr>
     <tr>
      <td>&nbsp;</td>
@@ -184,4 +160,6 @@ graph {
 	edge [color="#000000:#00AA00:#000000"]
 	X1:p6r:e -- C1:w2:w
 	C1:w2:e -- X2:p2l:w
+	C1:w1:e -- C1:w1:w [color="#000000:#FFFF00:#000000" straight=straight]
+	C1:w2:e -- C1:w2:w [color="#000000:#00AA00:#000000" straight=straight]
 }
