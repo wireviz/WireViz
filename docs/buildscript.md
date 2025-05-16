@@ -2,7 +2,7 @@
 
 <!--
 The following text is taken from #118
-https://github.com/formatc1702/WireViz/pull/118
+https://github.com/wireviz/WireViz/pull/118
 
 TODO: write a better explaination -->
 

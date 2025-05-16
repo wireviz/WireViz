@@ -2,15 +2,16 @@
 
 import re
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Callable, Dict, List, Union
 
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import Metadata, Options
+from wireviz.svgembed import data_URI_base64
 from wireviz.wv_gv_html import html_line_breaks
 from wireviz.wv_helper import (
+    file_read_text,
+    file_write_text,
     flatten2d,
-    open_file_read,
-    open_file_write,
     smart_file_resolve,
 )
 
@@ -21,7 +22,6 @@ def generate_html_output(
     metadata: Metadata,
     options: Options,
 ):
-
     # load HTML template
     templatename = metadata.get("template", {}).get("name")
     if templatename:
@@ -34,14 +34,14 @@ def generate_html_output(
         # fall back to built-in simple template if no template was provided
         templatefile = Path(__file__).parent / "templates/simple.html"
 
-    html = open_file_read(templatefile).read()
+    html = file_read_text(templatefile)  # TODO?: Warn if unexpected meta charset?
 
-    # embed SVG diagram
-    with open_file_read(f"{filename}.tmp.svg") as file:
-        svgdata = re.sub(
+    # embed SVG diagram (only if used)
+    def svgdata() -> str:
+        return re.sub(  # TODO?: Verify xml encoding="utf-8" in SVG?
             "^<[?]xml [^?>]*[?]>[^<]*<!DOCTYPE [^>]*>",
             "<!-- XML and DOCTYPE declarations from SVG file removed -->",
-            file.read(),
+            file_read_text(f"{filename}.tmp.svg"),
             1,
         )
 
@@ -80,12 +80,26 @@ def generate_html_output(
         "<!-- %generator% -->": f"{APP_NAME} {__version__} - {APP_URL}",
         "<!-- %fontname% -->": options.fontname,
         "<!-- %bgcolor% -->": wv_colors.translate_color(options.bgcolor, "hex"),
-        "<!-- %diagram% -->": svgdata,
+        "<!-- %filename% -->": str(filename),
+        "<!-- %filename_stem% -->": Path(filename).stem,
         "<!-- %bom% -->": bom_html,
         "<!-- %bom_reversed% -->": bom_html_reversed,
         "<!-- %sheet_current% -->": "1",  # TODO: handle multi-page documents
         "<!-- %sheet_total% -->": "1",  # TODO: handle multi-page documents
+        "<!-- %template_sheetsize% -->": metadata.get("template", {}).get(
+            "sheetsize", ""
+        ),
     }
+
+    def replacement_if_used(key: str, func: Callable[[], str]) -> None:
+        """Append replacement only if used in html."""
+        if key in html:
+            replacements[key] = func()
+
+    replacement_if_used("<!-- %diagram% -->", svgdata)
+    replacement_if_used(
+        "<!-- %diagram_png_b64% -->", lambda: data_URI_base64(f"{filename}.png")
+    )
 
     # prepare metadata replacements
     if metadata:
@@ -97,14 +111,11 @@ def generate_html_output(
                     if isinstance(entry, Dict):
                         replacements[f"<!-- %{item}_{index+1}% -->"] = str(category)
                         for entry_key, entry_value in entry.items():
-                            replacements[f"<!-- %{item}_{index+1}_{entry_key}% -->"] = (
-                                html_line_breaks(str(entry_value))
-                            )
-
-        replacements['"sheetsize_default"'] = '"{}"'.format(
-            metadata.get("template", {}).get("sheetsize", "")
-        )
-        # include quotes so no replacement happens within <style> definition
+                            replacements[
+                                f"<!-- %{item}_{index+1}_{entry_key}% -->"
+                            ] = html_line_breaks(str(entry_value))
+                    elif isinstance(entry, (str, int, float)):
+                        pass  # TODO?: replacements[f"<!-- %{item}_{category}% -->"] = html_line_breaks(str(entry))
 
     # perform replacements
     # regex replacement adapted from:
@@ -116,4 +127,4 @@ def generate_html_output(
     pattern = re.compile("|".join(replacements_escaped))
     html = pattern.sub(lambda match: replacements[match.group(0)], html)
 
-    open_file_write(f"{filename}.html").write(html)
+    file_write_text(f"{filename}.html", html)

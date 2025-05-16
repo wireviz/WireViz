@@ -1,6 +1,6 @@
 # Contribution Guidelines
 
-When contributing to this repository, please [submit a new issue](https://github.com/formatc1702/WireViz/issues) first to discuss the proposed change, before submitting a pull request.
+When contributing to this repository, please [submit a new issue](https://github.com/wireviz/WireViz/issues) first to discuss the proposed change, before submitting a pull request.
 
 ## Submitting a new Issue
 
@@ -27,7 +27,7 @@ When contributing to this repository, please [submit a new issue](https://github
 1. Push the changes to your fork.
 1. Please format your code using [`isort`](https://pycqa.github.io/isort/) and [`black`](https://black.readthedocs.io) before submitting.
 1. Submit a new pull request, using `dev` as the base branch.
-  - If your code changes or extends the WireViz YAML syntax, be sure to update the [syntax description document](https://github.com/formatc1702/WireViz/blob/dev/docs/syntax.md) in your PR.
+  - If your code changes or extends the WireViz YAML syntax, be sure to update the [syntax description document](https://github.com/wireviz/WireViz/blob/dev/docs/syntax.md) in your PR.
 1. Please include in the PR description (and optionally also in the commit message body) a reference (# followed by issue number) to the issue where the suggested changes are discussed.
 
 ### Hints

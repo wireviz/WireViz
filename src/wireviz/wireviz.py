@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import platform
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
@@ -14,11 +15,13 @@ from wireviz.DataClasses import Metadata, Options, Tweak
 from wireviz.Harness import Harness
 from wireviz.wv_helper import (
     expand,
+    file_read_text,
     get_single_key_and_value,
     is_arrow,
-    open_file_read,
     smart_file_resolve,
 )
+
+from . import APP_NAME
 
 
 def parse(
@@ -86,6 +89,10 @@ def parse(
         raise Exception("No output formats or return types specified")
 
     yaml_data, yaml_file = _get_yaml_data_and_path(inp)
+    if not isinstance(yaml_data, dict):
+        raise TypeError(
+            f"Expected a dict as top-level YAML input, but got: {type(yaml_data)}"
+        )
     if output_formats:
         # need to write data to file, determine output directory and filename
         output_dir = _get_output_dir(yaml_file, output_dir)
@@ -117,10 +124,7 @@ def parse(
 
     # When title is not given, either deduce it from filename, or use default text.
     if "title" not in harness.metadata:
-        if yaml_file is None:
-            harness.metadata["title"] = "WireViz diagram and BOM"
-        else:
-            harness.metadata["title"] = Path(yaml_file).stem
+        harness.metadata["title"] = output_name or f"{APP_NAME} diagram and BOM"
 
     # add items
     # parse YAML input file ====================================================
@@ -205,7 +209,6 @@ def parse(
         expected_type = alternating_types[1 - alternating_types.index(expected_type)]
 
     for connection_set in connection_sets:
-
         # figure out number of parallel connections within this set
         connectioncount = []
         for entry in connection_set:
@@ -405,14 +408,21 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
         try:
             yaml_path = Path(inp).expanduser().resolve(strict=True)
             # if no FileNotFoundError exception happens, get file contents
-            yaml_str = open_file_read(yaml_path).read()
-        except (FileNotFoundError, OSError) as e:
-            # if inp is a long YAML string, Pathlib will raise OSError: [errno.ENAMETOOLONG]
-            # when trying to expand and resolve it as a path.
-            # Catch this error, but raise any others
-            from errno import ENAMETOOLONG
+            yaml_str = file_read_text(yaml_path)
+        except (FileNotFoundError, OSError, ValueError) as e:
+            # if inp is a long YAML string, Pathlib will normally raise
+            # FileNotFoundError or OSError(errno = ENAMETOOLONG) when
+            # trying to expand and resolve it as a path, but in Windows
+            # might ValueError or OSError(errno = EINVAL or None) be raised
+            # instead in some cases (depending on the Python version).
+            # Catch these specific errors, but raise any others.
 
-            if type(e) is OSError and e.errno != ENAMETOOLONG:
+            from errno import EINVAL, ENAMETOOLONG
+
+            if type(e) is OSError and e.errno not in (EINVAL, ENAMETOOLONG, None):
+                print(
+                    f"OSError(errno={e.errno}) in Python {sys.version} at {platform.platform()}"
+                )
                 raise e
             # file does not exist; assume inp is a YAML string
             yaml_str = inp
