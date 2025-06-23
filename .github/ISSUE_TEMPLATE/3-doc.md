@@ -1,5 +1,5 @@
 ---
-name: Documentation issue template
+name: Documentation issue
 about: Help us improve the WireViz documentation
 title: "[doc] "
 labels: 'documentation'
