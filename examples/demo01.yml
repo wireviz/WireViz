@@ -3,7 +3,7 @@ connectors:
     type: D-Sub
     subtype: female
     pinlabels: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
-  X2:
+  Xblabla2:
     type: Molex KK 254
     subtype: female
     pinlabels: [GND, RX, TX]
@@ -11,7 +11,7 @@ connectors:
 cables:
   W1:
     gauge: 0.25 mm2
-    length: 0.2
+    length: 0.5
     color_code: DIN
     wirecount: 3
     shield: true
