@@ -4,7 +4,7 @@ connectors:
     type: Stewart Connector SS-37000-002
     subtype: male
     pinlabels: [DA+,DA-,DB+,DC+,DC-,DB-,DD+,DD-] # pincount is implicit in pinout
-  X2:
+  Xblabla2:
     type: Stewart Connector SS-37000-002
     subtype: male
     pinlabels: [DB+,DB-,DA+,DD+,DD-,DA-,DC+,DC-]
