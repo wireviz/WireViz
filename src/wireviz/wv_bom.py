@@ -185,6 +185,56 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
         # add cable/bundles aditional components to bom
         bom_entries.extend(get_additional_component_bom(cable))
 
+    # conduits
+    for conduit in harness.conduits.values():
+        if not conduit.ignore_in_bom:
+            description = (
+                "Conduit"
+                + (f", {conduit.type}" if conduit.type else "")
+                + (f", {conduit.gauge} {conduit.gauge_unit}" if conduit.gauge else "")
+                + (
+                    f", {conduit.length} {conduit.length_unit}"
+                    if conduit.length > 0
+                    else ""
+                )
+                + (
+                    f", {translate_color(conduit.color, harness.options.color_mode)}"
+                    if conduit.color
+                    else ""
+                )
+            )
+            bom_entries.append(
+                {
+                    "description": description,
+                    "qty": conduit.length,
+                    "unit": conduit.length_unit,
+                    "designators": conduit.name if conduit.show_name else None,
+                    **optional_fields(conduit),
+                }
+            )
+
+        # add conduits aditional components to bom
+        bom_entries.extend(get_additional_component_bom(conduit))
+
+    # conduit connectors
+    for conduit_connector in harness.conduit_connectors.values():
+        if not conduit_connector.ignore_in_bom:
+            description = "Conduit Connector" + (
+                f", {conduit_connector.type}" if conduit_connector.type else ""
+            )
+            bom_entries.append(
+                {
+                    "description": description,
+                    "designators": (
+                        conduit_connector.name if conduit_connector.show_name else None
+                    ),
+                    **optional_fields(conduit_connector),
+                }
+            )
+
+        # add conduit connectors aditional components to bom
+        bom_entries.extend(get_additional_component_bom(conduit_connector))
+
     # add harness aditional components to bom directly, as they both are List[BOMEntry]
     bom_entries.extend(harness.additional_bom_items)
 
@@ -204,9 +254,11 @@ def generate_bom(harness: "Harness") -> List[BOMEntry]:
         bom.append(
             {
                 **group_entries[0],
-                "qty": int(total_qty)
-                if float(total_qty).is_integer()
-                else round(total_qty, 3),
+                "qty": (
+                    int(total_qty)
+                    if float(total_qty).is_integer()
+                    else round(total_qty, 3)
+                ),
                 "designators": sorted(set(designators)),
             }
         )

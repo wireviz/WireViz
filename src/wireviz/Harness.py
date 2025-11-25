@@ -8,9 +8,12 @@ from pathlib import Path
 from typing import Any, List, Union
 
 from graphviz import Graph
+
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import (
     Cable,
+    Conduit,
+    ConduitConnector,
     Connector,
     MateComponent,
     MatePin,
@@ -73,7 +76,9 @@ class Harness:
 
     def __post_init__(self):
         self.connectors = {}
+        self.conduit_connectors = {}
         self.cables = {}
+        self.conduits = {}
         self.mates = []
         self._bom = []  # Internal Cache for generated bom
         self.additional_bom_items = []
@@ -82,8 +87,14 @@ class Harness:
         check_old(f"Connector '{name}'", OLD_CONNECTOR_ATTR, kwargs)
         self.connectors[name] = Connector(name, *args, **kwargs)
 
+    def add_conduit_connector(self, name: str, *args, **kwargs) -> None:
+        self.conduit_connectors[name] = ConduitConnector(name, *args, **kwargs)
+
     def add_cable(self, name: str, *args, **kwargs) -> None:
         self.cables[name] = Cable(name, *args, **kwargs)
+
+    def add_conduit(self, name: str, *args, **kwargs) -> None:
+        self.conduits[name] = Conduit(name, *args, **kwargs)
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
         self.mates.append(MatePin(from_name, from_pin, to_name, to_pin, arrow_type))
@@ -100,6 +111,7 @@ class Harness:
         self,
         from_name: str,
         from_pin: (int, str),
+        conduits: [str],
         via_name: str,
         via_wire: (int, str),
         to_name: str,
@@ -128,7 +140,7 @@ class Harness:
                 if not pin in connector.pins:
                     raise Exception(f"{name}:{pin} not found.")
 
-        # check via cable
+        # check via cable or conduit
         if via_name in self.cables:
             cable = self.cables[via_name]
             # check if provided name is ambiguous
@@ -153,9 +165,27 @@ class Harness:
                 via_wire = (
                     cable.wirelabels.index(via_wire) + 1
                 )  # list index starts at 0, wire IDs start at 1
+            cable.conduits = conduits
+        elif via_name in self.conduits:
+            conduit = self.conduits[via_name]
+            # for conduits, via_wire is the port number
+            if not isinstance(via_wire, int):
+                raise Exception(
+                    f"{via_name}:{via_wire} must be an integer port number for conduits."
+                )
+            if via_wire < 1 or via_wire > conduit.ports:
+                raise Exception(f"{via_name}:{via_wire} port out of range.")
+            conduit.conduits = conduits
 
         # perform the actual connection
-        self.cables[via_name].connect(from_name, from_pin, via_wire, to_name, to_pin)
+        if via_name in self.cables:
+            self.cables[via_name].connect(
+                from_name, from_pin, via_wire, to_name, to_pin
+            )
+        elif via_name in self.conduits:
+            self.conduits[via_name].connect(
+                from_name, from_pin, via_wire, to_name, to_pin
+            )
         if from_name in self.connectors:
             self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
         if to_name in self.connectors:
@@ -302,10 +332,10 @@ class Harness:
                 # Only convert units we actually know about, i.e. currently
                 # mm2 and awg --- other units _are_ technically allowed,
                 # and passed through as-is.
-                if cable.gauge_unit == "mm\u00B2":
+                if cable.gauge_unit == "mm\u00b2":
                     awg_fmt = f" ({awg_equiv(cable.gauge)} AWG)"
                 elif cable.gauge_unit.upper() == "AWG":
-                    awg_fmt = f" ({mm2_equiv(cable.gauge)} mm\u00B2)"
+                    awg_fmt = f" ({mm2_equiv(cable.gauge)} mm\u00b2)"
 
             # fmt: off
             rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
@@ -530,6 +560,79 @@ class Harness:
                 shape="box",
                 style=style,
                 fillcolor=translate_color(bgcolor, "HEX"),
+            )
+
+        for conduit in self.conduits.values():
+            html = []
+
+            awg_fmt = ""
+            if conduit.show_equiv:
+                # Only convert units we actually know about, i.e. currently
+                # mm2 and awg --- other units _are_ technically allowed,
+                # and passed through as-is.
+                if conduit.gauge_unit == "mm\u00b2":
+                    awg_fmt = f" ({awg_equiv(conduit.gauge)} AWG)"
+                elif conduit.gauge_unit.upper() == "AWG":
+                    awg_fmt = f" ({mm2_equiv(conduit.gauge)} mm\u00b2)"
+
+            # fmt: off
+            rows = [[f'{html_bgcolor(conduit.bgcolor_title)}{remove_links(conduit.name)}'
+                        if conduit.show_name else None],
+                    [pn_info_string(HEADER_PN, None,
+                        remove_links(conduit.pn)) if not isinstance(conduit.pn, list) else None,
+                     html_line_breaks(pn_info_string(HEADER_MPN,
+                        conduit.manufacturer if not isinstance(conduit.manufacturer, list) else None,
+                        conduit.mpn if not isinstance(conduit.mpn, list) else None)),
+                     html_line_breaks(pn_info_string(HEADER_SPN,
+                        conduit.supplier if not isinstance(conduit.supplier, list) else None,
+                        conduit.spn if not isinstance(conduit.spn, list) else None))],
+                     [html_line_breaks(conduit.type),
+                        f'{conduit.gauge} {conduit.gauge_unit}{awg_fmt}' if conduit.gauge else None,
+                        f'{conduit.length} {conduit.length_unit}' if conduit.length > 0 else None,
+                      translate_color(conduit.color, self.options.color_mode) if conduit.color else None,
+                      html_colorbar(cable.color)],
+                     '<!-- wire table -->',
+                     [html_image(conduit.image)],
+                     [html_caption(conduit.image)]]
+            # fmt: on
+
+            rows.extend(get_additional_component_table(self, conduit))
+            rows.append([html_line_breaks(conduit.notes)])
+            html.extend(nested_html_table(rows, html_bgcolor_attr(conduit.bgcolor)))
+
+            wirehtml = []
+            # conductor table
+            wirehtml.append('<table border="0" cellspacing="0" cellborder="0">')
+            wirehtml.append("   <tr><td>&nbsp;</td></tr>")
+
+            for i in range(1, conduit.ports + 1):
+                # fmt: off
+                bgcolors = ['#000000'] + get_color_hex(conduit.colors[i - 1], pad=pad) + ['#000000']
+                wirehtml.append(f"   <tr>")
+                wirehtml.append(f'    <td colspan="3" border="0" cellspacing="0" cellpadding="0" port="w{i}" height="{(2 * len(bgcolors))}">')
+                wirehtml.append('     <table cellspacing="0" cellborder="0" border="0">')
+                for j, bgcolor in enumerate(bgcolors[::-1]):  # Reverse to match the curved wires when more than 2 colors
+                    wirehtml.append(f'      <tr><td colspan="3" cellpadding="0" height="2" bgcolor="{bgcolor if bgcolor != "" else wv_colors.default_color}" border="0"></td></tr>')
+                wirehtml.append("     </table>")
+                wirehtml.append("    </td>")
+                wirehtml.append("   </tr>")
+                # fmt: on
+
+                wirehtml.append("   <tr><td>&nbsp;</td></tr>")
+
+            wirehtml.append("  </table>")
+
+            html = [
+                row.replace("<!-- wire table -->", "\n".join(wirehtml)) for row in html
+            ]
+
+            html = "\n".join(html)
+            dot.node(
+                conduit.name,
+                label=f"<\n{html}\n>",
+                shape="box",
+                style="dotted",
+                fillcolor=translate_color(self.options.bgcolor_conduit, "HEX"),
             )
 
         # mates

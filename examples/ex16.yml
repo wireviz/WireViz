@@ -1,0 +1,46 @@
+connectors:
+  X1:
+    type: Connector
+    subtype: Male
+    pincount: 2
+    pins: [1, 2]
+    pinlabels: [A, B]
+  X2:
+    type: Connector
+    subtype: Female
+    pincount: 2
+    pins: [1, 2]
+    pinlabels: [A, B]
+
+conduit-connectors:
+  X1:
+    type: Conduit Connector
+  X2:
+    type: Conduit Connector
+
+cables:
+  W1:
+    wirecount: 1
+    colors: [BU]
+  W2:
+    wirecount: 1
+    colors: [BN]
+
+conduits:
+  C1:
+    type: Conduit
+    ports: 2
+    colors: [BU, BN]
+
+connections:
+  - - X1
+    - W1
+    - X2
+  - - X1
+    - W2
+    - X2
+
+conduit-connections:
+  - - X1
+    - C1
+    - X2

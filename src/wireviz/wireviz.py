@@ -109,7 +109,10 @@ def parse(
     # containers for parsed component data and connection sets
     template_connectors = {}
     template_cables = {}
+    template_conduits = {}
+    template_conduit_connectors = {}
     connection_sets = []
+    conduit_connection_sets = []
     # actual harness
     harness = Harness(
         metadata=Metadata(**yaml_data.get("metadata", {})),
@@ -129,8 +132,15 @@ def parse(
     # add items
     # parse YAML input file ====================================================
 
-    sections = ["connectors", "cables", "connections"]
-    types = [dict, dict, list]
+    sections = [
+        "connectors",
+        "cables",
+        "conduits",
+        "conduit-connectors",
+        "connections",
+        "conduit-connections",
+    ]
+    types = [dict, dict, dict, dict, list, list]
     for sec, ty in zip(sections, types):
         if sec in yaml_data and type(yaml_data[sec]) == ty:  # section exists
             if len(yaml_data[sec]) > 0:  # section has contents
@@ -149,6 +159,10 @@ def parse(
                             template_connectors[key] = attribs
                         elif sec == "cables":
                             template_cables[key] = attribs
+                        elif sec == "conduits":
+                            template_conduits[key] = attribs
+                        elif sec == "conduit-connectors":
+                            template_conduit_connectors[key] = attribs
             else:  # section exists but is empty
                 pass
         else:  # section does not exist, create empty section
@@ -158,6 +172,8 @@ def parse(
                 yaml_data[sec] = []
 
     connection_sets = yaml_data["connections"]
+    conduit_connection_sets = yaml_data.get("conduit-connections", [])
+    conduit_dict = {}
 
     # go through connection sets, generate and connect components ==============
 
@@ -192,6 +208,7 @@ def parse(
     # utilities to check for alternating connectors and cables/arrows ==========
 
     alternating_types = ["connector", "cable/arrow"]
+    alternating_types_conduit = ["conduit-connector", "conduit"]
     expected_type = None
 
     def check_type(designator, template, actual_type):
@@ -204,7 +221,7 @@ def parse(
                 f'Expected {expected_type}, but "{designator}" ("{template}") is {actual_type}'
             )
 
-    def alternate_type():  # flip between connector and cable/arrow
+    def alternate_type(alternating_types):  # flip between types
         nonlocal expected_type
         expected_type = alternating_types[1 - alternating_types.index(expected_type)]
 
@@ -307,7 +324,9 @@ def parse(
                         f"{template} is an unknown template/designator/arrow."
                     )
 
-            alternate_type()  # entries in connection set must alternate between connectors and cables/arrows
+            alternate_type(
+                alternating_types
+            )  # entries in connection set must alternate between connectors and cables/arrows
 
         # transpose connection set list
         # before: one item per component, one subitem per connection in set
@@ -336,7 +355,7 @@ def parse(
                             entry[index_item + 1]
                         )
                     harness.connect(
-                        from_name, from_pin, via_name, via_pin, to_name, to_pin
+                        from_name, from_pin, [], via_name, via_pin, to_name, to_pin
                     )
 
                 elif is_arrow(designator):
@@ -362,10 +381,172 @@ def parse(
                         # mate two connectors as a whole
                         harness.add_mate_component(from_name, to_name, designator)
 
+    # go through conduit connection sets, generate and connect conduit components ==============
+
+    for connection_set in conduit_connection_sets:
+        # figure out number of parallel connections within this set
+        connectioncount = []
+        for entry in connection_set:
+            if isinstance(entry, list):
+                connectioncount.append(len(entry))
+            elif isinstance(entry, dict):
+                connectioncount.append(len(expand(list(entry.values())[0])))
+                # e.g.: - X1: [1-4,6] yields 5
+            else:
+                pass  # strings do not reveal connectioncount
+        if not any(connectioncount):
+            # no item in the list revealed connection count;
+            # assume connection count is 1
+            connectioncount = [1]
+            # Example: The following is a valid connection set,
+            #          even though no item reveals the connection count;
+            #          the count is not needed because only a component-level mate happens.
+            # -
+            #   - CONNECTOR
+            #   - ==>
+            #   - CONNECTOR
+
+        # check that all entries are the same length
+        if len(set(connectioncount)) > 1:
+            raise Exception(
+                "All items in connection set must reference the same number of connections"
+            )
+        # all entries are the same length, connection count is set
+        connectioncount = connectioncount[0]
+
+        # expand string entries to list entries of correct length
+        for index, entry in enumerate(connection_set):
+            if isinstance(entry, str):
+                connection_set[index] = [entry] * connectioncount
+
+        # resolve all designators
+        for index, entry in enumerate(connection_set):
+            if isinstance(entry, list):
+                for subindex, item in enumerate(entry):
+                    template, designator = resolve_designator(
+                        item, template_separator_char
+                    )
+                    connection_set[index][subindex] = designator
+            elif isinstance(entry, dict):
+                key = list(entry.keys())[0]
+                template, designator = resolve_designator(key, template_separator_char)
+                value = entry[key]
+                connection_set[index] = {designator: value}
+            else:
+                pass  # string entries have been expanded in previous step
+
+        # expand all pin lists
+        for index, entry in enumerate(connection_set):
+            if isinstance(entry, list):
+                connection_set[index] = [{designator: 1} for designator in entry]
+            elif isinstance(entry, dict):
+                designator = list(entry.keys())[0]
+                pinlist = expand(entry[designator])
+                connection_set[index] = [{designator: pin} for pin in pinlist]
+            else:
+                pass  # string entries have been expanded in previous step
+
+        # Populate wiring harness ==============================================
+
+        expected_type = None  # reset check for alternating types
+        # at the beginning of every connection set
+        # since each set may begin with either type
+
+        # generate components
+        for entry in connection_set:
+            for item in entry:
+                designator = list(item.keys())[0]
+                template = designators_and_templates[designator]
+
+                if (
+                    designator in harness.conduit_connectors
+                ):  # existing conduit connector instance
+                    check_type(designator, template, "conduit-connector")
+                elif template in template_conduit_connectors.keys():
+                    # generate new conduit connector instance from template
+                    check_type(designator, template, "conduit-connector")
+                    harness.add_conduit_connector(
+                        name=designator, **template_conduit_connectors[template]
+                    )
+
+                elif designator in harness.conduits:  # existing conduit instance
+                    check_type(designator, template, "conduit")
+                elif template in template_conduits.keys():
+                    # generate new conduit instance from template
+                    check_type(designator, template, "conduit")
+                    harness.add_conduit(name=designator, **template_conduits[template])
+
+                else:
+                    raise Exception(
+                        f"{template} is an unknown conduit template/designator."
+                    )
+
+            alternate_type(
+                alternating_types_conduit
+            )  # entries in connection set must alternate between conduit-connectors and conduits
+
+        # transpose connection set list
+        # before: one item per component, one subitem per connection in set
+        # after:  one item per connection in set, one subitem per component
+        connection_set = list(map(list, zip(*connection_set)))
+
+        # connect conduit components
+        for index_entry, entry in enumerate(connection_set):
+            for index_item, item in enumerate(entry):
+                designator = list(item.keys())[0]
+
+                if designator in harness.conduits:
+                    if index_item == 0:
+                        # list started with a conduit, no conduit connector to join on left side
+                        from_name, from_pin = (None, None)
+                    else:
+                        from_name, from_pin = get_single_key_and_value(
+                            entry[index_item - 1]
+                        )
+                    via_name, via_pin = (designator, item[designator])
+                    if index_item == len(entry) - 1:
+                        # list ends with a conduit, no conduit connector to join on right side
+                        to_name, to_pin = (None, None)
+                    else:
+                        to_name, to_pin = get_single_key_and_value(
+                            entry[index_item + 1]
+                        )
+                    harness.connect(
+                        from_name, from_pin, [], via_name, via_pin, to_name, to_pin
+                    )
+
+    # build conduit_dict
+    for conduit_connection_set in conduit_connection_sets:
+        for connection in conduit_connection_set:
+            if len(connection) == 3:
+                from_name = connection[0]
+                via_name = connection[1]
+                to_name = connection[2]
+                if via_name in harness.conduits:
+                    conduit = via_name
+                    conduit_connectors = [from_name, to_name]
+                    for cable_name, cable in harness.cables.items():
+                        for conn in cable.connections:
+                            if (
+                                conn.from_name in conduit_connectors
+                                or conn.to_name in conduit_connectors
+                            ):
+                                if cable_name not in conduit_dict:
+                                    conduit_dict[cable_name] = []
+                                if conduit not in conduit_dict[cable_name]:
+                                    conduit_dict[cable_name].append(conduit)
+
+    # set conduits for cables
+    for cable_name, cable in harness.cables.items():
+        cable.conduits = conduit_dict.get(cable_name, [])
+
     # warn about unused templates
 
-    proposed_components = list(template_connectors.keys()) + list(
-        template_cables.keys()
+    proposed_components = (
+        list(template_connectors.keys())
+        + list(template_cables.keys())
+        + list(template_conduits.keys())
+        + list(template_conduit_connectors.keys())
     )
     used_components = set(designators_and_templates.values())
     forgotten_components = [c for c in proposed_components if not c in used_components]
