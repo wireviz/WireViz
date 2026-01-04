@@ -64,6 +64,13 @@ def get_mime_subtype(filename: Union[str, Path]) -> str:
     return mime_subtype
 
 
+def _get_latest_revision(metadata: Dict) -> str:
+    if not "revisions" in metadata:
+        return ""
+    revision = list(metadata.get("revisions"))[-1]
+    return revision
+
+
 def embed_svg_images_file(
     filename_in: Union[str, Path], overwrite: bool = True
 ) -> None:
@@ -148,6 +155,7 @@ def generate_html_output(
         "<!-- %template_sheetsize% -->": metadata.get("template", {}).get(
             "sheetsize", ""
         ),
+        "<!-- %revision% -->": _get_latest_revision(metadata),
     }
 
     def replacement_if_used(key: str, func: Callable[[], str]) -> None:
