@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 from wireviz.wv_colors import COLOR_CODES, Color, ColorMode, Colors, ColorScheme
-from wireviz.wv_helper import aspect_ratio, int2tuple
+from wireviz.wv_helper import aspect_ratio, int2tuple, normalize_pin
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
 PlainText = str  # Text not containing HTML tags nor newlines
@@ -168,6 +168,15 @@ class Connector:
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
+        # Normalize pin-like fields so int/str types are consistent
+        # regardless of YAML quoting (e.g. "1" vs 1).
+        if self.pins:
+            self.pins = [normalize_pin(p) for p in self.pins]
+        if self.pinlabels:
+            self.pinlabels = [normalize_pin(p) for p in self.pinlabels]
+        if self.loops:
+            self.loops = [[normalize_pin(p) for p in loop] for loop in self.loops]
+
         self.ports_left = False
         self.ports_right = False
         self.visible_pins = {}
@@ -203,24 +212,81 @@ class Connector:
             # hide pincount for simple (1 pin) connectors by default
             self.show_pincount = self.style != "simple"
 
-        for loop in self.loops:
-            # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
+        for i, loop in enumerate(self.loops):
             # TODO: include properties of wire used to create the loop
             if len(loop) != 2:
                 raise Exception("Loops must be between exactly two pins!")
+            resolved = []
             for pin in loop:
-                if pin not in self.pins:
-                    raise Exception(
-                        f'Unknown loop pin "{pin}" for connector "{self.name}"!'
-                    )
+                pin = self.resolve_pin(pin)
+                resolved.append(pin)
                 # Make sure loop connected pins are not hidden.
                 self.activate_pin(pin, None)
+            if resolved[0] == resolved[1]:
+                raise Exception(
+                    f'Loop in connector "{self.name}" connects pin '
+                    f'"{resolved[0]}" to itself.'
+                )
+            self.loops[i] = resolved
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
 
-    def activate_pin(self, pin: Pin, side: Side) -> None:
+    def resolve_pin(self, pin: Pin) -> Pin:
+        """Resolve a pin identifier to its canonical pin number.
+
+        Given a value that may be either a pin number (from self.pins)
+        or a pin label (from self.pinlabels), returns the corresponding
+        pin number from self.pins.
+
+        Callers needing a positional index should use
+        self.pins.index(return_value).
+
+        Resolution order:
+            1. Value in both pins and pinlabels at the same position
+               -> return directly (no ambiguity).
+            2. Value in both at different positions -> raise.
+            3. Value only in pinlabels -> return corresponding pin number.
+            4. Value only in pins -> return directly.
+            5. Not found -> raise.
+
+        Note: Lookups are type-sensitive (int 1 != str "1").
+        """
+        in_pins = pin in self.pins
+        in_labels = pin in self.pinlabels if self.pinlabels else False
+
+        if in_pins and in_labels:
+            # present in both lists — check for duplicate labels first
+            if self.pinlabels.count(pin) > 1:
+                raise Exception(
+                    f'Pin label "{pin}" in connector "{self.name}" '
+                    f"is defined more than once in pinlabels."
+                )
+            # then check for positional ambiguity
+            if self.pins.index(pin) != self.pinlabels.index(pin):
+                raise Exception(
+                    f'"{pin}" in connector "{self.name}" exists in both '
+                    f"pins and pinlabels at different positions."
+                )
+            return pin  # same position, no ambiguity
+
+        if in_labels:
+            if self.pinlabels.count(pin) > 1:
+                raise Exception(
+                    f'Pin label "{pin}" in connector "{self.name}" '
+                    f"is defined more than once."
+                )
+            return self.pins[self.pinlabels.index(pin)]
+
+        if in_pins:
+            return pin
+
+        raise Exception(
+            f'Unknown pin "{pin}" for connector "{self.name}"!'
+        )
+
+    def activate_pin(self, pin: Pin, side: Optional[Side]) -> None:
         self.visible_pins[pin] = True
         if side == Side.LEFT:
             self.ports_left = True
@@ -347,6 +413,7 @@ class Cable:
             self.wirecount = len(self.colors)
 
         if self.wirelabels:
+            self.wirelabels = [normalize_pin(w) for w in self.wirelabels]
             if self.shield and "s" in self.wirelabels:
                 raise Exception(
                     '"s" may not be used as a wire label for a shielded cable.'
