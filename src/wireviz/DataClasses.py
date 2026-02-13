@@ -203,22 +203,54 @@ class Connector:
             # hide pincount for simple (1 pin) connectors by default
             self.show_pincount = self.style != "simple"
 
-        for loop in self.loops:
-            # TODO: allow using pin labels in addition to pin numbers, just like when defining regular connections
+        for i, loop in enumerate(self.loops):
             # TODO: include properties of wire used to create the loop
             if len(loop) != 2:
                 raise Exception("Loops must be between exactly two pins!")
+            resolved = []
             for pin in loop:
-                if pin not in self.pins:
-                    raise Exception(
-                        f'Unknown loop pin "{pin}" for connector "{self.name}"!'
-                    )
+                pin = self.resolve_pin(pin)
+                resolved.append(pin)
                 # Make sure loop connected pins are not hidden.
                 self.activate_pin(pin, None)
+            self.loops[i] = resolved
 
         for i, item in enumerate(self.additional_components):
             if isinstance(item, dict):
                 self.additional_components[i] = AdditionalComponent(**item)
+
+    def resolve_pin(self, pin: Pin) -> Pin:
+        """Resolve a pin identifier to its canonical pin number.
+
+        Accepts pin numbers (from self.pins) or pin labels (from
+        self.pinlabels). Raises if ambiguous or not found.
+        """
+        in_pins = pin in self.pins
+        in_labels = pin in self.pinlabels if self.pinlabels else False
+
+        if in_pins and in_labels:
+            # present in both lists — check for ambiguity
+            if self.pins.index(pin) != self.pinlabels.index(pin):
+                raise Exception(
+                    f'"{pin}" in connector "{self.name}" exists in both '
+                    f"pins and pinlabels at different positions."
+                )
+            return pin  # same position, no ambiguity
+
+        if in_labels:
+            if self.pinlabels.count(pin) > 1:
+                raise Exception(
+                    f'Pin label "{pin}" in connector "{self.name}" '
+                    f"is defined more than once."
+                )
+            return self.pins[self.pinlabels.index(pin)]
+
+        if in_pins:
+            return pin
+
+        raise Exception(
+            f'Unknown pin "{pin}" for connector "{self.name}"!'
+        )
 
     def activate_pin(self, pin: Pin, side: Side) -> None:
         self.visible_pins[pin] = True
