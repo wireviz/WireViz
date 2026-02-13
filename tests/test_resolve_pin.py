@@ -295,3 +295,114 @@ class TestHarnessConnectDelegation:
 
         with pytest.raises(Exception, match="Unknown pin"):
             harness.connect("X1", 99, "W1", 1, "X2", 1)
+
+
+# --- Pin type coercion (C-3 fix) ---
+
+
+class TestPinTypeCoercion:
+    """Verify that YAML quoting differences don't break pin lookups.
+
+    YAML safe_load() parses unquoted 1 as int(1) and quoted "1" as str("1").
+    The C-3 fix normalizes all pin-like fields at the dataclass boundary
+    so downstream code always sees consistent types.
+    """
+
+    def test_str_numeric_pins_normalize_to_int(self):
+        """String numeric pins are coerced to int."""
+        c = make_connector(pins=["1", "2", "3"])
+        assert c.pins == [1, 2, 3]
+        assert all(isinstance(p, int) for p in c.pins)
+
+    def test_mixed_type_pins_normalize(self):
+        """Mix of int and str numeric pins all become int."""
+        c = make_connector(pins=[1, "2", 3])
+        assert c.pins == [1, 2, 3]
+
+    def test_leading_zeros_normalize(self):
+        """Leading zeros normalize to plain ints."""
+        c = make_connector(pins=["01", "02", "03"])
+        assert c.pins == [1, 2, 3]
+
+    def test_non_numeric_pins_stay_str(self):
+        """Non-numeric pins remain as strings."""
+        c = make_connector(pins=["A", "B", "C"])
+        assert c.pins == ["A", "B", "C"]
+        assert all(isinstance(p, str) for p in c.pins)
+
+    def test_duplicate_after_normalization_raises(self):
+        """Pins that become duplicates after normalization are caught."""
+        with pytest.raises(Exception, match="Pins are not unique"):
+            make_connector(pins=[1, "1"])
+
+    def test_pinlabels_normalize(self):
+        """Pinlabels are also normalized."""
+        c = make_connector(pins=[1, 2], pinlabels=["10", "20"])
+        assert c.pinlabels == [10, 20]
+
+    def test_loop_pins_normalize(self):
+        """Loop pin references are normalized before resolve_pin()."""
+        c = make_connector(
+            pins=[1, 2, 3, 4],
+            loops=[["1", "2"]],
+        )
+        # Loops are resolved to pin numbers (which are already int)
+        assert c.loops == [[1, 2]]
+
+    def test_str_loop_pins_match_auto_generated_int_pins(self):
+        """String loop pins match auto-generated sequential int pins.
+
+        This is the core regression: without normalization,
+        "1" in [1, 2, 3] is False, so resolve_pin() would fail.
+        """
+        c = make_connector(
+            pincount=4,
+            loops=[["1", "3"]],
+        )
+        assert c.loops == [[1, 3]]
+
+    def test_wirelabels_normalize(self):
+        """Cable wirelabels are normalized."""
+        from wireviz.DataClasses import Cable
+
+        cable = Cable(name="W1", wirecount=3, colors=["BK", "RD", "GN"],
+                      wirelabels=["1", "2", "3"])
+        assert cable.wirelabels == [1, 2, 3]
+
+    def test_quoted_pin_yaml_renders(self):
+        """Integration: quoted pins in YAML render without error."""
+        import yaml
+
+        from wireviz.DataClasses import Metadata, Options, Tweak
+        from wireviz.Harness import Harness
+
+        yaml_str = """
+connectors:
+  X1:
+    pins: ["1", "2", "3"]
+    pinlabels: [VCC, GND, SIG]
+    loops:
+      - ["1", "2"]
+cables:
+  W1:
+    wirecount: 1
+    colors: [BK]
+connections:
+  -
+    - X1: ["3"]
+    - W1: [1]
+"""
+        data = yaml.safe_load(yaml_str)
+        harness = Harness(
+            metadata=Metadata(data.get("metadata", {})),
+            options=Options(**data.get("options", {})),
+            tweak=Tweak(**data.get("tweak", {})),
+        )
+        for name, conn_data in data.get("connectors", {}).items():
+            harness.add_connector(name, **conn_data)
+        for name, cable_data in data.get("cables", {}).items():
+            harness.add_cable(name, **cable_data)
+
+        # Should not raise — the whole point of C-3
+        graph = harness.create_graph()
+        assert graph is not None

@@ -34,6 +34,17 @@ def mm2_equiv(awg):
     return mm2_equiv_table.get(str(awg), "Unknown")
 
 
+def normalize_pin(value):
+    """Normalize a pin value: try int() first, fall back to str().
+
+    Matches the coercion convention used by expand().
+    """
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return str(value) if value is not None else value
+
+
 def expand(yaml_data):
     # yaml_data can be:
     # - a singleton (normally str or int)
@@ -61,11 +72,7 @@ def expand(yaml_data):
                 # '-' was not a delimiter between two ints, pass e through unchanged
                 output.append(e)
         else:
-            try:
-                x = int(e)  # single int
-            except Exception:
-                x = e  # string
-            output.append(x)
+            output.append(normalize_pin(e))
     return output
 
 

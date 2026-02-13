@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
 from wireviz.wv_colors import COLOR_CODES, Color, ColorMode, Colors, ColorScheme
-from wireviz.wv_helper import aspect_ratio, int2tuple
+from wireviz.wv_helper import aspect_ratio, int2tuple, normalize_pin
 
 # Each type alias have their legal values described in comments - validation might be implemented in the future
 PlainText = str  # Text not containing HTML tags nor newlines
@@ -167,6 +167,15 @@ class Connector:
     def __post_init__(self) -> None:
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
+
+        # Normalize pin-like fields so int/str types are consistent
+        # regardless of YAML quoting (e.g. "1" vs 1).
+        if self.pins:
+            self.pins = [normalize_pin(p) for p in self.pins]
+        if self.pinlabels:
+            self.pinlabels = [normalize_pin(p) for p in self.pinlabels]
+        if self.loops:
+            self.loops = [[normalize_pin(p) for p in loop] for loop in self.loops]
 
         self.ports_left = False
         self.ports_right = False
@@ -404,6 +413,7 @@ class Cable:
             self.wirecount = len(self.colors)
 
         if self.wirelabels:
+            self.wirelabels = [normalize_pin(w) for w in self.wirelabels]
             if self.shield and "s" in self.wirelabels:
                 raise Exception(
                     '"s" may not be used as a wire label for a shielded cable.'
