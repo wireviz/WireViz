@@ -105,28 +105,17 @@ class Harness:
         to_name: str,
         to_pin: (int, str),
     ) -> None:
-        # check from and to connectors
-        for name, pin in zip([from_name, to_name], [from_pin, to_pin]):
+        # resolve pin labels to pin numbers via Connector.resolve_pin()
+        for name, pin, is_from in [
+            (from_name, from_pin, True),
+            (to_name, to_pin, False),
+        ]:
             if name is not None and name in self.connectors:
-                connector = self.connectors[name]
-                # check if provided name is ambiguous
-                if pin in connector.pins and pin in connector.pinlabels:
-                    if connector.pins.index(pin) != connector.pinlabels.index(pin):
-                        raise Exception(
-                            f"{name}:{pin} is defined both in pinlabels and pins, for different pins."
-                        )
-                    # TODO: Maybe issue a warning if present in both lists but referencing the same pin?
-                if pin in connector.pinlabels:
-                    if connector.pinlabels.count(pin) > 1:
-                        raise Exception(f"{name}:{pin} is defined more than once.")
-                    index = connector.pinlabels.index(pin)
-                    pin = connector.pins[index]  # map pin name to pin number
-                    if name == from_name:
-                        from_pin = pin
-                    if name == to_name:
-                        to_pin = pin
-                if not pin in connector.pins:
-                    raise Exception(f"{name}:{pin} not found.")
+                resolved = self.connectors[name].resolve_pin(pin)
+                if is_from:
+                    from_pin = resolved
+                else:
+                    to_pin = resolved
 
         # check via cable
         if via_name in self.cables:
@@ -280,9 +269,14 @@ class Harness:
                 else:
                     raise Exception("No side for loops")
                 for loop in connector.loops:
+                    # Convert pin numbers to 1-based port indices.
+                    # Ports are named p{index+1} in the connector table,
+                    # not p{pin_number} — these differ for non-sequential pins.
+                    idx0 = connector.pins.index(loop[0]) + 1
+                    idx1 = connector.pins.index(loop[1]) + 1
                     dot.edge(
-                        f"{connector.name}:p{loop[0]}{loop_side}:{loop_dir}",
-                        f"{connector.name}:p{loop[1]}{loop_side}:{loop_dir}",
+                        f"{connector.name}:p{idx0}{loop_side}:{loop_dir}",
+                        f"{connector.name}:p{idx1}{loop_side}:{loop_dir}",
                         label=" ",  # Work-around to avoid over-sized loops.
                     )
 

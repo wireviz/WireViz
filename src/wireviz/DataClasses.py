@@ -213,6 +213,11 @@ class Connector:
                 resolved.append(pin)
                 # Make sure loop connected pins are not hidden.
                 self.activate_pin(pin, None)
+            if resolved[0] == resolved[1]:
+                raise Exception(
+                    f'Loop in connector "{self.name}" connects pin '
+                    f'"{resolved[0]}" to itself.'
+                )
             self.loops[i] = resolved
 
         for i, item in enumerate(self.additional_components):
@@ -229,7 +234,13 @@ class Connector:
         in_labels = pin in self.pinlabels if self.pinlabels else False
 
         if in_pins and in_labels:
-            # present in both lists — check for ambiguity
+            # present in both lists — check for duplicate labels first
+            if self.pinlabels.count(pin) > 1:
+                raise Exception(
+                    f'Pin label "{pin}" in connector "{self.name}" '
+                    f"is defined more than once in pinlabels."
+                )
+            # then check for positional ambiguity
             if self.pins.index(pin) != self.pinlabels.index(pin):
                 raise Exception(
                     f'"{pin}" in connector "{self.name}" exists in both '
@@ -252,7 +263,7 @@ class Connector:
             f'Unknown pin "{pin}" for connector "{self.name}"!'
         )
 
-    def activate_pin(self, pin: Pin, side: Side) -> None:
+    def activate_pin(self, pin: Pin, side: Optional[Side]) -> None:
         self.visible_pins[pin] = True
         if side == Side.LEFT:
             self.ports_left = True
