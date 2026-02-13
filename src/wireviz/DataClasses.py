@@ -227,8 +227,22 @@ class Connector:
     def resolve_pin(self, pin: Pin) -> Pin:
         """Resolve a pin identifier to its canonical pin number.
 
-        Accepts pin numbers (from self.pins) or pin labels (from
-        self.pinlabels). Raises if ambiguous or not found.
+        Given a value that may be either a pin number (from self.pins)
+        or a pin label (from self.pinlabels), returns the corresponding
+        pin number from self.pins.
+
+        Callers needing a positional index should use
+        self.pins.index(return_value).
+
+        Resolution order:
+            1. Value in both pins and pinlabels at the same position
+               -> return directly (no ambiguity).
+            2. Value in both at different positions -> raise.
+            3. Value only in pinlabels -> return corresponding pin number.
+            4. Value only in pins -> return directly.
+            5. Not found -> raise.
+
+        Note: Lookups are type-sensitive (int 1 != str "1").
         """
         in_pins = pin in self.pins
         in_labels = pin in self.pinlabels if self.pinlabels else False
