@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any, List, Union
 
 from graphviz import Graph
+
 from wireviz import APP_NAME, APP_URL, __version__, wv_colors
 from wireviz.DataClasses import (
     Cable,
@@ -289,7 +290,7 @@ class Harness:
         # determine if there are double- or triple-colored wires in the harness;
         # if so, pad single-color wires to make all wires of equal thickness
         pad = any(
-            len(colorstr) > 2
+            len(get_color_hex(colorstr)) > 1
             for cable in self.cables.values()
             for colorstr in cable.colors
         )
