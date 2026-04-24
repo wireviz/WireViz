@@ -1,0 +1,40 @@
+---
+# Regression witness for the pin-number-vs-pin-position bug in loop
+# edge emission.
+#
+# The pin *table* emits port IDs as `p{pinindex+1}{l|r}` -- 1-based
+# POSITIONS in the pin table -- but the loop edge emission used the
+# raw pin NUMBER from `loops: [[a, b]]`. When pin numbers happen to
+# equal their 1-based positions (e.g., pincount=4 with default pins
+# [1,2,3,4]) the two agree by coincidence. When they diverge (explicit
+# `pins:` with non-sequential numbering, like a D-Sub wired for
+# differential pairs), the loop edge references ports that do not
+# exist and GraphViz silently draws the edge at the node center,
+# producing weird routing over the top of the connector.
+#
+# Here X1 has pins [1, 14, 3, 16] laid out in table positions
+# 1, 2, 3, 4. loops: [[1, 14], [3, 16]] must emit edges
+# p1..p2 and p3..p4 (positions), not p1..p14 and p3..p16.
+
+connectors:
+  X1:
+    type: D-Sub diff pair
+    pins: [1, 14, 3, 16]
+    pinlabels: [SIG_P_1, SIG_N_1, SIG_P_2, SIG_N_2]
+    loops:
+      - [1, 14]
+      - [3, 16]
+  X2:
+    type: Peer
+    pincount: 4
+
+cables:
+  W1:
+    wirecount: 4
+    length: 0.1
+    colors: [RD, BK, YE, GN]
+
+connections:
+  - - X1: [1, 14, 3, 16]
+    - W1: [1-4]
+    - X2: [1-4]

@@ -1,0 +1,5 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 1 wires	0.9	m	W_AB, W_BC, W_CA
+2	Connector, 2-pin endpoint, 2 pins	1		C
+3	Connector, 2-pin pass-through, 2 pins	1		B
+4	Connector, 2-pin terminal, 2 pins	1		A

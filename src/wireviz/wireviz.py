@@ -362,6 +362,24 @@ def parse(
                         # mate two connectors as a whole
                         harness.add_mate_component(from_name, to_name, designator)
 
+    # Auto-instantiate any declared connector that has loops but was not
+    # referenced in a connection set. A connector whose only purpose is to
+    # carry loopback wires is still a legitimate part of the harness and
+    # must not be silently dropped as an "unused template".
+    auto_loop_connectors = []
+    for template_name, attribs in template_connectors.items():
+        if template_name in harness.connectors:
+            continue
+        if attribs.get("loops"):
+            harness.add_connector(name=template_name, **attribs)
+            designators_and_templates[template_name] = template_name
+            auto_loop_connectors.append(template_name)
+    if auto_loop_connectors:
+        print(
+            "Info: auto-instantiating loop-only connector(s) not referenced"
+            " in any connection set: " + ", ".join(auto_loop_connectors)
+        )
+
     # warn about unused templates
 
     proposed_components = list(template_connectors.keys()) + list(

@@ -1,0 +1,6 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 2 wires	0.2	m	W1, W2
+2	Connector, Only loops, 4 pins	1		X1
+3	Connector, Peer, 2 pins	2		X4, X5
+4	Connector, Right-side only, 4 pins	1		X3
+5	Connector, Two-sided, 6 pins	1		X2
