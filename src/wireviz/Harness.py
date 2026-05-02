@@ -2,7 +2,7 @@
 
 import re
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from itertools import zip_longest
 from pathlib import Path
 from typing import Any, List, Union
@@ -42,11 +42,9 @@ from wireviz.wv_gv_html import (
     remove_links,
 )
 from wireviz.wv_helper import (
-    awg_equiv,
     file_write_text,
     flatten2d,
     is_arrow,
-    mm2_equiv,
     tuplelist2tsv,
 )
 from wireviz.wv_html import generate_html_output
@@ -83,7 +81,9 @@ class Harness:
         self.connectors[name] = Connector(name, *args, **kwargs)
 
     def add_cable(self, name: str, *args, **kwargs) -> None:
-        self.cables[name] = Cable(name, *args, **kwargs)
+        self.cables[name] = Cable(
+            name, *args, **kwargs, gauge_equiv_defaults=asdict(self.options.gauge_equiv)
+        )
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
         self.mates.append(MatePin(from_name, from_pin, to_name, to_pin, arrow_type))
@@ -303,9 +303,9 @@ class Harness:
                 # mm2 and awg --- other units _are_ technically allowed,
                 # and passed through as-is.
                 if cable.gauge_unit == "mm\u00B2":
-                    g_equiv = f" ({awg_equiv(cable.gauge)} AWG)"
+                    g_equiv = cable.show_equiv.for_mm2(cable.gauge)
                 elif cable.gauge_unit.upper() == "AWG":
-                    g_equiv = f" ({mm2_equiv(cable.gauge)} mm\u00B2)"
+                    g_equiv = cable.show_equiv.for_awg(cable.gauge)
 
             # fmt: off
             rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'

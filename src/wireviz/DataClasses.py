@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from bisect import bisect_left, bisect_right
 from dataclasses import InitVar, dataclass, field
 from enum import Enum, auto
+from math import pi
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -48,6 +50,129 @@ class Metadata(dict):
 
 
 @dataclass
+class MatchDeviationPercentage:
+    """Match deviation limits in precentage for a poor and invalid match."""
+
+    poor: int = 20
+    invalid: int = 50
+
+    def check(self, found: Optional[float], target: float, equiv: str) -> str:
+        """Check deviation between found and target value. Adjust equivalent accordingly."""
+        if found is None:
+            return ""  # No match
+        deviationPercentage = abs(100.0 * (found - target) / target)
+        if deviationPercentage < self.poor:
+            return f" ({equiv})"
+        if deviationPercentage < self.invalid:
+            return f" (~{equiv})"
+        return ""  # Invalid match
+
+
+@dataclass
+class GaugeEquiv:
+    """Gauge equivalence between mm2 and AWG."""
+
+    Rounding = Enum("Rounding", "NEAREST THICKER THINNER")
+
+    show: bool = True
+    rounding: Rounding = Rounding.NEAREST
+    awg: List[Union[str,int]] = tuple(range(41)) + tuple("00 000 0000".split())  # tuple(range(2, 30, 2)) + (1, 21)
+    mm2: Union[int, List[str]] = tuple("0.09 0.14 0.25 0.34 0.5 0.75 1 1.5 2.5 4 6 10 16 25 35 50".split())
+    match: MatchDeviationPercentage = field(default_factory=dict)
+
+    def __post_init__(self):
+        if isinstance(self.rounding, str):
+            self.rounding = self.Rounding[self.rounding.upper()]
+        self.match = MatchDeviationPercentage(**self.match)
+        self.awg = sorted([str(e) for e in self.awg], key=self.awg_n)
+        self._fmm2_awg = sorted([(self.awg_to_mm2(e), e) for e in self.awg])
+        if not isinstance(self.mm2, int):
+            self.mm2 = sorted([str(e) for e in self.mm2], key=float)
+            self._f_mm2 = sorted([(float(e), e) for e in self.mm2])
+
+    @classmethod
+    def create(cls, input: Union[dict, bool], defaults: dict = {}):
+        """Factory method accepting also optional defaults."""
+        if isinstance(input, bool):
+            input = {"show": input}
+        if not isinstance(input, dict):
+            raise TypeError(
+                f"Expected dict or bool as GaugeEquiv input, but got {type(input)}"
+            )
+        if not isinstance(defaults, dict):
+            raise TypeError(
+                f"Expected dict as GaugeEquiv defaults, but got {type(defaults)}"
+            )
+        input = dict(input)  # Shallow copy to safely modify mutable dict
+        if input and "show" not in input:
+            input["show"] = True
+        if all(
+            "match" in d and isinstance(d["match"], dict) for d in (defaults, input)
+        ):
+            input["match"] = defaults["match"] | input["match"]
+        input = defaults | input
+        return cls(**input)
+
+    @staticmethod
+    def awg_n(awg: str) -> int:
+        """Return numeric AWG or -1 for 00, -2 for 000, etc."""
+        if all(c == "0" for c in awg):
+            return 1 - len(awg)
+        if awg[-2:] == "/0":
+            return 1 - int(awg[:-2])
+        return int(awg)
+
+    @staticmethod
+    def awg_to_mm2(awg: str) -> float:
+        n = GaugeEquiv.awg_n(awg)
+        return pi * (0.005 * 25.4 / 2) ** 2 * 92 ** ((36 - n) / 19.5)
+
+    def find(
+        self, target: float, available: List[Tuple[float, str]]
+    ) -> Tuple[Optional[float], str]:
+        """Find a match for target in list of available float-equiv pairs."""
+        first = lambda x: x[0]
+        if self.rounding == self.Rounding.THINNER:
+            i = bisect_right(available, target, key=first) - 1
+            if i < 0:
+                return (None, "")
+            return available[i]
+        i = bisect_left(available, target, key=first)
+        if self.rounding == self.Rounding.THICKER:
+            if i == len(available):
+                return (None, "")
+            return available[i]
+        if self.rounding == self.Rounding.NEAREST:
+            # Check neighbors
+            candidates = []
+            if i < len(available):
+                candidates.append(available[i])
+            if i > 0:
+                candidates.append(available[i - 1])
+            if not candidates:
+                return (None, "")
+
+            # Pick the nearest
+            return min(candidates, key=lambda x: abs(x[0] - target))
+
+        raise ValueError(f"Invalid rounding value {self.rounding!r}")
+
+    def for_awg(self, value: str) -> str:
+        target = self.awg_to_mm2(value)
+        if isinstance(self.mm2, int):
+            equiv = f"{target:.{self.mm2}g}"
+            f = float(equiv)
+        else:
+            f, equiv = self.find(target, self._f_mm2)
+        return self.match.check(f, target, equiv + " mm\u00b2")
+
+    def for_mm2(self, value: str) -> str:
+        target = float(value)
+        fmm2, equiv = self.find(target, self._fmm2_awg)
+        return self.match.check(fmm2, target, equiv + " AWG")
+
+
+@dataclass
 class Options:
     fontname: PlainText = "arial"
     bgcolor: Color = "WH"
@@ -58,6 +183,7 @@ class Options:
     color_mode: ColorMode = "SHORT"
     mini_bom_mode: bool = True
     template_separator: str = "."
+    gauge_equiv: GaugeEquiv = False
 
     def __post_init__(self):
         if not self.bgcolor_node:
@@ -68,6 +194,7 @@ class Options:
             self.bgcolor_cable = self.bgcolor_node
         if not self.bgcolor_bundle:
             self.bgcolor_bundle = self.bgcolor_cable
+        self.gauge_equiv = GaugeEquiv.create(self.gauge_equiv)
 
 
 @dataclass
@@ -256,7 +383,7 @@ class Cable:
     type: Optional[MultilineHypertext] = None
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
-    show_equiv: bool = False
+    show_equiv: GaugeEquiv = False
     length: float = 0
     length_unit: Optional[str] = None
     color: Optional[Color] = None
@@ -273,7 +400,9 @@ class Cable:
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
 
-    def __post_init__(self) -> None:
+    gauge_equiv_defaults: InitVar[GaugeEquiv] = {}
+
+    def __post_init__(self, gauge_equiv_defaults: GaugeEquiv) -> None:
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
 
@@ -300,6 +429,8 @@ class Cable:
                 self.gauge_unit = "mm\u00B2"
         else:
             pass  # gauge not specified
+
+        self.show_equiv = GaugeEquiv.create(self.show_equiv, gauge_equiv_defaults)
 
         if isinstance(self.length, str):  # length and unit specified
             try:
