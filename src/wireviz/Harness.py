@@ -298,7 +298,7 @@ class Harness:
             html = []
 
             awg_fmt = ""
-            if cable.show_equiv:
+            if cable.gauge_unit and cable.show_equiv:
                 # Only convert units we actually know about, i.e. currently
                 # mm2 and awg --- other units _are_ technically allowed,
                 # and passed through as-is.
