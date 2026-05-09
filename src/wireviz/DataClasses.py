@@ -53,7 +53,7 @@ class Metadata(dict):
 class MatchDeviationPercentage:
     """Match deviation limits in precentage for a poor and invalid match."""
 
-    poor: int = 20
+    poor: int = 10
     invalid: int = 50
 
     def check(self, found: Optional[float], target: float, equiv: str) -> str:
@@ -76,8 +76,8 @@ class GaugeEquiv:
 
     show: bool = True
     rounding: Rounding = Rounding.NEAREST
-    awg: List[Union[str,int]] = tuple(range(41)) + tuple("00 000 0000".split())  # tuple(range(2, 30, 2)) + (1, 21)
-    mm2: Union[int, List[str]] = tuple("0.09 0.14 0.25 0.34 0.5 0.75 1 1.5 2.5 4 6 10 16 25 35 50".split())
+    awg: List[Union[str, int]] = tuple("0000 000 00".split()) + tuple(range(41))
+    mm2: Union[int, List[Union[str, float]]] = 3
     match: MatchDeviationPercentage = field(default_factory=dict)
 
     def __post_init__(self):
