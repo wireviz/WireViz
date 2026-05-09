@@ -174,7 +174,20 @@ class GaugeEquiv:
     def for_awg(self, value: str) -> str:
         target = self.awg_to_mm2(value)
         if isinstance(self.mm2, int):
-            equiv = f"{target:.{self.mm2}g}"
+            if self.rounding == self.Rounding.NEAREST:
+                rounded_target = target
+            else:
+                assert target > 0
+                magnitude = math.floor(math.log10(target))
+                scale = 10 ** (self.mm2 - 1 - magnitude)
+                if self.rounding == self.Rounding.THICKER:
+                    rounded_target = math.ceil(target * scale) / scale
+                elif self.rounding == self.Rounding.THINNER:
+                    rounded_target = math.floor(target * scale) / scale
+                else:
+                    raise ValueError(f"Invalid rounding value {self.rounding!r}")
+
+            equiv = f"{rounded_target:.{self.mm2}g}"
             fmm2 = float(equiv)
         else:
             fmm2, equiv = self.find(target, self._fmm2_smm2_pairs)
