@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import math
 from bisect import bisect_left, bisect_right
 from dataclasses import InitVar, dataclass, field
 from enum import Enum, auto
-from math import pi
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
 
@@ -139,7 +139,7 @@ class GaugeEquiv:
     @staticmethod
     def awg_to_mm2(awg: str) -> float:
         n = GaugeEquiv.awg_n(awg)
-        return pi * (0.005 * 25.4 / 2) ** 2 * 92 ** ((36 - n) / 19.5)
+        return math.pi * (0.005 * 25.4 / 2) ** 2 * 92 ** ((36 - n) / 19.5)
 
     def find(
         self, target: float, available: List[Tuple[float, str]]
