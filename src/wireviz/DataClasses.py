@@ -56,6 +56,20 @@ class MatchDeviationPercentage:
     poor: int = 10
     invalid: int = 50
 
+    def __post_init__(self):
+        if any(not isinstance(v, int) for v in (self.poor, self.invalid)):
+            raise TypeError(
+                f"Both match.poor ({self.poor!r}) and match.invalid ({self.invalid!r}) are expected to be int"
+            )
+        if self.poor < 0:
+            raise ValueError(
+                f"A match.poor ({self.poor!r}) less than zero is not supported"
+            )
+        if self.invalid < self.poor:
+            raise ValueError(
+                f"A match.invalid ({self.invalid!r}) less than match.poor ({self.poor!r}) is not supported"
+            )
+
     def check(self, found: Optional[float], target: float, equiv: str) -> str:
         """Check deviation between found and target value. Adjust equivalent accordingly."""
         if found is None:
