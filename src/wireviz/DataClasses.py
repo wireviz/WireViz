@@ -51,7 +51,7 @@ class Metadata(dict):
 
 @dataclass
 class MatchDeviationPercentage:
-    """Match deviation limits in precentage for a poor and invalid match."""
+    """Match deviation limits in percentage for a poor and invalid match."""
 
     poor: int = 10
     invalid: int = 50
