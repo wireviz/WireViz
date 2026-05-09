@@ -85,10 +85,10 @@ class GaugeEquiv:
             self.rounding = self.Rounding[self.rounding.upper()]
         self.match = MatchDeviationPercentage(**self.match)
         self.awg = sorted([str(e) for e in self.awg], key=self.awg_n)
-        self._fmm2_awg = sorted([(self.awg_to_mm2(e), e) for e in self.awg])
+        self._fmm2_sawg_pairs = sorted([(self.awg_to_mm2(e), e) for e in self.awg])
         if not isinstance(self.mm2, int):
             self.mm2 = sorted([str(e) for e in self.mm2], key=float)
-            self._f_mm2 = sorted([(float(e), e) for e in self.mm2])
+            self._fmm2_smm2_pairs = sorted([(float(e), e) for e in self.mm2])
 
     @classmethod
     def create(cls, input: Union[dict, bool], defaults: dict = {}):
@@ -161,14 +161,14 @@ class GaugeEquiv:
         target = self.awg_to_mm2(value)
         if isinstance(self.mm2, int):
             equiv = f"{target:.{self.mm2}g}"
-            f = float(equiv)
+            fmm2 = float(equiv)
         else:
-            f, equiv = self.find(target, self._f_mm2)
-        return self.match.check(f, target, equiv + " mm\u00b2")
+            fmm2, equiv = self.find(target, self._fmm2_smm2_pairs)
+        return self.match.check(fmm2, target, equiv + " mm\u00b2")
 
     def for_mm2(self, value: str) -> str:
         target = float(value)
-        fmm2, equiv = self.find(target, self._fmm2_awg)
+        fmm2, equiv = self.find(target, self._fmm2_sawg_pairs)
         return self.match.check(fmm2, target, equiv + " AWG")
 
 
