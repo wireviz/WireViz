@@ -70,3 +70,8 @@ include = [
 
 [tool.isort]
 profile = "black"
+
+[dependency-groups]
+docs = [
+    "zensical>=0.0.2",
+]

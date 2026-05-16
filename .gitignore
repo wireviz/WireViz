@@ -15,7 +15,11 @@ build/
 dist/
 *.egg-info
 *.pyc
+site
 
 # Other temporary files
 __pycache__
 .*.swp
+
+# AI Related
+AGENTS.md

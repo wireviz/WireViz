@@ -1,0 +1,115 @@
+
+# Project information
+site_name: WireViz Documentation
+
+# site_url:
+# site_description: >-
+#   Documentatio for the python tool WireViz which aids in the creation of engineering drawings
+#   for electrical wiring schematics
+  
+# Repository
+repo_name: ishaid/WireViz
+repo_url: https://github.com/ishaid/WireViz/
+edit_uri: https://github.com/ishaid/WireViz/docs/
+
+# Configuration
+theme:
+  name: material
+  # custom_dir: 
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.footnote.tooltips
+    - content.tabs.link
+    - content.tooltips
+    - navigation.footer
+    - navigation.indexes
+    - navigation.path
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: lucide/sun-moon
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: lucide/sun
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: orange
+      toggle:
+        icon: lucide/moon-star
+        name: Switch to system preference
+  # favicon: assets/
+  # logo: assets/
+  icon:
+    tag:
+      default: lucide/hash
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+# Plugins
+plugins:
+  - search
+  - tags
+
+# Extensions
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - zensical.extensions.glightbox:
+      auto_themed: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Page tree
+nav:
+  - Home: README.md
+  - Setup:
+    - Custom Drawing Templates: docs/drawing-templates.md
+    - Automating Production Files: docs/automations.md
+  - Usage:
+    - Syntax: syntax.md
+  - Other:
+    - Changelog: CHANGELOG.md
