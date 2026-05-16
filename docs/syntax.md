@@ -578,4 +578,4 @@ See [yaml-multiline.info](https://yaml-multiline.info/) for more information.
 
 ## Inheritance
 
-[YAML anchors and references](https://blog.daemonl.com/2016/02/yaml.html) are useful for defining and referencing information that is used more than once in a file, e.g. when using defining multiple connectors of the same type or family. See [Demo 02](../examples/demo02.yml) for an example.
+[YAML anchors and references](https://blog.daemonl.com/2016/02/yaml.html) are useful for defining and referencing information that is used more than once in a file, e.g. when using defining multiple connectors of the same type or family. See [Demo 02](examples/demo02.yml) for an example.

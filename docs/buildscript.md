@@ -22,9 +22,9 @@ TODO: write a better explaination -->
 - Append `-c` or `--compare-graphviz-output` to the `compare` command above to also compare the Graphviz output (default: False).
 - Append `-g` or `--groups` followed by space separated group names to any command above, and the set of generated files affected by the command will be limited to the selected groups.
 Possible group names:
-  - `examples` to process `examples/{readme.md,ex*.*}`
+  - `examples` to process `docs/examples/{readme.md,ex*.*}`
   - `tutorial` to process`tutorial/{readme.md,tutorial*.*}`
-  - `demos` to process`examples/demo*.*`
+  - `demos` to process`docs/examples/demo*.*`
 
   Affected filetypes: `.gv`, `.tsv`, `.png`, `.svg`, `.html`
 

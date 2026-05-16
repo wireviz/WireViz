@@ -1,2 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wireviz"
+version = "0.5-dev+refactor"
+description = "Easily document cables and wiring harnesses"
+readme = "docs/README.md"
+requires-python = ">=3.9"
+license = { text = "GPL-3.0-or-later" }
+authors = [{ name = "Daniel Rojas" }]
+keywords = [
+    "cable",
+    "connector",
+    "hardware",
+    "harness",
+    "wiring",
+    "wiring-diagram",
+    "wiring-harness",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Utilities",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+dependencies = [
+    "click",
+    "graphviz",
+    "pillow",
+    "pyyaml",
+    "tabulate",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "autoflake",
+    "pudb",
+    "pyan3",
+]
+
+[project.scripts]
+wireviz = "wireviz.wv_cli:wireviz"
+
+[project.urls]
+Homepage = "https://github.com/wireviz/WireViz"
+Repository = "https://github.com/wireviz/WireViz"
+
+[tool.hatch.version]
+path = "src/wireviz/__init__.py"
+pattern = '__version__ = "(?P<version>[^"]+)"'
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wireviz"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/wireviz",
+    "docs/README.md",
+    "LICENSE",
+]
+
 [tool.isort]
 profile = "black"
+
+[dependency-groups]
+docs = [
+    "zensical>=0.0.2",
+]

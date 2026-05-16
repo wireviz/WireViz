@@ -13,10 +13,10 @@ from wireviz import APP_NAME, __version__, wireviz
 from wireviz.wv_utils import open_file_append, open_file_read, open_file_write
 
 dir = script_path.parent.parent.parent.parent
-readme = "readme.md"
+readme = "examples.md"
 groups = {
     "examples": {
-        "path": dir / "examples",
+        "path": dir / "docs" / "examples",
         "prefix": "ex",
         readme: [],  # Include no files
         "title": "Example Gallery",
@@ -28,7 +28,7 @@ groups = {
         "title": f"{APP_NAME} Tutorial",
     },
     "demos": {
-        "path": dir / "examples",
+        "path": dir / "docs" / "examples",
         "prefix": "demo",
     },
     **{p.stem: {"path": p} for p in (dir / "tests").glob("**")},

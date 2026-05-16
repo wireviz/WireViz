@@ -1,6 +1,0 @@
-click
-graphviz
-pillow
-pyyaml
-setuptools
-tabulate

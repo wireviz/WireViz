@@ -1,5 +1,5 @@
 #!/bin/zsh
 
-autoflake -i --remove-all-unused-imports src/wireviz/*.py
-isort src/wireviz/*py
-black src/wireviz/*.py
+uv run autoflake -i --remove-all-unused-imports src/wireviz/*.py
+uv run isort src/wireviz/*.py
+uv run black src/wireviz/*.py

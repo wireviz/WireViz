@@ -39,7 +39,7 @@ _Note_: WireViz is not designed to represent the complete wiring of a system. It
 
 ### Demo 01
 
-[WireViz input file](../examples/demo01.yml):
+[WireViz input file](examples/demo01.yml):
 
 ```yaml
 connectors:
@@ -72,21 +72,21 @@ connections:
 
 Output file:
 
-![Sample output diagram](../examples/demo01.png)
+![Sample output diagram](examples/demo01.png)
 
-[Bill of Materials](../examples/demo01.tsv) (auto-generated)
+[Bill of Materials](examples/demo01.tsv) (auto-generated)
 
 ### Demo 02
 
-![](../examples/demo02.png)
+![](examples/demo02.png)
 
-[Source](../examples/demo02.yml) - [Bill of Materials](../examples/demo02.tsv)
+[Source](examples/demo02.yml) - [Bill of Materials](examples/demo02.tsv)
 
 ### Syntax, tutorial and example gallery
 
 Read the [syntax description](syntax.md) to learn about WireViz' features and how to use them.
 
-See the [tutorial page](../tutorial/readme.md) for sample code, as well as the [example gallery](../examples/readme.md) to see more of what WireViz can do.
+See the [tutorial page](../tutorial/readme.md) for sample code, as well as the [example gallery](examples/readme.md) to see more of what WireViz can do.
 
 
 ## Usage

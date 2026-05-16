@@ -1,0 +1,75 @@
+@keyframes heart {
+
+  0%,
+  40%,
+  80%,
+  100% {
+    transform: scale(1);
+  }
+
+  20%,
+  60% {
+    transform: scale(1.15);
+  }
+}
+
+.mdx-heart {
+  animation: heart 1000ms infinite;
+}
+
+.mdx-columns ol,
+.mdx-columns ul {
+  columns: 2;
+}
+
+@media screen and (max-width: 29.9844em) {
+  .md-typeset .mdx-columns ol,
+  .md-typeset .mdx-columns ul {
+    columns: initial;
+  }
+}
+
+.mdx-columns li {
+  break-inside: avoid;
+}
+
+.mdx-switch button {
+  cursor: pointer;
+}
+
+.mdx-flags {
+  margin: 2em auto
+}
+
+.md-typeset .mdx-flags ol {
+  list-style: none
+}
+
+.md-typeset .mdx-flags ol li {
+  margin-bottom: 1em
+}
+
+.md-typeset .mdx-flags__item {
+  display: flex;
+  gap: .6rem
+}
+
+.md-typeset .mdx-flags__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column
+}
+
+.md-typeset .mdx-flags__content span {
+  align-items: baseline;
+  display: inline-flex;
+  justify-content: space-between
+}
+
+.md-typeset .mdx-flags__content>span:nth-child(2) {
+  font-size: 80%
+}
+
+.md-typeset .mdx-flags__content code {
+  float: right
+}
