@@ -29,6 +29,6 @@ jobs:
         with:
           name: examples-and-tutorials-v${{ matrix.python-version }}
           path: |
-            examples/
+            docs/examples/
             tutorial/
           if-no-files-found: error

@@ -107,9 +107,10 @@ markdown_extensions:
 nav:
   - Home: README.md
   - Setup:
-    - Custom Drawing Templates: docs/drawing-templates.md
-    - Automating Production Files: docs/automations.md
+    - Custom Drawing Templates: drawing-templates.md
+    - Automating Production Files: automations.md
   - Usage:
     - Syntax: syntax.md
+    - Examples: examples/examples.md
   - Other:
     - Changelog: CHANGELOG.md
