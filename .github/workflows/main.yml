@@ -7,31 +7,23 @@ jobs:
     strategy:
       max-parallel: 6
       matrix:
-        # ubuntu-22.04 supports Python 3.7-3.12
-        # ubuntu-24.04 (currently latest & preferred) supports Python 3.9-3.12
-        # More details: https://github.com/actions/runner-images/issues/10636
         os: [ubuntu-latest]
         python-version: ["3.9", "3.10", "3.11", "3.12"]
-        include:
-          - os: ubuntu-22.04
-            python-version: "3.7"
-          - os: ubuntu-22.04
-            python-version: "3.8"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          enable-cache: true
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv python install ${{ matrix.python-version }}
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .
+      - name: Install project
+        run: uv sync --python ${{ matrix.python-version }}
       - name: Create Examples
-        run: PYTHONPATH=$(pwd)/src/wireviz:$PYTHONPATH cd src/wireviz/tools/ && python build_examples.py
+        run: uv run --python ${{ matrix.python-version }} python src/wireviz/tools/build_examples.py
       - name: Upload examples, demos, and tutorials
         uses: actions/upload-artifact@v4
         with:
