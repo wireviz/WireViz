@@ -123,8 +123,8 @@ class GaugeEquiv:
         if all(
             "match" in d and isinstance(d["match"], dict) for d in (defaults, input)
         ):
-            input["match"] = defaults["match"] | input["match"]
-        input = defaults | input
+            input["match"] = {**defaults["match"], **input["match"]}
+        input = {**defaults, **input}
         return cls(**input)
 
     @staticmethod
@@ -147,11 +147,17 @@ class GaugeEquiv:
         """Find a match for target in list of available float-equiv pairs."""
         first = lambda x: x[0]
         if self.rounding == self.Rounding.THINNER:
-            i = bisect_right(available, target, key=first) - 1
+            try:
+                i = bisect_right(available, target, key=first) - 1
+            except TypeError:  # No key argument in Python < 3.10
+                i = bisect_right([first(e) for e in available], target) - 1
             if i < 0:
                 return (None, "")
             return available[i]
-        i = bisect_left(available, target, key=first)
+        try:
+            i = bisect_left(available, target, key=first)
+        except TypeError:  # No key argument in Python < 3.10
+            i = bisect_left([first(e) for e in available], target)
         if self.rounding == self.Rounding.THICKER:
             if i == len(available):
                 return (None, "")
