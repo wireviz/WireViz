@@ -76,9 +76,9 @@ class MatchDeviationPercentage:
             return ""  # No match
         deviationPercentage = abs(100.0 * (found - target) / target)
         if deviationPercentage < self.poor:
-            return f" ({equiv})"
+            return f" ({equiv})"  # Good match
         if deviationPercentage < self.invalid:
-            return f" (~{equiv})"
+            return f" (~{equiv})"  # Poor match
         return ""  # Invalid match
 
 
