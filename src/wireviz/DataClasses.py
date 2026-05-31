@@ -430,7 +430,7 @@ class Cable:
     type: Optional[MultilineHypertext] = None
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
-    show_equiv: GaugeEquiv = False
+    show_equiv: GaugeEquiv = field(default_factory=dict)
     length: float = 0
     length_unit: Optional[str] = None
     color: Optional[Color] = None
