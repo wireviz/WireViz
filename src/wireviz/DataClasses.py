@@ -95,14 +95,28 @@ class GaugeEquiv:
     match: MatchDeviationPercentage = field(default_factory=dict)
 
     def __post_init__(self):
-        if isinstance(self.rounding, str):
-            self.rounding = self.Rounding[self.rounding.upper()]
+        if not isinstance(self.rounding, self.Rounding):
+            try:
+                self.rounding = self.Rounding[self.rounding.upper()]
+            except AttributeError as e:
+                raise TypeError(
+                    f"Expected rounding string, but got {self.rounding!r}: {e}"
+                ) from e
+            except KeyError as e:
+                raise ValueError(f"Unexpected rounding value {self.rounding!r}") from e
         self.match = MatchDeviationPercentage(**self.match)
-        self.awg = sorted([str(e) for e in self.awg], key=self.awg_n)
-        self._fmm2_sawg_pairs = sorted([(self.awg_to_mm2(e), e) for e in self.awg])
+        # Stringify, deduplicate, and sort equiv lists. Make float-equiv pair lists.
+        try:
+            self.awg = sorted({str(e) for e in self.awg}, key=self.awg_n)
+            self._fmm2_sawg_pairs = sorted((self.awg_to_mm2(e), e) for e in self.awg)
+        except ValueError as e:
+            raise ValueError(f"Unexpexted awg entry: {e}") from e
         if not isinstance(self.mm2, int):
-            self.mm2 = sorted([str(e) for e in self.mm2], key=float)
-            self._fmm2_smm2_pairs = sorted([(float(e), e) for e in self.mm2])
+            try:
+                self.mm2 = sorted({str(e) for e in self.mm2}, key=float)
+                self._fmm2_smm2_pairs = sorted((float(e), e) for e in self.mm2)
+            except ValueError as e:
+                raise ValueError(f"Unexpexted mm2 entry: {e}") from e
 
     @classmethod
     def create(cls, input: Union[dict, bool], defaults: dict = {}):
@@ -111,11 +125,11 @@ class GaugeEquiv:
             input = {"show": input}
         if not isinstance(input, dict):
             raise TypeError(
-                f"Expected dict or bool as GaugeEquiv input, but got {type(input)}"
+                f"Expected dict or bool as GaugeEquiv input, but got {input!r} ({type(input)})"
             )
         if not isinstance(defaults, dict):
             raise TypeError(
-                f"Expected dict as GaugeEquiv defaults, but got {type(defaults)}"
+                f"Expected dict as GaugeEquiv defaults, but got {defaults!r} ({type(defaults)})"
             )
         input = dict(input)  # Shallow copy to safely modify mutable dict
         if input and "show" not in input:
@@ -159,7 +173,7 @@ class GaugeEquiv:
         except TypeError:  # No key argument in Python < 3.10
             i = bisect_left([first(e) for e in available], target)
         if self.rounding == self.Rounding.THICKER:
-            if i == len(available):
+            if i >= len(available):
                 return (None, "")
             return available[i]
         if self.rounding == self.Rounding.NEAREST:
