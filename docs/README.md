@@ -88,6 +88,13 @@ Read the [syntax description](syntax.md) to learn about WireViz' features and ho
 
 See the [tutorial page](../tutorial/readme.md) for sample code, as well as the [example gallery](../examples/readme.md) to see more of what WireViz can do.
 
+### Example projects and tools
+
+Public projects using or extending WireViz include:
+
+* [CTS-SAT-1 Cable Harnesses](https://github.com/CalgaryToSpace/CTS-SAT-1-Cable-Harnesses), which documents harnesses for CalgaryToSpace's CTS-SAT-1 CubeSat mission. This project was suggested by one of its contributors.
+* [wireviz-web](https://github.com/wireviz/wireviz-web), a web interface for generating WireViz diagrams from YAML input. This tool is maintained in the WireViz organization by a WireViz co-maintainer.
+
 
 ## Usage
 
