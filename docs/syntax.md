@@ -103,8 +103,8 @@ tweak:  # optional tweaking of .gv output
                           # <int/float>      is assumed to be mm2
                           # <str>            custom units and formats are allowed
                           #                  but unavailable for auto-conversion
-  show_equiv: <gauge_equiv>     # Can auto-convert between mm2 and AWG and display both when specified.
-                                # Uses defaults from options when unset (see below).
+  gauge_equiv: <gauge_equiv>    # Can auto-convert between mm2 and AWG and display both when specified.
+                                # Uses defaults from options.gauge_equiv when unset (see below).
   length: <int/float>[ <unit>]  # <int/float> is assumed to be in meters unless <unit> is specified
                                 # e.g. length: 2.5 -> assumed to be 2.5 m
                                 # or   length: 2.5 ft -> "ft" is used as the unit
@@ -407,6 +407,7 @@ A single `<bool>` value will set the `show` attribute only.
 Unset attributes will use the corresponding attribute from `options.gauge_equiv`.
 
 ```yaml
+gauge_equiv:  # This attribute accepts either a single <bool> or a dict with attributes shown below
   show: <bool>       # Show equivalent value if True, or not if False
   rounding: <str>    # nearest, thicker, or thinner
   awg: <list>        # List of available AWG values
