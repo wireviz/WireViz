@@ -432,7 +432,7 @@ class Cable:
     type: Optional[MultilineHypertext] = None
     gauge: Optional[float] = None
     gauge_unit: Optional[str] = None
-    show_equiv: GaugeEquiv = field(default_factory=dict)
+    gauge_equiv: GaugeEquiv = field(default_factory=dict)
     length: float = 0
     length_unit: Optional[str] = None
     color: Optional[Color] = None
@@ -479,7 +479,7 @@ class Cable:
         else:
             pass  # gauge not specified
 
-        self.show_equiv = GaugeEquiv.create(self.show_equiv, gauge_equiv_defaults)
+        self.gauge_equiv = GaugeEquiv.create(self.gauge_equiv, gauge_equiv_defaults)
 
         if isinstance(self.length, str):  # length and unit specified
             try:

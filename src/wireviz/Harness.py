@@ -52,7 +52,11 @@ from wireviz.wv_html import generate_html_output
 OLD_CONNECTOR_ATTR = {
     "pinout": "was renamed to 'pinlabels' in v0.2",
     "pinnumbers": "was renamed to 'pins' in v0.2",
-    "autogenerate": "is replaced with new syntax in v0.4",
+    "autogenerate": "was replaced with new syntax in v0.4",
+}
+
+OLD_CABLE_ATTR = {
+    "show_equiv": "was renamed to 'gauge_equiv' in v0.4.2",
 }
 
 
@@ -81,6 +85,7 @@ class Harness:
         self.connectors[name] = Connector(name, *args, **kwargs)
 
     def add_cable(self, name: str, *args, **kwargs) -> None:
+        check_old(f"Cable '{name}'", OLD_CABLE_ATTR, kwargs)
         self.cables[name] = Cable(
             name, *args, **kwargs, gauge_equiv_defaults=asdict(self.options.gauge_equiv)
         )
@@ -298,14 +303,14 @@ class Harness:
             html = []
 
             g_equiv = ""
-            if cable.gauge_unit and cable.show_equiv.show:
+            if cable.gauge_unit and cable.gauge_equiv.show:
                 # Only convert units we actually know about, i.e. currently
                 # mm2 and awg --- other units _are_ technically allowed,
                 # and passed through as-is.
                 if cable.gauge_unit == "mm\u00B2":
-                    g_equiv = cable.show_equiv.for_mm2(cable.gauge)
+                    g_equiv = cable.gauge_equiv.for_mm2(cable.gauge)
                 elif cable.gauge_unit.upper() == "AWG":
-                    g_equiv = cable.show_equiv.for_awg(cable.gauge)
+                    g_equiv = cable.gauge_equiv.for_awg(cable.gauge)
 
             # fmt: off
             rows = [[f'{html_bgcolor(cable.bgcolor_title)}{remove_links(cable.name)}'
