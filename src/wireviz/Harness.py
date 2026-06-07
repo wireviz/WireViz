@@ -70,6 +70,7 @@ class Harness:
     metadata: Metadata
     options: Options
     tweak: Tweak
+    source_path: Path
 
     def __post_init__(self):
         self.connectors = {}
@@ -697,7 +698,7 @@ class Harness:
             print("CSV output is not yet supported")
         # HTML output
         if "html" in fmt:
-            generate_html_output(filename, bomlist, self.metadata, self.options)
+            generate_html_output(filename, bomlist, self.metadata, self.options, self.source_path)
         # PDF output
         if "pdf" in fmt:
             # TODO: implement PDF output
