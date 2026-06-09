@@ -510,7 +510,7 @@ class WireClass:
         if not self.gauge:
             return None
         actual_gauge = f"{self.gauge.number} {self.gauge.unit}"
-        actual_gauge = actual_gauge.replace("mm2", "mm\u00B2")
+        actual_gauge = actual_gauge.replace("mm2", "mm\u00b2")
         return actual_gauge
 
     @property
@@ -547,6 +547,9 @@ class Cable(TopLevelGraphicalComponent):
     # wire information in particular
     wirecount: Optional[int] = None
     shield: Union[bool, MultiColor] = False
+    sleeve_color: Optional[SingleColor] = (
+        None  # outer wrap/sleeve drawn around the bundle
+    )
     colors: List[str] = field(default_factory=list)  # legacy
     wirelabels: List[Wire] = field(default_factory=list)  # legacy
     wire_objects: Dict[Any, WireClass] = field(default_factory=dict)  # new
@@ -571,7 +574,7 @@ class Cable(TopLevelGraphicalComponent):
         if not self.gauge:
             return None
         actual_gauge = f"{self.gauge.number} {self.gauge.unit}"
-        actual_gauge = actual_gauge.replace("mm2", "mm\u00B2")
+        actual_gauge = actual_gauge.replace("mm2", "mm\u00b2")
         return actual_gauge
 
     @property
@@ -587,7 +590,7 @@ class Cable(TopLevelGraphicalComponent):
             elif self.gauge.unit.upper() == "AWG":
                 equivalent_gauge = f" ({mm2_equiv(self.gauge.number)} mm2)"
         out = f"{actual_gauge}{equivalent_gauge}"
-        out = out.replace("mm2", "mm\u00B2")
+        out = out.replace("mm2", "mm\u00b2")
         return out
 
     @property
@@ -647,6 +650,7 @@ class Cable(TopLevelGraphicalComponent):
 
         self.bgcolor_title = SingleColor(self.bgcolor_title)
         self.color = MultiColor(self.color)
+        self.sleeve_color = SingleColor(self.sleeve_color)
 
         # cables do not support custom qty or amount
         if self.qty is None:
