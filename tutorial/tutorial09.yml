@@ -1,0 +1,23 @@
+connectors:
+  X1:
+    pinlabels: [GND, GND, +24V, +24V]
+    type: Molex Mini-Fit Jr
+    subtype: female
+  X2:
+    pinlabels: [GND, GND, +24V, +24V]
+    type: Molex Mini-Fit Jr
+    subtype: female
+
+cables:
+  W1:
+    category: bundle
+    gauge: 18 AWG
+    length: 0.8
+    colors: [BK, BK, RD, RD]
+    sleeve_color: RD # draw a red braided sleeve around the bundle
+
+connections:
+  -
+    - X1: [1-4]
+    - W1: [1-4]
+    - X2: [1-4]
