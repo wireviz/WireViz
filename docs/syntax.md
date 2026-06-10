@@ -115,6 +115,9 @@ tweak:  # optional tweaking of .gv output
                         # using a color (see below) will render the shield in that color
                         # A shield can be accessed by using 's' as the wire ID
   color: <color>  # see below
+  sleeve_color: <color>  # defaults to none; see below
+                         # draws a colored braided sleeve/wrap around the bundle
+                         # and shows a "+ Sleeve" indicator with the color name
   image: <image>  # see below
   notes: <str>   
 

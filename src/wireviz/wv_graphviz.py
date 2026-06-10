@@ -61,6 +61,8 @@ def gv_node_component(component: Component) -> Table:
             "+ S" if component.shield else None,
             component.length_str,
             str(component.color) if component.color else None,
+            "+ Sleeve" if component.sleeve_color else None,
+            str(component.sleeve_color) if component.sleeve_color else None,
         ]
 
     if component.additional_parameters:
@@ -301,9 +303,47 @@ def gv_connector_loops(connector: Connector) -> List:
     return loop_edges
 
 
+def gv_sleeve_braid_band(
+    hex_main: str, ncells: int = 26, cw: int = 9, ch: int = 5
+) -> Table:
+    """Return a Table that fakes a braided-sleeve band.
+
+    Two offset rows of alternating cells (the sleeve color and a darker shade)
+    read as an interlaced basket weave -- the closest braid approximation that
+    GraphViz HTML labels allow without diagonal hatching or image tiling.
+    """
+    try:
+        h = hex_main.lstrip("#")
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        f = 0.55  # darken factor for the interlacing strands
+        hex_alt = f"#{int(r * f):02x}{int(g * f):02x}{int(b * f):02x}"
+    except (ValueError, IndexError):
+        hex_alt = hex_main  # non-hex color name: fall back to a single tone
+    band_rows = []
+    for row in range(2):
+        cells = [
+            Td(
+                "",
+                bgcolor=(hex_main if (c + row) % 2 == 0 else hex_alt),
+                width=cw,
+                height=ch,
+                border=0,
+            )
+            for c in range(ncells)
+        ]
+        band_rows.append(Tr(cells))
+    return Table(band_rows, border=0, cellborder=0, cellspacing=0, cellpadding=0)
+
+
 def gv_conductor_table(cable) -> Table:
     rows = []
+    # a colored sleeve is drawn as a woven braid band across the top and bottom
+    # of the conductor bundle, with thin colored side rails around the table
+    sleeve_hex = cable.sleeve_color.html if cable.sleeve_color else None
+    sleeve_colspan = 6 if cable.category == "bundle" else 5
     rows.append(Tr(Td("&nbsp;")))  # spacer row on top
+    if sleeve_hex:
+        rows.append(Tr(Td(gv_sleeve_braid_band(sleeve_hex), colspan=sleeve_colspan)))
 
     inserted_break_inbetween = False
     for wire in cable.wire_objects.values():
@@ -358,7 +398,11 @@ def gv_conductor_table(cable) -> Table:
                 rows.append(Tr(Td(table_below, colspan=len(cells_above))))
 
     rows.append(Tr(Td("&nbsp;")))  # spacer row on bottom
-    tbl = Table(rows, border=0, cellborder=0, cellspacing=0)
+    if sleeve_hex:
+        rows.append(Tr(Td(gv_sleeve_braid_band(sleeve_hex), colspan=sleeve_colspan)))
+        tbl = Table(rows, border=2, color=sleeve_hex, cellborder=0, cellspacing=0)
+    else:
+        tbl = Table(rows, border=0, cellborder=0, cellspacing=0)
     return tbl
 
 
