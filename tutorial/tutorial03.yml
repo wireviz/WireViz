@@ -11,7 +11,7 @@ cables:
     wirecount: 4
     length: 1
     gauge: 0.25 mm2
-    show_equiv: true
+    gauge_equiv: true
     color_code: DIN # auto-assign colors based on DIN 47100
     shield: true # add cable shielding
 

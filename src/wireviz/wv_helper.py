@@ -4,35 +4,6 @@ import re
 from pathlib import Path
 from typing import Dict, List
 
-awg_equiv_table = {
-    "0.09": "28",
-    "0.14": "26",
-    "0.25": "24",
-    "0.34": "22",
-    "0.5": "21",
-    "0.75": "20",
-    "1": "18",
-    "1.5": "16",
-    "2.5": "14",
-    "4": "12",
-    "6": "10",
-    "10": "8",
-    "16": "6",
-    "25": "4",
-    "35": "2",
-    "50": "1",
-}
-
-mm2_equiv_table = {v: k for k, v in awg_equiv_table.items()}
-
-
-def awg_equiv(mm2):
-    return awg_equiv_table.get(str(mm2), "Unknown")
-
-
-def mm2_equiv(awg):
-    return mm2_equiv_table.get(str(awg), "Unknown")
-
 
 def expand(yaml_data):
     # yaml_data can be:
