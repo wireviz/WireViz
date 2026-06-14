@@ -14,7 +14,7 @@ When contributing to this repository, please [submit a new issue](https://github
   - **[doc]** For documentation issues.
   - **[meta]** For issues about the development or contribution process.
 - Please include enough information in the description to enable another user to reproduce any error state described in your issue:
-  - The versions of your WireViz, Graphviz (`dot -V`), Python (`python -V`), and operating system.
+  - The versions of your WireViz (`wireviz -VV`), Graphviz (`dot -V`), Python (`python -V`), and operating system.
   - The relevant input files unless (preferably) you can demonstrate the same issue using one of the example files. If your input file is large or complex, please try to find a smaller/simplified input that still can reproduce the same issue.
   - Any warnings or error messages you get.
 - See also [How We Write Github Issues](https://wiredcraft.com/blog/how-we-write-our-github-issues/) in general.
