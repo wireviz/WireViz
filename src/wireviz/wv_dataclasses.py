@@ -365,9 +365,16 @@ class Connector(TopLevelGraphicalComponent):
         self.visible_pins = {}
 
         if self.style == "simple":
-            if self.pincount and self.pincount > 1:
+            pin_count_specified = max(
+                self.pincount or 0,
+                len(self.pinlabels),
+                len(self.pins) if self.pins else 0,
+            )
+            if pin_count_specified > 1:
                 raise Exception(
-                    "Connectors with style set to simple may only have one pin"
+                    f"Connector '{self.designator}' has style 'simple', which only supports one pin,"
+                    f" but {pin_count_specified} pin(s) were specified."
+                    f" Either remove 'style: simple' or reduce to a single pin."
                 )
             self.pincount = 1
 
@@ -510,7 +517,7 @@ class WireClass:
         if not self.gauge:
             return None
         actual_gauge = f"{self.gauge.number} {self.gauge.unit}"
-        actual_gauge = actual_gauge.replace("mm2", "mm\u00B2")
+        actual_gauge = actual_gauge.replace("mm2", "mm\u00b2")
         return actual_gauge
 
     @property
@@ -571,7 +578,7 @@ class Cable(TopLevelGraphicalComponent):
         if not self.gauge:
             return None
         actual_gauge = f"{self.gauge.number} {self.gauge.unit}"
-        actual_gauge = actual_gauge.replace("mm2", "mm\u00B2")
+        actual_gauge = actual_gauge.replace("mm2", "mm\u00b2")
         return actual_gauge
 
     @property
@@ -587,7 +594,7 @@ class Cable(TopLevelGraphicalComponent):
             elif self.gauge.unit.upper() == "AWG":
                 equivalent_gauge = f" ({mm2_equiv(self.gauge.number)} mm2)"
         out = f"{actual_gauge}{equivalent_gauge}"
-        out = out.replace("mm2", "mm\u00B2")
+        out = out.replace("mm2", "mm\u00b2")
         return out
 
     @property

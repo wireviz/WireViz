@@ -248,6 +248,12 @@ class Harness:
                     if connector.pinlabels.count(pin) > 1:
                         raise Exception(f"{name}:{pin} is defined more than once.")
                     index = connector.pinlabels.index(pin)
+                    if index >= len(connector.pins):
+                        raise Exception(
+                            f"{name}: pin label '{pin}' (index {index}) has no corresponding"
+                            f" pin number — connector has {len(connector.pins)} pin(s)"
+                            f" but {len(connector.pinlabels)} pinlabel(s)."
+                        )
                     pin = connector.pins[index]  # map pin name to pin number
                     if name == from_name:
                         from_pin = pin
@@ -257,6 +263,10 @@ class Harness:
                     raise Exception(f"{name}:{pin} not found.")
 
         # check via cable
+        if via_name not in self.cables and via_name is not None:
+            raise Exception(
+                f"Cable '{via_name}' is referenced in a connection but has not been defined."
+            )
         if via_name in self.cables:
             cable = self.cables[via_name]
             # check if provided name is ambiguous
