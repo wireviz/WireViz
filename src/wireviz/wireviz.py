@@ -214,7 +214,16 @@ def parse(
         nonlocal expected_type
         expected_type = alternating_types[1 - alternating_types.index(expected_type)]
 
-    for connection_set in connection_sets:
+    for index_cs, connection_set in enumerate(connection_sets):
+        # Capture raw component names before the connection set is transformed,
+        # so they can be included in any error message raised later.
+        _cs_names = []
+        for _entry in connection_set:
+            if isinstance(_entry, str):
+                _cs_names.append(_entry)
+            elif isinstance(_entry, dict):
+                _cs_names.append(list(_entry.keys())[0])
+
         # figure out number of parallel connections within this set
         connectioncount = []
         for entry in connection_set:
@@ -284,39 +293,44 @@ def parse(
         # since each set may begin with either type
 
         # generate components
-        for entry in connection_set:
-            for item in entry:
-                designator = list(item.keys())[0]
-                template = designators_and_templates[designator]
+        try:
+            for entry in connection_set:
+                for item in entry:
+                    designator = list(item.keys())[0]
+                    template = designators_and_templates[designator]
 
-                if designator in harness.connectors:  # existing connector instance
-                    check_type(designator, template, "connector")
-                elif template in template_connectors.keys():
-                    # generate new connector instance from template
-                    check_type(designator, template, "connector")
-                    harness.add_connector(
-                        designator=designator, **template_connectors[template]
-                    )
+                    if designator in harness.connectors:  # existing connector instance
+                        check_type(designator, template, "connector")
+                    elif template in template_connectors.keys():
+                        # generate new connector instance from template
+                        check_type(designator, template, "connector")
+                        harness.add_connector(
+                            designator=designator, **template_connectors[template]
+                        )
 
-                elif designator in harness.cables:  # existing cable instance
-                    check_type(designator, template, "cable/arrow")
-                elif template in template_cables.keys():
-                    # generate new cable instance from template
-                    check_type(designator, template, "cable/arrow")
-                    harness.add_cable(
-                        designator=designator, **template_cables[template]
-                    )
+                    elif designator in harness.cables:  # existing cable instance
+                        check_type(designator, template, "cable/arrow")
+                    elif template in template_cables.keys():
+                        # generate new cable instance from template
+                        check_type(designator, template, "cable/arrow")
+                        harness.add_cable(
+                            designator=designator, **template_cables[template]
+                        )
 
-                elif is_arrow(designator):
-                    check_type(designator, template, "cable/arrow")
-                    # arrows do not need to be generated here
-                else:
-                    raise Exception(
-                        f"{template} is an unknown template/designator/arrow."
-                    )
+                    elif is_arrow(designator):
+                        check_type(designator, template, "cable/arrow")
+                        # arrows do not need to be generated here
+                    else:
+                        raise Exception(
+                            f"{template} is an unknown template/designator/arrow."
+                        )
 
-            # entries in connection set must alternate between connectors and cables/arrows
-            alternate_type()
+                # entries in connection set must alternate between connectors and cables/arrows
+                alternate_type()
+        except Exception as e:
+            _hint = " → ".join(_cs_names) if _cs_names else ""
+            _label = f"connection set {index_cs + 1}" + (f" ({_hint})" if _hint else "")
+            raise Exception(f"Error in {_label}: {e}") from e
 
         # transpose connection set list
         # before: one item per component, one subitem per connection in set
@@ -344,9 +358,16 @@ def parse(
                         to_name, to_pin = get_single_key_and_value(
                             entry[index_item + 1]
                         )
-                    harness.connect(
-                        from_name, from_pin, via_name, via_pin, to_name, to_pin
-                    )
+                    try:
+                        harness.connect(
+                            from_name, from_pin, via_name, via_pin, to_name, to_pin
+                        )
+                    except Exception as e:
+                        _hint = " → ".join(_cs_names) if _cs_names else ""
+                        _label = f"connection set {index_cs + 1}" + (
+                            f" ({_hint})" if _hint else ""
+                        )
+                        raise Exception(f"Error in {_label}: {e}") from e
 
                 elif is_arrow(designator):
                     if index_item == 0:  # list starts with an arrow
