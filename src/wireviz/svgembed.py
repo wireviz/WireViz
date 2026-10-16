@@ -2,6 +2,7 @@
 
 import base64
 import re
+import sys
 from pathlib import Path
 from typing import Union
 
@@ -17,7 +18,8 @@ def data_URI_base64(file: Union[str, Path], media: str = "image") -> str:
     # print(f"data_URI_base64('{file}', '{media}') -> {len(uri)}-character URI")
     if len(uri) > 65535:
         print(
-            "data_URI_base64(): Warning: Browsers might have different URI length limitations"
+            "data_URI_base64(): Warning: Browsers might have different URI length limitations",
+            file=sys.stderr,
         )
     return uri
 

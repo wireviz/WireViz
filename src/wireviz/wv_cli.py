@@ -75,10 +75,11 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
-    print()
-    print(f"{APP_NAME} {__version__}")
     if version:
+        print(f"{APP_NAME} {__version__}")
         return  # print version number only and exit
+    print(file=sys.stderr)
+    print(f"{APP_NAME} {__version__}", file=sys.stderr)
 
     # get list of files
     try:
@@ -109,7 +110,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             prepend_file = Path(prepend_file)
             if not prepend_file.exists():
                 raise Exception(f"File does not exist:\n{prepend_file}")
-            print("Prepend file:", prepend_file)
+            print("Prepend file:", prepend_file, file=sys.stderr)
 
             prepend_input += file_read_text(prepend_file) + "\n"
     else:
@@ -125,9 +126,11 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
         _output_dir = file.parent if not output_dir else output_dir
         _output_name = file.stem if not output_name else output_name
 
-        print("Input file:  ", file)
+        print("Input file:  ", file, file=sys.stderr)
         print(
-            "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
+            "Output file: ",
+            f"{Path(_output_dir / _output_name)}.{output_formats_str}",
+            file=sys.stderr,
         )
 
         yaml_input = file_read_text(file)
@@ -146,7 +149,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             image_paths=list(image_paths),
         )
 
-    print()
+    print(file=sys.stderr)
 
 
 if __name__ == "__main__":
