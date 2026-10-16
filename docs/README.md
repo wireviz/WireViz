@@ -142,6 +142,15 @@ Wildcards in the file path are also supported to process multiple files at once,
 $ wireviz ~/path/to/files/*.yml
 ```
 
+Use `-` as input file to read from stdin. In that case, the output is written to stdout:
+
+```
+$ cat mywire.yml | wireviz -f s -
+```
+
+Use `-o -` to write to stdout when reading from a file.
+Only one output format (SVG or PNG) can be written to stdout.
+
 To see how to specify the output formats, as well as additional options, run:
 
 ```
