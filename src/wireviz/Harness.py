@@ -86,9 +86,13 @@ class Harness:
         self.cables[name] = Cable(name, *args, **kwargs)
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
-        # Pins may be given by label, as in cable connections (upstream #510).
-        from_pin = self._resolve_pin(from_name, from_pin)
-        to_pin = self._resolve_pin(to_name, to_pin)
+        # Pins may be given by label, as in cable connections (#510).
+        # create_graph() ignores the pin of a simple connector in a mate,
+        # so it is not resolved or checked here either.
+        if self.connectors[from_name].style != "simple":
+            from_pin = self._resolve_pin(from_name, from_pin)
+        if self.connectors[to_name].style != "simple":
+            to_pin = self._resolve_pin(to_name, to_pin)
         self.mates.append(MatePin(from_name, from_pin, to_name, to_pin, arrow_type))
         self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
         self.connectors[to_name].activate_pin(to_pin, Side.LEFT)
