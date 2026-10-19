@@ -86,9 +86,32 @@ class Harness:
         self.cables[name] = Cable(name, *args, **kwargs)
 
     def add_mate_pin(self, from_name, from_pin, to_name, to_pin, arrow_type) -> None:
+        # Pins may be given by label, as in cable connections (upstream #510).
+        from_pin = self._resolve_pin(from_name, from_pin)
+        to_pin = self._resolve_pin(to_name, to_pin)
         self.mates.append(MatePin(from_name, from_pin, to_name, to_pin, arrow_type))
         self.connectors[from_name].activate_pin(from_pin, Side.RIGHT)
         self.connectors[to_name].activate_pin(to_pin, Side.LEFT)
+
+    def _resolve_pin(self, name: str, pin):
+        """Return the pin number for ``pin`` on connector ``name``, where
+        ``pin`` is a pin number or a pin label."""
+        connector = self.connectors[name]
+        # check if provided name is ambiguous
+        if pin in connector.pins and pin in connector.pinlabels:
+            if connector.pins.index(pin) != connector.pinlabels.index(pin):
+                raise Exception(
+                    f"{name}:{pin} is defined both in pinlabels and pins, for different pins."
+                )
+            # TODO: Maybe issue a warning if present in both lists but referencing the same pin?
+        if pin in connector.pinlabels:
+            if connector.pinlabels.count(pin) > 1:
+                raise Exception(f"{name}:{pin} is defined more than once.")
+            index = connector.pinlabels.index(pin)
+            pin = connector.pins[index]  # map pin name to pin number
+        if not pin in connector.pins:
+            raise Exception(f"{name}:{pin} not found.")
+        return pin
 
     def add_mate_component(self, from_name, to_name, arrow_type) -> None:
         self.mates.append(MateComponent(from_name, to_name, arrow_type))
@@ -106,27 +129,10 @@ class Harness:
         to_pin: (int, str),
     ) -> None:
         # check from and to connectors
-        for name, pin in zip([from_name, to_name], [from_pin, to_pin]):
-            if name is not None and name in self.connectors:
-                connector = self.connectors[name]
-                # check if provided name is ambiguous
-                if pin in connector.pins and pin in connector.pinlabels:
-                    if connector.pins.index(pin) != connector.pinlabels.index(pin):
-                        raise Exception(
-                            f"{name}:{pin} is defined both in pinlabels and pins, for different pins."
-                        )
-                    # TODO: Maybe issue a warning if present in both lists but referencing the same pin?
-                if pin in connector.pinlabels:
-                    if connector.pinlabels.count(pin) > 1:
-                        raise Exception(f"{name}:{pin} is defined more than once.")
-                    index = connector.pinlabels.index(pin)
-                    pin = connector.pins[index]  # map pin name to pin number
-                    if name == from_name:
-                        from_pin = pin
-                    if name == to_name:
-                        to_pin = pin
-                if not pin in connector.pins:
-                    raise Exception(f"{name}:{pin} not found.")
+        if from_name is not None and from_name in self.connectors:
+            from_pin = self._resolve_pin(from_name, from_pin)
+        if to_name is not None and to_name in self.connectors:
+            to_pin = self._resolve_pin(to_name, to_pin)
 
         # check via cable
         if via_name in self.cables:
