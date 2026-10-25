@@ -1,0 +1,55 @@
+---
+# Three-connector return-loop example.
+#
+# NOTE: despite the filename, this example does NOT use the connector
+# `loops:` feature. Cross-connector return paths are properly modelled
+# as ordinary cables. See examples/loopback_bug.yml for the intra-
+# connector `loops:` feature.
+#
+# Signal travels A -> B -> C on one path, then a separate wire runs back
+# C -> A to close the loop. Three wires in total, forming a triangle
+# across three different connectors.
+#
+#      W_AB            W_BC
+#   A ------> B ----------> C
+#   ^                       |
+#   |         W_CA          |
+#   +-----------------------+
+
+connectors:
+  A:
+    type: 2-pin terminal
+    pinlabels: [OUT, RTN]
+  B:
+    type: 2-pin pass-through
+    pinlabels: [IN, OUT]
+  C:
+    type: 2-pin endpoint
+    pinlabels: [IN, RTN]
+
+cables:
+  W_AB:
+    wirecount: 1
+    length: 0.2
+    colors: [RD]
+  W_BC:
+    wirecount: 1
+    length: 0.2
+    colors: [RD]
+  W_CA:
+    wirecount: 1
+    length: 0.5
+    colors: [BK]
+
+connections:
+  # Forward path: A -> B -> C
+  - - A: [OUT]
+    - W_AB: [1]
+    - B: [IN]
+  - - B: [OUT]
+    - W_BC: [1]
+    - C: [IN]
+  # Return path: C -> A
+  - - C: [RTN]
+    - W_CA: [1]
+    - A: [RTN]

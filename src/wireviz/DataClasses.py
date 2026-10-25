@@ -3,7 +3,7 @@
 from dataclasses import InitVar, dataclass, field
 from enum import Enum, auto
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from wireviz.wv_colors import COLOR_CODES, Color, ColorMode, Colors, ColorScheme
 from wireviz.wv_helper import aspect_ratio, int2tuple
@@ -171,6 +171,12 @@ class Connector:
         self.ports_left = False
         self.ports_right = False
         self.visible_pins = {}
+        # Per-pin set of sides on which the pin has been activated by an
+        # actual cable/mate connection. Loop-only activations (side=None)
+        # are NOT recorded here, so loop side resolution can tell the
+        # difference between "pin has a cable on the left" and
+        # "pin is only referenced from a loop".
+        self.pin_sides: Dict[Pin, Set[Side]] = {}
 
         if self.style == "simple":
             if self.pincount and self.pincount > 1:
@@ -224,8 +230,58 @@ class Connector:
         self.visible_pins[pin] = True
         if side == Side.LEFT:
             self.ports_left = True
+            self.pin_sides.setdefault(pin, set()).add(Side.LEFT)
         elif side == Side.RIGHT:
             self.ports_right = True
+            self.pin_sides.setdefault(pin, set()).add(Side.RIGHT)
+
+    def resolve_loops(self) -> List[Tuple["Side", "Side"]]:
+        """Resolve each loop's two endpoint sides, preferring sides already
+        used by the pin's cable connections. Cross-connector loops
+        (pins on opposite sides) are supported and drawn as such.
+
+        As a side effect, pins are activated on their chosen sides so the
+        corresponding port column is rendered. Must be called before the
+        connector's node is emitted to GraphViz.
+
+        Returns a list parallel to ``self.loops`` containing the resolved
+        ``(side_a, side_b)`` for each loop.
+        """
+        resolved: List[Tuple["Side", "Side"]] = []
+        for pin_a, pin_b in self.loops:
+            sides_a = self.pin_sides.get(pin_a, set())
+            sides_b = self.pin_sides.get(pin_b, set())
+            shared = sides_a & sides_b
+            if shared:
+                # Both pins already render on a common side; draw there.
+                side = Side.RIGHT if Side.RIGHT in shared else Side.LEFT
+                side_a = side_b = side
+            elif sides_a and sides_b:
+                # Disjoint: pin_a on one side, pin_b on the other.
+                # Draw a cross-connector loop spanning both sides.
+                side_a = Side.RIGHT if Side.RIGHT in sides_a else Side.LEFT
+                side_b = Side.RIGHT if Side.RIGHT in sides_b else Side.LEFT
+            elif sides_a or sides_b:
+                # Exactly one pin has a cable: match the loop-only pin to it.
+                known = sides_a or sides_b
+                side = Side.RIGHT if Side.RIGHT in known else Side.LEFT
+                side_a = side_b = side
+            else:
+                # Neither pin has a cable connection. There is no data to
+                # drive the choice -- the pick is arbitrary. We use the
+                # only other rendered port column if exactly one exists,
+                # otherwise RIGHT. Note that Harness.create_graph may have
+                # already forced ports_left=True for loop-only connectors,
+                # in which case this evaluates to LEFT.
+                if self.ports_left and not self.ports_right:
+                    side = Side.LEFT
+                else:
+                    side = Side.RIGHT
+                side_a = side_b = side
+            self.activate_pin(pin_a, side_a)
+            self.activate_pin(pin_b, side_b)
+            resolved.append((side_a, side_b))
+        return resolved
 
     def get_qty_multiplier(self, qty_multiplier: Optional[ConnectorMultiplier]) -> int:
         if not qty_multiplier:

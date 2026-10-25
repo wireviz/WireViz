@@ -1,0 +1,57 @@
+---
+# Driving example to reproduce loopback rendering bugs.
+#
+# Cases exercised:
+#   X1 : connector with ONLY loopback wires, no external connections
+#        -> currently raises Exception("No side for loops")
+#   X2 : connector with cables on BOTH sides plus loops on the right pins
+#        -> currently forces all loops onto the LEFT side (geometrically wrong)
+#   X3 : normal case, connector with right-side connections plus loops
+#        -> expected to work today; kept as sanity check
+
+connectors:
+  X1:
+    type: Only loops
+    pincount: 4
+    loops:
+      - [1, 2]
+      - [3, 4]
+  X2:
+    type: Two-sided
+    pincount: 6
+    pinlabels: [A, B, C, D, E, F]
+    loops:
+      - [5, 6]   # loop on the right-hand pins
+  X3:
+    type: Right-side only
+    pincount: 4
+    loops:
+      - [1, 2]
+  X4:
+    type: Peer
+    pincount: 2
+  X5:
+    type: Peer
+    pincount: 2
+
+cables:
+  W1:
+    wirecount: 2
+    length: 0.1
+    color_code: DIN
+  W2:
+    wirecount: 2
+    length: 0.1
+    color_code: DIN
+
+connections:
+  # X2 spans both sides via two cables
+  - - X4: [1-2]
+    - W1: [1-2]
+    - X2: [1-2]
+  - - X2: [3-4]
+    - W2: [1-2]
+    - X5: [1-2]
+  # X3 gets a single-side connection
+  - - X3: [3-4]
+    - W1: [1-2]
