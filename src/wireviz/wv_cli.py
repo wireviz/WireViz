@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
+import platform
 import sys
 from pathlib import Path
 
 import click
+import graphviz
 
 if __name__ == "__main__":
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -67,18 +69,39 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
 @click.option(
     "-V",
     "--version",
-    is_flag=True,
+    count=True,
     default=False,
-    help=f"Output {APP_NAME} version and exit.",
+    help=f"Output {APP_NAME} version and exit. Repeat this option for extra information.",
 )
 def wireviz(file, format, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
     """
     print()
-    print(f"{APP_NAME} {__version__}")
+    print(APP_NAME, __version__)
     if version:
-        return  # print version number only and exit
+        if version > 1:
+            print("Python", sys.version)
+            # TODO: List versions of dependencies
+            print("Graphviz", ".".join(str(v) for v in graphviz.version()))
+            print("Platform:", platform.platform())
+            try:
+                os_release = platform.freedesktop_os_release()
+                distro = tuple(
+                    os_release.get(k)
+                    for k in "PRETTY_NAME NAME VERSION ID VERSION_ID VERSION_CODENAME ID_LIKE".split()
+                )
+                print("Distribution:", distro)
+            except (AttributeError, FileNotFoundError):
+                pass  # Python <3.10 or os-release file not found
+            if platform.system() == "Windows":
+                print("win32_ver:", platform.win32_ver())
+            elif platform.system() == "Darwin":
+                print("mac_ver:", platform.mac_ver())
+            if version > 2:
+                print("Executable Path:", sys.executable)
+                print(platform.uname())
+        return  # print version info only and exit
 
     # get list of files
     try:
