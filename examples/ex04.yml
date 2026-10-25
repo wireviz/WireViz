@@ -1,7 +1,7 @@
 cables:
   W1:
     gauge: 0.25 mm2
-    show_equiv: true
+    gauge_equiv: true
     length: 0.2
     color_code: IEC
     wirecount: 6
