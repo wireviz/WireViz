@@ -15,7 +15,7 @@ def data_URI_base64(file: Union[str, Path], media: str = "image") -> str:
     file = Path(file)
     b64 = base64.b64encode(file.read_bytes()).decode("utf-8")
     uri = f"data:{media}/{get_mime_subtype(file)};base64, {b64}"
-    # print(f"data_URI_base64('{file}', '{media}') -> {len(uri)}-character URI")
+    # print(f"data_URI_base64('{file}', '{media}') -> {len(uri)}-character URI", file=sys.stderr)
     if len(uri) > 65535:
         print(
             "data_URI_base64(): Warning: Browsers might have different URI length limitations",
