@@ -352,7 +352,7 @@ class Harness:
                 colorstr = wv_colors.translate_color(
                     connection_color, self.options.color_mode
                 )
-                if colorstr:
+                if colorstr and cable.show_colorname:
                     wireinfo.append(colorstr)
                 if cable.wirelabels:
                     wireinfo.append(wirelabel if wirelabel is not None else "")
