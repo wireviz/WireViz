@@ -144,6 +144,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             output_dir=_output_dir,
             output_name=_output_name,
             image_paths=list(image_paths),
+            source_path=file
         )
 
     print()
