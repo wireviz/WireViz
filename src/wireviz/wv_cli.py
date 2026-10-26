@@ -23,6 +23,9 @@ format_codes = {
     "t": "tsv",
 }
 
+# output formats that can be written to stdout
+stdout_formats = ("png", "svg")
+
 epilog = "The -f or --format option accepts a string containing one or more of the "
 epilog += "following characters to specify which file types to output:\n"
 epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.items()])
@@ -74,11 +77,15 @@ epilog += ", ".join([f"{key} ({value.upper()})" for key, value in format_codes.i
 def wireviz(file, format, prepend, output_dir, output_name, version):
     """
     Parses the provided FILE and generates the specified outputs.
+
+    Use - as FILE to read from stdin, and -o - to write to stdout.
+    When reading from stdin, output is written to stdout unless -o is specified.
     """
-    print()
-    print(f"{APP_NAME} {__version__}")
     if version:
+        print(f"{APP_NAME} {__version__}")
         return  # print version number only and exit
+    print(file=sys.stderr)
+    print(f"{APP_NAME} {__version__}", file=sys.stderr)
 
     # get list of files
     try:
@@ -109,7 +116,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             prepend_file = Path(prepend_file)
             if not prepend_file.exists():
                 raise Exception(f"File does not exist:\n{prepend_file}")
-            print("Prepend file:", prepend_file)
+            print("Prepend file:", prepend_file, file=sys.stderr)
 
             prepend_input += file_read_text(prepend_file) + "\n"
     else:
@@ -117,26 +124,58 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
 
     # run WireVIz on each input file
     for file in filepaths:
-        file = Path(file)
-        if not file.exists():
-            raise Exception(f"File does not exist:\n{file}")
+        if file == "-":
+            # read from stdin
+            yaml_input = sys.stdin.read()
+            image_paths = {Path.cwd()}
+            write_stdout = output_dir is None or str(output_dir) == "-"
+        else:
+            file = Path(file)
+            if not file.exists():
+                raise Exception(f"File does not exist:\n{file}")
+            yaml_input = file_read_text(file)
+            image_paths = {file.parent}
+            write_stdout = output_dir is not None and str(output_dir) == "-"
 
-        # file_out = file.with_suffix("") if not output_file else output_file
-        _output_dir = file.parent if not output_dir else output_dir
-        _output_name = file.stem if not output_name else output_name
-
-        print("Input file:  ", file)
-        print(
-            "Output file: ", f"{Path(_output_dir / _output_name)}.{output_formats_str}"
-        )
-
-        yaml_input = file_read_text(file)
-        file_dir = file.parent
+        print("Input file:  ", file, file=sys.stderr)
 
         yaml_input = prepend_input + yaml_input
-        image_paths = {file_dir}
         for p in prepend:
             image_paths.add(Path(p).parent)
+
+        if write_stdout:
+            if len(output_formats) > 1 or output_formats[0] not in stdout_formats:
+                raise Exception(
+                    f"Only one of the following output formats can be written to stdout: {', '.join(stdout_formats)}"
+                )
+            print("Output file:  <stdout>", file=sys.stderr)
+            output = wv.parse(
+                yaml_input,
+                return_types=output_formats[0],
+                image_paths=list(image_paths),
+            )
+            if isinstance(output, (bytes, bytearray)):
+                sys.stdout.buffer.write(output)
+            else:
+                sys.stdout.write(output)
+            sys.stdout.flush()
+            continue
+
+        if file == "-":
+            if not output_name:
+                raise Exception("Output name (-O) is required to write files when reading from stdin")
+            _output_dir = output_dir
+            _output_name = output_name
+        else:
+            # file_out = file.with_suffix("") if not output_file else output_file
+            _output_dir = file.parent if not output_dir else output_dir
+            _output_name = file.stem if not output_name else output_name
+
+        print(
+            "Output file: ",
+            f"{Path(_output_dir / _output_name)}.{output_formats_str}",
+            file=sys.stderr,
+        )
 
         wv.parse(
             yaml_input,
@@ -146,7 +185,7 @@ def wireviz(file, format, prepend, output_dir, output_name, version):
             image_paths=list(image_paths),
         )
 
-    print()
+    print(file=sys.stderr)
 
 
 if __name__ == "__main__":

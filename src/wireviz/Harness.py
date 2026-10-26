@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+import sys
 from collections import Counter
 from dataclasses import dataclass
 from itertools import zip_longest
@@ -596,11 +597,13 @@ class Harness:
                                 )
                                 if n_subs < 1:
                                     print(
-                                        f"Harness.create_graph() warning: {attr} not found in {keyword}!"
+                                        f"Harness.create_graph() warning: {attr} not found in {keyword}!",
+                                        file=sys.stderr,
                                     )
                                 elif n_subs > 1:
                                     print(
-                                        f"Harness.create_graph() warning: {attr} removed {n_subs} times in {keyword}!"
+                                        f"Harness.create_graph() warning: {attr} removed {n_subs} times in {keyword}!",
+                                        file=sys.stderr,
                                     )
                                 continue
 
@@ -615,7 +618,8 @@ class Harness:
                                 entry = re.sub(r"\]$", f" {attr}={value}]", entry)
                             elif n_subs > 1:
                                 print(
-                                    f"Harness.create_graph() warning: {attr} overridden {n_subs} times in {keyword}!"
+                                    f"Harness.create_graph() warning: {attr} overridden {n_subs} times in {keyword}!",
+                                    file=sys.stderr,
                                 )
 
                         dot.body[i] = entry
@@ -694,14 +698,14 @@ class Harness:
             file_write_text(f"{filename}.bom.tsv", tuplelist2tsv(bomlist))
         if "csv" in fmt:
             # TODO: implement CSV output (preferrably using CSV library)
-            print("CSV output is not yet supported")
+            print("CSV output is not yet supported", file=sys.stderr)
         # HTML output
         if "html" in fmt:
             generate_html_output(filename, bomlist, self.metadata, self.options)
         # PDF output
         if "pdf" in fmt:
             # TODO: implement PDF output
-            print("PDF output is not yet supported")
+            print("PDF output is not yet supported", file=sys.stderr)
         # delete SVG if not needed
         if "html" in fmt and not "svg" in fmt:
             # SVG file was just needed to generate HTML

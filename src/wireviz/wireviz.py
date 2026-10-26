@@ -371,9 +371,10 @@ def parse(
     forgotten_components = [c for c in proposed_components if not c in used_components]
     if len(forgotten_components) > 0:
         print(
-            "Warning: The following components are not referenced in any connection set:"
+            "Warning: The following components are not referenced in any connection set:",
+            file=sys.stderr,
         )
-        print(", ".join(forgotten_components))
+        print(", ".join(forgotten_components), file=sys.stderr)
 
     # harness population completed =============================================
 
@@ -421,7 +422,8 @@ def _get_yaml_data_and_path(inp: Union[str, Path, Dict]) -> (Dict, Path):
 
             if type(e) is OSError and e.errno not in (EINVAL, ENAMETOOLONG, None):
                 print(
-                    f"OSError(errno={e.errno}) in Python {sys.version} at {platform.platform()}"
+                    f"OSError(errno={e.errno}) in Python {sys.version} at {platform.platform()}",
+                    file=sys.stderr,
                 )
                 raise e
             # file does not exist; assume inp is a YAML string
@@ -458,7 +460,7 @@ def _get_output_name(input_file: Path, default_output_name: Path) -> str:
 
 
 def main():
-    print("When running from the command line, please use wv_cli.py instead.")
+    print("When running from the command line, please use wv_cli.py instead.", file=sys.stderr)
 
 
 if __name__ == "__main__":
