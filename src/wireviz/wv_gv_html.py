@@ -109,3 +109,10 @@ def html_size_attr(image):
 
 def html_line_breaks(inp):
     return remove_links(inp).replace("\n", "<br />") if isinstance(inp, str) else inp
+
+
+def html_length(o) -> str:
+    if o: # Can be None
+        return f'{o.length} {o.length_unit}' if o.length > 0 else None
+    else:
+        return '-'
