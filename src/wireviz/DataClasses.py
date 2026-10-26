@@ -72,6 +72,7 @@ class Options:
 
 @dataclass
 class Tweak:
+    placeholder: Optional[PlainText] = None
     override: Optional[Dict[Designator, Dict[str, Optional[str]]]] = None
     append: Union[str, List[str], None] = None
 
@@ -163,10 +164,13 @@ class Connector:
     loops: List[List[Pin]] = field(default_factory=list)
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
+    tweak: Optional[Tweak] = None
 
     def __post_init__(self) -> None:
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
+        if self.tweak is not None:
+            self.tweak = Tweak(**self.tweak)
 
         self.ports_left = False
         self.ports_right = False
@@ -272,10 +276,13 @@ class Cable:
     show_wirenumbers: Optional[bool] = None
     ignore_in_bom: bool = False
     additional_components: List[AdditionalComponent] = field(default_factory=list)
+    tweak: Optional[Tweak] = None
 
     def __post_init__(self) -> None:
         if isinstance(self.image, dict):
             self.image = Image(**self.image)
+        if self.tweak is not None:
+            self.tweak = Tweak(**self.tweak)
 
         if isinstance(self.gauge, str):  # gauge and unit specified
             try:
