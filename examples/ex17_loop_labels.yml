@@ -1,0 +1,23 @@
+# Connector loops using pin labels
+# RS-232 loopback adapter: RTS-CTS and DSR-DTR-DCD jumpered,
+# with TX/RX/GND passed through to a cable.
+
+connectors:
+  X1:
+    type: D-Sub
+    subtype: female
+    pinlabels: [DCD, RX, TX, DTR, GND, DSR, RTS, CTS, RI]
+    loops:
+      - [RTS, CTS]      # pin labels instead of numbers
+      - [DSR, DTR]
+      - [4, DCD]         # mixed: pin number + label
+
+cables:
+  W1:
+    wirecount: 3
+    colors: [BK, RD, GN]
+
+connections:
+  -
+    - X1: [RX, TX, GND]  # labels in connections too
+    - W1: [1-3]
